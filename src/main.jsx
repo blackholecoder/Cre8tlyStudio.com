@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import App from "./App.jsx";
 import NotFound from "./components/NotFound.jsx";
 import ThankYou from "./sections/ThankYou.jsx";
+import Bio from "./sections/Bio.jsx";
 import DeleteData from "./components/DeleteData.jsx";
 import Terms from "./documents/Terms.jsx";
 import Privacy from "./documents/Privacy.jsx";
@@ -20,6 +21,7 @@ const RootComponent = () => {
       <Routes>
         <Route path="/support" element={<SupportPage />} />
         <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/drama-bio" element={<Bio />} />
         <Route path="/" element={<App />} />
         <Route path="/features" element={<App />} />
         <Route path="/terms" element={<Terms />} />

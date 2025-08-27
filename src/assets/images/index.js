@@ -1,6 +1,7 @@
 import headerLogo from './dramaMusicLogo.png';
 import banner from './dirt-road-banner.png';
 import comingSoon from './coming-soon.png';
+import dramaImg from './drama_music.jpg';
 import icon from './header_logo.svg';
 import customer1 from './doublejapparel.png';
 import customer2 from '../icons/toby.png';
@@ -45,6 +46,7 @@ export {
   stormyWeather,
   pleaseForgiveMe,
   banner,
-  comingSoon
+  comingSoon,
+  dramaImg
 
 }

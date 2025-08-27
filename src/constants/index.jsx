@@ -1,12 +1,12 @@
 import { verified, purpleTank, greenTumbler, phlokkOffHatGrey, betterOffAlone, stormyWeather, pleaseForgiveMe, banner, comingSoon } from "../assets/images";
 import { facebook, instagram } from "../assets/icons";
 import { FaSpotify, FaApple, FaYoutube, FaFacebook, FaInstagram, FaAt, FaAmazon } from "react-icons/fa";
-import { CheckOutlined } from "@mui/icons-material";
 
 const className =
   "w-[75%] flex justify-center items-center rounded-full shadow-lg  shadow-grey-400 text-phlokkGreen border-2 border-phlokkGreen m-2 px-32 p-4 cursor-pointer hover:scale-110 ease-in duration-200";
 
 export const navLinks = [
+  { href: "/drama-bio", label: "Bio", class: className },
   { href: "#features", label: "Music", class: className },
   { href: "#reviews", label: "Reviews", class: className },
   { href: "#social", label: "Socials", class: className },

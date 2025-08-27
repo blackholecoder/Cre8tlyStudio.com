@@ -15,7 +15,7 @@ const textVariants = {
 };
 
 const Subscribe = () => {
-  const url = "https://phlokk-website-api.phlokk.com/api/subscribe/subscriberData";
+  const url = "https://therealdrama.com/api/subscribe/subscriberData";
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -52,7 +52,7 @@ const Subscribe = () => {
       Sign Up for <span className="text-phlokkGreen">Updates</span> & Newsletter
     </h3>
     <p className="mt-3 text-gray-400 text-sm sm:text-base max-w-md mx-auto lg:mx-0">
-      Get early access to announcements, merch drops, and exclusive content.
+      Unlock early access to big news, limited merch drops, and VIP content
     </p>
   </motion.div>
 

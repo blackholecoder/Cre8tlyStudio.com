@@ -14,62 +14,6 @@ const textVariants = {
   },
 };
 
-// const Hero = () => {
-//   return (
-//     <section id="home" className="relative w-full min-h-screen overflow-hidden">
-//       <div
-//         className="absolute inset-0 bg-cover bg-center"
-//         style={{ backgroundImage: `url(${artist.bgHero})` }}
-//         aria-hidden="true"
-//       />
-//       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-//       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 flex flex-col items-center text-center">
-//         <h1 className="mt-1 font-palanquin text-8xl max-sm:text-[72px] max-sm:leading-[82px] font-bold">
-//           <span className="text-white inline-block mt-3">{artist.name}</span>
-//         </h1>
-//         <motion.p
-//           className="font-montserrat text-white-400 text-lg leading-8 mt-6 mb-14 sm:max-w-2xl"
-//           variants={textVariants}
-//           initial="hidden"
-//           animate="visible"
-//         >
-//           {artist.tagline}<br /> New single "{artist.latestSingle.title}" out now.
-//         </motion.p>
-//         <div className="mt-8 w-full max-w-lg flex items-center gap-5">
-//           <img
-//             src={artist.latestSingle.cover}
-//             alt={artist.latestSingle.title}
-//             className="w-24 h-24 rounded-xl object-cover ring-1 ring-white/10"
-//           />
-//           <div className="flex-1 text-left">
-//             <p className="text-sm text-silver">Latest single</p>
-//             <p className="text-2xl font-bold text-white">
-//               {artist.latestSingle.title}
-//             </p>
-//             <div className="mt-3 flex gap-3">
-//               <a
-//                 href={artist.latestSingle.link}
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="px-4 py-2 rounded-xl bg-blue text-white font-montserrat hover:opacity-90 transition"
-//               >
-//                 Listen now
-//               </a>
-//               <a
-//                 href={artist.ctas.youtube}
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="px-4 py-2 rounded-xl border border-white/20 text-white font-montserrat hover:bg-white/10 transition"
-//               >
-//                 Watch on YouTube
-//               </a>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
 const Hero = () => {
   return (
     <section id="home" className="relative w-full min-h-screen overflow-hidden">
@@ -126,7 +70,7 @@ const Hero = () => {
                 rel="noopener noreferrer"
                 className="px-5 py-2 rounded-xl border border-white/20 text-white font-montserrat hover:bg-white/10 transition"
               >
-                Watch on YouTube
+                Buy Single Now
               </a>
             </div>
           </div>

@@ -40,12 +40,12 @@ const App = () => (
       <Reviews />
     </section>
 
-    {/* <section
+    <section
       id="subscribe"
       className="p-5 sm:px-8 sm:py-32 py-16 w-full bg-bioModal"
     >
       <Subscribe />
-    </section> */}
+    </section>
 
     <section
       id="contact"

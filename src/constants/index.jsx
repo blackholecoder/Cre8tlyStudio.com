@@ -225,7 +225,7 @@ export const artist = {
   },
   ctas: {
     listen: "https://open.spotify.com/artist/3KwC4ieT6gVeOeGTpBkEn7?si=7j84UbKYSoOc48ZcjdXcsg",
-    youtube: "https://www.youtube.com/@DramaMusicTV",
+    youtube: "https://buy.stripe.com/5kQeVc8Yp1dnc1L7GrdfG00",
   },
   socials: [
     { name: "instagram", href: "https://instagram.com/itsdramamusic" },

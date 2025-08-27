@@ -1,0 +1,275 @@
+
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Palanquin:wght@100;200;300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Palanquin:wght@100;200;300;400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  
+}
+
+body {
+  background-color: black;
+}
+
+.subscribe-bg {
+  background-color:#FFFFFF;
+}
+
+@layer components {
+  .max-container {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .input {
+    @apply sm:flex-1 max-sm:w-full text-base leading-normal bg-charcoal text-white pl-5 max-sm:p-5 outline-none sm:border-none border max-sm:border-slate-gray max-sm:rounded-full;
+  }
+}
+
+.scroll-watcher {
+  height: 2px;
+  position: fixed;
+  top: 0;
+  z-index:1000;
+  background-color: #1877F2;
+  width: 100%;
+  scale: 0 1;
+  transform-origin: left;
+  animation: scroll-watcher linear;
+  animation-timeline: scroll();
+}
+
+@keyframes scroll-watcher {
+  to { scale: 1 1; }
+}
+
+.scroll-watcher-2 {
+  height: 2px;
+  position: fixed;
+  top: 0;
+  z-index:1000;
+  background: #6C5CE7;
+  width: 100%;
+  scale: 0 1;
+  transform-origin: right;
+  animation: scroll-watcher-2 linear;
+  animation-timeline: scroll();
+}
+
+@keyframes scroll-watcher-2 {
+  to { scale: 1 1; }
+}
+
+/** For mobile devices **/
+@media (max-width: 767px) {}
+
+@media screen and (max-width: 552px) {
+  .subscribe-button {
+    width: 120px; /* Smaller width for small screens */
+    height: 80px; /* Optional: slightly reduce height */
+    font-size: 14px; /* Adjust font size */
+  }
+}
+  
+
+.rmbackground {
+  display: "none";
+}
+
+
+.subscribe-bg {
+  background-color: "transparent"
+}
+
+.bold {
+  font-weight: bold;
+  /* color: #00CEC9; */
+}
+
+.normal {
+  font-weight: normal;
+  /* color: #00CEC9; */
+}
+
+.neomorphism-card {
+  background: #00CEC9; /* Neutral dark gray */
+  border-radius: 12px; /* Soft corners */
+  box-shadow: 
+  8px 8px 16px rgba(0, 0, 0, 0.25),  /* Dark shadow */
+  -4px -4px 8px rgba(255, 255, 255, 0.02); /* Light shadow */
+  padding: 20px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.neomorphism-card:hover {
+  box-shadow: 
+    6px 6px 12px rgba(0, 0, 0, 0.35), /* Slightly darker for depth */
+    -6px -6px 12px rgba(255, 255, 255, 0.25); /* More vibrant glow */
+  transform: translateY(-2px); /* Gentle lift */
+}
+
+/* Start Styles for Sections */
+
+.angled-divider {
+  background: #00CEC9;
+  clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 90%);
+}
+.glass-divider {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  height: 10px;
+  margin: 50px 0;
+  border-radius: 10px;
+}
+
+.glass-divider-shop {
+  background: rgba(255, 255, 255, 0.08); /* softer light */
+  box-shadow: 
+    inset 2px 2px 5px rgba(255, 255, 255, 0.1),   /* highlight edge */
+    inset -2px -2px 5px rgba(0, 0, 0, 0.4);       /* shadow edge */
+  backdrop-filter: blur(10px);
+  height: 10px;
+  margin: 50px 0;
+  border-radius: 10px;
+}
+
+.elevated-divider {
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+  height: 10px;
+  background: #1E1E1E;
+  margin: 50px 0;
+}
+
+.neon-divider {
+  height: 4px;
+  background: linear-gradient(to right, #00CEC9, #FFFFFF);
+  box-shadow: 0 0 10px #00CEC9, 0 0 20px #00CEC9;
+  margin: 40px 0;
+}
+
+.glass {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0);
+  box-shadow: 0 0 20px #670fe7;
+  padding: 20px;
+}
+
+.textShadow {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.brand-image {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease; /* Smooth transition */
+}
+
+.brand-image:hover {
+  filter: grayscale(0%); /* Remove grayscale on hover */
+}
+
+.hero-text {
+  font-family: "Cormorant", serif;
+}
+
+
+@layer utilities {
+  .padding {
+    @apply sm:px-16 px-8 sm:py-24 py-12;
+  }
+
+  .padding-x {
+    @apply sm:px-16 px-16;
+  }
+
+  .padding-y {
+    @apply sm:py-24 py-12;
+  }
+
+  .padding-l {
+    @apply sm:pl-16 pl-8;
+  }
+
+  .padding-r {
+    @apply sm:pr-16 pr-8;
+  }
+
+  .padding-t {
+    @apply sm:pt-24 pt-12;
+  }
+
+  .padding-b {
+    @apply sm:pb-24 pb-12;
+  }
+  .padding-h {
+    @apply sm:px-8 px-8;
+  }
+
+  .info-text {
+    @apply font-montserrat text-white text-lg leading-7 font-bold;
+  }
+  .shop-text {
+    @apply font-montserrat text-white text-lg leading-7;
+  }
+  .verified-text {
+    @apply font-montserrat text-phlokkGreen text-lg leading-7 font-bold;
+  }
+
+  .feedback-text {
+    @apply font-montserrat text-white-400 font-bold text-lg leading-none;
+  }
+
+  .feedback-text2 {
+    @apply font-montserrat text-white-400 text-lg leading-7;
+  }
+
+  .notFound-text {
+    @apply font-montserrat font-bold text-white-400 text-3xl leading-7;
+  }
+
+  .thankYou-text {
+    @apply font-montserrat text-white-400 text-xl leading-7;
+  }
+
+  .icon-text {
+    @apply font-montserrat text-white-400 text-lg leading-7;
+  }
+
+  .merch-text {
+    @apply font-montserrat text-white-400 text-lg leading-7;
+  }
+
+  .review-text {
+    @apply font-montserrat text-white text-lg font-bold leading-7;
+  }
+
+  .price-text {
+    @apply font-montserrat text-white text-lg leading-7 font-bold;
+  }
+
+  .document-p-text {
+    @apply font-montserrat text-white text-lg leading-7;
+  }
+
+  .document-title-text {
+    @apply font-montserrat font-bold text-white text-3xl leading-7;
+  }
+
+  .header-title-text {
+    @apply font-montserrat text-white font-bold text-4xl leading-7;
+  }
+
+
+  .verified-icon {
+    @apply font-montserrat text-white text-xl;
+  }
+
+}

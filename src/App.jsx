@@ -39,7 +39,7 @@ const App = () => (
 
     <section
       id="reviews"
-      className="padding-x sm:py-32 py-16 w-full bg-bioModal"
+      className="padding-x sm:py-32 py-4 w-full bg-bioModal"
     >
       <Reviews />
     </section>

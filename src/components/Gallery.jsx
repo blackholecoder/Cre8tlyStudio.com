@@ -5,6 +5,7 @@ import {
   dramaLeather,
   dramaLegacy,
   dramaNash,
+  dramaImg
 } from "../assets/images";
 
 function ToolbarButton({ children, onClick, title }) {
@@ -132,18 +133,19 @@ function CloseIcon() {
 export default function GalleryPage() {
   const images = useMemo(
     () => [
-      { src: dramaAtl, alt: "Drama in Atlanta" },
+      { src: dramaImg, alt: "Drama head shot" },
       { src: dramaBooth, alt: "Drama in the booth, U47 JR " },
       { src: dramaLeather, alt: "Drama in leather biker jacket" },
       { src: dramaLegacy, alt: "Drama legacy photoshoot" },
       { src: dramaNash, alt: "Drama downtown Broadway Nashville TN 2025" },
+      { src: dramaAtl, alt: "Drama in Atlanta" },
     ],
     []
   );
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <h1 className="text-3xl md:text-4xl font-extrabold">Portfolio</h1>
+    <div className="min-h-screen bg-bioModal text-white">
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <h1 className="text-3xl md:text-4xl font-extrabold">Gallery</h1>
         <ImageGallery images={images} />
       </div>
     </div>

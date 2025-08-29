@@ -57,8 +57,7 @@ const Hero = () => {
             </p>
             <div className="mt-3 flex justify-center sm:justify-start gap-3">
               <a
-                href={artist.latestSingle.link}
-                target="_blank"
+                href="#features"
                 rel="noopener noreferrer"
                 className="px-5 py-2 rounded-xl bg-blue text-white font-montserrat hover:opacity-90 transition"
               >

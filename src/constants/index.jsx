@@ -8,6 +8,7 @@ const className =
 export const navLinks = [
   { href: "/drama-bio", label: "Bio", class: className },
   { href: "#features", label: "Music", class: className },
+  { href: "#gallery", label: "Gallery", class: className },
   { href: "#reviews", label: "Reviews", class: className },
   { href: "#social", label: "Socials", class: className },
   // { href: "#shop", label: "Shop", class: className },

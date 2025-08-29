@@ -71,6 +71,9 @@ function Bio() {
           <p className="mt-4 leading-relaxed text-white/85">
             Music has been at the core of Drama’s life since he was 16. Though record labels came calling, he turned them down to stay true to his morals and values. His mission has always been to bring back real music, music that connects to the soul. His path wasn’t easy: he endured childhood abuse, faced hardship, got caught up in the streets, and spent time incarcerated. Those struggles reshaped him, teaching him what truly matters. Out of that transformation, Drama became a voice for survivors of domestic violence, abused children, and anyone fighting through adversity. With a powerful story and an even more powerful sound, he now uses his art to inspire change, bring hope, and touch lives with every record.
           </p>
+          <p className="mt-4 leading-relaxed text-white/85">
+            In an industry dominated by streaming platforms that exploit artists, Drama takes a stand. He refuses to participate in streaming services, choosing instead to sell his music directly to fans. The only place you can buy his music is from him personally, right here on this website. With a powerful story and an even more powerful sound, he now uses his art to inspire change, bring hope, and touch lives with every record.
+          </p>
 
           {/* Quick facts card */}
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
@@ -78,7 +81,7 @@ function Bio() {
             <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 text-white/80">
               <li>Based in Nashville TN</li>
               <li>Country rap, pop rap, storytelling</li>
-              <li>For fans of Jelly Roll, Struggle Jennings, Jason Aldean, Ryan Upchurch</li>
+              <li>For fans of Post Malone, Kane Brown, Jason Aldean, Ryan Upchurch</li>
               <li>Open to features, sync, and co writing</li>
             </ul>
           </div>

@@ -34,6 +34,7 @@ const FeaturesCard = ({ feature }) => {
       </div>
 
       {/* Bottom Button */}
+      {feature.previewUrl && (
       <div className="mt-6">
         <a
           href={feature.buyLink}
@@ -44,6 +45,7 @@ const FeaturesCard = ({ feature }) => {
           Buy Single
         </a>
       </div>
+      )}
     </div>
   );
 };

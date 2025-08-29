@@ -9,6 +9,7 @@ import {
   // Shop,
 } from "./sections";
 import Nav from "./components/Nav";
+import GalleryPage from "./components/Gallery";
 
 const App = () => (
   <main className="relative">
@@ -24,6 +25,9 @@ const App = () => (
     </section>
     <section id="features" className="bg-bioModal padding">
       <Features />
+    </section>
+    <section id="gallery">
+      <GalleryPage />
     </section>
     {/* <section id="merch" className="bg-bioModal padding">
       <Merch user={user} setUser={setUser} />

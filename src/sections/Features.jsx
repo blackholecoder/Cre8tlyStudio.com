@@ -1,6 +1,8 @@
 import { features } from "../constants";
 import { FeaturesCard } from "../sections";
 import { motion } from "framer-motion";
+import { FiCreditCard, FiDownload } from "react-icons/fi";
+import { FaFacebookMessenger } from "react-icons/fa";
 
 
 
@@ -41,6 +43,20 @@ const AppFeatures = () => {
         <h2 className='text-3xl font-montserrat font-normal'>
           <span className='text-white-400 font-bold'> Album: </span> <span className='text-white'> The Broken ( 11 songs ) </span>
         </h2>
+        <div className="space-y-3">
+<p className="text-xs text-white/70">
+  Instant download after checkout, MP3 included. No account needed. Pay with card Apple Pay or Google Pay.{" "}
+  <a
+    href="https://m.me/dramamusicofficial"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-1.5 align-middle leading-none underline decoration-white/30 underline-offset-2 hover:opacity-90"
+  >
+    <FaFacebookMessenger className="h-3.5 w-3.5 text-[#0084FF] translate-y-[-1px]" />
+    <span className="relative top-[-1px]">message me on Messenger</span>
+  </a>
+</p>
+</div>
         
       </motion.div>
 

@@ -1,5 +1,6 @@
 import CustomIcon from "./CustomIcon";
 import { PreviewPlayer } from "./Player";
+import { VscWorkspaceTrusted } from "react-icons/vsc";
 
 const FeaturesCard = ({ feature }) => {
   return (
@@ -37,13 +38,17 @@ const FeaturesCard = ({ feature }) => {
       {feature.previewUrl && (
       <div className="mt-6">
         <a
-          href={feature.buyLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block px-4 py-2 rounded-xl bg-green text-white font-montserrat font-semibold text-center hover:opacity-90 transition"
-        >
-          Buy Single
-        </a>
+    href={feature.buyLink}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="block w-full rounded-xl bg-green text-white font-montserrat font-semibold hover:opacity-90 transition"
+    aria-label="Buy the single, instant download"
+  >
+    <span className="flex items-center justify-center gap-2 px-4 py-2">
+        <VscWorkspaceTrusted className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <span>Buy Single</span>
+    </span>
+  </a>
       </div>
       )}
     </div>

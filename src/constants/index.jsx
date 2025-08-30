@@ -15,16 +15,6 @@ export const navLinks = [
   { href: "#contact", label: "Contact", class: className },
 ];
 
-export const footerLinks = [
-  {
-    title: "Menu",
-    links: [
-      { name: "Music", link: "#features" },
-      { name: "Reviews", link: "#reviews" },
-    ],
-  },
-];
-
 export const footerLinks2 = [
   
   {
@@ -49,16 +39,6 @@ export const footerLinks2 = [
     ],
   },
 ];
-
-export const footerLinks3 = [
-  {
-    title: "Contact",
-    links: [
-      { name: "Message Us", link: "https://m.me/phlokk" },
-    ]
-  },
-];
-
 
 // add this to stripe payment links for after Check out
 // https://therealdrama.com/thank-you?session_id={CHECKOUT_SESSION_ID}

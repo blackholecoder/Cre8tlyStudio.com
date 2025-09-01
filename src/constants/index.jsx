@@ -1,6 +1,6 @@
 import { betterOffAlone, stormyWeather, pleaseForgiveMe, banner, comingSoon, wildHorses } from "../assets/images";
 import { facebook, instagram } from "../assets/icons";
-import { FaYoutube, FaFacebook, FaInstagram, FaAt } from "react-icons/fa";
+import { FaYoutube, FaFacebook, FaInstagram, FaAt, FaPatreon } from "react-icons/fa";
 
 const className =
   "w-[75%] flex justify-center items-center rounded-full shadow-lg  shadow-grey-400 text-phlokkGreen border-2 border-phlokkGreen m-2 px-32 p-4 cursor-pointer hover:scale-110 ease-in duration-200";
@@ -165,10 +165,12 @@ export const artist = {
   ctas: {
     listen: "https://open.spotify.com/artist/3KwC4ieT6gVeOeGTpBkEn7?si=7j84UbKYSoOc48ZcjdXcsg",
     youtube: "https://buy.stripe.com/5kQeVc8Yp1dnc1L7GrdfG00",
+    patreon: "https://www.patreon.com/dramamusic",
   },
   socials: [
     { name: "instagram", href: "https://instagram.com/itsdramamusic" },
     { name: "facebook", href: "https://facebook.com/dramamusicofficial" },
+    { name: "patreon", href: "https://www.patreon.com/dramamusic" },
   ],
 };
 
@@ -177,4 +179,5 @@ export const links = [
     { href: "https://facebook.com/dramamusicofficial", icon: <FaFacebook className="w-6 h-6" />, label: "Facebook", color: "#1877F2"  },
     { href: "https://instagram.com/itsdramamusic", icon: <FaInstagram className="w-6 h-6" />, label: "Instagram", color: "#E1306C" },
     { href: "https://www.threads.net/@itsdramamusic", icon: <FaAt className="w-6 h-6" />, label: "Threads", color: "#FFD700" },
+    { href: "https://www.patreon.com/DramaMusic", icon: <FaPatreon className="w-6 h-6" />, label: "Patreon", color: "#ffffff" },
   ];

@@ -6,51 +6,45 @@ const Refund = () => {
         <br />
 
         <p className="document-p-text">
-          At Drama Music, we strive to deliver the highest quality music and
-          digital products. Because of the nature of digital downloads and
-          instant delivery, our refund policy is limited. Please read the
-          details below carefully before making your purchase.
+          At Cre8tly Studio, all purchases of subscriptions, credits, and lead
+          magnet slots are final. Because our Services involve the instant
+          creation and delivery of digital content, <strong>no refunds will be
+          issued under any circumstances.</strong>
         </p>
         <br />
 
-        <h1 className="document-title-text">Eligibility for Refunds</h1>
+        <h1 className="document-title-text">All Sales Are Final</h1>
         <br />
         <p className="document-p-text">
-          Refund requests may be granted under the following circumstances:
+          By completing a purchase, you acknowledge and agree that:
           <br /><br />
-          • The customer&apos;s account is in good standing <br />
-          • The product has not been downloaded, installed, or activated <br />
-          • The product is found to be defective, corrupted, or does not work as described <br />
-          • The product is incompatible due to an error on our side <br />
+          • You are purchasing access to digital services and instantly usable
+          content.<br />
+          • We do not provide refunds or exchanges for unused slots, cancelled
+          accounts, or change of mind.<br />
+          • Errors caused by incorrect prompt entry, theme selection, or user
+          setup are not eligible for refunds.<br />
         </p>
         <br />
 
+        <h1 className="document-title-text">Service Quality</h1>
+        <br />
         <p className="document-p-text">
-          If a product has already been downloaded or accessed, we generally
-          cannot issue a refund. However, we will always review cases where the
-          product is defective or unusable. Please note that error messages
-          related to incorrect setup, software conflicts, or device
-          configuration do not necessarily mean the product is defective.
+          While no refunds are available, if you experience a technical problem
+          with your order (such as the PDF not generating correctly), please
+          contact us. Our team will investigate and, where appropriate, provide
+          a replacement or re-issue the digital content you purchased.
         </p>
         <br />
 
-        <h1 className="document-title-text">Refund Period</h1>
+        <h1 className="document-title-text">Contact Us</h1>
         <br />
         <p className="document-p-text">
-          Refund requests must be submitted within <strong>7 calendar days</strong> 
-          from the date of purchase. After this period, all sales are considered
-          final.
+          For questions or technical support regarding your order, you can reach
+          us at:
         </p>
         <br />
-
-        <h1 className="document-title-text">Contacting Us</h1>
-        <br />
-        <p className="document-p-text">
-          If you have any questions or would like to request a refund, please
-          contact us at:
-        </p>
-        <br />
-        <p className="document-p-text">support@dramamusic.com</p>
+        <p className="document-p-text">support@cre8tlystudio.com</p>
         <br />
 
         <p className="document-p-text">

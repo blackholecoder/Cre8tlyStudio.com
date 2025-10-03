@@ -26,11 +26,23 @@ const Nav = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+  if (isOpen) {
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed"; // prevents iOS bounce scroll
+    document.body.style.width = "100%";
+  } else {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  }
+}, [isOpen]);
+
   const filteredNavLinks = navLinks.filter((link) => {
-    // If you're on the "/videos" page, filter out the "Contact" link
-    if (location.pathname === "/videos" && link.label === "Contact") {
-      return false;
-    }
+    // Hide "Pricing" on /signup
+  if (link.label === "Pricing" && location.pathname !== "/") {
+    return false;
+  }
     return true;
   });
 

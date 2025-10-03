@@ -52,7 +52,11 @@ export default function LoginPage() {
         >
           Log In
         </button>
+        <p className="text-center text-sm text-silver mt-3">
+          🔒 Secure Login
+        </p>
       </form>
+      
     </div>
   );
 }

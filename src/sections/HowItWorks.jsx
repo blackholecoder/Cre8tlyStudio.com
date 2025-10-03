@@ -3,21 +3,23 @@ import { motion } from "framer-motion";
 
 const steps = [
   {
-    icon: <Edit3 className="w-10 h-10 text-whote" />,
+    icon: <Edit3 className="w-10 h-10 text-white" />,
     title: "1. Add Your Prompt",
-    desc: "Describe your audience or offer in one line.",
+    desc: "Describe your audience, product, or idea in one line, our AI is built to expand it into full content.",
   },
   {
     icon: <FileOutput className="w-10 h-10 text-white" />,
-    title: "2. We Generate PDF",
-    desc: "Our AI creates a polished lead magnet instantly.",
+    title: "2. AI Creates Your Lead Magnet",
+    desc: "We generate up to 25 full A4 pages with examples, insights, and structure, styled with professional themes.",
   },
   {
     icon: <ArrowDownCircle className="w-10 h-10 text-green" />,
-    title: "3. Download & Sell",
-    desc: "Get your file and start capturing leads today.",
+    title: "3. Download & Launch",
+    desc: "Receive a polished PDF ready to use instantly, perfect for selling, sharing, or capturing new leads.",
   },
 ];
+
+
 
 const container = {
   hidden: { opacity: 0 },

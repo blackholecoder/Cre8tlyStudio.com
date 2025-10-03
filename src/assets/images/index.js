@@ -1,4 +1,4 @@
-import headerLogo from './GreenArrowLogo.svg';
+import headerLogo from './Robot-AI.svg';
 import banner from './ai-hero.jpg';
 
 

@@ -11,6 +11,7 @@ export default function CustomerDashboard() {
   const [activeMagnet, setActiveMagnet] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingMagnets, setLoadingMagnets] = useState(true);
+
   const location = useLocation();
 
   const ITEMS_PER_PAGE = 10;
@@ -45,10 +46,12 @@ export default function CustomerDashboard() {
     }
   }, [location]);
 
-  function handlePromptSubmitted(magnetId, promptText) {
+  function handlePromptSubmitted(magnetId, promptText, theme) {
     setMagnets((prev) =>
       prev.map((m) =>
-        m.id === magnetId ? { ...m, prompt: promptText, status: "pending" } : m
+        m.id === magnetId
+          ? { ...m, prompt: promptText, status: "pending", theme }
+          : m
       )
     );
   }
@@ -73,9 +76,8 @@ export default function CustomerDashboard() {
   useEffect(() => {
     if (!accessToken) return;
 
-    const hasPending = magnets.some(
-      (m) => m.status !== "completed" && m.status !== "failed"
-    );
+    if (magnets.length === 0) return; // 👈 nothing to poll for
+    const hasPending = magnets.some((m) => m.status === "pending");
     if (!hasPending) return;
 
     const interval = setInterval(() => {
@@ -87,8 +89,8 @@ export default function CustomerDashboard() {
   }, [magnets, accessToken]);
 
   const sortedMagnets = [...magnets].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-  );
+  (a, b) => (a.slot_number || 0) - (b.slot_number || 0)
+);
   const totalPages = Math.ceil(sortedMagnets.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedMagnets = sortedMagnets.slice(
@@ -99,6 +101,20 @@ export default function CustomerDashboard() {
   return (
     <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <h1 className="text-2xl font-bold text-white mb-6">My Lead Magnets</h1>
+      <p className="text-silver mb-6">
+        You currently have {magnets.filter((m) => !m.prompt).length} of{" "}
+        {magnets.length} slots available.
+      </p>
+      {magnets.filter((m) => !m.prompt).length === 0 && (
+  <div className="mb-6">
+    <button
+      onClick={handleCheckout}
+      className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold hover:opacity-90 transition shadow-lg"
+    >
+      Purchase 5 More Slots
+    </button>
+  </div>
+)}
 
       {loadingMagnets ? (
         <div className="flex flex-col items-center justify-center text-center min-h-[60vh]">
@@ -124,6 +140,7 @@ export default function CustomerDashboard() {
             <table className="min-w-full border border-gray-700 text-white">
               <thead className="bg-gray-800">
                 <tr>
+                  <th className="px-4 py-2 text-left">Slot</th>
                   <th className="px-4 py-2 text-left">Created</th>
                   <th className="px-4 py-2 text-left">Status</th>
                   <th className="px-4 py-2 text-left">Prompt</th>
@@ -131,8 +148,14 @@ export default function CustomerDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedMagnets.map((m) => (
+                {paginatedMagnets.map((m, i) => (
                   <tr key={m.id} className="border-t border-gray-700">
+                    {/* Slot number */}
+                    <td className="px-4 py-2">
+                      Slot #{m.slot_number}
+                    </td>
+
+                    {/* Created */}
                     <td className="px-4 py-2">
                       {new Date(m.created_at).toLocaleDateString()}{" "}
                       {new Date(m.created_at).toLocaleTimeString([], {
@@ -140,25 +163,8 @@ export default function CustomerDashboard() {
                         minute: "2-digit",
                       })}
                     </td>
-                    {/* <td className="px-4 py-2">
-                      {m.status === "completed" ? (
-                        <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
-                          Completed
-                        </span>
-                      ) : m.status === "failed" ? (
-                        <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                          Failed
-                        </span>
-                      ) : m.prompt ? (
-                        <span className="text-yellow italic">
-                          ⏳ Generating PDF...
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 italic">
-                          Awaiting prompt…
-                        </span>
-                      )}
-                    </td> */}
+
+                    {/* Status */}
                     <td className="px-4 py-2">
                       {m.status === "completed" ? (
                         <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
@@ -199,9 +205,12 @@ export default function CustomerDashboard() {
                       )}
                     </td>
 
+                    {/* Prompt */}
                     <td className="px-4 py-2">
                       {m.prompt ? "Submitted" : "Awaiting prompt…"}
                     </td>
+
+                    {/* Actions */}
                     <td className="px-4 py-2 flex gap-2">
                       {!m.prompt && (
                         <button
@@ -242,11 +251,16 @@ export default function CustomerDashboard() {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
-            {paginatedMagnets.map((m) => (
+            {paginatedMagnets.map((m, i) => (
               <div
                 key={m.id}
                 className="bg-neo p-4 rounded-xl shadow border border-gray-700"
               >
+                {/* Slot number at the top */}
+                <p className="text-sm text-white font-semibold mb-2">
+                  Slot #{m.slot_number || startIndex + i + 1}
+                </p>
+
                 <p className="text-sm text-silver">
                   <span className="font-semibold">Created:</span>{" "}
                   {new Date(m.created_at).toLocaleDateString()}{" "}
@@ -255,7 +269,8 @@ export default function CustomerDashboard() {
                     minute: "2-digit",
                   })}
                 </p>
-                {/* <p className="text-sm text-silver mt-1">
+
+                <p className="text-sm text-silver mt-1">
                   <span className="font-semibold">Status:</span>{" "}
                   {m.status === "completed" ? (
                     <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
@@ -265,55 +280,36 @@ export default function CustomerDashboard() {
                     <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                       Failed
                     </span>
-                  ) : m.prompt ? (
-                    <span className="text-yellow italic">
-                      ⏳ Generating PDF...
+                  ) : m.status === "pending" ? (
+                    <span className="flex items-center gap-2 text-yellow-400 italic">
+                      <svg
+                        className="animate-spin h-4 w-4 text-yellow"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                      </svg>
+                      Generating your PDF…
                     </span>
                   ) : (
                     <span className="text-gray-400 italic">
                       Awaiting prompt…
                     </span>
                   )}
-                </p> */}
-                <p className="text-sm text-silver mt-1">
-  <span className="font-semibold">Status:</span>{" "}
-  {m.status === "completed" ? (
-    <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
-      Completed
-    </span>
-  ) : m.status === "failed" ? (
-    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-      Failed
-    </span>
-  ) : m.status === "pending" ? (
-    <span className="flex items-center gap-2 text-yellow-400 italic">
-      <svg
-        className="animate-spin h-4 w-4 text-yellow"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v8H4z"
-        ></path>
-      </svg>
-      Generating your PDF…
-    </span>
-  ) : (
-    <span className="text-gray-400 italic">Awaiting prompt…</span>
-  )}
-</p>
-
+                </p>
 
                 <p className="text-sm text-silver mt-1">
                   <span className="font-semibold">Prompt:</span>{" "}

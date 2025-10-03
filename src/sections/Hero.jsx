@@ -28,7 +28,12 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 min-h-screen">
-        
+        <img
+          src={brand.brandLogo}
+          alt="Brand Graphic"
+          className="mx-auto mb-4 w-32 sm:w-48"
+        />
+
         <h1 className="font-palanquin !text-[12vw] sm:!text-[8rem] font-bold text-white leading-[0.95] tracking-tight hero-text">
           {brand.name}
         </h1>

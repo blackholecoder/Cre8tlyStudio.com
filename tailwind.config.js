@@ -41,6 +41,7 @@ export default {
         "bioModal": "#0a0a0a",
         "blue": "#0652DD",
         "green": "#7bed9f",
+        "headerGreen": "#5DD801",
         "yellow": "#fed330",
         "downloadGreen": "#009432"
         

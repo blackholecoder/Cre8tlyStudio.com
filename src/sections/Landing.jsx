@@ -2,13 +2,19 @@ import Button from "../components/Button";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
 import PricingSection from "./Pricing";
+import { headerLogo } from "../assets/images";
 
 const Landing = () => {
   return (
     <div className="min-h-screen w-full text-white flex flex-col font-sans">
       {/* HERO */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-32 relative overflow-hidden">
-        <h1 className="text-green text-4xl sm:text-6xl font-extrabold">
+        <img
+    src={headerLogo}
+    alt="Logo"
+    className="w-12 sm:w-16 md:w-18 lg:w-22"
+  />
+        <h1 className="text-headerGreen text-4xl sm:text-6xl font-extrabold">
           Cre8tly Studio
         </h1>
         <motion.h2
@@ -25,7 +31,8 @@ const Landing = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          The fastest lead magnet generation software<br/> on the planet.
+          The fastest way to turn your idea into a
+          <br /> sellable digital product.
         </motion.p>
 
         <motion.div
@@ -35,7 +42,7 @@ const Landing = () => {
           transition={{ delay: 1 }}
         >
           <a href="#pricing">
-          <Button label="Generate My Lead Magnet" fullWidth={false} />
+            <Button label="Generate My Lead Magnet" fullWidth={false} />
           </a>
         </motion.div>
       </section>

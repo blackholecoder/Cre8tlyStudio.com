@@ -6,130 +6,135 @@ const Terms = () => {
         <br />
 
         <p className="document-p-text">
-          These Terms and Conditions (“Agreement”) govern your use of the Drama
-          Music website and any related products or services (collectively,
-          “Services”). This Agreement is legally binding between you (“User”,
-          “you” or “your”) and Drama Music (“Drama Music”, “we”, “us” or
-          “our”). By accessing or using our Services, you acknowledge that you
-          have read, understood, and agree to be bound by this Agreement. If you
-          do not agree, you may not use our Services.
+          These Terms and Conditions (“Agreement”) govern your access to and use
+          of the Cre8tly Studio website, platform, and all related products and
+          services (collectively, “Services”). By creating an account, making a
+          purchase, or otherwise using our Services, you (“User”, “you”, or
+          “your”) agree to be legally bound by this Agreement. If you do not
+          agree, you must discontinue use of our Services immediately.
+        </p>
+        <br />
+
+        <h1 className="document-title-text">Ownership and License</h1>
+        <br />
+        <p className="document-p-text">
+          Cre8tly Studio owns and retains all rights, title, and interest in the
+          Services, including all software, source code, algorithms, designs,
+          trade secrets, and intellectual property. Your purchase provides a
+          limited, non-transferable, non-exclusive license to use the Services
+          for your personal or business needs in accordance with this Agreement.
+          No ownership rights are transferred to you. Any attempt to copy,
+          reverse-engineer, resell, or distribute the software or digital output
+          without written permission is strictly prohibited.
         </p>
         <br />
 
         <h1 className="document-title-text">Accounts and Membership</h1>
         <br />
         <p className="document-p-text">
-          You must be at least 18 years of age to use our Services. By creating
-          an account, you agree to provide accurate information and are
-          responsible for maintaining the security of your account and password.
-          You are fully responsible for all activities that occur under your
-          account. We reserve the right to suspend or terminate accounts that
-          provide false information, violate these terms, or engage in activity
-          that may harm our reputation or other users.
-        </p>
-        <br />
-
-        <h1 className="document-title-text">User Content</h1>
-        <br />
-        <p className="document-p-text">
-          Any content you submit (such as comments, reviews, or uploaded
-          material) remains your responsibility. By submitting content, you
-          grant Drama Music a limited license to use, display, and distribute it
-          as necessary to operate and promote the Services. We reserve the right
-          to remove content that is harmful, unlawful, or violates our policies.
+          You must be at least 18 years old to use our Services. You are
+          responsible for providing accurate account information and maintaining
+          the confidentiality of your login credentials. You are fully
+          responsible for all activity that occurs under your account. We
+          reserve the right to suspend or terminate accounts that provide false
+          information, violate these terms, or attempt to bypass usage limits
+          (including the maximum 25-page PDF limit per slot).
         </p>
         <br />
 
         <h1 className="document-title-text">Purchases and Payments</h1>
         <br />
         <p className="document-p-text">
-          All purchases made through our platform are final once downloaded,
-          except as outlined in our Refund Policy. You agree to provide current,
-          complete, and accurate payment information. We reserve the right to
-          refuse or cancel orders if fraud or unauthorized transactions are
-          suspected. Prices may change at any time, and we are not responsible
-          for pricing errors.
+          All purchases, subscriptions, and credits made through our platform
+          are final, as outlined in our Refund Policy. By making a purchase, you
+          agree to provide valid and accurate payment details. We reserve the
+          right to refuse or cancel any order suspected of fraud or unauthorized
+          use. Pricing is subject to change at our discretion.
         </p>
         <br />
 
-        <h1 className="document-title-text">Digital Products</h1>
+        <h1 className="document-title-text">Digital Products and Slots</h1>
         <br />
         <p className="document-p-text">
-          Music and digital products purchased from Drama Music are licensed for
-          personal use only. Redistribution, reselling, or unauthorized
-          commercial use is strictly prohibited. We are not responsible for
-          compatibility issues arising from unsupported devices or software.
+          Lead magnet slots and generated PDFs are digital products licensed for
+          your own use. You may not resell, redistribute, or use them for
+          automated scraping or mass content generation beyond what is permitted
+          by your plan. Slots cannot be exchanged, refunded, or rolled over once
+          purchased. Misuse of slots, including attempts to exceed system
+          safeguards, may result in account suspension without refund.
         </p>
         <br />
 
         <h1 className="document-title-text">Prohibited Uses</h1>
         <br />
         <p className="document-p-text">
-          You may not use our Services for unlawful purposes, to violate
-          intellectual property rights, to spread malicious software, to harass
-          others, or to interfere with the functionality of the Services. We
-          reserve the right to suspend or terminate access if prohibited uses
-          are detected.
+          You may not use our Services for any unlawful purpose, to attempt
+          unauthorized access to our systems, to exceed usage caps, to infringe
+          on intellectual property rights, or to interfere with the operation of
+          the Services. We reserve the right to suspend or terminate accounts
+          engaged in abuse, fraud, or misuse.
         </p>
         <br />
 
         <h1 className="document-title-text">Intellectual Property</h1>
         <br />
         <p className="document-p-text">
-          All content, logos, graphics, music, and materials provided by Drama
-          Music are the property of Drama Music or our licensors and are
-          protected by copyright and trademark laws. You may not reproduce,
-          distribute, or exploit our intellectual property without written
-          consent.
+          All software, designs, branding, content, and related intellectual
+          property are owned exclusively by Cre8tly Studio or its licensors. You
+          may not reproduce, republish, modify, or exploit any part of the
+          Services without our express written consent.
         </p>
         <br />
 
         <h1 className="document-title-text">Disclaimer of Warranties</h1>
         <br />
         <p className="document-p-text">
-          Our Services are provided “as is” and “as available.” We make no
-          warranties, express or implied, regarding the reliability, accuracy,
-          or availability of our Services. Your use of our Services is at your
-          own risk.
+          The Services are provided “as is” and “as available” without any
+          warranties of any kind, express or implied. We do not guarantee that
+          the Services will be uninterrupted, error-free, or suitable for your
+          specific purpose. You assume full responsibility for your use of the
+          Services.
         </p>
         <br />
 
         <h1 className="document-title-text">Limitation of Liability</h1>
         <br />
         <p className="document-p-text">
-          To the maximum extent permitted by law, Drama Music and its affiliates
-          shall not be liable for any indirect, incidental, or consequential
-          damages, including loss of data, revenue, or profits, arising from
-          your use of our Services.
+          To the fullest extent permitted by law, Cre8tly Studio, its owners,
+          employees, and affiliates shall not be liable for any indirect,
+          incidental, consequential, or punitive damages, including but not
+          limited to loss of profits, business interruption, or data loss,
+          arising out of or related to your use of the Services.
         </p>
         <br />
 
-        <h1 className="document-title-text">Changes to This Agreement</h1>
+        <h1 className="document-title-text">Changes to Terms</h1>
         <br />
         <p className="document-p-text">
-          We may update these Terms and Conditions from time to time. Any
-          changes will be effective immediately upon posting to the website. By
-          continuing to use our Services, you agree to the updated terms.
+          We may revise these Terms at any time by posting an updated version on
+          our website. Continued use of the Services after updates constitutes
+          acceptance of the revised Terms.
         </p>
         <br />
 
         <h1 className="document-title-text">Governing Law</h1>
         <br />
         <p className="document-p-text">
-          This Agreement shall be governed by and construed in accordance with
-          the laws of Tennessee, United States, without regard to conflict of
-          law principles. Any disputes shall be resolved exclusively in the
-          courts located in Tennessee, United States.
+          This Agreement shall be governed by and construed under the laws of
+          Tennessee, United States, without regard to its conflict of law
+          principles. Any disputes shall be resolved exclusively in the courts
+          of Tennessee, United States.
         </p>
         <br />
 
         <h1 className="document-title-text">Contact Us</h1>
         <br />
         <p className="document-p-text">
-          If you have questions about these Terms, please contact us at:
+          For questions regarding these Terms and Conditions, please contact us
+          at:
         </p>
         <br />
-        <p className="document-p-text">legal@dramamusic.com</p>
+        <p className="document-p-text">legal@cre8tlystudio.com</p>
         <br />
         <p className="document-p-text">
           This document was last updated on August 26, 2025.

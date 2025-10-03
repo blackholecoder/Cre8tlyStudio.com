@@ -46,7 +46,7 @@ const PricingSection = () => {
             $47
           </p>
           <p className="text-gray-400 mb-8 lead-text">
-            One-time payment per lead magnet
+            One-time payment for 5 lead magnet slots
           </p>
 
           <button

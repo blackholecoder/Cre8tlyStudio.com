@@ -19,6 +19,8 @@ export default function PromptModal({
 }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState("modern");
+  const [pages, setPages] = useState(5);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,10 +28,10 @@ export default function PromptModal({
     try {
       await axios.post(
         "https://cre8tlystudio.com/api/lead-magnets/prompt",
-        { magnetId, prompt: text },
+        { magnetId, prompt: text, theme, pages },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      onSubmitted(magnetId, text);
+      onSubmitted(magnetId, text, theme);
       setText("");
       onClose();
     } catch (err) {
@@ -66,6 +68,38 @@ export default function PromptModal({
                   placeholder="Write your prompt here..."
                   className="h-[250px] text-black"
                 />
+              </div>
+              <div>
+                <label className="block text-silver mb-2 font-medium">
+                  Number of Pages
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={pages}
+                  onChange={(e) => {
+                    const val = Math.min(
+                      25,
+                      Math.max(1, Number(e.target.value))
+                    );
+                    setPages(val);
+                  }}
+                  className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-silver mb-2 font-medium">
+                  Choose a Theme
+                </label>
+                <select
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+                >
+                  <option value="modern">Modern Minimal</option>
+                  <option value="classic">Classic Elegant</option>
+                  <option value="bold">Bold Creative</option>
+                </select>
               </div>
 
               <button

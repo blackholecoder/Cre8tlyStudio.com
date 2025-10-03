@@ -1,4 +1,4 @@
-import { banner } from "../assets/images";
+import { banner, headerLogo } from "../assets/images";
 import { FaYoutube, FaFacebook, FaInstagram, FaAt, FaPatreon } from "react-icons/fa";
 
 const className =
@@ -186,8 +186,9 @@ export const socialMedia = [
 
 export const brand = {
   name: "Cre8tly Studio",
-  tagline: "The fast lead magnet generation software on the planet",
+  tagline: "The fastest way to turn your idea into a sellable digital product.",
   bgHero: banner, // or a hosted video poster
+  brandLogo: headerLogo, 
   latestSingle: {
     title: "Better Off Alone",
     // cover: betterOffAlone,

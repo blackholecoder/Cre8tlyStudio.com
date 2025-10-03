@@ -1,18 +1,14 @@
-import { betterOffAlone, stormyWeather, pleaseForgiveMe, banner, comingSoon, wildHorses } from "../assets/images";
-import { facebook, instagram } from "../assets/icons";
+import { banner } from "../assets/images";
 import { FaYoutube, FaFacebook, FaInstagram, FaAt, FaPatreon } from "react-icons/fa";
 
 const className =
   "w-[75%] flex justify-center items-center rounded-full shadow-lg  shadow-grey-400 text-phlokkGreen border-2 border-phlokkGreen m-2 px-32 p-4 cursor-pointer hover:scale-110 ease-in duration-200";
 
 export const navLinks = [
-  { href: "/drama-bio", label: "Bio", class: className },
-  { href: "#features", label: "Music", class: className },
-  { href: "#gallery", label: "Gallery", class: className },
-  { href: "#reviews", label: "Reviews", class: className },
-  { href: "#social", label: "Socials", class: className },
-  // { href: "#shop", label: "Shop", class: className },
-  { href: "#contact", label: "Contact", class: className },
+  { href: "/#how", label: "How it works", class: className },
+  { href: "#pricing", label: "Pricing", class: className },
+  { href: "/sign-up", label: "Sign Up", class: className },
+  { href: "/login", label: "Login", class: className },
 ];
 
 export const footerLinks2 = [
@@ -52,7 +48,7 @@ export const features = [
     title:
       "Better Off Alone is a powerful anthem raising awareness for domestic violence, giving strength to survivors and hope to those still fighting. Share the message, spread the light, and stand united.",
     icon: "music",
-    imgURL: betterOffAlone, 
+    // imgURL: betterOffAlone, 
     previewUrl: "https://therealdrama.nyc3.cdn.digitaloceanspaces.com/Music-Downloads/Better%20Off%20Alone%20Short.mp3", 
     priceId: "price_1S08NwA3LinCYcoDs733er6U",
     buyLink: "https://buy.stripe.com/5kQeVc8Yp1dnc1L7GrdfG00"
@@ -67,7 +63,7 @@ export const features = [
     title:
       "Stormy Weather reflects the battles and pain we all endure, yet it shines with the promise of peace. A moving track that uplifts, heals, and inspires us to keep going forward.",
     icon: "music",
-    imgURL: stormyWeather, 
+    // imgURL: stormyWeather, 
     previewUrl: "https://therealdrama.nyc3.cdn.digitaloceanspaces.com/Music-Downloads/Stormy%20Weather%20Short.mp3",
     priceId: "prod_Sw0XtrWJDdcG4y",
     buyLink: "https://buy.stripe.com/14A7sKcaBg8hfdX9OzdfG01"
@@ -82,7 +78,7 @@ export const features = [
     title:
       "Wild Horses is a summer anthem of youth, bonfires, and creekside nights, where laughter was loud, dogs ran free, and every moment felt endless. Wild Horses takes you back to the good days",
     icon: "music",
-    imgURL: wildHorses, 
+    // imgURL: wildHorses, 
     previewUrl: "https://therealdrama.nyc3.cdn.digitaloceanspaces.com/Music-Downloads/Wild%20Horses%20Short.mp3",
     priceId: "price_1S0x5tA3LinCYcoDirTPBHYF",
     buyLink: "https://buy.stripe.com/14A9AS5Mde094zj8KvdfG03"
@@ -96,10 +92,23 @@ export const features = [
     title:
       "This redemption track tells the story of brokenness turned to hope, as a voice seeks forgiveness and healing. An emotional anthem for anyone who’s ever longed for a new beginning.",
     icon: "music",
-    imgURL: pleaseForgiveMe, 
+    // imgURL: pleaseForgiveMe, 
     previewUrl: "https://therealdrama.nyc3.cdn.digitaloceanspaces.com/Music-Downloads/Please%20Forgive%20Me%20Short.mp3",
     priceId: "prod_Sw0YRZwr5dRxsS",
     buyLink: "https://buy.stripe.com/5kQdR8a2t2hr5DnaSDdfG02"
+  },
+  {
+    name: (
+      <>
+        <span className="bold">Coal Mine</span>
+      </>
+    ),
+    title:
+      "Coal Mine is a song about discovering love where you least expect it. Set against the backdrop of darkness and struggle, it tells the story of two hearts colliding in a place where light rarely shines",
+    icon: "music",
+    // imgURL: coalMine, 
+    previewUrl: null,
+    buyLink: ""
   },
   {
     name: (
@@ -110,24 +119,12 @@ export const features = [
     title:
       "Life Goes On tells the story of life’s battles, the work, the storms, the little time we have, yet it’s a song of hope, showing how we press forward and raise our kids strong.",
     icon: "music",
-    imgURL: comingSoon, 
+    // imgURL: lifeGoesOn, 
     previewUrl: null,
     buyLink: ""
   },
 
-  {
-    name: (
-      <>
-        <span className="bold">Love was never enough</span>
-      </>
-    ),
-    title:
-      "Love Was Never Enough tells the story of a woman trapped in a broken relationship, where trust was missing and love faded away. A raw, emotional song about heartbreak and seeing the truth.",
-    icon: "music",
-    imgURL: comingSoon, 
-    previewUrl: null,
-    buyLink: ""
-  },
+  
   {
     name: (
       <>
@@ -137,29 +134,63 @@ export const features = [
     title:
       "Bullseye is a powerful song about losing yourself through years of struggle and searching for a way back. A raw and honest anthem about pain, resilience, and finding light in the darkness.",
     icon: "music",
-    imgURL: comingSoon, 
+    // imgURL: bullseye, 
+    previewUrl: null,
+    buyLink: ""
+  },
+  {
+    name: (
+      <>
+        <span className="bold">Love was never enough</span>
+      </>
+    ),
+    title:
+      "Love Was Never Enough tells the story of a woman trapped in a broken relationship, where trust was missing and love faded away. A raw, emotional song about heartbreak and seeing the truth.",
+    icon: "music",
+    // imgURL: comingSoon, 
+    previewUrl: null,
+    buyLink: ""
+  },
+  {
+    name: (
+      <>
+        <span className="bold">What If I</span>
+      </>
+    ),
+    title:
+      "What If I is an emotional song about rediscovering who you are after the storm has cleared. A heartfelt journey of healing, strength, and the courage it takes to begin again",
+    icon: "music",
+    // imgURL: comingSoon, 
+    previewUrl: null,
+    buyLink: ""
+  },
+  {
+    name: (
+      <>
+        <span className="bold">It ain't easy</span>
+      </>
+    ),
+    title:
+      "It Ain’t Easy is a powerful reflection on how time can deceive us, racing by and blurring what’s true. The song cuts through the noise, opening eyes to the truths we often overlook.",
+    icon: "music",
+    // imgURL: itAintEasy, 
     previewUrl: null,
     buyLink: ""
   },
 ];
 
 export const socialMedia = [
-  { src: facebook, alt: "facebook logo", href: "https://facebook.com/dramamusicofficial" },
-  {
-    src: instagram,
-    alt: "instagram logo",
-    href: "https://instagram.com/itsdramamusic",
-  },
+  
   // { src: patreon, alt: "patreon logo", href: "https://patreon.com/Phlokk" },
 ];
 
-export const artist = {
-  name: "Drama Music",
-  tagline: "Country rap with real stories and unforgettable emotional hooks",
+export const brand = {
+  name: "Cre8tly Studio",
+  tagline: "The fast lead magnet generation software on the planet",
   bgHero: banner, // or a hosted video poster
   latestSingle: {
     title: "Better Off Alone",
-    cover: betterOffAlone,
+    // cover: betterOffAlone,
     link: "https://open.spotify.com/artist/3KwC4ieT6gVeOeGTpBkEn7?si=7j84UbKYSoOc48ZcjdXcsg",
   },
   ctas: {

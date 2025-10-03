@@ -1,7 +1,6 @@
 import { features } from "../constants";
 import { FeaturesCard } from "../sections";
 import { motion } from "framer-motion";
-import { FiCreditCard, FiDownload } from "react-icons/fi";
 import { FaFacebookMessenger } from "react-icons/fa";
 
 

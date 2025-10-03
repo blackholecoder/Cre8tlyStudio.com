@@ -1,5 +1,4 @@
 import CustomIcon from "./CustomIcon";
-import { PreviewPlayer } from "./Player";
 import { VscWorkspaceTrusted } from "react-icons/vsc";
 import { FaPatreon } from "react-icons/fa";
 
@@ -25,14 +24,6 @@ const FeaturesCard = ({ feature, artist }) => {
         <p className="mt-3 text-silver text-base font-montserrat leading-relaxed">
           {feature.title}
         </p>
-        {feature.previewUrl && (
-          <PreviewPlayer
-            src={feature.previewUrl}
-            title={feature.name}
-            start={0}
-            end={30}
-          />
-        )}
       </div>
 
       {/* Bottom Button */}

@@ -40,7 +40,9 @@ export default {
         "mutedGrey": "#333333",
         "bioModal": "#0a0a0a",
         "blue": "#0652DD",
-        "green": "#27ae60"
+        "green": "#7bed9f",
+        "yellow": "#fed330",
+        "downloadGreen": "#009432"
         
 
 

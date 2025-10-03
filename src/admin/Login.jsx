@@ -1,42 +1,58 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../admin/AuthContext.jsx"; // adjust path if needed
 
-import { Link } from "react-router-dom";
-import { icon } from "../assets/images";
-const Login = () => {
+export default function LoginPage() {
+    const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password);
+      navigate("/dashboard"); // ✅ client-side navigation
+    } catch (err) {
+      if (err.response) {
+        alert(err.response.data.message || "Invalid credentials");
+      } else {
+        console.error("Login error:", err.message);
+        alert("Network error, please try again");
+      }
+    }
+  };
+
   return (
-    <section className="flex h-screen items-center bg-gradient-to-r from-black to-silver padding-x">
-      <div className="items-center justify-center flex-1">
-      <div className="flex justify-center items-center text-center">
-        <img
-          src={icon}
-          alt="Founder icon"
-          className="rounded-full object-cover w-[120px] h-[120px]"
-        />
-      </div>
-      <h3 className="font-palanquin padding-x text-center text-xl font-bold text-white">
-        <span className="text-white inline-block mt-3">
-          Founder Portal
-        </span>
-      </h3>
-      <p className="m-auto mt-4 max-w-xl text-center thankYou-text">
-        New Founder Portal coming soon!<br/><br/> Please DM us on Facebook for
-        asssitance.{" "}
-        <a className="text-phlokkGreen" href="https://m.me/phlokk">
-          click here{" "}
-        </a>{" "}
-        to message us for your convenience.
-      </p>
-      <div className="mt-24 flex-1 justify-center items-center text-center text-white max-lg:flex-col gap-14">
-        <h1 className="text-xl">
-          Go back to{" "}
-          <Link to="/">
-            {" "}
-            <span className="text-phlokkGreen">Homepage</span>
-          </Link>
-        </h1>
-      </div>
-      </div>
-    </section>
-  );
-};
+    <div className="bg-gradient-to-b from-dark-gray to-neo min-h-screen flex items-center justify-center">
+      <form onSubmit={handleSubmit} className="bg-charcoal p-6 rounded-xl w-full max-w-sm">
+        <h2 className="text-xl font-bold text-white mb-4">Log In</h2>
 
-export default Login;
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          className="w-full p-3 rounded mb-3 bg-neo text-white border border-mutedGrey"
+          required
+        />
+
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full p-3 rounded mb-3 bg-neo text-white border border-mutedGrey"
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full py-3 rounded bg-gradient-to-r from-green to-royalPurple text-white font-bold hover:opacity-90"
+        >
+          Log In
+        </button>
+      </form>
+    </div>
+  );
+}

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { navLinks } from "../constants";
 import { headerLogo } from "../assets/images";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../admin/AuthContext";
 
 const Nav = () => {
+  const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,17 +61,50 @@ const Nav = () => {
             </a>
           </div>
           {/* Desktop Menu */}
-          <ul className="hidden md:flex space-x-8 list-none">
-            {filteredNavLinks.map((item) => (
-              <li key={item.label}>
-                <a
-                  href={item.href}
-                  className="font-montserrat leading-normal text-md text-white-400"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+          <ul className="hidden md:flex space-x-8 list-none lead-text">
+            {filteredNavLinks.map((item) => {
+              // Hide "Sign Up" if user is logged in
+              if (
+                user &&
+                (item.label === "Sign Up" || item.label === "Pricing")
+              )
+                return null;
+
+              // If logged in, replace "Login" with first name and point to dashboard
+              if (item.label === "Login" && user) {
+                return (
+                  <li
+                    key="user-dashboard"
+                    className="flex items-center space-x-6"
+                  >
+                    <Link
+                      to="/dashboard"
+                      className="font-montserrat leading-normal text-md text-white-400 hover:text-white transition"
+                    >
+                      {user.name?.split(" ")[0] || "User"}
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="font-montserrat leading-normal text-md text-white-400 hover:text-white transition"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                );
+              }
+
+              // Default case
+              return (
+                <li key={item.label} className="flex items-center">
+                  <a
+                    href={item.href}
+                    className="font-montserrat leading-normal text-md text-white-400"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="md:hidden">
@@ -123,18 +158,53 @@ const Nav = () => {
         {(ref) => (
           <div
             ref={ref}
-            className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4"
+            className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4 lead-text"
           >
-            {navLinks.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
+            {navLinks.map((item) => {
+              // Hide "Sign Up" if logged in
+              if (
+                user &&
+                (item.label === "Sign Up" || item.label === "Pricing")
+              )
+                return null;
+
+              // Replace "Login" with first name linking to dashboard
+              if (item.label === "Login" && user) {
+                return (
+                  <Link
+                    key="user-dashboard"
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+                  >
+                    {user.name?.split(" ")[0] || "User"}
+                  </Link>
+                );
+              }
+
+              // Default case
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+            {user && (
+              <button
+                onClick={() => {
+                  logout();
+                  setIsOpen(false);
+                }}
                 className="font-montserrat text-md text-white-400 hover:text-white transition-all"
               >
-                {item.label}
-              </a>
-            ))}
+                Logout
+              </button>
+            )}
           </div>
         )}
       </Transition>

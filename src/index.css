@@ -179,6 +179,9 @@ body {
 .hero-text {
   font-family: "Cormorant", serif;
 }
+.lead-text {
+  font-family: "Montserrat", serif;
+}
 
 
 @layer utilities {

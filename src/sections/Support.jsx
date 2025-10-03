@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from "../assets/images/header_logo.svg"; // adjust path as needed
+
 
 const faqs = [
   {
@@ -48,11 +48,11 @@ const SupportPage = () => {
       <div className="w-full max-w-3xl bg-bioModal p-8 rounded-2xl shadow-lg border border-gray-800 flex flex-col items-center">
 
         {/* Logo */}
-        <img
+        {/* <img
           src={logo}
           alt="Phlokk Logo"
           className="mb-6 w-32 h-auto"
-        />
+        /> */}
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-white mb-6 text-center">

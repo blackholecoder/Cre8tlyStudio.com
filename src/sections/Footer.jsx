@@ -17,6 +17,7 @@ const Footer = () => {
 
           {/* Socials */}
           <div className="flex items-center gap-3">
+             <p>© {new Date().getFullYear()} Cre8tlyStudio</p>
             {socialMedia.map((icon) => (
               <a
                 key={icon.alt}
@@ -33,7 +34,6 @@ const Footer = () => {
 
         {/* Right side: © + Links */}
         <div className="flex flex-col items-center md:items-end gap-2 mt-6 md:mt-0">
-          <p>© {new Date().getFullYear()} Drama Music</p>
           <div className="flex items-center gap-3">
             <a href="/terms" className="hover:text-white transition-colors">Terms</a>
             <span>|</span>

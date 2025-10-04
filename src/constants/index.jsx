@@ -213,3 +213,73 @@ export const links = [
     { href: "https://www.threads.net/@itsdramamusic", icon: <FaAt className="w-6 h-6" />, label: "Threads", color: "#FFD700" },
     { href: "https://www.patreon.com/DramaMusic", icon: <FaPatreon className="w-6 h-6" />, label: "Patreon", color: "#ffffff" },
   ];
+
+  export const cannedPrompts = [
+  {
+    label: "🎯 Social Media Growth Guide",
+    text: "Write a 5-page lead magnet teaching small business owners how to grow their social media following with organic content, engagement, and consistency strategies."
+  },
+  {
+    label: "💰 Email Marketing Mastery",
+    text: "Create a detailed guide on building and nurturing an email list that converts leads into loyal customers with proven automation techniques."
+  },
+  {
+    label: "📈 Personal Branding Blueprint",
+    text: "Write a 5-page blueprint showing entrepreneurs how to define their brand identity, build authority online, and attract ideal clients."
+  },
+  {
+    label: "🎨 Design Secrets for Non-Designers",
+    text: "Generate a lead magnet teaching beginners how to design professional graphics using free tools like Canva, including typography and color tips."
+  },
+  {
+    label: "🎤 Content Creation Starter Pack",
+    text: "Write a detailed guide helping creators build a content calendar, repurpose videos, and plan content for multiple platforms efficiently."
+  },
+  {
+    label: "📚 The Beginner’s Guide to Digital Products",
+    text: "Create a 5-page guide explaining how to turn skills into profitable digital products like eBooks, courses, or templates."
+  },
+  {
+    label: "🧠 Productivity Hacks for Creators",
+    text: "Generate a guide full of time-saving systems, tools, and automation tricks that help creators stay consistent and organized."
+  },
+  {
+    label: "🚀 7 Steps to Launch Your Online Business",
+    text: "Write a step-by-step roadmap for beginners to start an online business, from idea validation to first sale."
+  },
+  {
+    label: "💡 The Ultimate AI Prompt Guide",
+    text: "Create a 5-page lead magnet showing users how to craft better AI prompts for marketing, writing, and design workflows."
+  },
+  {
+    label: "🎵 Monetize Your Music Online",
+    text: "Write a guide showing independent musicians how to sell music, build fanbases, and create recurring revenue from digital content."
+  },
+];
+
+export const themes = [
+  {
+    label: "Modern Minimal",
+    value: "modern",
+    preview: "linear-gradient(135deg, #00E07A 0%, #670fe7 100%)", // matches linkGradient
+    textColor: "#ffffff",
+    bg: "#fefefe",
+  },
+  {
+  label: "Classic Elegant",
+  value: "classic",
+  preview: "linear-gradient(135deg, #000000 0%, #000000 100%)",
+  textColor: "#FFD700", // bright gold text for contrast
+  bg: "#000000",
+},
+  {
+    label: "Bold Creative",
+    value: "bold",
+    preview: "linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)",
+    textColor: "#fff",
+    bg: "#0f0f0f",
+  },
+];
+
+
+

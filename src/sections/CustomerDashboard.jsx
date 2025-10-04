@@ -62,7 +62,7 @@ export default function CustomerDashboard() {
         "https://cre8tlystudio.com/api/checkout",
         {
           userId: user?.id,
-          priceId: "price_1SDdfNAZ83PYnpjWaf6rukfU",
+          priceId: "price_1SEC9lA3LinCYcoDTBYy0xY4",
         },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
@@ -175,7 +175,7 @@ export default function CustomerDashboard() {
                           Failed
                         </span>
                       ) : m.status === "pending" ? (
-                        <span className="flex items-center gap-2 text-yellow-400 italic">
+                        <span className="flex items-center gap-2 text-yellow italic">
                           <svg
                             className="animate-spin h-4 w-4 text-yellow"
                             xmlns="http://www.w3.org/2000/svg"

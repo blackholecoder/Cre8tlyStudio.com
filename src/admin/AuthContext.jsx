@@ -29,8 +29,9 @@ export function AuthProvider({ children, navigate }) {
       saveAuth(data.user, data.accessToken, data.refreshToken);
 
       toast.success("🎉 Login successful!", {
-        className: "bg-green text-white font-bold rounded-lg shadow-md",
-      });
+  className:
+    "bg-transparent !bg-transparent border-2 border-green text-white font-bold rounded-lg shadow-[0_0_15px_rgba(123,237,159,0.6)]",
+});
     } catch (err) {
       toast.error("❌ Login failed. Please check your credentials.", {
         className: "bg-red-600 text-white font-semibold rounded-lg shadow-md",
@@ -74,13 +75,6 @@ export function AuthProvider({ children, navigate }) {
     setUser(null);
     setAccessToken(null);
     localStorage.clear();
-
-    toast("👋 Logged out", {
-      style: {
-        background: "red",
-        color: "white",
-      },
-    });
 
     navigate("/"); // 👈 send them to homepage (or /login if you prefer)
   }

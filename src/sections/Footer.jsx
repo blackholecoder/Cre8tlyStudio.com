@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="flex flex-col items-center md:flex-row md:items-center gap-4 md:gap-6">
           {/* Logo */}
           <a href="/" className="flex-shrink-0">
-            <img src={headerLogo} alt="Drama Music Logo" width={50} height={50} />
+            <img src={headerLogo} alt="Cre8tly Studio Logo" width={50} height={50} />
           </a>
 
           {/* Socials */}
@@ -30,6 +30,7 @@ const Footer = () => {
               </a>
             ))}
           </div>
+          
         </div>
 
         {/* Right side: © + Links */}
@@ -43,6 +44,9 @@ const Footer = () => {
             <span>|</span>
             <a href="/refund-policy" className="hover:text-white transition-colors">Refunds</a>
           </div>
+          <p className="text-xs text-white/40">
+    Designed by <a href="https://dramarecords.com" className="hover:text-white transition-colors">Drama Records Design Agency</a>
+  </p>
         </div>
 
       </div>

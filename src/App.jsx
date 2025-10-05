@@ -8,7 +8,7 @@ const App = () => (
   <main className="relative">
 
     <Nav />
-    <section id="landing" className="bg-bioModal padding">
+    <section id="landing" className="padding">
       <Landing />
     </section>
 

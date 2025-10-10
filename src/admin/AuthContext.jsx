@@ -52,77 +52,61 @@ async function login(email, password) {
 
 
   // 🔹 Refresh Access Token
-  // async function refreshAccessToken() {
-  //   const refreshToken = localStorage.getItem("refreshToken");
-  //   if (!refreshToken) return null;
+  async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) return null;
 
-  //   try {
-  //     const res = await axiosInstance.post("/auth/refresh", { token: refreshToken });
-  //     const data = res.data;
+    try {
+      const res = await axiosInstance.post("/auth/refresh", { token: refreshToken });
+      const data = res.data;
 
-  //     setAccessToken(data.accessToken);
-  //     localStorage.setItem("accessToken", data.accessToken);
+      setAccessToken(data.accessToken);
+      localStorage.setItem("accessToken", data.accessToken);
 
-  //     if (data.refreshToken) {
-  //       localStorage.setItem("refreshToken", data.refreshToken);
-  //     }
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
 
-  //     return data.accessToken;
-  //   } catch (err) {
-  //     console.error("Refresh failed:", err);
-  //     if (err.response?.status === 401 || err.response?.status === 403) {
-  //       logout();
-  //     }
-  //     return null;
-  //   }
-  // }
-  // 🔹 Refresh token manually only if you really need it (most cases are auto)
-async function refreshAccessToken() {
-  const refresh = localStorage.getItem("refreshToken");
-  if (!refresh) return null;
-
-  try {
-    const res = await axios.post("https://cre8tlystudio.com/api/auth/refresh", {
-      token: refresh,
-    });
-
-    const { accessToken, refreshToken: newRefresh } = res.data;
-
-    setAccessToken(accessToken);
-    localStorage.setItem("accessToken", accessToken);
-    if (newRefresh) localStorage.setItem("refreshToken", newRefresh);
-
-    return accessToken;
-  } catch (err) {
-    console.error("Manual refresh failed:", err);
-    logout();
-    return null;
+      return data.accessToken;
+    } catch (err) {
+      console.error("Refresh failed:", err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        logout();
+      }
+      return null;
+    }
   }
+
+
+
+  function logout() {
+  try { axiosInstance.post("/auth/logout"); } catch {}
+  setUser(null);
+  setAccessToken(null);
+  localStorage.removeItem("user");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  navigate("/");
 }
 
-  // 🔹 Logout
-  async function logout() {
-    try {
-      await axiosInstance.post("/auth/logout");
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
-    setUser(null);
-    setAccessToken(null);
-    localStorage.clear();
 
-    navigate("/"); // 👈 send them to homepage (or /login if you prefer)
-  }
-
-  // 🔹 Restore user on mount
   useEffect(() => {
-    async function restoreUser() {
-      try {
-        const storedUser = localStorage.getItem("user");
-        const storedAccess = localStorage.getItem("accessToken");
-        if (storedUser) setUser(JSON.parse(storedUser));
-        if (storedAccess) setAccessToken(storedAccess);
+  const timer = setTimeout(() => refreshAccessToken(), 1500);
+  return () => clearTimeout(timer);
+}, []);
 
+  useEffect(() => {
+  async function restoreUser() {
+    try {
+      const storedUser = localStorage.getItem("user");
+      const storedAccess = localStorage.getItem("accessToken");
+      const storedRefresh = localStorage.getItem("refreshToken");
+
+      if (storedUser) setUser(JSON.parse(storedUser));
+      if (storedAccess) setAccessToken(storedAccess);
+
+      // ✅ Only try refreshing if we have a refresh token but no access token
+      if (!storedAccess && storedRefresh) {
         const token = await refreshAccessToken();
         if (token) {
           const res = await axiosInstance.get("/auth/me", {
@@ -131,14 +115,17 @@ async function refreshAccessToken() {
           setUser(res.data);
           localStorage.setItem("user", JSON.stringify(res.data));
         }
-      } catch (err) {
-        console.error("Failed to restore user:", err);
-      } finally {
-        setAuthLoading(false); // ✅ always stop loading
       }
+    } catch (err) {
+      console.error("Failed to restore user:", err);
+    } finally {
+      setAuthLoading(false);
     }
-    restoreUser();
-  }, []);
+  }
+
+  restoreUser();
+}, []);
+
 
   // Silent refresh every 12 minutes to prevent expiry during work
 useEffect(() => {

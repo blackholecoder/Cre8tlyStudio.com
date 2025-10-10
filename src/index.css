@@ -254,6 +254,14 @@ select.dropdown-scroll:focus option {
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-in-out;
+}
+
 .animate-progress {
   position: relative;
   width: 100%;
@@ -296,7 +304,6 @@ select.dropdown-scroll:focus option {
 }
 
   
-  
   html, body {
   background-color: #030712 !important;
   background-image: none !important;
@@ -305,5 +312,30 @@ select.dropdown-scroll:focus option {
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+.prompt-editor .ql-container {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: none !important;
+}
+
+.prompt-editor .ql-editor {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 1rem !important;
+  padding-bottom: 3rem !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.prompt-editor .ql-editor.ql-blank::before {
+  color: #999;
+  font-style: italic;
+}
+
+
+
 
 }

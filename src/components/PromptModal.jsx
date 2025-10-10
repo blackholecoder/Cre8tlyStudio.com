@@ -20,6 +20,9 @@ export default function PromptModal({
   magnetId,
   accessToken,
   onSubmitted,
+  setShowGenerating,  
+  progress,
+  setProgress 
 }) {
   const [text, setText] = useState("");
   const [theme, setTheme] = useState("modern");
@@ -29,7 +32,7 @@ export default function PromptModal({
   const [link, setLink] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+
   const [cover, setCover] = useState(null);
   const [cta, setCta] = useState("");
   const [phase, setPhase] = useState("questions");
@@ -54,71 +57,12 @@ export default function PromptModal({
 
   const handleClose = () => onClose();
 
-  // async function handleSubmit(e) {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setProgress(0);
-
-  //   let interval;
-  //   try {
-  //     interval = setInterval(() => {
-  //       setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
-  //     }, 300);
-
-  //     await axios.post(
-  //       "https://cre8tlystudio.com/api/lead-magnets/prompt",
-  //       {
-  //         magnetId,
-  //         prompt: text,
-  //         theme,
-  //         pages,
-  //         logo,
-  //         link,
-  //         coverImage: cover,
-  //         cta,
-  //       },
-  //       {
-  //         headers: { Authorization: `Bearer ${accessToken}` },
-  //       }
-  //     );
-
-  //     clearInterval(interval);
-  //     setProgress(100);
-
-  //     toast.success("🎉 Lead magnet generated successfully!");
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //       onSubmitted(magnetId, text, theme);
-  //       onClose();
-  //     }, 600);
-  //   } catch (err) {
-  //     console.error("❌ Prompt submission error:", err);
-  //     clearInterval(interval);
-  //     setProgress(0);
-  //     setLoading(false);
-
-  //     // ✅ Handle specific backend messages
-  //     if (err.response) {
-  //       const { status, data } = err.response;
-
-  //       if (status === 413) {
-  //         toast.error(
-  //           data.message || "Your input is too long. Please shorten it."
-  //         );
-  //       } else if (status === 400) {
-  //         toast.error(data.message || "Missing required fields.");
-  //       } else {
-  //         toast.error(data.message || "Something went wrong on the server.");
-  //       }
-  //     } else {
-  //       toast.error("Network error — please check your connection.");
-  //     }
-  //   }
-  // }
   async function handleSubmit(e) {
   e.preventDefault();
   setLoading(true);
   setProgress(0);
+  setShowGenerating(true); // ✅ show the global overlay
+  onClose(); // ✅ close modal right away
 
   let interval;
   try {
@@ -146,6 +90,7 @@ export default function PromptModal({
     clearInterval(interval);
     setProgress(100);
     toast.success("🎉 Lead magnet generated successfully!");
+    setShowGenerating(false);
 
     // ✅ Step 1: keep progress visible for a bit
     await new Promise((r) => setTimeout(r, 1000));
@@ -164,6 +109,7 @@ export default function PromptModal({
     clearInterval(interval);
     setProgress(0);
     setLoading(false);
+    setShowGenerating(false);
 
     if (err.response) {
       const { status, data } = err.response;

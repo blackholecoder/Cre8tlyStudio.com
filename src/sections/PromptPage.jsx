@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
@@ -6,6 +6,7 @@ import ReactQuill from "react-quill";
 function PromptPage() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const quillRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
@@ -26,6 +27,15 @@ function PromptPage() {
     ],
   };
 
+  useEffect(() => {
+    if (prompt && quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      setTimeout(() => {
+        editor.root.scrollTop = 0;
+        editor.root.dispatchEvent(new Event("input")); // forces Quill layout refresh
+      }, 100);
+    }
+  }, [prompt]);
   // Validate session ID on mount
   useEffect(() => {
     const checkSession = async () => {
@@ -106,21 +116,18 @@ function PromptPage() {
     );
   }
 
-return (
+  return (
     <div className="max-w-2xl mx-auto py-20 px-6 text-center">
       <h2 className="text-3xl sm:text-4xl font-bold mb-6">Enter Your Prompt</h2>
 
       {!success ? (
         <>
-          <ReactQuill
-            theme="snow"
+          <textarea
             value={prompt}
-            onChange={setPrompt}
-            modules={modules}
-             style={{ height: "500px", overflowY: "auto" }} 
-            className="bg-white text-left rounded-lg mb-6"
+            onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe your audience or offer..."
-          />
+            className="w-full h-[500px] bg-white text-black text-left rounded-lg p-4 leading-relaxed font-montserrat border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-inner resize-none overflow-y-auto"
+          ></textarea>
           <button
             onClick={handleSubmit}
             disabled={submitting || !prompt || prompt.trim() === "<p><br></p>"}
@@ -159,4 +166,3 @@ return (
 }
 
 export default PromptPage;
-

@@ -17,6 +17,8 @@
     "@mui/material": "^5.14.7",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
+    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/plugin-shell": "^2.3.1",
     "axios": "^1.7.9",
     "framer-motion": "^11.2.9",
     "jwt-decode": "^4.0.0",

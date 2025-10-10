@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = "https://cre8tlystudio.com/api"; // 👈 use your domain
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "https://cre8tlystudio.com/api" // ✅ use Nginx proxy
+    : "https://cre8tlystudio.com/api";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -9,6 +12,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+  withCredentials: true,
 });
 
 // ✅ Attach token automatically to every request

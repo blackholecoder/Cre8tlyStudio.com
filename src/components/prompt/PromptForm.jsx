@@ -41,6 +41,7 @@ export default function PromptForm({
           theme="snow"
           value={text}
           onChange={setText}
+          modules={{ toolbar: false }}
           placeholder="Write your prompt..."
           className="h-[250px]"
         />

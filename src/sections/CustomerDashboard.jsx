@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useMagnets } from "../admin/MagnetContext.jsx"; // ✅ use the global context
-
+import { getVersion } from "@tauri-apps/api/app";
 // Components
 import PromptModal from "../components/PromptModal.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
@@ -12,14 +12,21 @@ import MagnetTable from "../components/dashboard/MagnetTable.jsx";
 import MagnetCardList from "../components/dashboard/MagnetCardList.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";
 import SupportTab from "./SupportTab.jsx";
+import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
+import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
+
+
 
 export default function CustomerDashboard() {
   const { accessToken } = useAuth();
   const { magnets, setMagnets, fetchMagnets, loading } = useMagnets(); // ✅ data from context
-
+  const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeMagnet, setActiveMagnet] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isApp, setIsApp] = useState(false);
+  const [showGenerating, setShowGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,7 +58,11 @@ export default function CustomerDashboard() {
 
   // ✅ Plan checkout
   function handleCheckout() {
-    navigate("/plans");
+    if (isApp) {
+      setShowOutOfSlots(true); // 👈 open info modal inside the app
+    } else {
+      navigate("/plans"); // 👈 normal Stripe checkout for web
+    }
   }
 
   // ✅ Pagination
@@ -71,6 +82,36 @@ export default function CustomerDashboard() {
     setOpenPrompt(true);
   }
 
+  async function refreshUserSlots() {
+    try {
+      const res = await fetch("https://cre8tlystudio.com/api/auth/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data) {
+        // Update your magnet context or user state
+        fetchMagnets(); // refresh lead magnets to reflect new slot count
+      }
+    } catch (err) {
+      console.error("Failed to refresh slots:", err);
+    }
+  }
+
+  useEffect(() => {
+    async function checkIfApp() {
+      try {
+        await getVersion(); // ✅ This will succeed ONLY in Tauri
+        setIsApp(true);
+        console.log("✅ Running inside Tauri app");
+      } catch {
+        console.log("🌐 Running in browser");
+        setIsApp(false);
+      }
+    }
+    checkIfApp();
+  }, []);
+
   // ✅ Render
   return (
     <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -83,10 +124,16 @@ export default function CustomerDashboard() {
       ) : (
         <>
           {/* Desktop view */}
-          <MagnetTable magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
+          <MagnetTable
+            magnets={paginatedMagnets}
+            onAddPrompt={openPromptModal}
+          />
 
           {/* Mobile view */}
-          <MagnetCardList magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
+          <MagnetCardList
+            magnets={paginatedMagnets}
+            onAddPrompt={openPromptModal}
+          />
 
           {/* Pagination */}
           <PaginationControls
@@ -105,9 +152,18 @@ export default function CustomerDashboard() {
           onClose={() => setOpenPrompt(false)}
           magnetId={activeMagnet}
           accessToken={accessToken}
+          setShowGenerating={setShowGenerating}
+          setProgress={setProgress}
           onSubmitted={handlePromptSubmitted}
         />
       )}
+      <OutOfSlotsModal
+        open={showOutOfSlots}
+        onClose={() => setShowOutOfSlots(false)}
+        onRefresh={refreshUserSlots}
+        isFirstTime={magnets.length === 0}
+      />
+      <GenerationOverlay visible={showGenerating} progress={progress} />
     </div>
   );
 }

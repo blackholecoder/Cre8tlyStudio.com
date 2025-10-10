@@ -1,13 +1,33 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
+import { getVersion } from "@tauri-apps/api/app";
+import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal";
 
 const PricingSection = () => {
   const { user } = useAuth();
+   const [isApp, setIsApp] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleSignUpRedirect = () => {
-    // ✅ Always send users to /plans instead of Stripe
-    window.location.href = "/sign-up";
+    if (isApp) {
+      setShowModal(true); // show the info modal in the app
+    } else {
+      window.location.href = "/sign-up"; // normal web flow
+    }
   };
+
+  useEffect(() => {
+    async function checkIfApp() {
+      try {
+        await getVersion();
+        setIsApp(true);
+      } catch {
+        setIsApp(false);
+      }
+    }
+    checkIfApp();
+  }, []);
 
   return (
     <section id="pricing" className="px-6 py-24 text-center">
@@ -56,6 +76,11 @@ const PricingSection = () => {
           🔒 Secure checkout
         </p>
       </div>
+      <OutOfSlotsModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        isFirstTime={!user || !user.slot_count || user.slot_count === 0}
+      />
     </section>
   );
 };

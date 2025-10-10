@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
+import { useMagnets } from "../admin/MagnetContext.jsx"; // ✅ use the global context
 
 // Components
 import PromptModal from "../components/PromptModal.jsx";
@@ -11,54 +11,31 @@ import EmptyState from "../components/dashboard/EmptyState.jsx";
 import MagnetTable from "../components/dashboard/MagnetTable.jsx";
 import MagnetCardList from "../components/dashboard/MagnetCardList.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";
+import SupportTab from "./SupportTab.jsx";
 
 export default function CustomerDashboard() {
-  const { accessToken, user } = useAuth();
-  const [magnets, setMagnets] = useState([]);
+  const { accessToken } = useAuth();
+  const { magnets, setMagnets, fetchMagnets, loading } = useMagnets(); // ✅ data from context
+
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeMagnet, setActiveMagnet] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loadingMagnets, setLoadingMagnets] = useState(true);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const ITEMS_PER_PAGE = 10;
 
-  // -------------------------------
-  // Fetch lead magnets
-  // -------------------------------
-  async function fetchMagnets() {
-    try {
-      setLoadingMagnets(true);
-      const res = await axios.get("https://cre8tlystudio.com/api/lead-magnets", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      setMagnets(res.data);
-    } catch (err) {
-      console.error("Error fetching lead magnets:", err);
-    } finally {
-      setLoadingMagnets(false);
-    }
-  }
-
-  useEffect(() => {
-    if (accessToken) fetchMagnets();
-  }, [accessToken]);
-
-  // -------------------------------
-  // Stripe checkout redirect handler
-  // -------------------------------
-  useEffect(() => {
+  // ✅ Handle Stripe success redirect
+  if (typeof window !== "undefined") {
     const params = new URLSearchParams(location.search);
     if (params.get("session_id")) {
       console.log("✅ Stripe checkout success:", params.get("session_id"));
       fetchMagnets();
       window.history.replaceState({}, document.title, "/dashboard");
     }
-  }, [location]);
+  }
 
-  // -------------------------------
-  // Prompt submission handler
-  // -------------------------------
+  // ✅ Update local state instantly after a new prompt is submitted
   function handlePromptSubmitted(magnetId, promptText, theme) {
     setMagnets((prev) =>
       prev.map((m) =>
@@ -67,48 +44,17 @@ export default function CustomerDashboard() {
           : m
       )
     );
+
+    // trigger refresh shortly after
+    setTimeout(fetchMagnets, 3000);
   }
 
-  // -------------------------------
-  // Checkout handler
-  // -------------------------------
-  async function handleCheckout() {
-    try {
-      const { data } = await axios.post(
-        "https://cre8tlystudio.com/api/checkout",
-        {
-          userId: user?.id,
-          priceId: "price_1SEC9lA3LinCYcoDTBYy0xY4",
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("Checkout failed:", err);
-      alert("Checkout failed. Try again.");
-    }
+  // ✅ Plan checkout
+  function handleCheckout() {
+    navigate("/plans");
   }
 
-  // -------------------------------
-  // Poll for pending PDFs
-  // -------------------------------
-  useEffect(() => {
-    if (!accessToken || magnets.length === 0) return;
-
-    const hasPending = magnets.some((m) => m.status === "pending");
-    if (!hasPending) return;
-
-    const interval = setInterval(() => {
-      console.log("🔄 Polling for PDF updates...");
-      fetchMagnets();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [magnets, accessToken]);
-
-  // -------------------------------
-  // Pagination setup
-  // -------------------------------
+  // ✅ Pagination
   const sortedMagnets = [...magnets].sort(
     (a, b) => (a.slot_number || 0) - (b.slot_number || 0)
   );
@@ -119,22 +65,18 @@ export default function CustomerDashboard() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  // -------------------------------
-  // Prompt modal trigger
-  // -------------------------------
+  // ✅ Prompt modal open
   function openPromptModal(id) {
     setActiveMagnet(id);
     setOpenPrompt(true);
   }
 
-  // -------------------------------
-  // Render
-  // -------------------------------
+  // ✅ Render
   return (
     <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <DashboardHeader magnets={magnets} onCheckout={handleCheckout} />
 
-      {loadingMagnets ? (
+      {loading ? (
         <LoadingState />
       ) : magnets.length === 0 ? (
         <EmptyState onCheckout={handleCheckout} />
@@ -152,6 +94,8 @@ export default function CustomerDashboard() {
             totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
+
+          <SupportTab />
         </>
       )}
 

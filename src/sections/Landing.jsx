@@ -1,10 +1,10 @@
-
 import Button from "../components/Button";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
 import PricingSection from "./Pricing";
 import { headerLogo } from "../assets/images";
 import VideoPlayer from "../components/VideoPlayer";
+import FreePDFSection from "./FreePDFSection";
 
 const Landing = () => {
   return (
@@ -47,7 +47,7 @@ const Landing = () => {
         </div>
 
         <motion.div
-          className="mt-8"
+          className="mt-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
@@ -58,8 +58,10 @@ const Landing = () => {
         </motion.div>
       </section>
 
+
       <HowItWorks />
       <PricingSection />
+      <FreePDFSection />
     </div>
   );
 };

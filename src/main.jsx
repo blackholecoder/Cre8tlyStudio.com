@@ -1,87 +1,172 @@
-import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
-import PrivateRoute from "./components/PrivateRoute.jsx";
+
 import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import App from "./App.jsx";
+import { BrowserRouter as Router, useLocation, Routes, Route } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
+import { MagnetProvider } from "./admin/MagnetContext.jsx";
+import PrivateRoute from "./components/PrivateRoute.jsx";
 import NotFound from "./components/NotFound.jsx";
 import ThankYou from "./sections/ThankYou.jsx";
 import Terms from "./documents/Terms.jsx";
 import Privacy from "./documents/Privacy.jsx";
 import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
-import "./index.css";
 import SupportPage from "./sections/Support.jsx";
 import PromptPage from "./sections/PromptPage.jsx";
-import "react-quill/dist/quill.snow.css";
 import SignupPage from "./sections/SignUp.jsx";
 import { Login, Nav } from "./sections/index.js";
 import CustomerDashboard from "./sections/CustomerDashboard.jsx";
 import AdminDashboard from "./sections/AdminDashboard.jsx";
-
+import Contact from "./sections/Contact.jsx";
+import PlansPage from "./sections/PlansPage.jsx";
+import App from "./App.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "react-quill/dist/quill.snow.css";
+import "./index.css";
+import EntryRouter from "./EntryRouter.jsx";
 
+// 🔹 Define your Routes inside a subcomponent that has access to the Router
+const AnimatedRoutes = () => {
+  const location = useLocation();
 
-const RootComponent = () => {
-  
-  
   return (
-      
-    <Router>
-      <AuthProviderWithRouter>
-      <ToastContainer 
-          position="top-center" 
-          autoClose={3000} 
-          hideProgressBar={false} 
-          newestOnTop={true} 
-          closeOnClick 
-          pauseOnHover 
-          draggable 
-          theme="colored" 
+    <AnimatePresence mode="sync">
+      <Routes location={location} key={location.pathname}>
+        {/* Public site */}
+        <Route path="/" element={<EntryRouter />} />
+        <Route
+    path="/home"
+    element={
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <App />
+      </motion.div>
+    }
+  />
+
+        <Route
+          path="/support"
+          element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="min-h-screen bg-[#030712]"
+            >
+              <SupportPage />
+            </motion.div>
+          }
         />
-      <Nav/>  
-      <Routes>
-        <Route path="/support" element={<SupportPage />} />
         <Route path="/thank-you" element={<ThankYou />} />
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/features" element={<App />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
-        <Route path="/prompt" element={<PromptPage />} />
-        <Route path="/sign-up" element={<SignupPage />} />
         <Route path="/privacy-policy" element={<Privacy />} />
         <Route path="/refund-policy" element={<Refund />} />
         <Route path="/cookie-policy" element={<Cookie />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/prompt" element={<PromptPage />} />
+
+        {/* Auth */}
+        <Route path="/sign-up" element={<SignupPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/plans" element={<PlansPage />} />
 
         {/* Private */}
         <Route
-    path="/dashboard"
-    element={
-      <PrivateRoute role="customer">
-        <CustomerDashboard />
-      </PrivateRoute>
-    }
-  />
-  <Route
-    path="/admin"
-    element={
-      <PrivateRoute role="admin">
-        <AdminDashboard />
-      </PrivateRoute>
-    }
-  />
+          path="/dashboard"
+          element={
+            <PrivateRoute role={["customer", "admin"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <CustomerDashboard />
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute role="admin">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <AdminDashboard />
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Debug */}
+        <Route
+          path="/debug"
+          element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                backgroundColor: "#030712",
+                color: "#fff",
+                minHeight: "100vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Debug Test Page
+            </motion.div>
+          }
+        />
+
+        {/* Catch-all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      </AuthProviderWithRouter>
-    </Router>
-    
+    </AnimatePresence>
   );
 };
 
+// 🔹 Root wrapper with Router outside (fixes useLocation error)
+const RootApp = () => {
+  return (
+    <Router>
+      <AuthProviderWithRouter>
+        <MagnetProvider>
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="colored"
+        />
+        <Nav />
+        <AnimatedRoutes />
+        </MagnetProvider>
+      </AuthProviderWithRouter>
+    </Router>
+  );
+};
 
+// 🔹 Create root only once
 const container = document.getElementById("root");
-
-// Only create the root if it doesn't already exist
 const root = createRoot(container);
-root.render(<RootComponent />);
+root.render(<RootApp />);
 

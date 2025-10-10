@@ -106,55 +106,6 @@ function PromptPage() {
     );
   }
 
-  // return (
-  //   <div className="max-w-2xl mx-auto py-20 px-6 text-center">
-  //     <h2 className="text-3xl sm:text-4xl font-bold mb-6">Enter Your Prompt</h2>
-
-  //     {!success ? (
-  //       <>
-  //         <textarea
-  //           value={prompt}
-  //           onChange={(e) => setPrompt(e.target.value)}
-  //           placeholder="Describe your audience or offer..."
-  //           className="w-full h-40 p-4 rounded-lg bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 mb-6"
-  //         />
-  //         <button
-  //           onClick={handleSubmit}
-  //           disabled={submitting || !prompt.trim()}
-  //           className={`w-full py-4 rounded-xl font-semibold text-lg transition shadow-lg ${
-  //             submitting || !prompt.trim()
-  //               ? "bg-gray-600 cursor-not-allowed"
-  //               : "bg-black border border-green-400 text-white hover:opacity-90"
-  //           }`}
-  //         >
-  //           {submitting ? "Generating..." : "Generate PDF"}
-  //         </button>
-  //       </>
-  //     ) : (
-  //       <div className="mt-6">
-  //         <p className="text-xl text-green mb-6">
-  //           ✅ Your prompt was submitted!
-  //         </p>
-  //         {pdfUrl ? (
-  //           <a
-  //             href={pdfUrl}
-  //             target="_blank"
-  //             rel="noopener noreferrer"
-  //             className="inline-block bg-gradient-to-r from-[#1DA1F2] to-purple-600 text-white px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition"
-
-  //           >
-  //             Download PDF
-  //           </a>
-  //         ) : (
-  //           <p className="text-gray-400">
-  //             Your PDF is being generated... Please wait.
-  //           </p>
-  //         )}
-  //       </div>
-  //     )}
-  //   </div>
-  // );
-
 return (
     <div className="max-w-2xl mx-auto py-20 px-6 text-center">
       <h2 className="text-3xl sm:text-4xl font-bold mb-6">Enter Your Prompt</h2>

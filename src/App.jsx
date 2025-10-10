@@ -1,24 +1,44 @@
-import {
-  Footer,
-  Landing
-} from "./sections";
+import { Footer, Landing } from "./sections";
 import Nav from "./components/Nav";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
-const App = () => (
-  <main className="relative">
+const isTauri = Boolean(window.__TAURI__);
 
-    <Nav />
-    <section id="landing" className="padding">
-      <Landing />
-    </section>
+const App = () => {
 
-    <section
-      id="contact"
-      className="bg-bioModal p-5 sm:px-8 sm:pt-20 sm:pb-8 sm:py-20"
-    >
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const section = document.querySelector(location.hash);
+      if (section) {
+        // Delay ensures the DOM has rendered before scrolling
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 200);
+      }
+    }
+  }, [location]);
+  // 🧭 If running inside Tauri, don’t render marketing site
+  if (isTauri) {
+    return (
+      <main className="flex items-center justify-center min-h-screen bg-black text-white text-xl font-semibold">
+        Redirecting to app...
+      </main>
+    );
+  }
+
+  // 🌐 Normal web visitors get the full landing site
+  return (
+    <main>
+      <Nav />
+      <section id="landing" className="padding">
+        <Landing />
+      </section>
       <Footer />
-    </section>
-  </main>
-);
+    </main>
+  );
+};
 
 export default App;

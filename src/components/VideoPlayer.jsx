@@ -109,7 +109,7 @@ export default function VideoPlayer() {
         poster="/assets/video-thumbnail.jpg"
       >
         <source
-          src="https://cre8tlystudio.nyc3.cdn.digitaloceanspaces.com/Videos/Cre8tlyStudio-8-bit.mp4"
+          src="https://cre8tlystudio.nyc3.cdn.digitaloceanspaces.com/Videos/Cre8tlyStudio.mp4"
           type="video/mp4"
         />
         Your browser does not support the video tag.

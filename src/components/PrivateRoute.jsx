@@ -6,15 +6,19 @@ export default function PrivateRoute({ children, role }) {
   const { user, authLoading } = useAuth();
 
   if (authLoading) {
-    return <LoadingOverlay />; // 👈 show spinner overlay until restore finishes
+    return <LoadingOverlay />;
   }
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && user.role !== role) {
-    return <Navigate to="/" replace />;
+  // ✅ Allow one or multiple roles
+  if (role) {
+    const allowedRoles = Array.isArray(role) ? role : [role];
+    if (!allowedRoles.includes(user.role)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;

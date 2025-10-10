@@ -1,62 +1,89 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../admin/AuthContext.jsx"; // adjust path if needed
+import { useAuth } from "./AuthContext.jsx";
+import Footer from "../sections/Footer.jsx";
 
 export default function LoginPage() {
-    const { login } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      await login(email, password);
-      navigate("/dashboard"); // ✅ client-side navigation
+      await login(form.email, form.password);
+      navigate("/dashboard");
     } catch (err) {
-      if (err.response) {
-        alert(err.response.data.message || "Invalid credentials");
-      } else {
-        console.error("Login error:", err.message);
-        alert("Network error, please try again");
-      }
+      console.error("Login error:", err);
+      alert("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-gradient-to-b from-dark-gray to-neo min-h-screen flex items-center justify-center">
-      <form onSubmit={handleSubmit} className="bg-charcoal p-6 rounded-xl w-full max-w-sm">
-        <h2 className="text-xl font-bold text-white mb-4">Log In</h2>
+    <div
+      style={{
+        backgroundColor: "#030712",
+        isolation: "isolate",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
+        <div className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+          <h1 className="text-3xl font-bold text-green text-center mb-6">
+            Welcome Back
+          </h1>
+          <p className="text-gray-300 text-center mb-8">
+            Log in to your account to continue creating and managing your lead magnets.
+          </p>
 
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full p-3 rounded mb-3 bg-neo text-white border border-mutedGrey"
-          required
-        />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email Address"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+            />
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-green text-black font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+            >
+              {loading ? "Logging In..." : "Log In"}
+            </button>
+          </form>
 
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full p-3 rounded mb-3 bg-neo text-white border border-mutedGrey"
-          required
-        />
+          <p className="text-sm text-gray-400 text-center mt-6">
+            Don’t have an account?{" "}
+            <a href="/sign-up" className="text-green hover:underline">
+              Sign Up
+            </a>
+          </p>
+        </div>
+      </section>
 
-        <button
-          type="submit"
-          className="w-full py-3 rounded bg-gradient-to-r from-green to-royalPurple text-white font-bold hover:opacity-90"
-        >
-          Log In
-        </button>
-        <p className="text-center text-sm text-silver mt-3">
-          🔒 Secure Login
-        </p>
-      </form>
-      
+      <Footer />
     </div>
   );
 }

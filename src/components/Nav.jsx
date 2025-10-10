@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { navLinks } from "../constants";
 import { headerLogo } from "../assets/images";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext";
 
 const Nav = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
@@ -27,28 +29,32 @@ const Nav = () => {
   }, []);
 
   useEffect(() => {
-  if (isOpen) {
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed"; // prevents iOS bounce scroll
-    document.body.style.width = "100%";
-  } else {
-    document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.width = "";
-  }
-}, [isOpen]);
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed"; // prevents iOS bounce scroll
+      document.body.style.width = "100%";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }
+  }, [isOpen]);
 
   const filteredNavLinks = navLinks.filter((link) => {
     // Hide "Pricing" on /signup
-  if (link.label === "Pricing" && location.pathname !== "/") {
-    return false;
-  }
+    if (link.label === "Pricing" && location.pathname !== "/home") {
+      return false;
+    }
+
+    // Hide "Contact Us" on /contact page
+    if (link.label === "Contact Us" && location.pathname === "/contact")
+      return false;
     return true;
   });
 
   return (
     <div
-      className={`bg-black ${isScrolled ? "bg-opacity-90" : "bg-opacity-0"} transition duration-300 ease-in-out fixed top-0 left-0 w-full z-50`}
+      className={`bg-[#0b0f1a] ${isScrolled ? "bg-opacity-90" : "bg-opacity-0"} transition duration-300 ease-in-out fixed top-0 left-0 w-full z-50`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="flex items-center justify-between px-4 h-[72px]">
@@ -78,7 +84,10 @@ const Nav = () => {
               // Hide "Sign Up" if user is logged in
               if (
                 user &&
-                (item.label === "Sign Up" || item.label === "Pricing")
+                (item.label === "Sign Up" ||
+                  item.label === "Pricing" ||
+                  item.label === "How it works" ||
+                  item.label === "Contact Us")
               )
                 return null;
 
@@ -109,11 +118,28 @@ const Nav = () => {
               return (
                 <li key={item.label} className="flex items-center">
                   <a
-                    href={item.href}
-                    className="font-montserrat leading-normal text-md text-white-400"
-                  >
-                    {item.label}
-                  </a>
+  href={item.href}
+  onClick={(e) => {
+    if (item.href.startsWith("#")) {
+      e.preventDefault();
+      const targetSection = document.querySelector(item.href);
+
+      if (location.pathname === "/" || location.pathname === "/home") {
+        // already on home, just scroll
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      } else {
+        // not on home → navigate to home and include hash
+        navigate(`/home${item.href}`);
+      }
+    }
+  }}
+  className="font-montserrat leading-normal text-md text-white-400 hover:text-white cursor-pointer transition"
+>
+  {item.label}
+</a>
+
                 </li>
               );
             })}
@@ -172,11 +198,14 @@ const Nav = () => {
             ref={ref}
             className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4 lead-text"
           >
-            {navLinks.map((item) => {
+            {filteredNavLinks.map((item) => {
               // Hide "Sign Up" if logged in
               if (
                 user &&
-                (item.label === "Sign Up" || item.label === "Pricing")
+                (item.label === "Sign Up" ||
+                  item.label === "Pricing" ||
+                  item.label === "How it works" ||
+                  item.label === "Contact Us")
               )
                 return null;
 
@@ -199,8 +228,8 @@ const Nav = () => {
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className="font-montserrat text-md text-white-400 hover:text-white transition-all cursor-pointer"
                 >
                   {item.label}
                 </a>

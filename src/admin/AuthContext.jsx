@@ -22,48 +22,83 @@ export function AuthProvider({ children, navigate }) {
   }
 
   // 🔹 Login
-  async function login(email, password) {
-    try {
-      const res = await axiosInstance.post("/auth/login", { email, password });
-      const data = res.data;
-      saveAuth(data.user, data.accessToken, data.refreshToken);
+async function login(email, password) {
+  try {
+    const res = await axiosInstance.post("/auth/login", { email, password });
+    const data = res.data;
+    saveAuth(data.user, data.accessToken, data.refreshToken);
 
-      toast.success("🎉 Login successful!", {
-  className:
-    "bg-transparent !bg-transparent border-2 border-green text-white font-bold rounded-lg shadow-[0_0_15px_rgba(123,237,159,0.6)]",
-});
-    } catch (err) {
-      toast.error("❌ Login failed. Please check your credentials.", {
-        className: "bg-red-600 text-white font-semibold rounded-lg shadow-md",
+    // 🔥 Immediately refresh user data to include latest fields (like pro_covers)
+    try {
+      const meRes = await axiosInstance.get("/auth/me", {
+        headers: { Authorization: `Bearer ${data.accessToken}` },
       });
+      setUser(meRes.data);
+      localStorage.setItem("user", JSON.stringify(meRes.data));
+    } catch (fetchErr) {
+      console.error("Failed to fetch fresh user data after login:", fetchErr);
     }
+
+    toast.success("🎉 Login successful!", {
+      className:
+        "bg-transparent !bg-transparent border-2 border-green text-white font-bold rounded-lg shadow-[0_0_15px_rgba(123,237,159,0.6)]",
+    });
+  } catch (err) {
+    toast.error("❌ Login failed. Please check your credentials.", {
+      className: "bg-red-600 text-white font-semibold rounded-lg shadow-md",
+    });
   }
+}
+
 
   // 🔹 Refresh Access Token
-  async function refreshAccessToken() {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) return null;
+  // async function refreshAccessToken() {
+  //   const refreshToken = localStorage.getItem("refreshToken");
+  //   if (!refreshToken) return null;
 
-    try {
-      const res = await axiosInstance.post("/auth/refresh", { token: refreshToken });
-      const data = res.data;
+  //   try {
+  //     const res = await axiosInstance.post("/auth/refresh", { token: refreshToken });
+  //     const data = res.data;
 
-      setAccessToken(data.accessToken);
-      localStorage.setItem("accessToken", data.accessToken);
+  //     setAccessToken(data.accessToken);
+  //     localStorage.setItem("accessToken", data.accessToken);
 
-      if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
-      }
+  //     if (data.refreshToken) {
+  //       localStorage.setItem("refreshToken", data.refreshToken);
+  //     }
 
-      return data.accessToken;
-    } catch (err) {
-      console.error("Refresh failed:", err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        logout();
-      }
-      return null;
-    }
+  //     return data.accessToken;
+  //   } catch (err) {
+  //     console.error("Refresh failed:", err);
+  //     if (err.response?.status === 401 || err.response?.status === 403) {
+  //       logout();
+  //     }
+  //     return null;
+  //   }
+  // }
+  // 🔹 Refresh token manually only if you really need it (most cases are auto)
+async function refreshAccessToken() {
+  const refresh = localStorage.getItem("refreshToken");
+  if (!refresh) return null;
+
+  try {
+    const res = await axios.post("https://cre8tlystudio.com/api/auth/refresh", {
+      token: refresh,
+    });
+
+    const { accessToken, refreshToken: newRefresh } = res.data;
+
+    setAccessToken(accessToken);
+    localStorage.setItem("accessToken", accessToken);
+    if (newRefresh) localStorage.setItem("refreshToken", newRefresh);
+
+    return accessToken;
+  } catch (err) {
+    console.error("Manual refresh failed:", err);
+    logout();
+    return null;
   }
+}
 
   // 🔹 Logout
   async function logout() {
@@ -104,6 +139,15 @@ export function AuthProvider({ children, navigate }) {
     }
     restoreUser();
   }, []);
+
+  // Silent refresh every 12 minutes to prevent expiry during work
+useEffect(() => {
+  const interval = setInterval(() => {
+    refreshAccessToken();
+  }, 12 * 60 * 1000); // every 12 minutes
+
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <AuthContext.Provider

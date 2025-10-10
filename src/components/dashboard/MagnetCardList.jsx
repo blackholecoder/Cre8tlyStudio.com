@@ -8,7 +8,6 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
           key={m.id}
           className="bg-neo p-4 rounded-xl shadow border border-gray-700"
         >
-          {/* Slot number */}
           <p className="text-sm text-white font-semibold mb-2">
             Slot #{m.slot_number || i + 1}
           </p>
@@ -57,13 +56,24 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 Generating your PDF…
               </span>
             ) : (
-              <span className="text-gray-400 italic">Awaiting prompt…</span>
+              <span className="text-gray-400 italic">Idle...</span>
+            )}
+          </p>
+
+          <p className="text-sm text-silver mt-1 flex items-center gap-2">
+            <span className="font-semibold">Theme:</span>
+            {m.theme ? (
+              <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-gray-700 text-white capitalize">
+                {m.theme}
+              </span>
+            ) : (
+              <span className="text-gray-500 italic">N/A</span>
             )}
           </p>
 
           <p className="text-sm text-silver mt-1">
             <span className="font-semibold">Prompt:</span>{" "}
-            {m.prompt ? "Submitted" : "Awaiting prompt…"}
+            {m.prompt ? "Submitted" : "Not submitted"}
           </p>
 
           <div className="flex gap-2 mt-3">

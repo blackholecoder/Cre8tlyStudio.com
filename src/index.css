@@ -16,8 +16,9 @@
   
 }
 
-body {
-  background-color: #0a0a0a;
+html, body, #root {
+  background-color: #030712 !important;
+  color: #ffffff;
 }
 
 .subscribe-bg {
@@ -100,68 +101,7 @@ body {
   /* color: #00CEC9; */
 }
 
-.neomorphism-card {
-  background: #00CEC9; /* Neutral dark gray */
-  border-radius: 12px; /* Soft corners */
-  box-shadow: 
-  8px 8px 16px rgba(0, 0, 0, 0.25),  /* Dark shadow */
-  -4px -4px 8px rgba(255, 255, 255, 0.02); /* Light shadow */
-  padding: 20px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
 
-.neomorphism-card:hover {
-  box-shadow: 
-    6px 6px 12px rgba(0, 0, 0, 0.35), /* Slightly darker for depth */
-    -6px -6px 12px rgba(255, 255, 255, 0.25); /* More vibrant glow */
-  transform: translateY(-2px); /* Gentle lift */
-}
-
-/* Start Styles for Sections */
-
-.angled-divider {
-  background: #00CEC9;
-  clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 90%);
-}
-.glass-divider {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  height: 10px;
-  margin: 50px 0;
-  border-radius: 10px;
-}
-
-.glass-divider-shop {
-  background: rgba(255, 255, 255, 0.08); /* softer light */
-  box-shadow: 
-    inset 2px 2px 5px rgba(255, 255, 255, 0.1),   /* highlight edge */
-    inset -2px -2px 5px rgba(0, 0, 0, 0.4);       /* shadow edge */
-  backdrop-filter: blur(10px);
-  height: 10px;
-  margin: 50px 0;
-  border-radius: 10px;
-}
-
-.elevated-divider {
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
-  height: 10px;
-  background: #1E1E1E;
-  margin: 50px 0;
-}
-
-.neon-divider {
-  height: 4px;
-  background: linear-gradient(to right, #00CEC9, #FFFFFF);
-  box-shadow: 0 0 10px #00CEC9, 0 0 20px #00CEC9;
-  margin: 40px 0;
-}
-
-.glass {
-  backdrop-filter: blur(10px);
-  background: rgba(0, 0, 0, 0);
-  box-shadow: 0 0 20px #670fe7;
-  padding: 20px;
-}
 
 .textShadow {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
@@ -182,6 +122,17 @@ body {
 .lead-text {
   font-family: "Montserrat", serif;
 }
+
+/* Limit dropdown height and make it scroll after 10 items */
+select.dropdown-scroll option {
+  padding: 8px 12px;
+}
+
+select.dropdown-scroll:focus option {
+  max-height: 200px; /* roughly 10 items */
+  overflow-y: auto;
+}
+
 
 
 @layer utilities {
@@ -274,5 +225,85 @@ body {
   .verified-icon {
     @apply font-montserrat text-white text-xl;
   }
+
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield; /* Firefox */
+  }
+
+  @keyframes progressSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes gradientPulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-progress {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.animate-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #00e0ff,
+    #00e07a,
+    #00e0ff
+  );
+  background-size: 200% 100%;
+  animation: gradientPulse 2s linear infinite;
+  filter: drop-shadow(0 0 6px #00e0ff) drop-shadow(0 0 12px #00e07a);
+  border-radius: 9999px;
+}
+
+/* Light beam effect sweeping left to right */
+.animate-progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0)
+  );
+  animation: progressSlide 2s linear infinite;
+  border-radius: 9999px;
+}
+
+  
+  
+  html, body {
+  background-color: #030712 !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  overflow-x: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
 }

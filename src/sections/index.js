@@ -1,18 +1,17 @@
-
-//Components 
+//Components
 export { default as Nav } from "../components/Nav";
-export { default as FeaturesCard} from "../components/FeaturesCard";
-export { default as Button} from "../components/Button";
-export { default as NotFound} from "../components/NotFound";
+export { default as SignUpPage } from "../sections/SignUp";
+
+
+export { default as Button } from "../components/Button";
+export { default as NotFound } from "../components/NotFound";
 // Sections
-export { default as Hero } from './Hero';
-export { default as Landing } from './Landing';
-export { default as Features } from './Features';
-export { default as Subscribe } from './Subscribe';
+export { default as Hero } from "./Hero";
+export { default as Landing } from "./Landing";
+
+export { default as Subscribe } from "./Subscribe";
 export { default as Footer } from "./Footer";
 // export { default as Shop} from "./Shop";
-export { default as SocialLinks} from "./SocialLinks";
-
 
 // Documents
 export { default as Terms } from "../documents/Terms";
@@ -20,13 +19,5 @@ export { default as Privacy } from "../documents/Privacy";
 export { default as Refund } from "../documents/Refund";
 export { default as Cookie } from "../documents/Cookie";
 
-
-
 // admin
 export { default as Login } from "../admin/Login";
-
-
-
-
-
-

@@ -1,0 +1,33 @@
+{
+  "identifier": "com.aluredigital.cre8tlystudio",
+  "productName": "Cre8tly Studio",
+  "version": "1.0.0",
+  "build": {
+    "frontendDist": "../client/dist",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Cre8tly Studio",
+        "width": 1280,
+        "height": 800,
+         "minWidth": 1100,
+      "minHeight": 800,
+        "resizable": true,
+        "backgroundColor": "#030712",
+        "url": "/" 
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' https://cre8tlystudio.com data: blob: filesystem:;"
+    }
+  },
+  "bundle": {
+    "targets": ["dmg", "app"],
+    "icon": ["icons/app.icns"],
+    "category": "public.app-category.productivity"
+  }
+}

@@ -26,7 +26,7 @@ import "react-quill/dist/quill.snow.css";
 import "./index.css";
 import EntryRouter from "./EntryRouter.jsx";
 
-// 🔹 Define your Routes inside a subcomponent that has access to the Router
+
 const AnimatedRoutes = () => {
   const location = useLocation();
 

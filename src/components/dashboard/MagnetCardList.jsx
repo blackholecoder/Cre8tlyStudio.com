@@ -1,4 +1,9 @@
+import { useState } from "react";
+import PDFPreviewModal from "./PDFPreviewModal";
+
 export default function MagnetCardList({ magnets = [], onAddPrompt }) {
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   if (!Array.isArray(magnets) || magnets.length === 0) return null;
 
   return (
@@ -76,6 +81,7 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
             {m.prompt ? "Submitted" : "Not submitted"}
           </p>
 
+          {/* Actions */}
           <div className="flex gap-2 mt-3">
             {!m.prompt && (
               <button
@@ -85,28 +91,26 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 Add Prompt
               </button>
             )}
+
             {m.pdf_url && (
-              <>
-                <a
-                  href={m.pdf_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 px-3 py-2 bg-blue text-white rounded text-center"
-                >
-                  View
-                </a>
-                <a
-                  href={m.pdf_url}
-                  download={`lead-magnet-${m.id}.pdf`}
-                  className="flex-1 px-3 py-2 bg-downloadGreen text-white rounded text-center"
-                >
-                  Download
-                </a>
-              </>
+              <button
+                onClick={() => setPreviewUrl(m.pdf_url)}
+                className="flex-1 px-3 py-2 bg-blue text-white rounded"
+              >
+                Download
+              </button>
             )}
           </div>
         </div>
       ))}
+
+      {/* ✅ Shared PDF Preview Modal */}
+      {previewUrl && (
+        <PDFPreviewModal
+          fileUrl={previewUrl}
+          onClose={() => setPreviewUrl(null)}
+        />
+      )}
     </div>
   );
 }

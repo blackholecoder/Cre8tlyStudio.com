@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
-import { useMagnets } from "../admin/MagnetContext.jsx"; // ✅ use the global context
+import { useMagnets } from "../admin/MagnetContext.jsx"; 
 import { getVersion } from "@tauri-apps/api/app";
 // Components
 import PromptModal from "../components/PromptModal.jsx";

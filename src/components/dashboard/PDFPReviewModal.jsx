@@ -2,9 +2,15 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { useState, useMemo, useEffect } from "react";
 import { X, Download, ZoomIn, ZoomOut } from "lucide-react";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "/pdf.worker.min.js",
+  window.location.origin
+).toString();
+
+
 
 export default function PDFPreviewModal({ fileUrl, onClose }) {
+  console.log("🧾 PDFPreviewModal mounted with fileUrl:", fileUrl);
   const [numPages, setNumPages] = useState(null);
   const [scale, setScale] = useState(1.2);
   const [pdfReady, setPdfReady] = useState(false);

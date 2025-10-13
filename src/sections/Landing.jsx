@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
@@ -5,8 +6,24 @@ import PricingSection from "./Pricing";
 import { headerLogo } from "../assets/images";
 import VideoPlayer from "../components/VideoPlayer";
 import FreePDFSection from "./FreePDFSection";
+import PremiumEbooksCTA from "./PremiumEbooksCTA";
+import { getVersion } from "@tauri-apps/api/app";
 
 const Landing = () => {
+  const [isApp, setIsApp] = useState(false);
+
+   useEffect(() => {
+    async function checkIfApp() {
+      try {
+        await getVersion();
+        setIsApp(true);
+      } catch {
+        setIsApp(false);
+      }
+    }
+    checkIfApp();
+  }, []);
+
   return (
     <div className="min-h-screen w-full text-white flex flex-col font-sans overflow-x-hidden">
       {/* HERO */}
@@ -62,6 +79,9 @@ const Landing = () => {
       <HowItWorks />
       <PricingSection />
       <FreePDFSection />
+        {!isApp && (
+          <PremiumEbooksCTA />
+      )}
     </div>
   );
 };

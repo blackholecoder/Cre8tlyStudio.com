@@ -13,6 +13,7 @@ import PromptForm from "./prompt/PromptForm";
 import ProgressBar from "./prompt/ProgressBar";
 import ThemePreviewModal from "./prompt/ThemePreviewModal";
 import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
+import BookPromptForm from "./prompt/Book/BookPromptForm";
 
 export default function PromptModal({
   isOpen,
@@ -137,6 +138,54 @@ export default function PromptModal({
   }
 }
 
+async function handleBookSubmit(e) {
+  e.preventDefault();
+  setLoading(true);
+  setProgress(0);
+  setShowGenerating(true);
+  onClose();
+
+  let interval;
+  try {
+    interval = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
+    }, 350);
+
+    const res = await axios.post(
+      "https://cre8tlystudio.com/api/books/prompt",
+      {
+        prompt: text,
+        theme,
+        pages,
+        logo,
+        link,
+        coverImage: cover,
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    clearInterval(interval);
+    setProgress(100);
+    toast.success("📚 Your book was generated successfully!");
+    setShowGenerating(false);
+
+    await new Promise((r) => setTimeout(r, 1000));
+    onClose();
+  } catch (err) {
+    console.error("❌ Book generation error:", err);
+    clearInterval(interval);
+    setProgress(0);
+    setLoading(false);
+    setShowGenerating(false);
+    toast.error("Something went wrong while generating your book.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+
 
   return (
     <Transition show={isOpen} appear>
@@ -152,11 +201,12 @@ export default function PromptModal({
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-900 p-8 shadow-2xl border border-gray-700">
             <DialogTitle className="text-2xl font-bold text-white mb-6 text-center">
-              ✨ Create Your Lead Magnet
+             ✨ Create Your Lead Magnet
             </DialogTitle>
 
             {/* ---------- Form Wrapper ---------- */}
             <div className="relative">
+              {/* ---------- STEP 0: Choose Creation Type ---------- */}
               {/* ---------- STEP 1: Smart Prompt Builder ---------- */}
               {phase === "questions" && (
                 <SmartOutlineBuilder
@@ -208,6 +258,49 @@ export default function PromptModal({
                   />
                 </div>
               )}
+
+              {phase === "bookBuilder" && (
+  <div
+    className={`transition-all duration-300 ${
+      loading ? "pointer-events-none blur-sm opacity-50" : ""
+    }`}
+  >
+    <div className="flex justify-between items-center mb-4">
+      <button
+        type="button"
+        onClick={() => setPhase("selection")}
+        className="text-sm text-gray-400 underline hover:text-gray-200 transition"
+      >
+        ← Back to Selection
+      </button>
+    </div>
+
+    {/* This will be your new book form */}
+    <BookPromptForm
+      text={text}
+      setText={setText}
+      theme={theme}
+      setTheme={setTheme}
+      pages={pages}
+      setPages={setPages}
+      logo={logo}
+      setLogo={setLogo}
+      logoPreview={logoPreview}
+      setLogoPreview={setLogoPreview}
+      link={link}
+      setLink={setLink}
+      cover={cover}
+      setCover={setCover}
+      cta={cta}
+      setCta={setCta}
+      showPreview={showPreview}
+      setShowPreview={setShowPreview}
+      onSubmit={handleBookSubmit}
+      loading={loading}
+    />
+  </div>
+)}
+
 
               {/* Progress bar overlay */}
               {loading && (

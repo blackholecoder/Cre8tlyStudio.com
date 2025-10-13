@@ -5,15 +5,27 @@ import { navLinks } from "../constants";
 import { headerLogo } from "../assets/images";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
+import { getVersion } from "@tauri-apps/api/app";
 
 const Nav = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-
+  const [isApp, setIsApp] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    async function checkIfApp() {
+      try {
+        await getVersion();
+        setIsApp(true);
+      } catch {
+        setIsApp(false);
+      }
+    }
+    checkIfApp();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +61,8 @@ const Nav = () => {
     // Hide "Contact Us" on /contact page
     if (link.label === "Contact Us" && location.pathname === "/contact")
       return false;
+    if (isApp && link.label === "Shop") return false;
+
     return true;
   });
 
@@ -87,7 +101,7 @@ const Nav = () => {
                 (item.label === "Sign Up" ||
                   item.label === "Pricing" ||
                   item.label === "How it works" ||
-                  item.label === "Contact Us")
+                  item.label === "Contact Us" || item.label === "Shop")
               )
                 return null;
 
@@ -205,7 +219,7 @@ const Nav = () => {
                 (item.label === "Sign Up" ||
                   item.label === "Pricing" ||
                   item.label === "How it works" ||
-                  item.label === "Contact Us")
+                  item.label === "Contact Us" || item.label === "Shop")
               )
                 return null;
 

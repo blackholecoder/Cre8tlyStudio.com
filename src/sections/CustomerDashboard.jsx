@@ -115,12 +115,40 @@ export default function CustomerDashboard() {
   // ✅ Render
   return (
     <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <DashboardHeader magnets={magnets} onCheckout={handleCheckout} />
+      <DashboardHeader
+  type="magnet"
+  items={magnets}
+  onCheckout={handleCheckout}
+/>
+
+      {/* ✅ Navigation Tabs */}
+    <div className="flex gap-3 mb-8">
+      <button
+        onClick={() => navigate("/dashboard")}
+        className={`px-4 py-2 rounded-lg ${
+          location.pathname === "/dashboard"
+            ? "bg-blue text-white"
+            : "bg-gray-700 text-gray-200"
+        }`}
+      >
+        🎯 Lead Magnets
+      </button>
+      <button
+        onClick={() => navigate("/books")}
+        className={`px-4 py-2 rounded-lg ${
+          location.pathname === "/books"
+            ? "bg-blue text-white"
+            : "bg-gray-700 text-gray-200"
+        }`}
+      >
+        📚 Books
+      </button>
+    </div>
 
       {loading ? (
         <LoadingState />
       ) : magnets.length === 0 ? (
-        <EmptyState onCheckout={handleCheckout} />
+        <EmptyState onCheckout={handleCheckout} type="magnet" />
       ) : (
         <>
           {/* Desktop view */}
@@ -163,7 +191,7 @@ export default function CustomerDashboard() {
         onRefresh={refreshUserSlots}
         isFirstTime={magnets.length === 0}
       />
-      <GenerationOverlay visible={showGenerating} progress={progress} />
+      <GenerationOverlay visible={showGenerating} progress={progress} type="lead" />
     </div>
   );
 }

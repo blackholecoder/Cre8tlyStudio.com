@@ -335,6 +335,21 @@ select.dropdown-scroll:focus option {
   font-style: italic;
 }
 
+.quill-dark .ql-container {
+  background-color: #111;
+  color: #f5f5f5;
+  border: none;
+}
+
+.quill-dark .ql-editor {
+  min-height: 200px;
+  color: #f5f5f5;
+}
+
+.quill-dark .ql-editor::before {
+  color: #777; /* placeholder text color */
+}
+
 
 
 

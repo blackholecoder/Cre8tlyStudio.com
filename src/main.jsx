@@ -25,6 +25,11 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-quill/dist/quill.snow.css";
 import "./index.css";
 import EntryRouter from "./EntryRouter.jsx";
+import ForgotPassword from "./admin/ForgotPassword.jsx";
+import ResetPassword from "./admin/ResetPassword.jsx";
+import EbooksStore from "./sections/EbookStore.jsx";
+import BooksDashboard from "./sections/BooksDashboard.jsx";
+import { BookProvider } from "./admin/BookContext.jsx";
 
 
 const AnimatedRoutes = () => {
@@ -66,6 +71,8 @@ const AnimatedRoutes = () => {
         />
         <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/shop" element={<EbooksStore />} />
+        <Route path="/books" element={<BooksDashboard />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy-policy" element={<Privacy />} />
         <Route path="/refund-policy" element={<Refund />} />
@@ -76,6 +83,8 @@ const AnimatedRoutes = () => {
         <Route path="/sign-up" element={<SignupPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/plans" element={<PlansPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Private */}
         <Route
@@ -146,6 +155,7 @@ const RootApp = () => {
   return (
     <Router>
       <AuthProviderWithRouter>
+        <BookProvider>
         <MagnetProvider>
         <ToastContainer
           position="top-center"
@@ -160,6 +170,7 @@ const RootApp = () => {
         <Nav />
         <AnimatedRoutes />
         </MagnetProvider>
+        </BookProvider>
       </AuthProviderWithRouter>
     </Router>
   );

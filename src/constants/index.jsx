@@ -12,6 +12,7 @@ export const navLinks = [
   { href: "#pricing", label: "Pricing"},
   { href: "sign-up", label: "Sign Up"},
   { href: "contact", label: "Contact Us"},
+  { href: "shop", label: "Shop"},
   { href: "login", label: "Login"},
 
 ];

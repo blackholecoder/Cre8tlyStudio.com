@@ -133,8 +133,10 @@ export default function FreePDFSection() {
               helpful insights to grow your business and brand.
             </p>
           </div>
+          
         </div>
       </div>
+      
     </section>
   );
 }

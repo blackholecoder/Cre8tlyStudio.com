@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PDFPreviewModal from "./PDFPreviewModal";
+import { themeStyles } from "../../constants/index";
 
 export default function MagnetCardList({ magnets = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -65,10 +66,17 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
             )}
           </p>
 
-          <p className="text-sm text-silver mt-1 flex items-center gap-2">
-            <span className="font-semibold">Theme:</span>
+          <p className="py-2 flex items-center gap-2">
+            <span className="font-semibold text-silver">Theme:</span>
             {m.theme ? (
-              <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-gray-700 text-white capitalize">
+              <span
+                className="inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize"
+                style={{
+                  background: themeStyles[m.theme]?.background || "#333",
+                  color: themeStyles[m.theme]?.color || "#fff",
+                  border: themeStyles[m.theme]?.border || "none",
+                }}
+              >
                 {m.theme}
               </span>
             ) : (

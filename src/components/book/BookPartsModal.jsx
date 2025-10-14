@@ -43,6 +43,9 @@ export default function BookPartsModal({ bookId, accessToken, onClose }) {
                   <p className="text-white font-semibold">
                     Part {p.part_number}: {p.title || "Untitled"}
                   </p>
+                  <p className="text-white">
+                    Total pages: {p.pages}
+                  </p>
                   <p className="text-gray-400 text-xs">
                     {new Date(p.created_at).toLocaleString()}
                   </p>

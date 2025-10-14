@@ -18,7 +18,7 @@ import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 
 
 export default function CustomerDashboard() {
-  const { accessToken } = useAuth();
+  const { user, accessToken } = useAuth();
   const { magnets, setMagnets, fetchMagnets, loading } = useMagnets(); // ✅ data from context
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [openPrompt, setOpenPrompt] = useState(false);
@@ -99,6 +99,12 @@ export default function CustomerDashboard() {
   }
 
   useEffect(() => {
+  if (user?.has_book && !user?.has_magnet) {
+    navigate("/books");
+  }
+}, [user]);
+
+  useEffect(() => {
     async function checkIfApp() {
       try {
         await getVersion(); // ✅ This will succeed ONLY in Tauri
@@ -133,17 +139,28 @@ export default function CustomerDashboard() {
       >
         🎯 Lead Magnets
       </button>
-      <button
-        onClick={() => navigate("/books")}
-        className={`px-4 py-2 rounded-lg ${
-          location.pathname === "/books"
-            ? "bg-blue text-white"
-            : "bg-gray-700 text-gray-200"
-        }`}
-      >
-        📚 Books
-      </button>
-    </div>
+      {/* ✅ Only show Books tab if user.has_book = true */}
+        {user?.has_book ? (
+          <button
+            onClick={() => navigate("/books")}
+            className={`px-4 py-2 rounded-lg ${
+              location.pathname === "/books"
+                ? "bg-blue text-white"
+                : "bg-gray-700 text-gray-200"
+            }`}
+          >
+            📚 Books
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/books-upgrade")}
+            className="px-4 py-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700"
+          >
+            📚 Unlock Books
+          </button>
+        )}
+      </div>
+
 
       {loading ? (
         <LoadingState />

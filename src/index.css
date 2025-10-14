@@ -3,6 +3,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Palanquin:wght@100;200;300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Palanquin:wght@100;200;300;400;500;600;700&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -121,6 +122,9 @@ html, body, #root {
 }
 .lead-text {
   font-family: "Montserrat", serif;
+}
+.type-text {
+  font-family: "Inter", serif;
 }
 
 /* Limit dropdown height and make it scroll after 10 items */
@@ -349,6 +353,60 @@ select.dropdown-scroll:focus option {
 .quill-dark .ql-editor::before {
   color: #777; /* placeholder text color */
 }
+/* ---- Base ProseMirror editor ---- */
+.ProseMirror {
+  background: #111 !important;
+  color: #fff !important;
+  border: none !important;
+  outline: none !important;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  min-height: 70vh;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: none !important;
+}
+
+.ProseMirror {
+  outline: none;
+  min-height: 75vh;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  padding: 1rem;
+}
+.ProseMirror-focused {
+  outline: none;
+}
+
+.prose ul {
+  list-style-type: disc !important;
+  margin-left: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
+
+.prose ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
+
+.prose li {
+  margin: 0.25rem 0 !important;
+}
+
+.prose blockquote {
+  border-left: 3px solid #4ade80 !important; /* green accent */
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #d1d5db; /* soft gray text */
+  border-radius: 0.5rem;
+}
+.prose blockquote p {
+  margin: 0 !important;
+}
+
 
 
 

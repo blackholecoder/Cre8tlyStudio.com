@@ -5,7 +5,6 @@ import HowItWorks from "./HowItWorks";
 import PricingSection from "./Pricing";
 import { headerLogo } from "../assets/images";
 import VideoPlayer from "../components/VideoPlayer";
-import FreePDFSection from "./FreePDFSection";
 import PremiumEbooksCTA from "./PremiumEbooksCTA";
 import { getVersion } from "@tauri-apps/api/app";
 
@@ -78,7 +77,6 @@ const Landing = () => {
 
       <HowItWorks />
       <PricingSection />
-      <FreePDFSection />
         {!isApp && (
           <PremiumEbooksCTA />
       )}

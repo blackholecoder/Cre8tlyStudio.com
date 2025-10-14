@@ -88,14 +88,13 @@ export default function EbooksStore() {
                 ? "from-purple-600 via-blue-500 to-purple-600 shadow-[0_0_25px_rgba(147,51,234,0.4)] hover:shadow-[0_0_45px_rgba(147,51,234,0.7)]"
                 : "from-blue-600 via-cyan-400 to-blue-600 shadow-[0_0_25px_rgba(56,189,248,0.3)] hover:shadow-[0_0_45px_rgba(56,189,248,0.6)]";
 
-
           return (
             <div
               key={book.id}
-              className={`relative p-[2px] rounded-3xl bg-gradient-to-r ${borderGradient} transition-all duration-500`}
+              className={`relative rounded-3xl p-[2px] bg-gradient-to-r ${borderGradient}`}
             >
-              <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-8 flex flex-col justify-between min-h-[480px] text-center">
-                {/* Smaller cover image */}
+              <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-8 flex flex-col justify-between min-h-[480px] text-center shadow-[0_0_25px_rgba(0,0,0,0.4)]">
+                {/* Cover image */}
                 <div className="flex justify-center mb-6">
                   <img
                     src={book.image_url}
@@ -104,27 +103,23 @@ export default function EbooksStore() {
                   />
                 </div>
 
-                <h2
-                  className={`text-2xl font-semibold mb-3 text-white lead-text`}
-                >
+                <h2 className="text-2xl font-semibold mb-3 text-white">
                   {book.title}
                 </h2>
 
-                {/* Shortened description */}
                 <div
                   className="text-gray-300 mb-5 text-sm leading-relaxed line-clamp-3 text-left"
                   dangerouslySetInnerHTML={{ __html: book.description }}
                 />
 
-                {/* Read More button */}
                 <button
                   onClick={() => setSelectedEbook(book)}
-                  className="text-headerGreen text-sm hover:underline focus:outline-none mb-4"
+                  className="text-headerGreen text-sm hover:underline mb-4"
                 >
                   Read More
                 </button>
 
-                <p className="text-3xl font-extrabold mb-8 text-white lead-text">
+                <p className="text-3xl font-extrabold mb-8 text-white">
                   ${book.price}
                 </p>
 

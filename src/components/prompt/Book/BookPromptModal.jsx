@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-} from "@headlessui/react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import BookPromptForm from "../Book/BookPromptForm";
 import PDFThemePreview from "../../PDFThemePreview";
 import ThemePreviewModal from "../ThemePreviewModal";
-import BookPromptForm from "../Book/BookPromptForm";
+import { useNavigate } from "react-router-dom";
+
 
 export default function BookPromptModal({
   isOpen,
@@ -22,6 +17,7 @@ export default function BookPromptModal({
   setShowGenerating,
   setProgress,
 }) {
+  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [pages, setPages] = useState(10);
   const [link, setLink] = useState("");
@@ -30,8 +26,10 @@ export default function BookPromptModal({
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [authorName, setAuthorName] = useState("");
+  const [bookName, setBookName] = useState("");
+  const [bookInfo, setBookInfo] = useState(null);
 
-  // ✅ Reset on close
+  // ✅ Reset when closing
   useEffect(() => {
     if (!isOpen) {
       setText("");
@@ -44,121 +42,126 @@ export default function BookPromptModal({
     }
   }, [isOpen]);
 
-  const handleClose = () => {
-    if (!loading) onClose();
-  };
-
- async function handleSubmit(e) {
-  e.preventDefault();
-  if (!text.trim()) {
-    toast.error("Please enter your book idea or prompt first.");
-    return;
-  }
-
-  setLoading(true);
-  setProgress(0);
-  setShowGenerating(true);
-  onClose(); // ✅ closes modal so overlay shows
-
-  let interval;
-  try {
-    // Simulate progress animation
-    interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-    }, 400);
-
-    const res = await axios.post(
-      "https://cre8tlystudio.com/api/books/prompt",
-      {
-        bookId,
-        prompt: text,
-        pages,
-        link,
-        coverImage: cover,
-        title,
-        authorName,
-        partNumber,
-      },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-
-    clearInterval(interval);
-    setProgress(100);
-    toast.success("📚 Book section generated successfully!");
-
-    // ✅ Hide overlay after short delay
-    setTimeout(() => setShowGenerating(false), 800);
-
-    // ✅ Refresh dashboard after generation
-    if (typeof onSubmitted === "function") {
-      setTimeout(() => onSubmitted(bookId, text), 1500);
+  // ✅ Fetch book info
+  useEffect(() => {
+    async function fetchBook() {
+      if (!bookId) return;
+      try {
+        const res = await fetch(`https://cre8tlystudio.com/api/books/${bookId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        setBookInfo(data);
+      } catch (err) {
+        console.error("Failed to load book info:", err);
+      }
     }
-  } catch (err) {
-    console.error("❌ Book generation error:", err);
-    clearInterval(interval);
+    fetchBook();
+  }, [bookId]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!text.trim()) {
+      toast.error("Please enter your book idea or prompt first.");
+      return;
+    }
+
+    setLoading(true);
     setProgress(0);
-    setShowGenerating(false);
-    toast.error(err.response?.data?.message || "Book generation failed. Try again.");
+    setShowGenerating(true);
 
-    if (typeof onSubmitted === "function") {
-      setTimeout(() => onSubmitted(bookId, text), 2500);
+    let interval;
+    try {
+      interval = setInterval(() => {
+        setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
+      }, 400);
+
+      const res = await axios.post(
+        "https://cre8tlystudio.com/api/books/prompt",
+        {
+          bookId,
+          prompt: text,
+          pages,
+          link,
+          coverImage: cover,
+          title,
+          authorName,
+          bookName,
+          partNumber,
+        },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      clearInterval(interval);
+      setProgress(100);
+      toast.success("📚 Book section generated successfully!");
+      setTimeout(() => setShowGenerating(false), 800);
+
+      if (typeof onSubmitted === "function") {
+        setTimeout(() => onSubmitted(bookId, text), 1500);
+      }
+      setTimeout(() => {
+  onClose(); // this hides the modal
+  window.dispatchEvent(new Event("refreshBooks")); // custom event to refresh
+}, 2000);
+    } catch (err) {
+      clearInterval(interval);
+      setProgress(0);
+      setShowGenerating(false);
+      toast.error(err.response?.data?.message || "Book generation failed. Try again.");
+      console.error("❌ Book generation error:", err);
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
   }
-}
 
+  if (!isOpen) return null;
 
+  // ✅ Full-screen layout replaces modal
   return (
-    <Transition show={isOpen} appear>
-      <Dialog className="relative z-50" onClose={handleClose}>
-        <DialogBackdrop className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-900 p-8 shadow-2xl border border-gray-700">
-            <DialogTitle className="text-2xl font-bold text-white mb-6 text-center">
-              📖 Build Your Novel Part {partNumber}
-            </DialogTitle>
+    <div className="fixed inset-0 z-50 bg-[#0b0b0b] text-white flex flex-col overflow-hidden">
+      {/* Header Bar */}
+      {/* Header Bar */}
+<div className="relative flex items-center justify-center px-6 py-5 border-b border-gray-700 bg-[#111]">
+  {/* Centered Title */}
+  <h1 className="text-2xl font-semibold text-white text-center">
+    📖 Build Your Novel — Part {partNumber}
+  </h1>
 
-            {/* ---------- Form ---------- */}
-            <div
-              className={`transition-all duration-300 ${
-                loading ? "pointer-events-none blur-sm opacity-50" : ""
-              }`}
-            >
-              <BookPromptForm
-                text={text}
-                setText={setText}
-                pages={pages}
-                setPages={setPages}
-                link={link}
-                setLink={setLink}
-                cover={cover}
-                setCover={setCover}
-                title={title}
-                setTitle={setTitle}
-                authorName={authorName}        // ✅ add these
-                setAuthorName={setAuthorName} 
-                onSubmit={handleSubmit}
-                loading={loading}
-                showPreview={showPreview}
-                setShowPreview={setShowPreview}
-              />
-            </div>
-            {/* Close button */}
-            <button
-              onClick={handleClose}
-              disabled={loading}
-              className={`absolute top-4 right-4 text-white text-xl transition ${
-                loading ? "opacity-30 cursor-not-allowed" : "hover:text-red-400"
-              }`}
-            >
-              ✕
-            </button>
-          </DialogPanel>
-        </div>
-      </Dialog>
+  {/* Back button absolutely positioned left */}
+  <button
+    onClick={onClose}
+    className="absolute left-6 text-silver hover:text-white transition text-lg"
+  >
+    ← Back
+  </button>
+</div>
 
-      {/* Theme Preview Modal */}
+      {/* Writing Area */}
+      <div className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full">
+        <BookPromptForm
+          text={text}
+          setText={setText}
+          pages={pages}
+          setPages={setPages}
+          link={link}
+          setLink={setLink}
+          cover={cover}
+          setCover={setCover}
+          title={title}
+          setTitle={setTitle}
+          authorName={bookInfo?.author_name || ""}
+          setAuthorName={() => {}}
+          bookName={bookInfo?.title || ""}
+          setBookName={() => {}}
+          onSubmit={handleSubmit}
+          loading={loading}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      </div>
+
+      {/* Preview */}
       {showPreview && (
         <ThemePreviewModal
           showPreview={showPreview}
@@ -166,6 +169,6 @@ export default function BookPromptModal({
           PDFThemePreview={PDFThemePreview}
         />
       )}
-    </Transition>
+    </div>
   );
 }

@@ -13,9 +13,10 @@ import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
 import BookPromptModal from "../components/prompt/Book/BookPromptModal.jsx";
 import BookCardList from "../components/book/BookCardList.jsx";
+import NewBookModal from "../components/book/NewBookModal.jsx";
 
 export default function BooksDashboard() {
-  const { accessToken } = useAuth();
+  const { user, accessToken } = useAuth();
   const { books, setBooks, fetchBooks, loading } = useBooks();
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeBook, setActiveBook] = useState(null);
@@ -24,6 +25,7 @@ export default function BooksDashboard() {
   const [isApp, setIsApp] = useState(false);
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showNewBookModal, setShowNewBookModal] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,9 +42,29 @@ export default function BooksDashboard() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  // ✅ Open modal for book or next part
   function openBookModal(bookId, partNumber = 1) {
-     setActiveBook({ id: bookId, part_number: partNumber });
+    const selectedBook = books.find((b) => b.id === bookId);
+    console.log("SelectedBook:", selectedBook);
+
+    if (!selectedBook) return;
+
+    const missingAuthor =
+      !selectedBook.author_name || selectedBook.author_name.trim() === "";
+    const missingTitle =
+      !selectedBook.book_name ||
+      selectedBook.book_name.trim() === "" ||
+      selectedBook.book_name === "Untitled" ||
+      selectedBook.book_name === "Untitled Book";
+
+    // Show modal only if *either* author OR book_name is missing
+    if (missingAuthor || missingTitle) {
+      setActiveBook({ id: bookId, part_number: partNumber });
+      setShowNewBookModal(true);
+      return;
+    }
+
+    // Otherwise go straight to writing
+    setActiveBook({ id: bookId, part_number: partNumber });
     setOpenPrompt(true);
   }
 
@@ -50,13 +72,54 @@ export default function BooksDashboard() {
   function handlePromptSubmitted(bookId, promptText) {
     setBooks((prev) =>
       prev.map((b) =>
-        b.id === bookId
-          ? { ...b, prompt: promptText, status: "pending" }
-          : b
+        b.id === bookId ? { ...b, prompt: promptText, status: "pending" } : b
       )
     );
     setTimeout(fetchBooks, 3000);
   }
+
+  async function handleAddAuthorAndTitle(title, authorName) {
+    try {
+      const res = await fetch(
+        `https://cre8tlystudio.com/api/books/update-info/${activeBook.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ title, authorName }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to update book info");
+
+      // ✅ Immediately update local book state
+      setBooks((prev) =>
+        prev.map((b) =>
+          b.id === activeBook.id ? { ...b, title, author_name: authorName } : b
+        )
+      );
+
+      // ✅ Close modal and open writing prompt right away
+      setShowNewBookModal(false);
+      setOpenPrompt(true);
+
+      // ✅ Fetch fresh data in background (syncs everything with DB)
+      fetchBooks();
+    } catch (err) {
+      console.error("Error updating book info:", err);
+    }
+  }
+
+  useEffect(() => {
+  function handleRefresh() {
+    fetchBooks();
+  }
+
+  window.addEventListener("refreshBooks", handleRefresh);
+  return () => window.removeEventListener("refreshBooks", handleRefresh);
+}, [fetchBooks]);
 
   async function refreshUserSlots() {
     try {
@@ -93,17 +156,23 @@ export default function BooksDashboard() {
       />
 
       {/* Navigation Tabs */}
+
       <div className="flex gap-3 mb-8">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className={`px-4 py-2 rounded-lg ${
-            location.pathname === "/dashboard"
-              ? "bg-blue text-white"
-              : "bg-gray-700 text-gray-200"
-          }`}
-        >
-          🎯 Lead Magnets
-        </button>
+        {/* ✅ Only show Lead Magnets if user.has_magnet = true */}
+        {user?.has_magnet && (
+          <button
+            onClick={() => navigate("/dashboard")}
+            className={`px-4 py-2 rounded-lg ${
+              location.pathname === "/dashboard"
+                ? "bg-blue text-white"
+                : "bg-gray-700 text-gray-200"
+            }`}
+          >
+            🎯 Lead Magnets
+          </button>
+        )}
+
+        {/* Always show Books tab */}
         <button
           onClick={() => navigate("/books")}
           className={`px-4 py-2 rounded-lg ${
@@ -120,7 +189,6 @@ export default function BooksDashboard() {
         <LoadingState />
       ) : books.length === 0 ? (
         <EmptyState onCheckout={() => navigate("/plans")} type="book" />
-
       ) : (
         <>
           <BookTable
@@ -144,6 +212,15 @@ export default function BooksDashboard() {
         </>
       )}
 
+      {showNewBookModal && activeBook && (
+        <NewBookModal
+          bookId={activeBook.id}
+          accessToken={accessToken}
+          onCreate={handleAddAuthorAndTitle}
+          onClose={() => setShowNewBookModal(false)}
+        />
+      )}
+
       {activeBook && (
         <BookPromptModal
           isOpen={openPrompt}
@@ -164,7 +241,11 @@ export default function BooksDashboard() {
         isFirstTime={books.length === 0}
       />
 
-      <GenerationOverlay visible={showGenerating} progress={progress} type="book" />
+      <GenerationOverlay
+        visible={showGenerating}
+        progress={progress}
+        type="book"
+      />
     </div>
   );
 }

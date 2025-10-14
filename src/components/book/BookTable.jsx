@@ -41,7 +41,7 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
               >
                 {/* Title */}
                 <td className="px-4 py-2 font-semibold">
-                  {b.title || "Untitled"}
+                  {b.book_name || "Untitled"}
                 </td>
 
                 {/* Part number */}
@@ -51,30 +51,21 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                     <div
                       className="bg-gradient-to-r from-green to-royalPurple h-2"
                       style={{
-                        width: `${Math.min((b.pages / 150) * 100, 100)}%`,
+                        width: `${Math.min((b.pages / 750) * 100, 100)}%`,
                       }}
                     />
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
-                    {b.pages || 0}/150 pages
+                    {b.pages || 0}/750 pages
                   </p>
                 </td>
                 {/* Created date */}
                 <td className="px-4 py-2">
                   {new Date(b.created_at).toLocaleDateString()}
                 </td>
-
-                {/* Status */}
+                {/* ✅ Smart Status Display */}
                 <td className="px-4 py-2">
-                  {b.status === "completed" ? (
-                    <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
-                      Completed
-                    </span>
-                  ) : b.status === "failed" ? (
-                    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                      Failed
-                    </span>
-                  ) : b.status === "pending" ? (
+                  {b.status === "pending" ? (
                     <span className="flex items-center gap-2 text-yellow italic">
                       <svg
                         className="animate-spin h-4 w-4 text-yellow"
@@ -98,8 +89,18 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                       </svg>
                       Generating…
                     </span>
+                  ) : b.status === "failed" ? (
+                    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                      Failed
+                    </span>
+                  ) : b.pages >= 750 ? (
+                    <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
+                      Completed
+                    </span>
                   ) : (
-                    <span className="text-gray-400 italic">Idle</span>
+                    <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                      In Progress
+                    </span>
                   )}
                 </td>
 
@@ -113,42 +114,41 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                   {!b.prompt && (
                     <button
                       onClick={() => onAddPrompt(b.id, b.part_number)}
-                      className="px-3 py-1 bg-royalPurple rounded text-sm"
+                      className="px-3 py-1 bg-blue rounded text-sm"
                     >
-                      Add Prompt
+                      Add Chapter
                     </button>
                   )}
-
-                  {/* ✅ This button now correctly opens the modal */}
                   {b.pdf_url && (
                     <button
-                      onClick={() => {
-                        console.log("Opening book PDF:", b.pdf_url);
-                        setPreviewUrl(b.pdf_url);
-                      }}
-                      className="px-4 py-1 bg-blue rounded text-sm"
+                      onClick={() => setPreviewUrl(b.pdf_url)}
+                      className={`px-4 py-1 rounded text-sm ${
+                        b.pages >= 750
+                          ? "bg-green text-black"
+                          : "bg-blue text-white"
+                      }`}
                     >
-                      Download
+                      {b.pages >= 750 ? "Download Book" : "Preview"}
                     </button>
                   )}
-
-                  {b.status === "completed" && (
-                    <button
-                      onClick={() => openPartsModal(b.id)}
-                      className="px-3 py-1 bg-gray-700 rounded text-sm hover:bg-gray-600 transition"
-                    >
-                      View All Parts
-                    </button>
+                  {b.pdf_url && (
+                  <button
+                    onClick={() => openPartsModal(b.id)}
+                    className="px-3 py-1 bg-gray-700 rounded text-sm hover:bg-gray-600 transition"
+                  >
+                    View All Parts
+                  </button>
                   )}
-
-                  {b.status === "completed" && (
+                  {b.prompt && b.pages < 750 && (
                     <button
                       onClick={() =>
                         onGenerateNext(b.id, (b.part_number || 1) + 1)
                       }
                       className="px-3 py-1 bg-gradient-to-r from-[#00E07A] to-[#6a5acd] text-black rounded text-sm hover:opacity-90 transition"
                     >
-                      ➕ Next Part ({(b.part_number || 1) + 1})
+                      {b.pages >= 740
+                        ? "🏁 Finish Book"
+                        : `➕ Continue Story (Part ${(b.part_number || 1) + 1})`}
                     </button>
                   )}
                 </td>

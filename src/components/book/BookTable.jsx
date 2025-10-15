@@ -1,7 +1,9 @@
 import { useState } from "react";
-import PDFPreviewModal from "../dashboard/PDFPreviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
+import { CheckCircle, Download, Plus, Timer } from "lucide-react";
+
 
 export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -105,9 +107,17 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                 </td>
 
                 {/* Prompt status */}
-                <td className="px-4 py-2">
-                  {b.prompt ? "Submitted" : "Not submitted"}
-                </td>
+               <td className="px-4 py-2">
+                {b.prompt ? (
+                  <div className="flex items-center text-headerGreen">
+                    <CheckCircle size={18} className="mr-1" />
+                  </div>
+                ) : (
+                  <div className="flex items-center text-grey">
+                    <Timer size={18} className="mr-1" />
+                  </div>
+                )}
+              </td>
 
                 {/* Action buttons */}
                 <td className="px-4 py-2 flex gap-2 flex-wrap">

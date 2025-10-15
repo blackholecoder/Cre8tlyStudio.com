@@ -10,7 +10,7 @@ export function EbookModal({ ebook, onClose, onBuy, loadingBook }) {
           ✕
         </button>
 
-        {/* Ebook cover centered */}
+        {/* Ebook cover */}
         <div className="flex justify-center">
           <img
             src={ebook.image_url}
@@ -19,14 +19,15 @@ export function EbookModal({ ebook, onClose, onBuy, loadingBook }) {
           />
         </div>
 
-        {/* Text content (left-aligned) */}
+        {/* Text content */}
         <div className="mt-6 text-left">
           <h2 className="text-3xl font-bold text-white mb-3">
             {ebook.title} (guide)
           </h2>
 
+          {/* ✅ Scrollable description area */}
           <div
-            className="text-gray-300 mb-5 text-sm leading-relaxed space-y-3"
+            className="text-gray-300 text-sm leading-relaxed space-y-3 overflow-y-auto max-h-[300px] pr-2 mb-5 py-4"
             dangerouslySetInnerHTML={{ __html: ebook.description }}
           />
 
@@ -35,7 +36,7 @@ export function EbookModal({ ebook, onClose, onBuy, loadingBook }) {
           </p>
 
           <button
-            onClick={() => onBuy(ebook)} // Pass the full ebook
+            onClick={() => onBuy(ebook)}
             disabled={loadingBook === ebook.product_type}
             className={`py-3 px-8 rounded-xl text-lg font-semibold shadow-lg ${
               loadingBook === ebook.product_type

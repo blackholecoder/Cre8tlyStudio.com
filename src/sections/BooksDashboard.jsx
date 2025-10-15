@@ -112,14 +112,7 @@ export default function BooksDashboard() {
     }
   }
 
-  useEffect(() => {
-  function handleRefresh() {
-    fetchBooks();
-  }
 
-  window.addEventListener("refreshBooks", handleRefresh);
-  return () => window.removeEventListener("refreshBooks", handleRefresh);
-}, [fetchBooks]);
 
   async function refreshUserSlots() {
     try {

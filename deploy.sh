@@ -13,4 +13,10 @@ sudo -i
 # cargo tauri build --bundles app --target universal-apple-darwin
 # npx tauri build --debug --target universal-apple-darwin
 
+
+# DYSM FILE BUILD
+# cd /Volumes/OWC\ VIDEOS/Code/cre8tlystudio.com/src-tauri/target/universal-apple-darwin/release/bundle/macos
+# dsymutil "Cre8tly Studio.app/Contents/MacOS/app" -o "Cre8tly Studio.app.dSYM"
+
+
 echo "Done!"

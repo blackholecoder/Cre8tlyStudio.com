@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import PDFThemePreview from "./PDFThemePreview";
 import PromptForm from "./prompt/PromptForm";
-import ProgressBar from "./prompt/ProgressBar";
 import ThemePreviewModal from "./prompt/ThemePreviewModal";
 import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
 import BookPromptForm from "./prompt/Book/BookPromptForm";
@@ -21,9 +20,8 @@ export default function PromptModal({
   magnetId,
   accessToken,
   onSubmitted,
-  setShowGenerating,  
-  progress,
-  setProgress 
+  setShowGenerating,
+  setProgress,
 }) {
   const [text, setText] = useState("");
   const [theme, setTheme] = useState("modern");
@@ -59,133 +57,133 @@ export default function PromptModal({
   const handleClose = () => onClose();
 
   async function handleSubmit(e) {
-  e.preventDefault();
-  setLoading(true);
-  setProgress(0);
-  setShowGenerating(true); // ✅ show the global overlay
-  onClose(); // ✅ close modal right away
-
-  let interval;
-  try {
-    interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
-    }, 300);
-
-    const res = await axios.post(
-      "https://cre8tlystudio.com/api/lead-magnets/prompt",
-      {
-        magnetId,
-        prompt: text,
-        theme,
-        pages,
-        logo,
-        link,
-        coverImage: cover,
-        cta,
-      },
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    clearInterval(interval);
-    setProgress(100);
-    toast.success("🎉 Lead magnet generated successfully!");
-    setShowGenerating(false);
-
-    // ✅ Step 1: keep progress visible for a bit
-    await new Promise((r) => setTimeout(r, 1000));
-
-    // ✅ Step 2: close modal first (return to dashboard)
-    onClose();
-
-    // ✅ Step 3: trigger dashboard to refresh magnet list
-    setTimeout(() => {
-      if (typeof onSubmitted === "function") {
-        onSubmitted(magnetId, text, theme);
-      }
-    }, 2000); // wait 2s for backend to finalize upload
-  } catch (err) {
-    console.error("❌ Prompt submission error:", err);
-    clearInterval(interval);
+    e.preventDefault();
+    setLoading(true);
     setProgress(0);
-    setLoading(false);
-    setShowGenerating(false);
+    setShowGenerating(true); // ✅ show the global overlay
+    onClose(); // ✅ close modal right away
 
-    if (err.response) {
-      const { status, data } = err.response;
-      if (status === 413) {
-        toast.error(
-          data.message || "Your input is too long. Please shorten it."
-        );
-      } else if (status === 400) {
-        toast.error(data.message || "Missing required fields.");
+    let interval;
+    try {
+      interval = setInterval(() => {
+        setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
+      }, 300);
+
+      const res = await axios.post(
+        "https://cre8tlystudio.com/api/lead-magnets/prompt",
+        {
+          magnetId,
+          prompt: text,
+          theme,
+          pages,
+          logo,
+          link,
+          coverImage: cover,
+          cta,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      clearInterval(interval);
+      setProgress(100);
+      toast.success("🎉 Lead magnet generated successfully!");
+      setShowGenerating(false);
+
+      // ✅ Step 1: keep progress visible for a bit
+      await new Promise((r) => setTimeout(r, 1000));
+
+      // ✅ Step 2: close modal first (return to dashboard)
+      onClose();
+
+      // ✅ Step 3: trigger dashboard to refresh magnet list
+      setTimeout(() => {
+        if (typeof onSubmitted === "function") {
+          onSubmitted(magnetId, text, theme);
+        }
+      }, 2000); // wait 2s for backend to finalize upload
+    } catch (err) {
+      console.error("❌ Prompt submission error:", err);
+      clearInterval(interval);
+      setProgress(0);
+      setLoading(false);
+      setShowGenerating(false);
+
+      if (err.response) {
+        const { status, data } = err.response;
+        if (status === 413) {
+          toast.error(
+            data.message || "Your input is too long. Please shorten it."
+          );
+        } else if (status === 400) {
+          toast.error(data.message || "Missing required fields.");
+        } else {
+          toast.error(data.message || "Something went wrong on the server.");
+        }
       } else {
-        toast.error(data.message || "Something went wrong on the server.");
+        toast.error(
+          "Network error — PDF is still being processed. Please refresh."
+        );
       }
-    } else {
-      toast.error("Network error — PDF is still being processed. Please refresh.");
-    }
 
-    // ✅ Close modal even if there's a "network error" (since backend succeeded)
-    onClose();
-    if (typeof onSubmitted === "function") {
-      setTimeout(() => onSubmitted(magnetId, text, theme), 3000);
+      // ✅ Close modal even if there's a "network error" (since backend succeeded)
+      onClose();
+      if (typeof onSubmitted === "function") {
+        setTimeout(() => onSubmitted(magnetId, text, theme), 3000);
+      }
+    } finally {
+      setLoading(false);
+      onClose();
     }
-  } finally {
-    setLoading(false);
-    onClose();
   }
-}
 
-async function handleBookSubmit(e) {
-  e.preventDefault();
-  setLoading(true);
-  setProgress(0);
-  setShowGenerating(true);
-  onClose();
-
-  let interval;
-  try {
-    interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-    }, 350);
-
-    const res = await axios.post(
-      "https://cre8tlystudio.com/api/books/prompt",
-      {
-        prompt: text,
-        theme,
-        pages,
-        logo,
-        link,
-        coverImage: cover,
-      },
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    clearInterval(interval);
-    setProgress(100);
-    toast.success("📚 Your book was generated successfully!");
-    setShowGenerating(false);
-
-    await new Promise((r) => setTimeout(r, 1000));
-    onClose();
-  } catch (err) {
-    console.error("❌ Book generation error:", err);
-    clearInterval(interval);
+  async function handleBookSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
     setProgress(0);
-    setLoading(false);
-    setShowGenerating(false);
-    toast.error("Something went wrong while generating your book.");
-  } finally {
-    setLoading(false);
+    setShowGenerating(true);
+    onClose();
+
+    let interval;
+    try {
+      interval = setInterval(() => {
+        setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
+      }, 350);
+
+      const res = await axios.post(
+        "https://cre8tlystudio.com/api/books/prompt",
+        {
+          prompt: text,
+          theme,
+          pages,
+          logo,
+          link,
+          coverImage: cover,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      clearInterval(interval);
+      setProgress(100);
+      toast.success("📚 Your book was generated successfully!");
+      setShowGenerating(false);
+
+      await new Promise((r) => setTimeout(r, 1000));
+      onClose();
+    } catch (err) {
+      console.error("❌ Book generation error:", err);
+      clearInterval(interval);
+      setProgress(0);
+      setLoading(false);
+      setShowGenerating(false);
+      toast.error("Something went wrong while generating your book.");
+    } finally {
+      setLoading(false);
+    }
   }
-}
-
-
 
   return (
     <Transition show={isOpen} appear>
@@ -201,7 +199,7 @@ async function handleBookSubmit(e) {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-900 p-8 shadow-2xl border border-gray-700">
             <DialogTitle className="text-2xl font-bold text-white mb-6 text-center">
-             ✨ Create Your Lead Magnet
+              ✨ Create Your Lead Magnet
             </DialogTitle>
 
             {/* ---------- Form Wrapper ---------- */}
@@ -260,60 +258,44 @@ async function handleBookSubmit(e) {
               )}
 
               {phase === "bookBuilder" && (
-  <div
-    className={`transition-all duration-300 ${
-      loading ? "pointer-events-none blur-sm opacity-50" : ""
-    }`}
-  >
-    <div className="flex justify-between items-center mb-4">
-      <button
-        type="button"
-        onClick={() => setPhase("selection")}
-        className="text-sm text-gray-400 underline hover:text-gray-200 transition"
-      >
-        ← Back to Selection
-      </button>
-    </div>
-
-    {/* This will be your new book form */}
-    <BookPromptForm
-      text={text}
-      setText={setText}
-      theme={theme}
-      setTheme={setTheme}
-      pages={pages}
-      setPages={setPages}
-      logo={logo}
-      setLogo={setLogo}
-      logoPreview={logoPreview}
-      setLogoPreview={setLogoPreview}
-      link={link}
-      setLink={setLink}
-      cover={cover}
-      setCover={setCover}
-      cta={cta}
-      setCta={setCta}
-      showPreview={showPreview}
-      setShowPreview={setShowPreview}
-      onSubmit={handleBookSubmit}
-      loading={loading}
-    />
-  </div>
-)}
-
-
-              {/* Progress bar overlay */}
-              {loading && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm rounded-2xl z-20 text-center">
-                  <h2 className="text-white text-xl sm:text-2xl font-semibold mb-4 animate-pulse">
-                    🚀 Creating your lead magnet...
-                  </h2>
-                  <div className="w-3/4">
-                    <ProgressBar progress={progress} />
+                <div
+                  className={`transition-all duration-300 ${
+                    loading ? "pointer-events-none blur-sm opacity-50" : ""
+                  }`}
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setPhase("selection")}
+                      className="text-sm text-gray-400 underline hover:text-gray-200 transition"
+                    >
+                      ← Back to Selection
+                    </button>
                   </div>
-                  <p className="text-gray-400 text-sm mt-4 italic">
-                    This might take a moment, crafting something powerful ✨
-                  </p>
+
+                  {/* This will be your new book form */}
+                  <BookPromptForm
+                    text={text}
+                    setText={setText}
+                    theme={theme}
+                    setTheme={setTheme}
+                    pages={pages}
+                    setPages={setPages}
+                    logo={logo}
+                    setLogo={setLogo}
+                    logoPreview={logoPreview}
+                    setLogoPreview={setLogoPreview}
+                    link={link}
+                    setLink={setLink}
+                    cover={cover}
+                    setCover={setCover}
+                    cta={cta}
+                    setCta={setCta}
+                    showPreview={showPreview}
+                    setShowPreview={setShowPreview}
+                    onSubmit={handleBookSubmit}
+                    loading={loading}
+                  />
                 </div>
               )}
             </div>

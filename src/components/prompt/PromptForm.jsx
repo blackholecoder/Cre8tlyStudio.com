@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { toast } from "react-toastify"; // 🆕 import Toastify
 import LogoUploader from "./LogoUploader";
 import ThemeSelector from "./ThemeSelector";
 import CoverUpload from "./CoverUpload";
@@ -17,36 +19,93 @@ export default function PromptForm({
   setLogoPreview,
   link,
   setLink,
-  cover, // 👈 add
+  cover,
   setCover,
-  cta, // 👈 new
+  cta,
   setCta,
   setShowPreview,
   onSubmit,
   loading,
 }) {
+  const [warning, setWarning] = useState("");
+  const [charCount, setCharCount] = useState(0);
+  const [tooLong, setTooLong] = useState(false);
+
+  useEffect(() => {
+    const plainText = text?.replace(/<[^>]+>/g, "").trim() || "";
+    const length = plainText.length;
+    const limit = 100000;
+    const softLimit = limit * 0.9;
+
+    setCharCount(length);
+
+    // ⚠️ handle limits + show toast
+    if (length > limit) {
+      if (!tooLong) {
+        toast.error(
+          `Your prompt is too long (${length.toLocaleString()} / ${limit.toLocaleString()} characters). Please shorten it before submitting.`,
+          { autoClose: 6000 }
+        );
+      }
+      setTooLong(true);
+      setWarning("⚠️ Your prompt exceeds the limit. Please shorten it.");
+    } else if (length > softLimit) {
+      setTooLong(false);
+      setWarning(
+        `Approaching limit — ${length.toLocaleString()} / ${limit.toLocaleString()} characters.`
+      );
+    } else {
+      setTooLong(false);
+      setWarning("");
+    }
+  }, [text]);
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      
       {/* Pre-Made Prompt */}
       <PromptSelect setText={setText} />
 
       {/* Prompt Editor */}
-      <div
-        className="h-[250px] overflow-hidden rounded-lg border border-gray-600 bg-white"
-        style={{ color: "#111" }}
-      >
-        <ReactQuill
-          theme="snow"
-          value={text}
-          onChange={setText}
-          modules={{ toolbar: false }}
-          placeholder="Write your prompt..."
-          className="h-[250px]"
-        />
+      <div>
+        <div
+          className="h-[250px] overflow-hidden rounded-lg border border-gray-600 bg-white"
+          style={{ color: "#111" }}
+        >
+          <ReactQuill
+            theme="snow"
+            value={text}
+            onChange={setText}
+            modules={{ toolbar: false }}
+            placeholder="Write your prompt..."
+            className="h-[250px]"
+          />
+        </div>
+
+        {/* Warning + Counter */}
+        <div className="flex justify-between items-center mt-2">
+          <p
+            className={`text-sm font-medium ${
+              warning.includes("⚠️")
+                ? "text-red-500"
+                : warning
+                ? "text-yellow-500"
+                : "text-gray-400"
+            }`}
+          >
+            {warning || " "}
+          </p>
+          <p
+            className={`text-xs ${
+              tooLong ? "text-red-500" : "text-gray-400"
+            }`}
+          >
+            {charCount.toLocaleString()} / 100,000
+          </p>
+        </div>
       </div>
 
       <CoverUpload cover={cover} setCover={setCover} />
+
       {/* Logo Upload */}
       <LogoUploader
         logoPreview={logoPreview}
@@ -57,25 +116,23 @@ export default function PromptForm({
       {/* Pages */}
       <div>
         <label className="block text-silver mb-2 font-medium">
-          Number of Pages
+          Number of Pages (50 max)
         </label>
 
         <div className="relative w-full max-w-xs">
-          {/* Number input */}
           <input
             type="number"
             min="1"
-            max="25"
+            max="50"
             value={pages ?? ""}
             onChange={(e) => {
               const value = e.target.value;
               if (value === "") setPages("");
-              else setPages(Math.min(25, Math.max(1, Number(value))));
+              else setPages(Math.min(50, Math.max(1, Number(value))));
             }}
             className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
           />
 
-          {/* Horizontal arrows inside input */}
           <div className="absolute inset-y-0 right-2 flex items-center gap-2">
             <button
               type="button"
@@ -89,7 +146,7 @@ export default function PromptForm({
             <button
               type="button"
               onClick={() =>
-                setPages((prev) => Math.min(25, Number(prev || 1) + 1))
+                setPages((prev) => Math.min(50, Number(prev || 1) + 1))
               }
               className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
             >
@@ -105,6 +162,7 @@ export default function PromptForm({
         setTheme={setTheme}
         setShowPreview={setShowPreview}
       />
+
       {/* Author Call-to-Action */}
       <div className="mt-6">
         <label className="block text-silver mb-2 font-medium">
@@ -142,7 +200,12 @@ export default function PromptForm({
       {!loading && (
         <button
           type="submit"
-          className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-green to-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition"
+          disabled={tooLong}
+          className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+            tooLong
+              ? "bg-gray-600 cursor-not-allowed text-gray-300"
+              : "bg-gradient-to-r from-green to-royalPurple text-white hover:opacity-90"
+          }`}
         >
           🚀 Submit Prompt
         </button>

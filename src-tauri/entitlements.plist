@@ -26,10 +26,6 @@
     <key>com.apple.security.assets.movies.read-write</key>
     <true/>
 
-    <!-- ✅ Allow app to read cached blobs / PDFs / videos created in temp dirs -->
-    <key>com.apple.security.files.temp.read-write</key>
-    <true/>
-
     <!-- ✅ Allow your PDF viewer (PDF.js) to read local blob URLs -->
     <key>com.apple.security.files.downloads.read-only</key>
     <true/>

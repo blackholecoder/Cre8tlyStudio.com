@@ -1,6 +1,7 @@
 import { useState } from "react";
-import PDFPreviewModal from "./PDFPreviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { themeStyles } from "../../constants/index";
+import { CheckCircle, XCircle, Download, Timer, Plus } from "lucide-react";
 
 export default function MagnetCardList({ magnets = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -15,22 +16,22 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
           className="bg-neo p-4 rounded-xl shadow border border-gray-700"
         >
           <p className="text-sm text-white font-semibold mb-2">
-            Slot #{m.slot_number || i + 1}
+            {m.slot_number || i + 1}
           </p>
 
           <p className="text-sm text-silver">
             <span className="font-semibold">Created:</span>{" "}
-            {new Date(m.created_at).toLocaleDateString()}{" "}
-            {new Date(m.created_at).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {new Date(m.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}{" "}
           </p>
 
           <p className="text-sm text-silver mt-1">
             <span className="font-semibold">Status:</span>{" "}
             {m.status === "completed" ? (
-              <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-black text-green border border-green px-2 py-1 rounded-full text-xs font-semibold">
                 Completed
               </span>
             ) : m.status === "failed" ? (
@@ -62,7 +63,7 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 Generating your PDF…
               </span>
             ) : (
-              <span className="text-gray-400 italic">Idle...</span>
+              <span className="bg-black text-purple border border-white px-7 py-1 rounded-full text-xs font-semibold">Idle</span>
             )}
           </p>
 
@@ -85,8 +86,15 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
           </p>
 
           <p className="text-sm text-silver mt-1">
-            <span className="font-semibold">Prompt:</span>{" "}
-            {m.prompt ? "Submitted" : "Not submitted"}
+            {m.prompt ? (
+                  <div className="flex items-center text-headerGreen">
+                    <CheckCircle size={18} className="mr-1" />
+                  </div>
+                ) : (
+                  <div className="flex items-center text-grey">
+                    <Timer size={18} className="mr-1" />
+                  </div>
+                )}
           </p>
 
           {/* Actions */}
@@ -94,18 +102,18 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
             {!m.prompt && (
               <button
                 onClick={() => onAddPrompt(m.id)}
-                className="flex-1 px-3 py-2 bg-royalPurple text-white rounded"
+                className="flex items-center justify-center flex-1 px-3 py-2 bg-headerGreen text-white rounded"
               >
-                Add Prompt
+                <Plus className="text-black" size={18} />
               </button>
             )}
 
             {m.pdf_url && (
               <button
                 onClick={() => setPreviewUrl(m.pdf_url)}
-                className="flex-1 px-3 py-2 bg-blue text-white rounded"
+                className="flex items-center justify-center flex-1 px-3 py-2 bg-muteGrey text-white rounded"
               >
-                Download
+                <Download size={18} />
               </button>
             )}
           </div>

@@ -1,6 +1,7 @@
 import { themeStyles } from "../../constants/index";
-import PDFPreviewModal from "./PDFPreviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { useState } from "react";
+import { CheckCircle, Download, Plus, Timer } from "lucide-react";
 
 export default function MagnetTable({ magnets = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -11,25 +12,28 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
       <table className="min-w-full border border-gray-700 text-white">
         <thead className="bg-gray-800">
           <tr>
-            <th className="px-4 py-2 text-left">Slot</th>
-            <th className="px-4 py-2 text-left">Created</th>
-            <th className="px-4 py-2 text-left">Status</th>
-            <th className="px-4 py-2 text-left">Theme</th>
-            <th className="px-4 py-2 text-left">Prompt</th>
-            <th className="px-4 py-2 text-left">Actions</th>
+            <th className="px-4 py-2 text-center">Slot</th>
+            <th className="px-4 py-2 text-center">Created</th>
+            <th className="px-4 py-2 text-center">Status</th>
+            <th className="px-4 py-2 text-center">Theme</th>
+            <th className="px-4 py-2 text-center">Prompt</th>
+            <th className="px-4 py-2 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {magnets.map((m) => (
             <tr key={m.id} className="border-t border-gray-700">
-              <td className="px-4 py-2">Slot #{m.slot_number}</td>
-              <td className="px-4 py-2">
-                {new Date(m.created_at).toLocaleDateString()}{" "}
-                
+              <td className="px-4 py-2 text-center">{m.slot_number}</td>
+              <td className="px-4 py-2 text-center">
+                {new Date(m.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                })}{" "}
               </td>
-              <td className="px-4 py-2">
+              <td className="px-4 py-2 text-center">
                 {m.status === "completed" ? (
-                  <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
+                  <span className="bg-black text-green border border-green px-2 py-1 rounded-full text-xs font-semibold">
                     Completed
                   </span>
                 ) : m.status === "failed" ? (
@@ -37,7 +41,7 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                     Failed
                   </span>
                 ) : m.status === "pending" ? (
-                  <span className="flex items-center gap-2 text-yellow italic">
+                  <div className="flex items-center justify-center gap-2 text-yellow italic">
                     <svg
                       className="animate-spin h-4 w-4 text-yellow"
                       xmlns="http://www.w3.org/2000/svg"
@@ -59,12 +63,15 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                       ></path>
                     </svg>
                     Generating your PDF…
-                  </span>
+                  </div>
                 ) : (
-                  <span className="text-gray-400 italic">Idle...</span>
+                  <span className="bg-black text-purple border border-white px-7 py-1 rounded-full text-xs font-semibold">
+                    Idle
+                  </span>
                 )}
               </td>
-              <td className="px-4 py-2">
+
+              <td className="px-4 py-2 text-center">
                 {m.theme ? (
                   <span
                     className="inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize"
@@ -80,29 +87,38 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                   <span className="text-gray-500 italic">N/A</span>
                 )}
               </td>
-              <td className="px-4 py-2">
-                {m.prompt ? "Submitted" : "Not submitted"}
-              </td>
-              <td className="px-4 py-2 flex gap-2">
-                {!m.prompt && (
-                  <button
-                    onClick={() => onAddPrompt(m.id)}
-                    className="px-3 py-1 bg-royalPurple rounded text-sm"
-                  >
-                    Add Prompt
-                  </button>
+              <td className="px-4 py-2 text-center">
+                {m.prompt ? (
+                  <div className="flex items-center justify-center text-headerGreen">
+                    <CheckCircle size={18} />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center text-grey">
+                    <Timer size={18} />
+                  </div>
                 )}
-                {m.pdf_url && (
-                  <>
+              </td>
+              <td className="px-4 py-2">
+                <div className="flex items-center justify-center gap-2">
+                  {!m.prompt && (
+                    <button
+                      onClick={() => onAddPrompt(m.id)}
+                      className="flex items-center justify-center p-2 bg-headerGreen rounded"
+                      title="Add Prompt"
+                    >
+                      <Plus className="text-black" size={18} />
+                    </button>
+                  )}
+                  {m.pdf_url && (
                     <button
                       onClick={() => setPreviewUrl(m.pdf_url)}
-                      className="px-4 py-1 bg-blue rounded text-sm"
+                      className="flex items-center justify-center p-2 bg-muteGrey text-white rounded"
+                      title="Download"
                     >
-                      Download
+                      <Download size={18} />
                     </button>
-                    
-                  </>
-                )}
+                  )}
+                </div>
               </td>
             </tr>
           ))}

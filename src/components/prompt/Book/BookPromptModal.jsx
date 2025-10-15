@@ -59,68 +59,128 @@ export default function BookPromptModal({
     fetchBook();
   }, [bookId]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!text.trim()) {
-      toast.error("Please enter your book idea or prompt first.");
-      return;
-    }
+//   async function handleSubmit(e) {
+//     e.preventDefault();
+//     if (!text.trim()) {
+//       toast.error("Please enter your book idea or prompt first.");
+//       return;
+//     }
 
-    setLoading(true);
-    setProgress(0);
-    setShowGenerating(true);
+//     setLoading(true);
+//     setProgress(0);
+//     setShowGenerating(true);
 
-    let interval;
-    try {
-      interval = setInterval(() => {
-        setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-      }, 400);
+//     let interval;
+//     try {
+//       interval = setInterval(() => {
+//         setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
+//       }, 400);
 
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/books/prompt",
-        {
-          bookId,
-          prompt: text,
-          pages,
-          link,
-          coverImage: cover,
-          title,
-          authorName,
-          bookName,
-          partNumber,
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
+//       const res = await axios.post(
+//         "https://cre8tlystudio.com/api/books/prompt",
+//         {
+//           bookId,
+//           prompt: text,
+//           pages,
+//           link,
+//           coverImage: cover,
+//           title,
+//           authorName,
+//           bookName,
+//           partNumber,
+//         },
+//         { headers: { Authorization: `Bearer ${accessToken}` } }
+//       );
 
-      clearInterval(interval);
-      setProgress(100);
-      toast.success("📚 Book section generated successfully!");
-      setTimeout(() => setShowGenerating(false), 800);
+//       clearInterval(interval);
+//       setProgress(100);
+//       toast.success("📚 Book section generated successfully!");
+//       setTimeout(() => setShowGenerating(false), 800);
 
-      if (typeof onSubmitted === "function") {
-        setTimeout(() => onSubmitted(bookId, text), 1500);
-      }
-      setTimeout(() => {
-  onClose(); // this hides the modal
-  window.dispatchEvent(new Event("refreshBooks")); // custom event to refresh
-}, 2000);
-    } catch (err) {
-      clearInterval(interval);
-      setProgress(0);
-      setShowGenerating(false);
-      toast.error(err.response?.data?.message || "Book generation failed. Try again.");
-      console.error("❌ Book generation error:", err);
-    } finally {
-      setLoading(false);
-    }
+//       if (typeof onSubmitted === "function") {
+//         setTimeout(() => onSubmitted(bookId, text), 1500);
+//       }
+//       setTimeout(() => {
+//   onClose(); // this hides the modal
+//   window.dispatchEvent(new Event("refreshBooks")); // custom event to refresh
+// }, 2000);
+
+//     } catch (err) {
+//       clearInterval(interval);
+//       setProgress(0);
+//       setShowGenerating(false);
+//       toast.error(err.response?.data?.message || "Book generation failed. Try again.");
+//       console.error("❌ Book generation error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+async function handleSubmit(e) {
+  e.preventDefault();
+  if (!text.trim()) {
+    toast.error("Please enter your book idea or prompt first.");
+    return;
   }
+
+  // ✅ Close modal *immediately* to prevent Tauri race
+  onClose();
+
+  setLoading(true);
+  setProgress(0);
+  setShowGenerating(true);
+
+  let interval;
+  try {
+    interval = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
+    }, 400);
+
+    const res = await axios.post(
+      "https://cre8tlystudio.com/api/books/prompt",
+      {
+        bookId,
+        prompt: text,
+        pages,
+        link,
+        coverImage: cover,
+        title,
+        authorName,
+        bookName,
+        partNumber,
+      },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    clearInterval(interval);
+    setProgress(100);
+    toast.success("📚 Book section generated successfully!");
+    setShowGenerating(false);
+
+    // ✅ Wait a short moment so DB finishes writing the new book part
+    await new Promise((r) => setTimeout(r, 1000));
+
+    // ✅ Trigger dashboard refresh + callback safely
+    window.dispatchEvent(new Event("refreshBooks"));
+    if (typeof onSubmitted === "function") {
+      setTimeout(() => onSubmitted(bookId, text), 1000);
+    }
+  } catch (err) {
+    clearInterval(interval);
+    setProgress(0);
+    setShowGenerating(false);
+    toast.error(err.response?.data?.message || "Book generation failed. Try again.");
+    console.error("❌ Book generation error:", err);
+  } finally {
+    setLoading(false);
+  }
+}
+
 
   if (!isOpen) return null;
 
   // ✅ Full-screen layout replaces modal
   return (
     <div className="fixed inset-0 z-50 bg-[#0b0b0b] text-white flex flex-col overflow-hidden">
-      {/* Header Bar */}
       {/* Header Bar */}
 <div className="relative flex items-center justify-center px-6 py-5 border-b border-gray-700 bg-[#111]">
   {/* Centered Title */}

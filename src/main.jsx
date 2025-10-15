@@ -82,11 +82,27 @@ const AnimatedRoutes = () => {
         {/* Auth */}
         <Route path="/sign-up" element={<SignupPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/plans" element={<PlansPage />} />
+        
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Private */}
+        <Route
+  path="/plans"
+  element={
+    <PrivateRoute role={["customer", "admin"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <PlansPage />
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
         <Route
           path="/dashboard"
           element={

@@ -1,48 +1,43 @@
 import { useAuth } from "../../admin/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardHeader({ items = [], onCheckout, type = "magnet" }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  console.log("USER DATA:", user);
-console.log("ITEMS:", items);
-
-  // ✅ Pull correct slot count from the actual DB column names
   const totalSlots =
     type === "book"
       ? user?.book_slots ?? 0
       : user?.magnet_slots ?? 0;
 
-  // ✅ Each record = one used slot
   const usedSlots =
-  type === "book"
-    ? items.filter(i => i.pages >= 750).length // ✅ Only count books that hit 750+ pages
-    : items.filter(i => i.status === "completed").length; // ✅ Normal logic for magnets
+    type === "book"
+      ? items.filter((i) => i.pages >= 750).length
+      : items.filter((i) => i.status === "completed").length;
 
-  // ✅ Remaining slots (never negative)
   const availableSlots = Math.max(totalSlots - usedSlots, 0);
-
-  // ✅ Dynamic title
   const title = type === "book" ? "My Books" : "My Lead Magnets";
 
   return (
-    <>
-      <h1 className="text-2xl font-bold text-white mb-6">{title}</h1>
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      {/* Left section */}
+      <div>
+        <h1 className="text-2xl font-bold text-white">{title}</h1>
+        <p className="text-silver mt-1">
+          You currently have {availableSlots} of {totalSlots} slots remaining.
+        </p>
 
-      <p className="text-silver mb-6">
-        You currently have {availableSlots} of {totalSlots} slots remaining.
-      </p>
-
-      {/* ✅ Button reappears only when user runs out */}
-      {availableSlots === 0 && (
-        <div className="mb-6">
-          <button
-            onClick={onCheckout}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold hover:opacity-90 transition shadow-lg"
-          >
-            Purchase More Slots
-          </button>
-        </div>
-      )}
-    </>
+        {availableSlots === 0 && (
+          <div className="mt-4">
+            <button
+              onClick={onCheckout}
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold hover:opacity-90 transition shadow-lg"
+            >
+              Purchase More Slots
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

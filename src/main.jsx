@@ -30,6 +30,8 @@ import ResetPassword from "./admin/ResetPassword.jsx";
 import EbooksStore from "./sections/EbookStore.jsx";
 import BooksDashboard from "./sections/BooksDashboard.jsx";
 import { BookProvider } from "./admin/BookContext.jsx";
+import SettingsPage from "./sections/SettingsPage.jsx";
+import DashboardLayout from "./components/layouts/DashboardLayout.jsx";
 
 
 const AnimatedRoutes = () => {
@@ -54,6 +56,25 @@ const AnimatedRoutes = () => {
       </motion.div>
     }
   />
+  <Route
+  path="/settings"
+  element={
+    <PrivateRoute role={["customer", "admin"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+        <SettingsPage />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+
 
         <Route
           path="/support"

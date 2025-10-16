@@ -9,7 +9,7 @@ const steps = [
   {
     icon: <FileOutput className="w-10 h-10 text-white" />,
     title: "2. AI Creates Your Lead Magnet",
-    desc: "We generate up to 25 full A4 pages with examples, insights, and structure, styled with professional themes.",
+    desc: "We generate up to 50 full A4 pages with examples, insights, and structure, styled with professional themes.",
   },
   {
     icon: <ArrowDownCircle className="w-10 h-10 text-green" />,

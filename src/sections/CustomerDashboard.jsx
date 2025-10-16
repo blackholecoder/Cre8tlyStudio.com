@@ -14,6 +14,7 @@ import PaginationControls from "../components/dashboard/PaginationControls.jsx";
 import SupportTab from "./SupportTab.jsx";
 import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
 import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
+import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 
 
 
@@ -118,79 +119,46 @@ export default function CustomerDashboard() {
     checkIfApp();
   }, []);
 
-  // ✅ Render
-  return (
-    <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <DashboardHeader
-  type="magnet"
-  items={magnets}
-  onCheckout={handleCheckout}
-/>
 
-      {/* ✅ Navigation Tabs */}
-    <div className="flex gap-3 mb-8">
-      <button
-        onClick={() => navigate("/dashboard")}
-        className={`px-4 py-2 rounded-lg ${
-          location.pathname === "/dashboard"
-            ? "bg-blue text-white"
-            : "bg-gray-700 text-gray-200"
-        }`}
-      >
-        🎯 Lead Magnets
-      </button>
-      {/* ✅ Only show Books tab if user.has_book = true */}
-        {user?.has_book ? (
-          <button
-            onClick={() => navigate("/books")}
-            className={`px-4 py-2 rounded-lg ${
-              location.pathname === "/books"
-                ? "bg-blue text-white"
-                : "bg-gray-700 text-gray-200"
-            }`}
-          >
-            📚 Books
-          </button>
-        ) : (
-          <button
-            onClick={() => navigate("/books-upgrade")}
-            className="px-4 py-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700"
-          >
-            📚 Unlock Books
-          </button>
-        )}
+return (
+  <DashboardLayout>
+    <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
+      {/* Header */}
+      <DashboardHeader type="magnet" items={magnets} onCheckout={handleCheckout} />
+
+      {/* Tabs */}
+      <div className="flex gap-3 mb-8 mt-4">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className={`px-4 py-2 rounded-lg ${
+            location.pathname === "/dashboard"
+              ? "bg-blue text-white font-semibold"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
+        >
+          🎯 Lead Magnets
+        </button>
       </div>
 
-
+      {/* Content */}
       {loading ? (
         <LoadingState />
       ) : magnets.length === 0 ? (
         <EmptyState onCheckout={handleCheckout} type="magnet" />
       ) : (
         <>
-          {/* Desktop view */}
-          <MagnetTable
-            magnets={paginatedMagnets}
-            onAddPrompt={openPromptModal}
-          />
-
-          {/* Mobile view */}
-          <MagnetCardList
-            magnets={paginatedMagnets}
-            onAddPrompt={openPromptModal}
-          />
-
-          {/* Pagination */}
+          <MagnetTable magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
+          <MagnetCardList magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
           <PaginationControls
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
-
           <SupportTab />
         </>
       )}
 
+      {/* Modals */}
       {activeMagnet && (
         <PromptModal
           isOpen={openPrompt}
@@ -202,13 +170,21 @@ export default function CustomerDashboard() {
           onSubmitted={handlePromptSubmitted}
         />
       )}
+
       <OutOfSlotsModal
         open={showOutOfSlots}
         onClose={() => setShowOutOfSlots(false)}
         onRefresh={refreshUserSlots}
         isFirstTime={magnets.length === 0}
       />
-      <GenerationOverlay visible={showGenerating} progress={progress} type="lead" />
+
+      <GenerationOverlay
+        visible={showGenerating}
+        progress={progress}
+        type="lead"
+      />
     </div>
-  );
+  </DashboardLayout>
+);
+
 }

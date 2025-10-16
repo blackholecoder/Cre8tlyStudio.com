@@ -52,6 +52,10 @@ const Nav = () => {
     }
   }, [isOpen]);
 
+  if (["/dashboard", "/books", "/settings"].includes(location.pathname)) {
+    return null;
+  }
+
   const filteredNavLinks = navLinks.filter((link) => {
     // Hide "Pricing" on /signup
     if (link.label === "Pricing" && location.pathname !== "/home") {
@@ -73,25 +77,20 @@ const Nav = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="flex items-center justify-between px-4 h-[72px]">
           {/* Logo */}
+
           <div className="flex-shrink-0">
             <a href="/">
               <motion.img
                 src={headerLogo}
                 width={50}
                 height={50}
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                transition={{
-                  duration: 4.5,
-                  delay: 2,
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 4.5, delay: 2 }}
               />
             </a>
           </div>
+
           {/* Desktop Menu */}
           <ul className="hidden md:flex space-x-8 list-none lead-text">
             {filteredNavLinks.map((item) => {
@@ -101,7 +100,8 @@ const Nav = () => {
                 (item.label === "Sign Up" ||
                   item.label === "Pricing" ||
                   item.label === "How it works" ||
-                  item.label === "Contact Us" || item.label === "Shop")
+                  item.label === "Contact Us" ||
+                  item.label === "Shop")
               )
                 return null;
 
@@ -132,28 +132,33 @@ const Nav = () => {
               return (
                 <li key={item.label} className="flex items-center">
                   <a
-  href={item.href}
-  onClick={(e) => {
-    if (item.href.startsWith("#")) {
-      e.preventDefault();
-      const targetSection = document.querySelector(item.href);
+                    href={item.href}
+                    onClick={(e) => {
+                      if (item.href.startsWith("#")) {
+                        e.preventDefault();
+                        const targetSection = document.querySelector(item.href);
 
-      if (location.pathname === "/" || location.pathname === "/home") {
-        // already on home, just scroll
-        if (targetSection) {
-          targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      } else {
-        // not on home → navigate to home and include hash
-        navigate(`/home${item.href}`);
-      }
-    }
-  }}
-  className="font-montserrat leading-normal text-md text-white-400 hover:text-white cursor-pointer transition"
->
-  {item.label}
-</a>
-
+                        if (
+                          location.pathname === "/" ||
+                          location.pathname === "/home"
+                        ) {
+                          // already on home, just scroll
+                          if (targetSection) {
+                            targetSection.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }
+                        } else {
+                          // not on home → navigate to home and include hash
+                          navigate(`/home${item.href}`);
+                        }
+                      }
+                    }}
+                    className="font-montserrat leading-normal text-md text-white-400 hover:text-white cursor-pointer transition"
+                  >
+                    {item.label}
+                  </a>
                 </li>
               );
             })}
@@ -219,7 +224,8 @@ const Nav = () => {
                 (item.label === "Sign Up" ||
                   item.label === "Pricing" ||
                   item.label === "How it works" ||
-                  item.label === "Contact Us" || item.label === "Shop")
+                  item.label === "Contact Us" ||
+                  item.label === "Shop")
               )
                 return null;
 

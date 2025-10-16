@@ -14,6 +14,7 @@ import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
 import BookPromptModal from "../components/prompt/Book/BookPromptModal.jsx";
 import BookCardList from "../components/book/BookCardList.jsx";
 import NewBookModal from "../components/book/NewBookModal.jsx";
+import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 
 export default function BooksDashboard() {
   const { user, accessToken } = useAuth();
@@ -140,8 +141,9 @@ export default function BooksDashboard() {
   }, []);
 
   // ✅ Render
-  return (
-    <div className="p-6 pt-28 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+return (
+  <DashboardLayout>
+    <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
       <DashboardHeader
         type="book"
         items={books}
@@ -149,35 +151,21 @@ export default function BooksDashboard() {
       />
 
       {/* Navigation Tabs */}
+      <div className="flex gap-3 mb-8 mt-4">
 
-      <div className="flex gap-3 mb-8">
-        {/* ✅ Only show Lead Magnets if user.has_magnet = true */}
-        {user?.has_magnet && (
-          <button
-            onClick={() => navigate("/dashboard")}
-            className={`px-4 py-2 rounded-lg ${
-              location.pathname === "/dashboard"
-                ? "bg-blue text-white"
-                : "bg-gray-700 text-gray-200"
-            }`}
-          >
-            🎯 Lead Magnets
-          </button>
-        )}
-
-        {/* Always show Books tab */}
         <button
           onClick={() => navigate("/books")}
           className={`px-4 py-2 rounded-lg ${
             location.pathname === "/books"
-              ? "bg-blue text-white"
-              : "bg-gray-700 text-gray-200"
+              ? "bg-blue text-white font-semibold"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
           }`}
         >
           📚 Books
         </button>
       </div>
 
+      {/* Content */}
       {loading ? (
         <LoadingState />
       ) : books.length === 0 ? (
@@ -189,6 +177,7 @@ export default function BooksDashboard() {
             onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
             onGenerateNext={(id, partNumber) => openBookModal(id, partNumber)}
           />
+
           <BookCardList
             books={paginatedBooks}
             onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
@@ -205,6 +194,7 @@ export default function BooksDashboard() {
         </>
       )}
 
+      {/* Modals */}
       {showNewBookModal && activeBook && (
         <NewBookModal
           bookId={activeBook.id}
@@ -240,5 +230,7 @@ export default function BooksDashboard() {
         type="book"
       />
     </div>
-  );
+  </DashboardLayout>
+);
+
 }

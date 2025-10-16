@@ -138,7 +138,7 @@ useEffect(() => {
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, authLoading, login, logout, refreshAccessToken }}
+      value={{ user, setUser, accessToken, authLoading, login, logout, refreshAccessToken }}
     >
       {children}
     </AuthContext.Provider>

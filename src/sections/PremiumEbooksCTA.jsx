@@ -33,7 +33,7 @@ export default function PremiumEbooksCTA() {
             href="/shop"
             className="inline-block px-8 py-4 bg-royalPurple text-white font-semibold rounded-lg shadow-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.03]"
           >
-            🚀 Browse Premium Ebooks
+            🚀 Browse Premium Guides
           </a>
         </div>
 

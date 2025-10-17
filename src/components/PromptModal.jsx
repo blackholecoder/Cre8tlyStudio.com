@@ -35,6 +35,7 @@ export default function PromptModal({
   const [cover, setCover] = useState(null);
   const [cta, setCta] = useState("");
   const [phase, setPhase] = useState("questions");
+  const [bgTheme, setBgTheme] = useState("#ffffff");
 
   // ✅ Reset form on close
   useEffect(() => {
@@ -69,12 +70,15 @@ export default function PromptModal({
         setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
       }, 300);
 
+      console.log("📦 Sending to API:", { theme, bgTheme });
+
       const res = await axios.post(
         "https://cre8tlystudio.com/api/lead-magnets/prompt",
         {
           magnetId,
           prompt: text,
           theme,
+          bgTheme,
           pages,
           logo,
           link,
@@ -237,6 +241,8 @@ export default function PromptModal({
                     setText={setText}
                     theme={theme}
                     setTheme={setTheme}
+                    bgTheme={bgTheme}
+                    setBgTheme={setBgTheme}
                     pages={pages}
                     setPages={setPages}
                     logo={logo}

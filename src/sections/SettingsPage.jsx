@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
-import { toast } from "react-toastify"; // ✅ Add this
+import { toast } from "react-toastify"; 
 
 export default function DashboardSettings() {
   const { user, setUser } = useAuth();
   const [settings, setSettings] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
     if (!user?.id) return;
@@ -93,18 +92,181 @@ export default function DashboardSettings() {
     }
   };
 
+  const getUserPlan = () => {
+    if (!user) return [];
+    const plans = [];
+    if (user.has_book) plans.push("Assistant");
+    if (user.has_magnet) plans.push("Magnets");
+    if (user.pro_covers) plans.push("Pro Covers");
+    return plans;
+  };
+
+  const plans = getUserPlan();
+
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
       <div className="w-full max-w-[900px] p-10">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-3xl font-bold text-headerGreen">
+          <h1 className="text-3xl font-bold text-white">
             Brand Settings
           </h1>
           <p className="text-gray-400 mt-2">
             Manage your brand tone and upload a reference file for AI
             generation.
           </p>
+        </div>
+
+        <div className="bg-[#0B0F19] border border-gray-800 rounded-2xl p-8 mb-10 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-white">Your Plan</h2>
+            <span className="text-sm text-gray-400">
+              {new Date().toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                })}{" "}
+            </span>
+          </div>
+
+          {plans.length > 0 ? (
+            <div className="grid sm:grid-cols-3 gap-6">
+              {plans.map((plan) => {
+                let planStatus = "active"; // active | expired | lifetime
+                let remainingSlots = null;
+
+                if (plan.includes("Assistant")) {
+                  remainingSlots = user?.book_slots ?? 0;
+                  if (remainingSlots <= 0) planStatus = "expired";
+                } else if (plan.includes("Magnets")) {
+                  remainingSlots = user?.magnet_slots ?? 0;
+                  if (remainingSlots <= 0) planStatus = "expired";
+                } else if (plan.includes("Pro")) {
+                  planStatus = user?.pro_covers ? "lifetime" : "expired";
+                }
+
+                return (
+                  <div
+                    key={plan}
+                    className={`relative flex flex-col justify-between transition-all rounded-xl p-5 border shadow-inner
+              ${
+                planStatus === "expired"
+                  ? "bg-[#0c0f18]/80 border-gray-800 opacity-70"
+                  : "bg-[#111827]/80 hover:bg-[#1f2937]/80 border-gray-700 hover:border-gray-600 hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
+              }`}
+                  >
+                    <span
+                      className={`text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded-md mb-2 self-start ${
+                        planStatus === "expired"
+                          ? "text-red-400 bg-red-400/10"
+                          : "text-green bg-green-400/10"
+                      }`}
+                    >
+                      {plan.includes("Pro")
+                        ? "Active"
+                        : planStatus === "active"
+                          ? "Active"
+                          : "Expired"}
+                    </span>
+
+                    {/* Icon and Title */}
+                    <div className="flex items-center gap-3 mb-3">
+                      {plan.includes("Assistant") && (
+                        <svg
+                          className="w-6 h-6 text-hotPink"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 20l9-5-9-5-9 5 9 5z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 12l9-5-9-5-9 5 9 5z"
+                          />
+                        </svg>
+                      )}
+                      {plan.includes("Magnets") && (
+                        <svg
+                          className="w-6 h-6 text-blue"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 10h11M9 21V3m12 7h-5a2 2 0 00-2 2v9"
+                          />
+                        </svg>
+                      )}
+                      {plan.includes("Pro") && (
+                        <svg
+                          className="w-6 h-6 text-royalPurple"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 3v18m9-9H3"
+                          />
+                        </svg>
+                      )}
+
+                      <h3 className="text-lg font-semibold text-white">
+                        {plan}
+                      </h3>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm text-gray-400 leading-relaxed">
+                      {plan.includes("Assistant")
+                        ? "Access advanced book creation and AI writing tools."
+                        : plan.includes("Magnets")
+                          ? "Generate lead magnets and marketing assets."
+                          : "Unlock pro cover uploads and customization tools."}
+                    </p>
+
+                    {/* ✅ Footer: Slots or Lifetime (aligned perfectly) */}
+                    <div className="mt-3">
+                      {planStatus === "lifetime" ? (
+                        <p className="text-xs font-semibold text-gray-500 tracking-wide">
+                          Lifetime
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-500">
+                          Slots remaining:{" "}
+                          <span
+                            className={`font-semibold ${
+                              remainingSlots > 0
+                                ? "text-gray-300"
+                                : "text-red-400"
+                            }`}
+                          >
+                            {remainingSlots}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm text-center py-4">
+              No active plan detected. Please contact support if this seems
+              incorrect.
+            </p>
+          )}
         </div>
 
         {/* Active File */}
@@ -161,15 +323,27 @@ export default function DashboardSettings() {
               )}
             </div>
 
-            <button
-              onClick={handleUpload}
-              disabled={uploading}
-              className={`w-full sm:w-auto px-6 py-2 rounded-lg font-semibold shadow-lg text-black bg-headerGreen hover:opacity-90 transition ${
-                uploading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {uploading ? "Uploading..." : "Save Brand File"}
-            </button>
+           <button
+  onClick={handleUpload}
+  disabled={uploading}
+  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
+    ${
+      uploading
+        ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green-700 to-green-600"
+        : "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+    }
+    text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
+>
+  <span className="relative z-10">
+    {uploading ? "Uploading..." : "Save Brand"}
+  </span>
+
+  {/* soft animated shine */}
+  {!uploading && (
+    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
+  )}
+</button>
+
           </div>
         </div>
       </div>

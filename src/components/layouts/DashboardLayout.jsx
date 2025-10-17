@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Settings,
   LogOut,
+  Magnet
 } from "lucide-react";
 
 export default function DashboardLayout({ children }) {
@@ -29,8 +30,8 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   const menu = [
-    { label: "Lead Magnets", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
-    { label: "Books", path: "/books", icon: <BookOpen size={18} /> },
+    { label: "Lead Magnets", path: "/dashboard", icon: <Magnet size={18} /> },
+    { label: "Assistant", path: "/books", icon: <BookOpen size={18} /> },
     { label: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
 

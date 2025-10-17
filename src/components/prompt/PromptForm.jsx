@@ -6,12 +6,15 @@ import LogoUploader from "./LogoUploader";
 import ThemeSelector from "./ThemeSelector";
 import CoverUpload from "./CoverUpload";
 import PromptSelect from "./PromptSelect";
+import ColorThemeChooser from "../ColorThemeChooser";
 
 export default function PromptForm({
   text,
   setText,
   theme,
   setTheme,
+  bgTheme,
+  setBgTheme,
   pages,
   setPages,
   setLogo,
@@ -155,6 +158,7 @@ export default function PromptForm({
           </div>
         </div>
       </div>
+      <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} />
 
       {/* Theme Selector */}
       <ThemeSelector

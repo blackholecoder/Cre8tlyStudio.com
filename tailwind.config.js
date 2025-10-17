@@ -44,7 +44,8 @@ export default {
         headerGreen: "#5DD801",
         yellow: "#fed330",
         downloadGreen: "#009432",
-        muteGrey: "#353b48"
+        muteGrey: "#353b48",
+        hotPink: "#e84393",
       },
       screens: {
         wide: "1440px",

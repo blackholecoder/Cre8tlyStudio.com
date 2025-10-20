@@ -1,9 +1,7 @@
 import { useAuth } from "../../admin/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function DashboardHeader({ items = [], onCheckout, type = "magnet" }) {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const totalSlots =
     type === "book"

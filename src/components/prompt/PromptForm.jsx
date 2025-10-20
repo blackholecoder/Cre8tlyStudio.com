@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { toast } from "react-toastify"; // 🆕 import Toastify
+import { toast } from "react-toastify"; 
 import LogoUploader from "./LogoUploader";
 import ThemeSelector from "./ThemeSelector";
 import CoverUpload from "./CoverUpload";

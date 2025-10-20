@@ -128,6 +128,7 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
       {previewUrl && (
         <PDFPreviewModal
           fileUrl={previewUrl}
+          sourceType="magnet"
           onClose={() => setPreviewUrl(null)}
         />
       )}

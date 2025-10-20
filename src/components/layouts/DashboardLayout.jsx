@@ -6,7 +6,6 @@ import {
   Menu,
   X,
   BookOpen,
-  LayoutDashboard,
   Settings,
   LogOut,
   Magnet

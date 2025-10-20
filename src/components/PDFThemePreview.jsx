@@ -1,7 +1,7 @@
 export default function PDFThemePreview({ themeConfig }) {
   if (!themeConfig) return null;
 
-  const { font, primaryColor, textColor, linkGradient } = themeConfig;
+  const { font, primaryColor, textColor  } = themeConfig;
 
   return (
     <div

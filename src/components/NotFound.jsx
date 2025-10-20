@@ -2,7 +2,6 @@
 import Lottie from "lottie-react";
 import notFound from '../assets/animations/notFound.json';
 import { Link } from "react-router-dom";
-import Nav from "../components/Nav";
 const NotFound = () => {
     return (
       <section className='max-xl h-screen bg-gradient-to-r from-black to-silver'>

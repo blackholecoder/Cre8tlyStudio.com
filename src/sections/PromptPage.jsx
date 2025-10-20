@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import ReactQuill from "react-quill";
 
 function PromptPage() {
   const [searchParams] = useSearchParams();

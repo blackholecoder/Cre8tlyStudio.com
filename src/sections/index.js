@@ -8,7 +8,6 @@ export { default as NotFound } from "../components/NotFound";
 // Sections
 export { default as Landing } from "./Landing";
 
-export { default as Subscribe } from "./Subscribe";
 export { default as Footer } from "./Footer";
 // export { default as Shop} from "./Shop";
 

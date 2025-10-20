@@ -11,9 +11,9 @@ const PricingSection = () => {
 
   const handleSignUpRedirect = () => {
     if (isApp) {
-      setShowModal(true); // show the info modal in the app
+      setShowModal(true); 
     } else {
-      window.location.href = "/sign-up"; // normal web flow
+      window.location.href = "/sign-up"; 
     }
   };
 

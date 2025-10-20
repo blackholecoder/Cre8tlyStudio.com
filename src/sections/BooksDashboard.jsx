@@ -15,6 +15,7 @@ import BookPromptModal from "../components/prompt/Book/BookPromptModal.jsx";
 import BookCardList from "../components/book/BookCardList.jsx";
 import NewBookModal from "../components/book/NewBookModal.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
+import axios from "axios";
 
 export default function BooksDashboard() {
   const { user, accessToken } = useAuth();
@@ -45,33 +46,62 @@ export default function BooksDashboard() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  function openBookModal(bookId, partNumber = 1) {
-    const selectedBook = books.find((b) => b.id === bookId);
-    console.log("SelectedBook:", selectedBook);
+  async function openBookModal(bookId, partNumber = 1) {
+  const apiUrl = `https://cre8tlystudio.com/api/books/${bookId}`;
 
-    if (!selectedBook) return;
+  let selectedBook = books.find((b) => b.id === bookId);
 
-    const missingAuthor =
-      !selectedBook.author_name || selectedBook.author_name.trim() === "";
-    const missingTitle =
-      !selectedBook.book_name ||
-      selectedBook.book_name.trim() === "" ||
-      selectedBook.book_name === "Untitled" ||
-      selectedBook.book_name === "Untitled Book";
+  try {
+    // ✅ Always fetch the most recent data from backend
+    const res = await axios.get(
+      `https://cre8tlystudio.com/api/books/${bookId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      }
+    );
 
-    // Show modal only if *either* author OR book_name is missing
-    if (missingAuthor || missingTitle) {
-      setActiveBook({ id: bookId, part_number: partNumber });
-      setShowNewBookModal(true);
-      return;
+    if (res.data) {
+      console.log("📘 Fresh data from backend:", res.data);
+      selectedBook = { ...selectedBook, ...res.data };
     }
-
-    // Otherwise go straight to writing
-    setActiveBook({ id: bookId, part_number: partNumber });
-    setOpenPrompt(true);
+  } catch (err) {
+    console.error("❌ Failed to fetch book by ID:", err);
+    toast.error("Could not refresh book info — using cached version");
   }
 
-  // ✅ Handle submitted prompt
+  if (!selectedBook) return;
+
+  const missingAuthor =
+    !selectedBook.author_name || selectedBook.author_name.trim() === "";
+  const missingTitle =
+    !selectedBook.title ||
+    selectedBook.title.trim() === "" ||
+    selectedBook.title === "Untitled" ||
+    selectedBook.title === "Untitled Book";
+
+  // ✅ If missing core info, open the "New Book" setup modal
+  if (missingAuthor || missingTitle) {
+    setActiveBook({ id: bookId, part_number: partNumber });
+    setShowNewBookModal(true);
+    return;
+  }
+
+  // ✅ Otherwise, open the writing modal with latest info
+  setActiveBook({
+    id: selectedBook.id,
+    part_number: partNumber,
+    title: selectedBook.title || selectedBook.book_name || "",
+    author_name: selectedBook.author_name || "",
+    book_type: selectedBook.bookType || selectedBook.book_type || "fiction",
+  });
+
+  setOpenPrompt(true);
+}
+
+  
+  
+  
   function handlePromptSubmitted(bookId, promptText) {
     setBooks((prev) =>
       prev.map((b) =>

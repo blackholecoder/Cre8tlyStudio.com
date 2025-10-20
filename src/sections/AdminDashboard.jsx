@@ -1,4 +1,3 @@
-// sections/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../admin/AuthContext.jsx";
 import axios from "axios";

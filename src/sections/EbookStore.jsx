@@ -50,7 +50,7 @@ export default function EbooksStore() {
   
     // optional: for scroll-linked animations
     lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
-      // console.log({ scroll, velocity })
+
     })
   
     return () => lenis.destroy()

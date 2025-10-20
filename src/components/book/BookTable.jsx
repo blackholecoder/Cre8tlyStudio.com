@@ -2,8 +2,7 @@ import { useState } from "react";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
-import { CheckCircle, Download, Plus, Timer } from "lucide-react";
-
+import { CheckCircle, Timer } from "lucide-react";
 
 export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -107,17 +106,17 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                 </td>
 
                 {/* Prompt status */}
-               <td className="px-4 py-2">
-                {b.prompt ? (
-                  <div className="flex items-center text-headerGreen">
-                    <CheckCircle size={18} className="mr-1" />
-                  </div>
-                ) : (
-                  <div className="flex items-center text-grey">
-                    <Timer size={18} className="mr-1" />
-                  </div>
-                )}
-              </td>
+                <td className="px-4 py-2">
+                  {b.prompt ? (
+                    <div className="flex items-center text-headerGreen">
+                      <CheckCircle size={18} className="mr-1" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-grey">
+                      <Timer size={18} className="mr-1" />
+                    </div>
+                  )}
+                </td>
 
                 {/* Action buttons */}
                 <td className="px-4 py-2 flex gap-2 flex-wrap">
@@ -131,7 +130,13 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                   )}
                   {b.pdf_url && (
                     <button
-                      onClick={() => setPreviewUrl(b.pdf_url)}
+                      onClick={() =>
+                        setPreviewUrl({
+                          url: b.pdf_url,
+                          title: b.title || b.book_name || "Untitled",
+                          partNumber: b.part_number || 1,
+                        })
+                      }
                       className={`px-4 py-1 rounded text-sm ${
                         b.pages >= 750
                           ? "bg-green text-black"
@@ -142,12 +147,12 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
                     </button>
                   )}
                   {b.pdf_url && (
-                  <button
-                    onClick={() => openPartsModal(b.id)}
-                    className="px-3 py-1 bg-gray-700 rounded text-sm hover:bg-gray-600 transition"
-                  >
-                    View All Parts
-                  </button>
+                    <button
+                      onClick={() => openPartsModal(b.id)}
+                      className="px-3 py-1 bg-gray-700 rounded text-sm hover:bg-gray-600 transition"
+                    >
+                      View All Parts
+                    </button>
                   )}
                   {b.prompt && b.pages < 750 && (
                     <button
@@ -169,7 +174,10 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
       </div>
       {previewUrl && (
         <PDFPreviewModal
-          fileUrl={previewUrl}
+          fileUrl={previewUrl.url}
+          fileTitle={previewUrl.title}
+          partNumber={previewUrl.partNumber}
+          sourceType="book"
           onClose={() => setPreviewUrl(null)}
         />
       )}

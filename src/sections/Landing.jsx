@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import Button from "../components/Button";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
-import PricingSection from "./Pricing";
 import VideoPlayer from "../components/VideoPlayer";
 import PremiumEbooksCTA from "./PremiumEbooksCTA";
 import { getVersion } from "@tauri-apps/api/app";

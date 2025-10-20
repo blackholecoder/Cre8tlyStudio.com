@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { themeStyles } from "../../constants/index";
-import { CheckCircle, XCircle, Download, Timer, Plus } from "lucide-react";
+import { CheckCircle, Download, Timer, Plus } from "lucide-react";
 
 export default function MagnetCardList({ magnets = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -124,6 +124,7 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
       {previewUrl && (
         <PDFPreviewModal
           fileUrl={previewUrl}
+          sourceType="magnet"
           onClose={() => setPreviewUrl(null)}
         />
       )}

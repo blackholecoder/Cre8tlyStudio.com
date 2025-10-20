@@ -91,7 +91,9 @@ async function handleSubmit(e) {
         partNumber,
         bookType,
       },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: { Authorization: `Bearer ${accessToken}` },
+    maxBodyLength: Infinity,
+    maxContentLength: Infinity, }
     );
 
     clearInterval(interval);

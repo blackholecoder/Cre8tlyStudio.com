@@ -2,7 +2,7 @@ import { useState } from "react";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
-import { CheckCircle, Download, Plus, Timer } from "lucide-react";
+import { CheckCircle, Timer } from "lucide-react";
 
 export default function BookCardList({ books = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -112,7 +112,13 @@ export default function BookCardList({ books = [], onAddPrompt }) {
 
             {b.pdf_url && (
               <button
-                onClick={() => setPreviewUrl(b.pdf_url)}
+                onClick={() =>
+                  setPreviewUrl({
+                    url: b.pdf_url,
+                    title: b.title || b.book_name || "Untitled",
+                    partNumber: b.part_number || 1,
+                  })
+                }
                 className="w-full px-3 py-2 bg-blue text-white rounded"
               >
                 Download
@@ -134,7 +140,10 @@ export default function BookCardList({ books = [], onAddPrompt }) {
       {/* ✅ Shared PDF Preview Modal */}
       {previewUrl && (
         <PDFPreviewModal
-          fileUrl={previewUrl}
+          fileUrl={previewUrl.url}
+          fileTitle={previewUrl.title}
+          partNumber={previewUrl.partNumber}
+          sourceType="book"
           onClose={() => setPreviewUrl(null)}
         />
       )}

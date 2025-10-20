@@ -47,14 +47,6 @@ const SupportPage = () => {
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12 overflow-y-auto">
       <div className="w-full max-w-3xl bg-bioModal p-8 rounded-2xl shadow-lg border border-gray-800 flex flex-col items-center">
 
-        {/* Logo */}
-        {/* <img
-          src={logo}
-          alt="Phlokk Logo"
-          className="mb-6 w-32 h-auto"
-        /> */}
-
-        {/* Title */}
         <h1 className="text-3xl font-bold text-white mb-6 text-center">
           Phlokk Support
         </h1>

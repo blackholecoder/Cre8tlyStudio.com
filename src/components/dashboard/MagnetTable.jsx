@@ -8,15 +8,16 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
   if (!Array.isArray(magnets) || magnets.length === 0) return null;
 
   return (
-    <div className="bg-[#111] hidden md:block overflow-x-auto">
-      <table className="min-w-full border border-gray-700 text-white">
+    <div className="bg-[#111] hidden md:block overflow-x-auto rounded-xl overflow-hidden border border-gray-700">
+      <table className="min-w-full text-white">
         <thead className="bg-gray-800">
           <tr>
             <th className="px-4 py-2 text-center">Slot</th>
-            <th className="px-4 py-2 text-center">Created</th>
+            <th className="px-4 py-2 text-center">Purchased</th>
             <th className="px-4 py-2 text-center">Status</th>
             <th className="px-4 py-2 text-center">Theme</th>
             <th className="px-4 py-2 text-center">Prompt</th>
+            <th className="px-4 py-2 text-center">Created</th>
             <th className="px-4 py-2 text-center">Actions</th>
           </tr>
         </thead>
@@ -25,11 +26,13 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
             <tr key={m.id} className="border-t border-gray-700">
               <td className="px-4 py-2 text-center">{m.slot_number}</td>
               <td className="px-4 py-2 text-center">
+                <span className="text-xs text-gray-300">
                 {new Date(m.created_at).toLocaleDateString("en-US", {
                   month: "short",
                   day: "2-digit",
                   year: "numeric",
                 })}{" "}
+                </span>
               </td>
               <td className="px-4 py-2 text-center">
                 {m.status === "completed" ? (
@@ -96,6 +99,23 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                   <div className="flex items-center justify-center text-grey">
                     <Timer size={18} />
                   </div>
+                )}
+              </td>
+              <td className="px-4 py-2 text-center">
+                {m.created_at_prompt ? (
+                  <span className="text-xs text-gray-300">
+                    {new Date(m.created_at_prompt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}{" "}
+                    {new Date(m.created_at_prompt).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                ) : (
+                  <span className="text-gray-500 italic text-xs">N/A</span>
                 )}
               </td>
               <td className="px-4 py-2">

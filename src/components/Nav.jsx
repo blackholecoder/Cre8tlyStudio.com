@@ -53,7 +53,7 @@ const Nav = () => {
     }
   }, [isOpen]);
 
-  if (["/dashboard", "/books", "/settings"].includes(location.pathname)) {
+  if (["/dashboard", "/books", "/settings", "/prompts"].includes(location.pathname)) {
     return null;
   }
 

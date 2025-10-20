@@ -17,12 +17,6 @@
   
 }
 
-html, body, #root {
-  color: #ffffff;
-  overscroll-behavior: none; 
-
-}
-
 .subscribe-bg {
   background-color:#FFFFFF;
 }
@@ -314,6 +308,9 @@ select.dropdown-scroll:focus option {
   
   html, body #root{
   background-image: linear-gradient(to bottom, #000000, #111827, #000000);
+    color: #ffffff;
+  overscroll-behavior: none; 
+  background-repeat: no-repeat;
   background-attachment: fixed;
   background-blend-mode: normal !important;
   overflow-x: hidden;

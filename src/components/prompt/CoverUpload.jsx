@@ -37,7 +37,7 @@ export default function CoverUpload({ setCover }) {
   return (
     <div className="relative mt-6 border border-gray-700 rounded-xl p-4 bg-gray-900/60 overflow-hidden">
       {/* Dim overlay if locked */}
-      {!isLocked && (
+      {isLocked && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-xl">
           <button
             onClick={handleUnlock}

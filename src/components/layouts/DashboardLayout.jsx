@@ -8,9 +8,11 @@ import {
   BookOpen,
   Settings,
   LogOut,
-  Magnet
+  Magnet,
+  SquareTerminal
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
+import PromptMemoryTab from "../dashboard/PromptMemoryTable";
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ export default function DashboardLayout({ children }) {
     { label: "Lead Magnets", path: "/dashboard", icon: <Magnet size={18} /> },
     { label: "Assistant", path: "/books", icon: <BookOpen size={18} /> },
     { label: "Settings", path: "/settings", icon: <Settings size={18} /> },
+    { label: "Prompt Memory", path: "/prompts", icon: <SquareTerminal size={18} /> },
   ];
 
   return (

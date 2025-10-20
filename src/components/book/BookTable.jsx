@@ -20,8 +20,8 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
 
   return (
     <>
-      <div className="bg-[#111] hidden md:block overflow-x-auto">
-        <table className="min-w-full border border-gray-700 text-white">
+      <div className="bg-[#111] hidden md:block overflow-x-auto rounded-xl overflow-hidden border border-gray-700">
+  <table className="min-w-full text-white">
           <thead className="bg-gray-800">
             <tr>
               <th className="px-4 py-2 text-left">Title</th>
@@ -191,4 +191,7 @@ export default function BookTable({ books = [], onAddPrompt, onGenerateNext }) {
       )}
     </>
   );
+
+
+
 }

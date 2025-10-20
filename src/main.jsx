@@ -32,6 +32,7 @@ import BooksDashboard from "./sections/BooksDashboard.jsx";
 import { BookProvider } from "./admin/BookContext.jsx";
 import SettingsPage from "./sections/SettingsPage.jsx";
 import DashboardLayout from "./components/layouts/DashboardLayout.jsx";
+import PromptMemoryDashboard from "./components/prompt/PromptMemoryDashboard.jsx";
 
 
 const AnimatedRoutes = () => {
@@ -68,6 +69,23 @@ const AnimatedRoutes = () => {
       >
         <DashboardLayout>
         <SettingsPage />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+  <Route
+  path="/prompts"
+  element={
+    <PrivateRoute role={["customer", "admin"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+      >
+        <DashboardLayout>
+        <PromptMemoryDashboard />
         </DashboardLayout>
       </motion.div>
     </PrivateRoute>

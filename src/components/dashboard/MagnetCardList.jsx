@@ -20,7 +20,7 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
           </p>
 
           <p className="text-sm text-silver">
-            <span className="font-semibold">Created:</span>{" "}
+            <span className="font-semibold">Purchased:</span>{" "}
             {new Date(m.created_at).toLocaleDateString("en-US", {
               month: "short",
               day: "2-digit",
@@ -63,7 +63,9 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 Generating your PDF…
               </span>
             ) : (
-              <span className="bg-black text-purple border border-white px-7 py-1 rounded-full text-xs font-semibold">Idle</span>
+              <span className="bg-black text-purple border border-white px-7 py-1 rounded-full text-xs font-semibold">
+                Idle
+              </span>
             )}
           </p>
 
@@ -87,15 +89,31 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
 
           <p className="text-sm text-silver mt-1">
             {m.prompt ? (
-                  <div className="flex items-center text-headerGreen">
-                    <CheckCircle size={18} className="mr-1" />
-                  </div>
-                ) : (
-                  <div className="flex items-center text-grey">
-                    <Timer size={18} className="mr-1" />
-                  </div>
-                )}
+              <div className="flex items-center text-headerGreen">
+                <CheckCircle size={18} className="mr-1" />
+              </div>
+            ) : (
+              <div className="flex items-center text-grey">
+                <Timer size={18} className="mr-1" />
+              </div>
+            )}
           </p>
+          {m.created_at_prompt ? (
+            <span className="text-xs text-gray-300">
+              <span className="text-green font-bold" >Created</span>{" "}
+              {new Date(m.created_at_prompt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}{" "}
+              {new Date(m.created_at_prompt).toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </span>
+          ) : (
+            <span className="text-gray-500 italic text-xs">N/A</span>
+          )}
 
           {/* Actions */}
           <div className="flex gap-2 mt-3">

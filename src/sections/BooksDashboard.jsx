@@ -27,6 +27,8 @@ export default function BooksDashboard() {
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showNewBookModal, setShowNewBookModal] = useState(false);
+  const [newBookData, setNewBookData] = useState(null);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,39 +81,11 @@ export default function BooksDashboard() {
     setTimeout(fetchBooks, 3000);
   }
 
-  async function handleAddAuthorAndTitle(title, authorName) {
-    try {
-      const res = await fetch(
-        `https://cre8tlystudio.com/api/books/update-info/${activeBook.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ title, authorName }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update book info");
-
-      // ✅ Immediately update local book state
-      setBooks((prev) =>
-        prev.map((b) =>
-          b.id === activeBook.id ? { ...b, title, author_name: authorName } : b
-        )
-      );
-
-      // ✅ Close modal and open writing prompt right away
-      setShowNewBookModal(false);
-      setOpenPrompt(true);
-
-      // ✅ Fetch fresh data in background (syncs everything with DB)
-      fetchBooks();
-    } catch (err) {
-      console.error("Error updating book info:", err);
-    }
-  }
+function handleAddBookInfo({ title, authorName, bookType }) {
+  setNewBookData({ title, authorName, bookType });
+  setShowNewBookModal(false);
+  setOpenPrompt(true);
+}
 
 
 
@@ -199,7 +173,7 @@ return (
         <NewBookModal
           bookId={activeBook.id}
           accessToken={accessToken}
-          onCreate={handleAddAuthorAndTitle}
+          onCreate={handleAddBookInfo}
           onClose={() => setShowNewBookModal(false)}
         />
       )}
@@ -214,6 +188,11 @@ return (
           setShowGenerating={setShowGenerating}
           setProgress={setProgress}
           onSubmitted={handlePromptSubmitted}
+          initialBookData={{
+      title: newBookData?.title || activeBook.title || "",
+      authorName: newBookData?.authorName || activeBook.author_name || "",
+      bookType: newBookData?.bookType || activeBook.book_type || "fiction",
+    }}
         />
       )}
 

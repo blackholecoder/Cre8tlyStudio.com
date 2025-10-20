@@ -114,6 +114,7 @@ import { toast } from "react-toastify";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import PlanDetailsModal from "../components/PlansDetailModal";
+import CustomCursor from "../components/CustomCursor";
 
 
 export default function PlansPage() {
@@ -151,7 +152,9 @@ export default function PlansPage() {
   };
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white flex flex-col items-center justify-center px-6 py-16">
+      <CustomCursor />
       <h1 className="text-5xl font-extrabold mb-12 tracking-tight text-center">
         Choose Your Plan
       </h1>

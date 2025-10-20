@@ -6,7 +6,6 @@ export { default as SignUpPage } from "../sections/SignUp";
 export { default as Button } from "../components/Button";
 export { default as NotFound } from "../components/NotFound";
 // Sections
-export { default as Hero } from "./Hero";
 export { default as Landing } from "./Landing";
 
 export { default as Subscribe } from "./Subscribe";

@@ -13,9 +13,8 @@ export default function BookPromptForm({
   title,
   setTitle,
   authorName,
-  setAuthorName,
   bookName,
-  setBookName,
+  bookType,
   onSubmit,
   loading,
 }) {
@@ -23,6 +22,8 @@ export default function BookPromptForm({
     <div className="space-y-6">
       {/* ---------- Book Info ---------- */}
       <div>
+        
+
         <label className="block text-silver mb-2 font-medium">Book Name</label>
         <input
           type="text"
@@ -51,6 +52,17 @@ export default function BookPromptForm({
           This name will appear as the author in your generated book PDF.
         </p>
       </div>
+      <div>
+          <label className="block text-silver mb-2 font-medium">
+            Book Type
+          </label>
+          <input
+            type="text"
+            value={bookType}
+            readOnly
+            className="w-full px-4 py-3 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+          />
+        </div>
 
       <div>
         <label className="block text-silver mb-2 font-medium">
@@ -148,4 +160,3 @@ export default function BookPromptForm({
     </div>
   );
 }
-

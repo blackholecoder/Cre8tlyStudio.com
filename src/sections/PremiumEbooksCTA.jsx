@@ -8,7 +8,7 @@ export default function PremiumEbooksCTA() {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      className="relative mt-28 mb-20 rounded-2xl overflow-hidden border border-white/10 bg-[#0b0f1a] p-10"
+      className="relative mt-28 mb-20 rounded-2xl overflow-hidden border border-white/10 bg-metalBlack p-10"
     >
       {/* Background glow */}
       <div className="absolute inset-0 blur-3xl opacity-40" />

@@ -4,7 +4,6 @@ import axios from "axios";
 import BookPromptForm from "../Book/BookPromptForm";
 import PDFThemePreview from "../../PDFThemePreview";
 import ThemePreviewModal from "../ThemePreviewModal";
-import { useNavigate } from "react-router-dom";
 
 
 export default function BookPromptModal({
@@ -16,8 +15,8 @@ export default function BookPromptModal({
   onSubmitted,
   setShowGenerating,
   setProgress,
+  initialBookData,
 }) {
-  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [pages, setPages] = useState(10);
   const [link, setLink] = useState("");
@@ -25,9 +24,21 @@ export default function BookPromptModal({
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [authorName, setAuthorName] = useState("");
-  const [bookName, setBookName] = useState("");
-  const [bookInfo, setBookInfo] = useState(null);
+
+  const [bookName, setBookName] = useState(initialBookData?.title || "");
+  const [authorName, setAuthorName] = useState(initialBookData?.authorName || "");
+  const [bookType, setBookType] = useState(initialBookData?.bookType || "fiction");
+
+
+useEffect(() => {
+  if (initialBookData) {
+    console.log("🩵 Syncing initialBookData to state:", initialBookData);
+    setBookName(initialBookData.title || "");
+    setAuthorName(initialBookData.authorName || "");
+    setBookType(initialBookData.bookType || "fiction");
+  }
+}, [initialBookData]);
+
 
   // ✅ Reset when closing
   useEffect(() => {
@@ -43,78 +54,9 @@ export default function BookPromptModal({
   }, [isOpen]);
 
   // ✅ Fetch book info
-  useEffect(() => {
-    async function fetchBook() {
-      if (!bookId) return;
-      try {
-        const res = await fetch(`https://cre8tlystudio.com/api/books/${bookId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const data = await res.json();
-        setBookInfo(data);
-      } catch (err) {
-        console.error("Failed to load book info:", err);
-      }
-    }
-    fetchBook();
-  }, [bookId]);
 
-//   async function handleSubmit(e) {
-//     e.preventDefault();
-//     if (!text.trim()) {
-//       toast.error("Please enter your book idea or prompt first.");
-//       return;
-//     }
 
-//     setLoading(true);
-//     setProgress(0);
-//     setShowGenerating(true);
 
-//     let interval;
-//     try {
-//       interval = setInterval(() => {
-//         setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-//       }, 400);
-
-//       const res = await axios.post(
-//         "https://cre8tlystudio.com/api/books/prompt",
-//         {
-//           bookId,
-//           prompt: text,
-//           pages,
-//           link,
-//           coverImage: cover,
-//           title,
-//           authorName,
-//           bookName,
-//           partNumber,
-//         },
-//         { headers: { Authorization: `Bearer ${accessToken}` } }
-//       );
-
-//       clearInterval(interval);
-//       setProgress(100);
-//       toast.success("📚 Book section generated successfully!");
-//       setTimeout(() => setShowGenerating(false), 800);
-
-//       if (typeof onSubmitted === "function") {
-//         setTimeout(() => onSubmitted(bookId, text), 1500);
-//       }
-//       setTimeout(() => {
-//   onClose(); // this hides the modal
-//   window.dispatchEvent(new Event("refreshBooks")); // custom event to refresh
-// }, 2000);
-
-//     } catch (err) {
-//       clearInterval(interval);
-//       setProgress(0);
-//       setShowGenerating(false);
-//       toast.error(err.response?.data?.message || "Book generation failed. Try again.");
-//       console.error("❌ Book generation error:", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
 async function handleSubmit(e) {
   e.preventDefault();
   if (!text.trim()) {
@@ -147,6 +89,7 @@ async function handleSubmit(e) {
         authorName,
         bookName,
         partNumber,
+        bookType,
       },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -210,10 +153,11 @@ async function handleSubmit(e) {
           setCover={setCover}
           title={title}
           setTitle={setTitle}
-          authorName={bookInfo?.author_name || ""}
-          setAuthorName={() => {}}
-          bookName={bookInfo?.title || ""}
-          setBookName={() => {}}
+          authorName={authorName}
+          setAuthorName={setAuthorName}
+          bookName={bookName}
+          setBookName={setBookName}
+          bookType={bookType}
           onSubmit={handleSubmit}
           loading={loading}
           showPreview={showPreview}

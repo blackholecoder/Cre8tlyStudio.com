@@ -81,15 +81,15 @@ export default function BookCardList({ books = [], onAddPrompt }) {
 
           {/* Prompt */}
           <p className="text-sm text-silver mt-1">
-           {b.prompt ? (
-                  <div className="flex items-center text-headerGreen">
-                    <CheckCircle size={18} className="mr-1" />
-                  </div>
-                ) : (
-                  <div className="flex items-center text-grey">
-                    <Timer size={18} className="mr-1" />
-                  </div>
-                )}
+            {b.prompt ? (
+              <span className="inline-flex items-center text-headerGreen">
+                <CheckCircle size={18} className="mr-1" />
+              </span>
+            ) : (
+              <span className="inline-flex items-center text-grey">
+                <Timer size={18} className="mr-1" />
+              </span>
+            )}
           </p>
 
           {/* Part number */}

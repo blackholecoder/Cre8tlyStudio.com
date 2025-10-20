@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
 export default function DashboardSettings() {
   const { user, setUser } = useAuth();
   const [settings, setSettings] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [ctaSaved, setCtaSaved] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -92,6 +93,28 @@ export default function DashboardSettings() {
     }
   };
 
+  const handleSaveCTA = async () => {
+    try {
+      await api.put("upload-data/user/settings/update-cta", {
+        userId: user.id,
+        cta: settings?.cta || "",
+      });
+
+      setUser((prev) => ({ ...prev, cta: settings?.cta }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...user, cta: settings?.cta })
+      );
+
+      setCtaSaved(true);
+      toast.success("CTA saved successfully!");
+      setTimeout(() => setCtaSaved(false), 3000);
+    } catch (err) {
+      console.error("Failed to update CTA:", err);
+      toast.error("Failed to update CTA. Please try again.");
+    }
+  };
+
   const getUserPlan = () => {
     if (!user) return [];
     const plans = [];
@@ -108,9 +131,7 @@ export default function DashboardSettings() {
       <div className="w-full max-w-[900px] p-10">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-3xl font-bold text-white">
-            Brand Settings
-          </h1>
+          <h1 className="text-3xl font-bold text-white">Brand Settings</h1>
           <p className="text-gray-400 mt-2">
             Manage your brand tone and upload a reference file for AI
             generation.
@@ -122,10 +143,10 @@ export default function DashboardSettings() {
             <h2 className="text-xl font-semibold text-white">Your Plan</h2>
             <span className="text-sm text-gray-400">
               {new Date().toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}{" "}
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}{" "}
             </span>
           </div>
 
@@ -323,27 +344,55 @@ export default function DashboardSettings() {
               )}
             </div>
 
-           <button
-  onClick={handleUpload}
-  disabled={uploading}
-  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
+            <button
+              onClick={handleUpload}
+              disabled={uploading}
+              className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
     ${
       uploading
         ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green-700 to-green-600"
         : "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
     }
     text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
->
-  <span className="relative z-10">
-    {uploading ? "Uploading..." : "Save Brand"}
-  </span>
+            >
+              <span className="relative z-10">
+                {uploading ? "Uploading..." : "Save Brand"}
+              </span>
 
-  {/* soft animated shine */}
-  {!uploading && (
-    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
-  )}
-</button>
+              {/* soft animated shine */}
+              {!uploading && (
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
+              )}
+            </button>
+          </div>
+        </div>
+        {/* CTA Settings */}
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Default Closing Message / CTA
+          </h2>
+          <p className="text-sm text-gray-400">
+            This message will appear at the end of your lead magnets or books.
+            You can change it anytime.
+          </p>
 
+          <textarea
+            placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
+            value={settings?.cta || ""}
+            onChange={(e) =>
+              setSettings((prev) => ({ ...prev, cta: e.target.value }))
+            }
+            rows={5}
+            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+          />
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleSaveCTA}
+              className="mt-3 px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
+            >
+              Save CTA
+            </button>
           </div>
         </div>
       </div>

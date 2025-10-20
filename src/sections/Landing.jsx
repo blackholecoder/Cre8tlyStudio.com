@@ -3,10 +3,10 @@ import Button from "../components/Button";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
 import PricingSection from "./Pricing";
-import { headerLogo } from "../assets/images";
 import VideoPlayer from "../components/VideoPlayer";
 import PremiumEbooksCTA from "./PremiumEbooksCTA";
 import { getVersion } from "@tauri-apps/api/app";
+import AnimatedLogo from "../components/animation/AnimatedLogo";
 
 const Landing = () => {
   const [isApp, setIsApp] = useState(false);
@@ -27,11 +27,8 @@ const Landing = () => {
     <div className="min-h-screen w-full text-white flex flex-col font-sans overflow-x-hidden">
       {/* HERO */}
       <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-32 relative overflow-hidden">
-        <img
-          src={headerLogo}
-          alt="Logo"
-          className="w-24 sm:w-36 md:w-18 lg:w-22"
-        />
+       
+        <AnimatedLogo />
         
 
         <h1 className="text-headerGreen text-4xl sm:text-6xl font-extrabold">
@@ -58,25 +55,13 @@ const Landing = () => {
         </motion.p>
 
         {/* Responsive full-width video */}
-        <div className="w-full max-w-5xl mt-12 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="w-full max-w-5xl mt-12 rounded-2xl overflow-hidden">
           <VideoPlayer />
         </div>
-
-        <motion.div
-          className="mt-16"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          <a href="#pricing">
-            <Button label="Generate My Lead Magnet" fullWidth={false} />
-          </a>
-        </motion.div>
       </section>
 
 
       <HowItWorks />
-      <PricingSection />
         {!isApp && (
           <PremiumEbooksCTA />
       )}

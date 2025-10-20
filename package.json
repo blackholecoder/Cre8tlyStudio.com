@@ -17,6 +17,7 @@
     "@mui/material": "^5.14.7",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
+    "@studio-freight/lenis": "^1.0.42",
     "@tauri-apps/api": "^2.8.0",
     "@tauri-apps/plugin-shell": "^2.3.1",
     "@tiptap/extension-blockquote": "^3.6.6",

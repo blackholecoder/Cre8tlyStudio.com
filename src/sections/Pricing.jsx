@@ -48,7 +48,7 @@ const PricingSection = () => {
               bg-[length:200%_200%] 
               animate-gradientPulse"
           >
-            <div className="w-full h-full rounded-2xl bg-gradient-to-b from-gray-900 to-gray-800" />
+            <div className="w-full h-full rounded-2xl bg-[#0d0d0d]" />
           </div>
 
           {/* card content */}
@@ -64,7 +64,7 @@ const PricingSection = () => {
               onClick={handleSignUpRedirect}
               className="w-full bg-royalPurple 
                 text-white text-lg font-semibold py-4 rounded-xl 
-                hover:opacity-90 hover:shadow-[0_0_20px_rgba(123,237,159,0.6)] 
+                hover:opacity-90 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]
                 transition shadow-lg lead-text"
             >
               {user ? "Sign Up Now" : "Sign Up Now"}

@@ -13,13 +13,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   
 }
 
 html, body, #root {
-  background-color: #030712 !important;
   color: #ffffff;
+  overscroll-behavior: none; 
+
 }
 
 .subscribe-bg {
@@ -37,50 +38,9 @@ html, body, #root {
   }
 }
 
-.scroll-watcher {
-  height: 2px;
-  position: fixed;
-  top: 0;
-  z-index:1000;
-  background-color: #1877F2;
-  width: 100%;
-  scale: 0 1;
-  transform-origin: left;
-  animation: scroll-watcher linear;
-  animation-timeline: scroll();
-}
-
-@keyframes scroll-watcher {
-  to { scale: 1 1; }
-}
-
-.scroll-watcher-2 {
-  height: 2px;
-  position: fixed;
-  top: 0;
-  z-index:1000;
-  background: #6C5CE7;
-  width: 100%;
-  scale: 0 1;
-  transform-origin: right;
-  animation: scroll-watcher-2 linear;
-  animation-timeline: scroll();
-}
-
-@keyframes scroll-watcher-2 {
-  to { scale: 1 1; }
-}
-
 /** For mobile devices **/
 @media (max-width: 767px) {}
 
-@media screen and (max-width: 552px) {
-  .subscribe-button {
-    width: 120px; /* Smaller width for small screens */
-    height: 80px; /* Optional: slightly reduce height */
-    font-size: 14px; /* Adjust font size */
-  }
-}
   
 
 .rmbackground {
@@ -171,46 +131,12 @@ select.dropdown-scroll:focus option {
     @apply sm:px-8 px-8;
   }
 
-  .info-text {
-    @apply font-montserrat text-white text-lg leading-7 font-bold;
-  }
-  .shop-text {
-    @apply font-montserrat text-white text-lg leading-7;
-  }
-  .verified-text {
-    @apply font-montserrat text-phlokkGreen text-lg leading-7 font-bold;
-  }
-
-  .feedback-text {
-    @apply font-montserrat text-white-400 font-bold text-lg leading-none;
-  }
-
-  .feedback-text2 {
-    @apply font-montserrat text-white-400 text-lg leading-7;
-  }
-
   .notFound-text {
     @apply font-montserrat font-bold text-white-400 text-3xl leading-7;
   }
 
   .thankYou-text {
     @apply font-montserrat text-white-400 text-xl leading-7;
-  }
-
-  .icon-text {
-    @apply font-montserrat text-white-400 text-lg leading-7;
-  }
-
-  .merch-text {
-    @apply font-montserrat text-white-400 text-lg leading-7;
-  }
-
-  .review-text {
-    @apply font-montserrat text-white text-lg font-bold leading-7;
-  }
-
-  .price-text {
-    @apply font-montserrat text-white text-lg leading-7 font-bold;
   }
 
   .document-p-text {
@@ -226,11 +152,6 @@ select.dropdown-scroll:focus option {
   }
 
 
-  .verified-icon {
-    @apply font-montserrat text-white text-xl;
-  }
-
-
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -239,15 +160,6 @@ select.dropdown-scroll:focus option {
   input[type=number] {
     -moz-appearance: textfield; /* Firefox */
   }
-
-  @keyframes progressSlide {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
 
 @keyframes gradientPulse {
   0% {
@@ -307,15 +219,6 @@ select.dropdown-scroll:focus option {
   border-radius: 9999px;
 }
 
-  
-  html, body {
-  background-color: #030712 !important;
-  background-image: none !important;
-  background-blend-mode: normal !important;
-  overflow-x: hidden;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
-}
 
 .prompt-editor .ql-container {
   height: 100% !important;
@@ -408,6 +311,15 @@ select.dropdown-scroll:focus option {
 }
 
 
+  
+  html, body #root{
+  background-image: linear-gradient(to bottom, #000000, #111827, #000000);
+  background-attachment: fixed;
+  background-blend-mode: normal !important;
+  overflow-x: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
 
 

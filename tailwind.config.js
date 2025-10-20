@@ -46,6 +46,7 @@ export default {
         downloadGreen: "#009432",
         muteGrey: "#353b48",
         hotPink: "#e84393",
+        metalBlack: "#030303",
       },
       screens: {
         wide: "1440px",

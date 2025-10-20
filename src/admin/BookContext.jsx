@@ -34,7 +34,6 @@ export function BookProvider({ children }) {
     fetchBooks(); // initial load
 
     const interval = setInterval(async () => {
-      console.log("🔄 [BookContext] Polling for new book updates...");
       try {
         const res = await axios.get("https://cre8tlystudio.com/api/books", {
           headers: { Authorization: `Bearer ${accessToken}` },

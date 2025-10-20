@@ -127,23 +127,42 @@ async function login(email, password) {
 }, []);
 
 
+async function refreshUser() {
+    try {
+      const res = await axiosInstance.get("/auth/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setUser(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data));
+      return res.data;
+    } catch (err) {
+      console.error("Failed to refresh user data:", err);
+      toast.error("Failed to refresh user data");
+      return null;
+    }
+  }
+
   // Silent refresh every 12 minutes to prevent expiry during work
 useEffect(() => {
   const interval = setInterval(() => {
     refreshAccessToken();
   }, 12 * 60 * 1000); // every 12 minutes
 
+  
+
   return () => clearInterval(interval);
 }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, accessToken, authLoading, login, logout, refreshAccessToken }}
+      value={{ user, setUser, accessToken, authLoading, login, logout, refreshAccessToken, refreshUser, }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
+
+
 
 export function useAuth() {
   return useContext(AuthContext);

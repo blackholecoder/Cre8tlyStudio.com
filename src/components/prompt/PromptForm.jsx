@@ -7,6 +7,7 @@ import ThemeSelector from "./ThemeSelector";
 import CoverUpload from "./CoverUpload";
 import PromptSelect from "./PromptSelect";
 import ColorThemeChooser from "../ColorThemeChooser";
+import { useAuth } from "../../admin/AuthContext"; 
 
 export default function PromptForm({
   text,
@@ -30,9 +31,16 @@ export default function PromptForm({
   onSubmit,
   loading,
 }) {
+  const { user } = useAuth(); 
   const [warning, setWarning] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [tooLong, setTooLong] = useState(false);
+
+useEffect(() => {
+  if (user?.cta && (!cta || cta.trim() === "")) {
+    setCta(user.cta);
+  }
+}, [user, user?.cta]);
 
   useEffect(() => {
     const plainText = text?.replace(/<[^>]+>/g, "").trim() || "";
@@ -169,20 +177,44 @@ export default function PromptForm({
 
       {/* Author Call-to-Action */}
       <div className="mt-6">
-        <label className="block text-silver mb-2 font-medium">
-          Add a Closing Message or Call-to-Action
-        </label>
-        <textarea
-          placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together, no tech overwhelm, no burnout, just steady growth.`}
-          value={cta}
-          onChange={(e) => setCta(e.target.value)}
-          rows={5}
-          className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
-        />
-        <p className="text-xs text-gray-400 mt-1">
-          This message will appear at the end of your lead magnet.
-        </p>
-      </div>
+  <label className="block text-silver mb-2 font-medium">
+    Add a Closing Message or Call-to-Action
+  </label>
+
+  {/* Dropdown for saved CTA */}
+  {user?.cta && (
+    <div className="flex items-center justify-between mb-2">
+      <select
+        onChange={(e) => {
+          const selected = e.target.value;
+          if (selected === "saved") setCta(user.cta);
+          else if (selected === "custom") setCta("");
+        }}
+        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+      >
+        <option value="">Choose CTA</option>
+        <option value="saved">Use My Saved CTA</option>
+        <option value="custom">Write New CTA</option>
+      </select>
+      <span className="text-xs text-gray-500 italic ml-2">
+        {cta === user.cta ? "Using saved CTA" : ""}
+      </span>
+    </div>
+  )}
+
+  {/* Editable text area */}
+  <textarea
+    placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter...`}
+    value={cta}
+    onChange={(e) => setCta(e.target.value)}
+    rows={5}
+    className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+  />
+
+  <p className="text-xs text-gray-400 mt-1">
+    This message will appear at the end of your lead magnet.
+  </p>
+</div>
 
       {/* Optional Link */}
       <div>

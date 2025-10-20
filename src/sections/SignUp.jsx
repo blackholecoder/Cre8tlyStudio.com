@@ -3,9 +3,12 @@ import { useAuth } from "../admin/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Footer from "../sections/Footer.jsx";
+import CustomCursor from "../components/CustomCursor.jsx";
+import { Eye, EyeOff } from "lucide-react"; 
 
 export default function SignupPage() {
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -35,15 +38,15 @@ export default function SignupPage() {
   return (
     <div
       style={{
-        backgroundColor: "#030712",
         isolation: "isolate",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
       }}
     >
+      <CustomCursor />
       <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
-        <div className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+        <div className="w-full max-w-md bg-metalBlack p-8 rounded-2xl border border-gray-800 shadow-2xl">
           <h1 className="text-3xl font-bold text-green text-center mb-6">
             Create Your Account
           </h1>
@@ -70,15 +73,25 @@ export default function SignupPage() {
               required
               className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
             />
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Password"
-              required
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
+                required
+                className="w-full px-4 py-3 pr-12 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-black"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             <button
               type="submit"
               disabled={loading}

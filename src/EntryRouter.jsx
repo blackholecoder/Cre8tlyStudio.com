@@ -27,7 +27,7 @@ export default function EntryRouter() {
   }, [navigate, isTauri]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#030712] text-white text-xl font-semibold">
+    <div className="flex items-center justify-center min-h-screen bg-[#000] text-white text-xl font-semibold">
       Loading Cre8tly Studio...
     </div>
   );

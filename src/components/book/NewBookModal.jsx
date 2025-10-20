@@ -1,36 +1,22 @@
 import { useState } from "react";
 
-export default function NewBookModal({ bookId, accessToken, onCreate, onClose }) {
+export default function NewBookModal({ onCreate, onClose }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [bookType, setBookType] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleAddInfo() {
-    if (!title || !author) {
-      alert("Please fill in both fields.");
+    if (!title || !author || !bookType) {
+      alert("Please fill in all fields, including book type.");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const res = await fetch(`https://cre8tlystudio.com/api/books/update-info/${bookId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ title, authorName: author }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update book info");
-      onCreate(title, author); // open the writing prompt modal next
-    } catch (err) {
-      console.error("Error saving book info:", err);
-      alert("Something went wrong while saving your book info.");
-    } finally {
-      setLoading(false);
-    }
+    onCreate({
+      title,
+      authorName: author,
+      bookType,
+    });
   }
 
   return (
@@ -42,7 +28,7 @@ export default function NewBookModal({ bookId, accessToken, onCreate, onClose })
           <label className="block text-silver mb-1">Book Title</label>
           <input
             type="text"
-            placeholder="e.g. The Clockmaker’s Secret"
+            placeholder="e.g. The Burning City"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-2 rounded bg-gray-800"
@@ -53,11 +39,34 @@ export default function NewBookModal({ bookId, accessToken, onCreate, onClose })
           <label className="block text-silver mb-1">Author Name</label>
           <input
             type="text"
-            placeholder="e.g. Elias Monroe"
+            placeholder="e.g. Dean Koontz"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             className="w-full p-2 rounded bg-gray-800"
           />
+        </div>
+
+        {/* 👇 New Book Type Section */}
+        <div>
+          <label className="block text-silver mb-2">Select Book Type</label>
+          <div className="flex flex-col gap-2">
+            {["Fiction", "Non-Fiction", "Educational"].map((type) => (
+              <label
+                key={type}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="bookType"
+                  value={type.toLowerCase()}
+                  checked={bookType === type.toLowerCase()}
+                  onChange={(e) => setBookType(e.target.value)}
+                  className="accent-royalPurple"
+                />
+                <span className="capitalize">{type}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-3">

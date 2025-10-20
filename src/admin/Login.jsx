@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 import Footer from "../sections/Footer.jsx";
+import CustomCursor from "../components/CustomCursor.jsx";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,7 +33,6 @@ export default function LoginPage() {
   return (
     <div
       style={{
-        backgroundColor: "#030712",
         isolation: "isolate",
         minHeight: "100vh",
         display: "flex",
@@ -38,12 +40,14 @@ export default function LoginPage() {
       }}
     >
       <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
-        <div className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+        <CustomCursor />
+        <div className="w-full max-w-md bg-metalBlack p-8 rounded-2xl border border-gray-800 shadow-2xl">
           <h1 className="text-3xl font-bold text-green text-center mb-6">
             Welcome Back
           </h1>
           <p className="text-gray-300 text-center mb-8">
-            Log in to your account to continue creating and managing your lead magnets.
+            Log in to your account to continue creating and managing your lead
+            magnets.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -56,15 +60,25 @@ export default function LoginPage() {
               required
               className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
             />
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Password"
-              required
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Password"
+                required
+                className="w-full px-4 py-3 pr-12 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-black"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             <button
               type="submit"
               disabled={loading}
@@ -75,10 +89,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-sm text-gray-400 text-center mt-4">
-            <a
-              href="/forgot-password"
-              className="text-green hover:underline"
-            >
+            <a href="/forgot-password" className="text-green hover:underline">
               Forgot Password?
             </a>
           </p>
@@ -89,7 +100,6 @@ export default function LoginPage() {
               Sign Up
             </a>
           </p>
-          
         </div>
       </section>
 

@@ -11,6 +11,7 @@ import {
   LogOut,
   Magnet
 } from "lucide-react";
+import CustomCursor from "../CustomCursor";
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-[#030712] text-white relative">
+      <CustomCursor />
       {/* Sidebar */}
       <aside
         className={`fixed lg:static top-0 left-0 h-screen bg-gray-900/95 border-r border-gray-800 flex flex-col justify-between transform transition-transform duration-300 z-50 ${

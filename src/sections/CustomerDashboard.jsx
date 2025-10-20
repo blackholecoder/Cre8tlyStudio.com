@@ -19,7 +19,7 @@ import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 
 
 export default function CustomerDashboard() {
-  const { user, accessToken } = useAuth();
+  const { user, accessToken, refreshUser } = useAuth();
   const { magnets, setMagnets, fetchMagnets, loading } = useMagnets(); // ✅ data from context
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [openPrompt, setOpenPrompt] = useState(false);
@@ -84,20 +84,13 @@ export default function CustomerDashboard() {
   }
 
   async function refreshUserSlots() {
-    try {
-      const res = await fetch("https://cre8tlystudio.com/api/auth/me", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data) {
-        // Update your magnet context or user state
-        fetchMagnets(); // refresh lead magnets to reflect new slot count
-      }
-    } catch (err) {
-      console.error("Failed to refresh slots:", err);
-    }
+  try {
+    await refreshUser();   // ✅ refreshes the logged-in user in AuthContext
+    await fetchMagnets();  // ✅ refreshes magnets with updated slot info
+  } catch (err) {
+    console.error("Failed to refresh user slots:", err);
   }
+}
 
   useEffect(() => {
   if (user?.has_book && !user?.has_magnet) {
@@ -117,6 +110,7 @@ export default function CustomerDashboard() {
       }
     }
     checkIfApp();
+    refreshUserSlots();
   }, []);
 
 

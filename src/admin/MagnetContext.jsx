@@ -38,7 +38,6 @@ export function MagnetProvider({ children }) {
     fetchMagnets(); // initial load
 
     const interval = setInterval(async () => {
-      console.log("🔄 [MagnetContext] Polling for PDF updates...");
       try {
         const res = await axios.get("https://cre8tlystudio.com/api/lead-magnets", {
           headers: { Authorization: `Bearer ${accessToken}` },

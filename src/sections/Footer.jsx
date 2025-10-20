@@ -19,7 +19,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-gray-950 text-white py-8 px-6">
+    <footer className="text-white py-8 px-6">
       <div className="max-w-7xl mx-auto border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-white/60">
         {/* Left: Logo + Branding */}
         <div className="flex flex-col items-center md:flex-row md:items-center gap-4 md:gap-6">

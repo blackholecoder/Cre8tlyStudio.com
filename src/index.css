@@ -99,7 +99,7 @@ select.dropdown-scroll:focus option {
 
 @layer utilities {
   .padding {
-    @apply sm:px-16 px-8 sm:py-24 py-12;
+    @apply sm:px-16 px-4 sm:py-24 py-12;
   }
 
   .padding-x {
@@ -309,7 +309,7 @@ select.dropdown-scroll:focus option {
 }
 
 
-  
+/*   
   html, body #root{
   background-image: linear-gradient(to bottom, #000000, #111827, #000000);
     color: #ffffff;
@@ -320,7 +320,44 @@ select.dropdown-scroll:focus option {
   overflow-x: hidden;
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
+} */
+ html, body, #root {
+  min-height: 100%;
+  background: linear-gradient(to bottom, #000000, #111827, #000000);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: #000 !important;
+  color: #fff;
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
+
+/* ✅ Extend the dark gradient far beyond the viewport to prevent white bounce */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -50vh;  /* push far below view */
+  height: 100vh;   /* covers bounce + scroll areas */
+  background: linear-gradient(to bottom, #000000, #111827, #000000);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Safari background stability */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    background-color: #000 !important;
+  }
+}
+
+
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+
 
 
 

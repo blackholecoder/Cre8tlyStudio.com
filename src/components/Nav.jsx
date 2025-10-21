@@ -21,7 +21,6 @@ const Nav = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isApp, setIsApp] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -36,19 +35,6 @@ const Nav = () => {
     }
     checkIfApp();
   }, []);
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (window.scrollY > 50) {
-  //       setIsScrolled(true);
-  //     } else {
-  //       setIsScrolled(false);
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,8 +57,8 @@ const Nav = () => {
   }
 
   const filteredNavLinks = navLinks.filter((link) => {
-    // Hide "Pricing" on /signup
-    if (link.label === "Pricing" && location.pathname !== "/home") {
+    // Hide "How It Works" on /signup
+    if (link.label === "Home" && location.pathname === "/home") {
       return false;
     }
 
@@ -263,11 +249,13 @@ const Nav = () => {
             className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4 lead-text"
           >
             {filteredNavLinks.map((item) => {
+
+             if (item.label === "Home" && location.pathname === "/home")
+          return null;
+
               if (
                 user &&
                 (item.label === "Sign Up" ||
-                  item.label === "Pricing" ||
-                  item.label === "How it works" ||
                   item.label === "Contact Us" ||
                   item.label === "Shop")
               )
@@ -298,20 +286,6 @@ const Nav = () => {
               );
             })}
             
-            <Link
-              to="/shop"
-              onClick={() => setIsOpen(false)}
-              className="font-montserrat text-md text-white-400 hover:text-white transition-all"
-            >
-              Shop
-            </Link>
-            <Link
-              to="/contact"
-              onClick={() => setIsOpen(false)}
-              className="font-montserrat text-md text-white-400 hover:text-white transition-all"
-            >
-              Contact
-            </Link>
 
             {user && (
               <button

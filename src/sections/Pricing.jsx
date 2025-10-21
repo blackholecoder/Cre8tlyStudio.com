@@ -67,7 +67,7 @@ const PricingSection = () => {
                 hover:opacity-90 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]
                 transition shadow-lg design-text"
             >
-              {user ? "Sign Up Now" : "Sign Up Now"}
+              {user ? "Sign Up" : "Sign Up"}
             </button>
           </div>
         </motion.div>

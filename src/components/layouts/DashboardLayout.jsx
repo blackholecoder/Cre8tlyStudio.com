@@ -9,10 +9,9 @@ import {
   Settings,
   LogOut,
   SquareTerminal,
-  Package
+  Package,
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
-
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -31,10 +30,18 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   const menu = [
-    { label: "Digital Products", path: "/dashboard", icon: <Package size={18} /> },
+    {
+      label: "Digital Products",
+      path: "/dashboard",
+      icon: <Package size={18} />,
+    },
     { label: "Assistant", path: "/books", icon: <BookOpen size={18} /> },
     { label: "Settings", path: "/settings", icon: <Settings size={18} /> },
-    { label: "Prompt Memory", path: "/prompts", icon: <SquareTerminal size={18} /> },
+    {
+      label: "Prompt Memory",
+      path: "/prompts",
+      icon: <SquareTerminal size={18} />,
+    },
   ];
 
   return (
@@ -55,11 +62,8 @@ export default function DashboardLayout({ children }) {
               <div className="flex items-center gap-2">
                 <img src={headerLogo} alt="Cre8tly" className="w-8 h-8" />
                 <h1 className="relative inline-block text-2xl font-bold text-green design-text">
-  Cre8tly Studio
-  <span className="absolute -top-1 -right-4 tracking-tight text-green lead-text text-2xl sm:text-sm font-bold">
-    AI
-  </span>
-</h1>
+                  Cre8tly Studio
+                </h1>
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
@@ -83,7 +87,8 @@ export default function DashboardLayout({ children }) {
             <nav className="space-y-3">
               {menu.map((item) => {
                 const active = location.pathname === item.path;
-                const hasBrandFile = user?.brand_identity_file && item.path === "/settings";
+                const hasBrandFile =
+                  user?.brand_identity_file && item.path === "/settings";
 
                 return (
                   <button
@@ -141,4 +146,3 @@ export default function DashboardLayout({ children }) {
     </div>
   );
 }
-

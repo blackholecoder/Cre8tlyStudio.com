@@ -64,7 +64,7 @@ useEffect(() => {
 
   // 🌐 Normal web visitors get the full landing site
   return (
-    <main style={{ backgroundColor: 'transparent' }}>
+    <main className="relative min-h-screen bg-transparent">
       <CustomCursor />
       <Nav />
       <section id="landing" className="padding">

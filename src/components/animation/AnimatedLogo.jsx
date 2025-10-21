@@ -1,28 +1,6 @@
 import { motion } from "framer-motion";
-import headerLogo from "../../assets/images/Robot-AI.svg";
+import headerLogo from "../../assets/images/Robot-AI-white.svg";
 
-// export default function AnimatedLogo() {
-//   return (
-//     <motion.img
-//       src={headerLogo}
-//       alt="Logo"
-//       className="w-32 h-32 relative z-10"
-//       initial={{ scale: 0.98 }}
-//       animate={{
-//         scale: [1, 1.05, 1], // gentle expansion and return
-//       }}
-//       transition={{
-//         duration: 5,          // slower, like breathing
-//         ease: "easeInOut",
-//         repeat: Infinity,
-//       }}
-//       whileHover={{
-//         scale: 1.1,           // a bit more when hovered
-//         transition: { type: "spring", stiffness: 120 },
-//       }}
-//     />
-//   );
-// }
 
 export default function AnimatedLogo() {
   return (

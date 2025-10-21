@@ -26,7 +26,7 @@ const steps = [
         <Bot className="w-10 h-10 text-white drop-shadow-[0_0_8px_rgba(103,15,231,0.6)]" />
       </motion.div>
     ),
-    title: "2. AI Creates Your Lead Magnet",
+    title: "2. AI Creates Your Digital Product",
     desc: "We generate up to 50 full A4 pages with examples, insights, and structure, styled with professional themes.",
   },
   {
@@ -46,7 +46,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="px-6 py-24 text-center bg-metalBlack relative overflow-hidden">
+    <section id="how" className="px-6 py-24 text-center bg-metalBlack relative overflow-hidden rounded-2xl">
       {/* Faint animated gradient background */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-[#0b0f1a] via-[#111827] to-[#0b0f1a] opacity-40"
@@ -55,7 +55,7 @@ export default function HowItWorks() {
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <h3 className="text-4xl mb-16 text-white font-semibold lead-text">How It Works</h3>
+        <h3 className="text-4xl mb-16 text-white font-semibold design-text">How It Works</h3>
 
         <div className="grid gap-10 sm:grid-cols-3">
           {steps.map((step, i) => (

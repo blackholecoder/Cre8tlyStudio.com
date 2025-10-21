@@ -8,7 +8,7 @@ export default function PremiumEbooksCTA() {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      className="relative mt-28 mb-20 rounded-2xl overflow-hidden border border-white/10 bg-metalBlack p-10"
+      className="relative mt-28 mb-20 rounded-2xl overflow-hidden bg-metalBlack p-10"
     >
       {/* Background glow */}
       <div className="absolute inset-0 blur-3xl opacity-40" />
@@ -16,9 +16,11 @@ export default function PremiumEbooksCTA() {
       <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 text-center lg:text-left">
         {/* Left text */}
         <div className="max-w-xl">
-          <h3 className="text-4xl sm:text-5xl font-extrabold mb-4 bg-green bg-clip-text text-transparent">
-            Ready to Go Deeper?
-          </h3>
+          <h3
+  className="text-4xl sm:text-5xl font-extrabold mb-6 bg-white bg-clip-text text-transparent design-text leading-[1.25] pb-1"
+>
+  Ready to Go Deeper?
+</h3>
 
           <p className="text-gray-300 text-lg leading-relaxed mb-6">
             Unlock our full library of{" "}
@@ -31,7 +33,7 @@ export default function PremiumEbooksCTA() {
 
           <a 
             href="/shop"
-            className="inline-block px-8 py-4 bg-royalPurple text-white font-semibold rounded-lg shadow-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.03]"
+            className="inline-block px-8 py-4 bg-royalPurple text-white text-xl font-semibold rounded-lg shadow-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.03] design-text"
           >
             🚀 Browse Premium Guides
           </a>

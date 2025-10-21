@@ -92,6 +92,7 @@ export default function CustomerDashboard() {
   }
 }
 
+
   useEffect(() => {
   if (user?.has_book && !user?.has_magnet) {
     navigate("/books");
@@ -120,19 +121,6 @@ return (
       {/* Header */}
       <DashboardHeader type="magnet" items={magnets} onCheckout={handleCheckout} />
 
-      {/* Tabs */}
-      <div className="flex gap-3 mb-8 mt-4">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className={`px-4 py-2 rounded-lg ${
-            location.pathname === "/dashboard"
-              ? "bg-blue text-white font-semibold"
-              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-          }`}
-        >
-          🎯 Lead Magnets
-        </button>
-      </div>
 
       {/* Content */}
       {loading ? (

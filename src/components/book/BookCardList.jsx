@@ -4,7 +4,7 @@ import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
 import { CheckCircle, Timer } from "lucide-react";
 
-export default function BookCardList({ books = [], onAddPrompt }) {
+export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [activeBookId, setActiveBookId] = useState(null);
@@ -91,6 +91,27 @@ export default function BookCardList({ books = [], onAddPrompt }) {
               </span>
             )}
           </p>
+          <p className="text-sm text-silver mt-1">
+            {b.created_at_prompt ? (
+                    <span className="text-xs text-gray-300">
+                      <span className="text-green font-bold">Created</span>{" "}
+                      {new Date(b.created_at_prompt).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        }
+                      )}{" "}
+                      {new Date(b.created_at_prompt).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 italic text-xs">N/A</span>
+                  )}
+          </p>
 
           {/* Part number */}
           {b.part_number && (
@@ -100,40 +121,57 @@ export default function BookCardList({ books = [], onAddPrompt }) {
           )}
 
           {/* Actions */}
-          <div className="flex flex-col gap-2 mt-3">
-            {!b.prompt && (
-              <button
-                onClick={() => onAddPrompt(b.id, b.part_number)}
-                className="w-full px-3 py-2 bg-royalPurple text-white rounded"
-              >
-                Add Prompt
-              </button>
-            )}
+<div className="flex flex-col gap-2 mt-3">
+  {/* Add Prompt */}
+  {!b.prompt && (
+    <button
+      onClick={() => onAddPrompt(b.id, b.part_number)}
+      className="w-full px-3 py-2 bg-royalPurple text-white rounded"
+    >
+      Add Prompt
+    </button>
+  )}
 
-            {b.pdf_url && (
-              <button
-                onClick={() =>
-                  setPreviewUrl({
-                    url: b.pdf_url,
-                    title: b.title || b.book_name || "Untitled",
-                    partNumber: b.part_number || 1,
-                  })
-                }
-                className="w-full px-3 py-2 bg-blue text-white rounded"
-              >
-                Download
-              </button>
-            )}
+  {/* Preview / Download */}
+  {b.pdf_url && (
+    <button
+      onClick={() =>
+        setPreviewUrl({
+          url: b.pdf_url,
+          title: b.title || b.book_name || "Untitled",
+          partNumber: b.part_number || 1,
+        })
+      }
+      className={`w-full px-3 py-2 rounded text-white ${
+        b.pages >= 750 ? "bg-green text-black" : "bg-blue"
+      }`}
+    >
+      {b.pages >= 750 ? "Download Book" : "Preview"}
+    </button>
+  )}
 
-            {b.status === "completed" && (
-              <button
-                onClick={() => openPartsModal(b.id)}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
-              >
-                View All Parts
-              </button>
-            )}
-          </div>
+  {/* View All Parts */}
+  {b.pdf_url && (
+    <button
+      onClick={() => openPartsModal(b.id)}
+      className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+    >
+      View All Parts
+    </button>
+  )}
+
+  {/* Continue Story */}
+  {b.prompt && b.pages < 750 && (
+    <button
+      onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
+      className="w-full px-3 py-2 bg-gradient-to-r from-[#00E07A] to-[#6a5acd] text-black rounded hover:opacity-90 transition"
+    >
+      {b.pages >= 740
+        ? "🏁 Finish Book"
+        : `➕ Continue Story (Part ${(b.part_number || 1) + 1})`}
+    </button>
+  )}
+</div>
         </div>
       ))}
 

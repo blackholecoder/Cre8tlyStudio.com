@@ -100,8 +100,8 @@ export default function EbooksStore() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white flex flex-col items-center px-6 py-20">
       <CustomCursor />
-      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-12 tracking-tight text-center">
-  Shop Our <span className="text-hotPink">Premium Guides</span>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-12 tracking-tight text-center lead-text">
+  Shop Our <span className="text-green design-text">Premium Guides</span>
 </h1>
 
       <p className="text-gray-400 text-center max-w-2xl mb-16 leading-relaxed">

@@ -6,7 +6,16 @@ import { headerLogo } from "../assets/images";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
 import { getVersion } from "@tauri-apps/api/app";
-import { Cog, Home, User, LogOut, MessageCircleQuestionMarkIcon, Crown, Store, LayoutDashboard  } from "lucide-react";
+import {
+  Cog,
+  Home,
+  User,
+  LogOut,
+  MessageCircleQuestionMarkIcon,
+  Crown,
+  Store,
+  LayoutDashboard,
+} from "lucide-react";
 
 const Nav = () => {
   const { user, logout } = useAuth();
@@ -28,18 +37,18 @@ const Nav = () => {
     checkIfApp();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (window.scrollY > 50) {
+  //       setIsScrolled(true);
+  //     } else {
+  //       setIsScrolled(false);
+  //     }
+  //   };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -53,7 +62,11 @@ const Nav = () => {
     }
   }, [isOpen]);
 
-  if (["/dashboard", "/books", "/settings", "/prompts"].includes(location.pathname)) {
+  if (
+    ["/dashboard", "/books", "/settings", "/prompts"].includes(
+      location.pathname
+    )
+  ) {
     return null;
   }
 
@@ -72,11 +85,7 @@ const Nav = () => {
   });
 
   return (
-    <div
-      className={`bg-[#0b0f1a] ${
-        isScrolled ? "bg-opacity-90" : "bg-opacity-0"
-      } transition duration-300 ease-in-out fixed top-0 left-0 w-full z-50`}
-    >
+    <div className={"fixed top-0 left-0 w-full z-50"}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav
           onClick={(e) => e.stopPropagation()}
@@ -96,24 +105,23 @@ const Nav = () => {
             </Link>
           </div>
 
-
-<div
-  className="hidden md:block relative"
-  onMouseEnter={() => setIsOpen(true)}
-  onMouseLeave={() => setIsOpen(false)}
->
-  {/* Cog button */}
-  <button
-    type="button"
-    className={`p-3 bg-muteGrey hover:bg-gray-800 text-white shadow-md transition
+          <div
+            className="hidden md:block relative"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+          >
+            {/* Cog button */}
+            <button
+              type="button"
+              className={`p-3 bg-muteGrey hover:bg-gray-800 text-white shadow-md transition
       ${isOpen ? "rounded-t-lg" : "rounded-lg"}`}
-  >
-    <Cog className="h-5 w-5 text-white" />
-  </button>
+            >
+              <Cog className="h-5 w-5 text-white" />
+            </button>
 
-  {/* Icon dropdown */}
-  <div
-    className={`absolute right-0 top-full flex flex-col items-center gap-2 
+            {/* Icon dropdown */}
+            <div
+              className={`absolute right-0 top-full flex flex-col items-center gap-2 
                  bg-muteGrey  shadow-xl
                 py-2 px-1 mt-[-2px] z-50
                 transition-all duration-150 ease-out rounded-b-lg 
@@ -122,84 +130,82 @@ const Nav = () => {
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 -translate-y-2 pointer-events-none"
                 }`}
-  >
-    {/* Always visible — Home */}
-    <button
-      onClick={() => navigate("/home")}
-      className="p-2 hover:bg-gray-800/60  transition"
-      title="Home"
-    >
-      <Home className="h-5 w-5 text-gray-300 hover:text-white" />
-    </button>
+            >
+              {/* Always visible — Home */}
+              <button
+                onClick={() => navigate("/home")}
+                className="p-2 hover:bg-gray-800/60  transition"
+                title="Home"
+              >
+                <Home className="h-5 w-5 text-gray-300 hover:text-white" />
+              </button>
 
-    {/* Logged-in vs Logged-out logic */}
-    {user ? (
-      <>
-        {/* Help */}
-        
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Dashboard"
-        >
-          <LayoutDashboard className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
-        <button
-          onClick={() => navigate("/contact")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Help"
-        >
-          <MessageCircleQuestionMarkIcon className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
+              {/* Logged-in vs Logged-out logic */}
+              {user ? (
+                <>
+                  {/* Help */}
 
-        {/* Logout (user only) */}
-        <button
-          onClick={() => logout()}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Logout"
-        >
-          <LogOut className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
-      </>
-    ) : (
-      <>
-        {/* Not logged in — Show Login & Help */}
-        
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Dashboard"
+                  >
+                    <LayoutDashboard className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Help"
+                  >
+                    <MessageCircleQuestionMarkIcon className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
 
-        <button
-          onClick={() => navigate("/sign-up")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Sign Up"
-        >
-          <Crown className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
-        <button
-          onClick={() => navigate("/shop")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Shop"
-        >
-          <Store className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
-        <button
-          onClick={() => navigate("/login")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Login"
-        >
-          <User className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
+                  {/* Logout (user only) */}
+                  <button
+                    onClick={() => logout()}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Not logged in — Show Login & Help */}
 
-        <button
-          onClick={() => navigate("/contact")}
-          className="p-2 hover:bg-gray-800/60  transition"
-          title="Contact"
-        >
-          <MessageCircleQuestionMarkIcon className="h-5 w-5 text-gray-300 hover:text-white" />
-        </button>
-      </>
-    )}
-  </div>
-</div>
+                  <button
+                    onClick={() => navigate("/sign-up")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Sign Up"
+                  >
+                    <Crown className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/shop")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Shop"
+                  >
+                    <Store className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Login"
+                  >
+                    <User className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
 
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Contact"
+                  >
+                    <MessageCircleQuestionMarkIcon className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
 
           {/* Mobile Hamburger */}
           <div className="md:hidden">
@@ -275,7 +281,7 @@ const Nav = () => {
                     onClick={() => setIsOpen(false)}
                     className="font-montserrat text-md text-white-400 hover:text-white transition-all"
                   >
-                    {user.name?.split(" ")[0] || "User"}
+                    Dashboard
                   </Link>
                 );
               }
@@ -291,6 +297,22 @@ const Nav = () => {
                 </a>
               );
             })}
+            
+            <Link
+              to="/shop"
+              onClick={() => setIsOpen(false)}
+              className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+            >
+              Shop
+            </Link>
+            <Link
+              to="/contact"
+              onClick={() => setIsOpen(false)}
+              className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+            >
+              Contact
+            </Link>
+
             {user && (
               <button
                 onClick={() => {

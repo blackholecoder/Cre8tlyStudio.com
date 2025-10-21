@@ -32,7 +32,7 @@ const PricingSection = () => {
   return (
     <section id="pricing" className="px-6 py-24 text-center">
       <div className="max-w-3xl mx-auto">
-        <h3 className="text-4xl mb-10 lead-text">Simple Pricing</h3>
+        <h3 className="text-4xl mb-10 design-text">Simple Pricing</h3>
 
         <motion.div
           className="relative rounded-2xl max-w-md mx-auto overflow-hidden"
@@ -53,19 +53,19 @@ const PricingSection = () => {
 
           {/* card content */}
           <div className="relative z-10 p-10 border border-transparent rounded-2xl shadow-xl">
-            <p className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-blue to-purple-500 bg-clip-text text-white">
+            <p className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-blue to-purple-500 bg-clip-text text-white design-text">
               $47
             </p>
-            <p className="text-gray-400 mb-8 lead-text">
+            <p className="text-gray-400 mb-8 type-text">
               One-time payment for 5 lead magnet slots
             </p>
 
             <button
               onClick={handleSignUpRedirect}
               className="w-full bg-royalPurple 
-                text-white text-lg font-semibold py-4 rounded-xl 
+                text-white text-xl font-semibold py-4 rounded-xl 
                 hover:opacity-90 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]
-                transition shadow-lg lead-text"
+                transition shadow-lg design-text"
             >
               {user ? "Sign Up Now" : "Sign Up Now"}
             </button>

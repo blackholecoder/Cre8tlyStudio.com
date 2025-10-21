@@ -57,7 +57,7 @@ export default function SupportTab() {
       {/* Floating Tab Button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 bg-green text-black font-semibold px-5 py-3 rounded-full shadow-lg hover:opacity-90 transition-all z-50"
+        className="fixed bottom-6 right-6 bg-green text-black font-semibold px-5 py-3 rounded-full shadow-lg hover:opacity-90 transition-all z-50 design-text text-xl"
       >
         💬 Support
       </button>

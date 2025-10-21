@@ -131,7 +131,7 @@ export default function DashboardSettings() {
       <div className="w-full max-w-[900px] p-10">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-3xl font-bold text-white">Brand Settings</h1>
+          <h1 className="text-4xl font-bold text-white design-text">Brand Settings</h1>
           <p className="text-gray-400 mt-2">
             Manage your brand tone and upload a reference file for AI
             generation.
@@ -253,7 +253,7 @@ export default function DashboardSettings() {
                       {plan.includes("Assistant")
                         ? "Access advanced book creation and AI writing tools."
                         : plan.includes("Magnets")
-                          ? "Generate lead magnets and marketing assets."
+                          ? "Generate digital products and marketing assets."
                           : "Unlock pro cover uploads and customization tools."}
                     </p>
 
@@ -394,6 +394,43 @@ export default function DashboardSettings() {
               Save CTA
             </button>
           </div>
+          {user?.has_book ? (
+            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">
+              <h2 className="text-lg font-semibold text-gray-200 mb-2">
+                Guided Tour
+              </h2>
+              <p className="text-sm text-gray-400 mb-4">
+                Replay the Book Builder onboarding walkthrough to revisit all
+                key features.
+              </p>
+
+              <button
+                onClick={async () => {
+                  try {
+                    await api.post(
+                      "https://cre8tlystudio.com/api/books/onboarding/replay",
+                      {},
+                      {
+                        headers: {
+                          Authorization: `Bearer ${user?.accessToken}`,
+                        },
+                      }
+                    );
+
+                    toast.success(
+                      "✅ Tour reset! It will replay next time you open Book Builder."
+                    );
+                  } catch (err) {
+                    console.error("❌ Failed to reset onboarding:", err);
+                    toast.error("Could not reset tour. Please try again.");
+                  }
+                }}
+                className="px-5 py-2.5 rounded-lg bg-[#6a5acd] text-black font-semibold hover:opacity-90 transition"
+              >
+                Replay Book Tour
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -8,11 +8,11 @@ import {
   BookOpen,
   Settings,
   LogOut,
-  Magnet,
-  SquareTerminal
+  SquareTerminal,
+  Package
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
-import PromptMemoryTab from "../dashboard/PromptMemoryTable";
+
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -20,11 +20,10 @@ export default function DashboardLayout({ children }) {
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // ✅ Auto-close sidebar when window shrinks
+  // ✅ Auto-close sidebar on resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) setIsSidebarOpen(false);
-      else setIsSidebarOpen(true);
+      setIsSidebarOpen(window.innerWidth >= 1024);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -32,31 +31,35 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   const menu = [
-    { label: "Lead Magnets", path: "/dashboard", icon: <Magnet size={18} /> },
+    { label: "Digital Products", path: "/dashboard", icon: <Package size={18} /> },
     { label: "Assistant", path: "/books", icon: <BookOpen size={18} /> },
     { label: "Settings", path: "/settings", icon: <Settings size={18} /> },
     { label: "Prompt Memory", path: "/prompts", icon: <SquareTerminal size={18} /> },
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#030712] text-white relative">
+    <div className="flex min-h-screen bg-[#030712] text-white relative overflow-hidden">
       <CustomCursor />
+
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static top-0 left-0 h-screen bg-gray-900/95 border-r border-gray-800 flex flex-col justify-between transform transition-transform duration-300 z-50 ${
-          isSidebarOpen ? "translate-x-0 w-64" : "-translate-x-full w-64"
-        }`}
+        className={`fixed top-0 left-0 h-screen w-64 bg-gray-900/95 border-r border-gray-800 
+                    flex flex-col justify-between transform transition-transform duration-300 z-50
+                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
-        {/* Content Wrapper */}
         <div className="flex flex-col justify-between h-full p-6">
           {/* Top Section */}
           <div>
+            {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-2">
                 <img src={headerLogo} alt="Cre8tly" className="w-8 h-8" />
-                <h1 className="text-xl font-bold text-headerGreen">
-                  Cre8tly Studio
-                </h1>
+                <h1 className="relative inline-block text-2xl font-bold text-green design-text">
+  Cre8tly Studio
+  <span className="absolute -top-1 -right-4 tracking-tight text-green lead-text text-2xl sm:text-sm font-bold">
+    AI
+  </span>
+</h1>
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
@@ -66,7 +69,7 @@ export default function DashboardLayout({ children }) {
               </button>
             </div>
 
-            {/* ✅ User Name */}
+            {/* User */}
             {user && (
               <div className="mb-6 text-sm text-gray-400">
                 Welcome,{" "}
@@ -76,49 +79,46 @@ export default function DashboardLayout({ children }) {
               </div>
             )}
 
-            {/* Navigation */}
-           <nav className="space-y-3">
-  {menu.map((item) => {
-    const active = location.pathname === item.path;
-    const hasBrandFile = user?.brand_identity_file && item.path === "/settings";
+            {/* Nav */}
+            <nav className="space-y-3">
+              {menu.map((item) => {
+                const active = location.pathname === item.path;
+                const hasBrandFile = user?.brand_identity_file && item.path === "/settings";
 
-    return (
-      <button
-        key={item.path}
-        onClick={() => {
-          navigate(item.path);
-          if (window.innerWidth < 1024) setIsSidebarOpen(false);
-        }}
-        className={`relative w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition
-          ${
-            active
-              ? "bg-muteGrey text-white shadow-md"
-              : "bg-gray-800/40 hover:bg-gray-800 text-gray-300"
-          }`}
-      >
-        {item.icon}
-        {item.label}
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => {
+                      navigate(item.path);
+                      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                    }}
+                    className={`relative w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition
+                      ${
+                        active
+                          ? "bg-muteGrey text-white shadow-md"
+                          : "bg-gray-800/40 hover:bg-gray-800 text-gray-300"
+                      }`}
+                  >
+                    {item.icon}
+                    {item.label}
 
-        {/* ✅ Double-layer glowing dot */}
-        {hasBrandFile && (
-          <>
-            {/* Outer pulsing ring */}
-            <span className="absolute right-3 w-3 h-3 bg-green rounded-full opacity-75 animate-ping" />
-            {/* Solid inner core */}
-            <span className="absolute right-3 w-3 h-3 bg-green rounded-full shadow-[0_0_6px_3px_rgba(34,197,94,0.8)]" />
-          </>
-        )}
-      </button>
-    );
-  })}
-</nav>
-
+                    {hasBrandFile && (
+                      <>
+                        <span className="absolute right-3 w-3 h-3 bg-green rounded-full opacity-75 animate-ping" />
+                        <span className="absolute right-3 w-3 h-3 bg-green rounded-full shadow-[0_0_6px_3px_rgba(34,197,94,0.8)]" />
+                      </>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
           {/* Logout */}
           <button
             onClick={logout}
-            className="w-full mt-8 text-sm font-semibold py-2 flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition rounded-md"
+            className="w-full mt-8 text-sm font-semibold py-2 flex items-center justify-center gap-2 
+                       bg-red-600 text-white hover:bg-red-700 transition rounded-md"
           >
             <LogOut size={16} />
             Logout
@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }) {
         </div>
       </aside>
 
-      {/* Toggle Button */}
+      {/* Toggle button (mobile) */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="lg:hidden fixed top-4 right-4 bg-gray-800/80 p-2 rounded-lg text-gray-200 hover:text-white z-50 transition"
@@ -134,10 +134,11 @@ export default function DashboardLayout({ children }) {
         <Menu size={22} />
       </button>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto transition-all duration-300">
+      {/* Main content (scrolls independently) */}
+      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-64">
         {children}
       </main>
     </div>
   );
 }
+

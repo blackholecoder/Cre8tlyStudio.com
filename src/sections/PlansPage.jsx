@@ -44,7 +44,7 @@ export default function PlansPage() {
     
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white flex flex-col items-center justify-center px-6 py-16">
       <CustomCursor />
-      <h1 className="text-5xl font-extrabold mb-12 tracking-tight text-center">
+      <h1 className="text-4xl font-extrabold mb-12 tracking-tight text-center design-text">
         Choose Your Plan
       </h1>
 
@@ -53,7 +53,7 @@ export default function PlansPage() {
         <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 shadow-[0_0_25px_rgba(147,51,234,0.4)] hover:shadow-[0_0_45px_rgba(147,51,234,0.7)] transition-all duration-500">
           <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
             <div>
-              <h2 className="text-2xl font-semibold mb-3 text-white">Basic Creator</h2>
+              <h2 className="text-3xl font-semibold mb-3 text-white design-text">Basic Creator</h2>
               <p className="text-gray-400 mb-4 text-sm leading-relaxed">
                 Includes <span className="text-white font-medium">5 lead magnet slots</span> and access to all standard templates.
                 Turn ideas into irresistible lead magnets fast.
@@ -64,16 +64,16 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-white">$47</p>
+              <p className="text-4xl font-extrabold mb-6 text-white design-text">$47</p>
             </div>
 
             <button
               onClick={() => handleSelectPlan("basic")}
               disabled={loadingPlan === "basic"}
-              className={`mt-auto py-3 px-6 text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+              className={`mt-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
                 loadingPlan === "basic"
                   ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-royalPurple hover:bg-purple-800 hover:shadow-[0_0_25px_rgba(147,51,234,0.6)] text-white"
+                  : "bg-royalPurple hover:bg-purple-800 hover:shadow-[0_0_25px_rgba(147,51,234,0.6)] text-white design-text"
               }`}
             >
               {loadingPlan === "basic" ? "Redirecting..." : "Select Basic Plan"}
@@ -85,7 +85,7 @@ export default function PlansPage() {
         <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 shadow-[0_0_25px_rgba(0,255,153,0.3)] hover:shadow-[0_0_45px_rgba(0,255,153,0.6)] transition-all duration-500">
           <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
             <div>
-              <h2 className="text-2xl font-semibold mb-3 text-green-400">Pro Covers</h2>
+              <h2 className="text-3xl font-semibold mb-3 text-green-400 design-text">Pro Covers</h2>
               <p className="text-gray-300 mb-4 text-sm leading-relaxed">
                 Everything in Basic plus <span className="text-white font-medium">unlimited custom cover uploads</span> for your lead magnets. Single purchase unlocks pro covers for lifetime.
               </p>
@@ -95,16 +95,16 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-green-400">$150 One-Time</p>
+              <p className="text-4xl font-extrabold mb-6 text-green-400 design-text">$150 One-Time</p>
             </div>
 
             <button
               onClick={() => handleSelectPlan("pro")}
               disabled={loadingPlan === "pro"}
-              className={`mt-auto py-3 px-6 text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+              className={`mt-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
                 loadingPlan === "pro"
                   ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-headerGreen hover:bg-green-700 hover:shadow-[0_0_25px_rgba(0,255,153,0.6)] text-white"
+                  : "bg-headerGreen hover:bg-green-700 hover:shadow-[0_0_25px_rgba(0,255,153,0.6)] text-black design-text"
               }`}
             >
               {loadingPlan === "pro" ? "Redirecting..." : "Upgrade to Pro Covers"}
@@ -116,7 +116,7 @@ export default function PlansPage() {
         <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 shadow-[0_0_25px_rgba(255,105,180,0.3)] hover:shadow-[0_0_45px_rgba(255,105,180,0.6)] transition-all duration-500">
           <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
             <div>
-              <h2 className="text-2xl font-semibold mb-3 text-pink-400">Author’s Assistant</h2>
+              <h2 className="text-3xl font-semibold mb-3 text-pink-400 design-text">Author’s Assistant</h2>
               <p className="text-gray-300 mb-4 text-sm leading-relaxed">
                 AI-powered co-writer that helps you structure, write, and edit up to 750 pages while keeping your unique voice.
               </p>
@@ -126,16 +126,16 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-pink-400">$850 One-Book</p>
+              <p className="text-4xl font-extrabold mb-6 text-pink-400 design-text">$850 One-Book</p>
             </div>
 
             <button
               onClick={() => handleSelectPlan("author")}
               disabled={loadingPlan === "author"}
-              className={`mt-auto py-3 px-6 text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+              className={`mt-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
                 loadingPlan === "author"
                   ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-pink-600 hover:bg-pink-700 hover:shadow-[0_0_25px_rgba(255,105,180,0.6)] text-white"
+                  : "bg-pink-600 hover:bg-pink-700 hover:shadow-[0_0_25px_rgba(255,105,180,0.6)] text-white design-text"
               }`}
             >
               {loadingPlan === "author" ? "Redirecting..." : "Select Author’s Assistant"}
@@ -147,7 +147,7 @@ export default function PlansPage() {
         <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-400 shadow-[0_0_25px_rgba(255,215,0,0.3)] hover:shadow-[0_0_45px_rgba(255,215,0,0.6)] transition-all duration-500">
           <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
             <div>
-              <h2 className="text-2xl font-semibold mb-3 text-yellow-300">
+              <h2 className="text-3xl font-semibold mb-3 text-yellow-300 design-text">
                 All-In-One Bundle
               </h2>
               <p className="text-gray-300 mb-4 text-sm leading-relaxed">
@@ -159,19 +159,19 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-yellow-300">$999</p>
+              <p className="text-4xl font-extrabold mb-6 text-yellow-300 design-text">$999</p>
             </div>
 
             <button
               onClick={() => handleSelectPlan("bundle")}
               disabled={loadingPlan === "bundle"}
-              className={`mt-auto py-3 px-6 text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+              className={`mt-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
                 loadingPlan === "bundle"
                   ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-yellow hover:bg-yellow hover:shadow-[0_0_25px_rgba(255,215,0,0.6)] text-black font-bold"
+                  : "bg-yellow hover:bg-yellow hover:shadow-[0_0_25px_rgba(255,215,0,0.6)] text-black font-bold design-text"
               }`}
             >
-              {loadingPlan === "bundle" ? "Redirecting..." : "Get the Full Bundle"}
+              {loadingPlan === "bundle" ? "Redirecting..." : "Get the Bundle"}
             </button>
           </div>
         </div>

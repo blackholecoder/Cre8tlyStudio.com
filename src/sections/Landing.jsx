@@ -77,7 +77,7 @@ const Landing = () => {
       
 
       <motion.p
-  className="mt-16 mb-10 text-2xl sm:text-4xl text-center font-semibold leading-snug text-green tracking-tight max-w-4xl mx-auto design-text"
+  className="mt-16 mb-10 text-3xl sm:text-4xl text-center font-semibold leading-snug text-green tracking-tight max-w-4xl mx-auto design-text"
   initial={{ opacity: 0, y: 30 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ delay: 0.5 }}

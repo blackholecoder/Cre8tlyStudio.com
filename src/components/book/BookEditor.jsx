@@ -69,6 +69,7 @@ export default function BookEditor({ content, setContent }) {
         {/* === Text Styles === */}
         <div className="flex gap-3 items-center">
           <button
+          type="button" 
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={`font-semibold text-lg ${
               editor.isActive("bold") ? "text-green-400" : "text-gray-300"
@@ -77,6 +78,7 @@ export default function BookEditor({ content, setContent }) {
             B
           </button>
           <button
+          type="button" 
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={`italic text-lg ${
               editor.isActive("italic") ? "text-green-400" : "text-gray-300"
@@ -85,6 +87,7 @@ export default function BookEditor({ content, setContent }) {
             I
           </button>
           <button
+          type="button" 
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={`underline text-lg ${
               editor.isActive("underline") ? "text-green-400" : "text-gray-300"
@@ -93,6 +96,7 @@ export default function BookEditor({ content, setContent }) {
             U
           </button>
           <button
+          type="button" 
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             className={`px-2 py-1 rounded text-sm ${
               editor.isActive("highlight")
@@ -107,6 +111,7 @@ export default function BookEditor({ content, setContent }) {
         {/* === Lists / Quotes */}
         <div className="flex gap-4 items-center pl-6 border-l border-gray-700">
             <button
+            type="button" 
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               className={`p-2 rounded-md ${
                 editor.isActive("bulletList")
@@ -119,6 +124,7 @@ export default function BookEditor({ content, setContent }) {
             </button>
 
             <button
+            type="button" 
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
               className={`p-2 rounded-md ${
                 editor.isActive("orderedList")
@@ -131,6 +137,7 @@ export default function BookEditor({ content, setContent }) {
             </button>
          
           <button
+          type="button" 
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             className={`${
               editor.isActive("blockquote") ? "text-green-400" : "text-gray-300"
@@ -142,6 +149,7 @@ export default function BookEditor({ content, setContent }) {
 
         <div className="flex gap-2 items-center pl-6 border-l border-gray-700">
           <button
+          type="button" 
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
             className={`p-2 rounded-md ${
               editor.isActive({ textAlign: "left" })
@@ -154,6 +162,7 @@ export default function BookEditor({ content, setContent }) {
           </button>
 
           <button
+          type="button" 
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
             className={`p-2 rounded-md ${
               editor.isActive({ textAlign: "center" })
@@ -166,6 +175,7 @@ export default function BookEditor({ content, setContent }) {
           </button>
 
           <button
+          type="button" 
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
             className={`p-2 rounded-md ${
               editor.isActive({ textAlign: "right" })
@@ -181,12 +191,14 @@ export default function BookEditor({ content, setContent }) {
         {/* === Undo / Redo === */}
         <div className="flex gap-4 items-center pl-6 ml-auto border-l border-gray-700">
           <button
+          type="button" 
             onClick={() => editor.chain().focus().undo().run()}
             className="text-gray-300 hover:text-white"
           >
             ⟲ Undo
           </button>
           <button
+          type="button" 
             onClick={() => editor.chain().focus().redo().run()}
             className="text-gray-300 hover:text-white"
           >

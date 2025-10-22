@@ -29,7 +29,14 @@ The All-In-One Bundle gives you everything in a single discounted package:
 • 1 Author’s Assistant Book Slot (750 pages + editor)  
 A full creative suite that lets you write, design, and publish with complete control from start to finish.`,
     },
-  };
+  prompt_memory: {
+  title: "Prompt Memory Subscription",
+  content: `
+The Prompt Memory Plan gives you a persistent AI memory across your entire Cre8tly Studio experience.
+It learns your tone, writing style, and preferences, letting you generate faster, more accurate, and
+on-brand results every time. Cancel anytime, no contracts.`,
+  }
+}
 
   const { title, content } = descriptions[plan] || {};
 

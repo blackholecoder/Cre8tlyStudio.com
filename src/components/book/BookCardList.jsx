@@ -41,43 +41,54 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
 
           {/* Status */}
           <p className="text-sm text-silver mt-1">
-            <span className="font-semibold">Status:</span>{" "}
-            {b.status === "completed" ? (
-              <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
-                Completed
-              </span>
-            ) : b.status === "failed" ? (
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                Failed
-              </span>
-            ) : b.status === "pending" ? (
-              <span className="flex items-center gap-2 text-yellow-400 italic">
-                <svg
-                  className="animate-spin h-4 w-4 text-yellow"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
-                Generating your book…
-              </span>
-            ) : (
-              <span className="text-gray-400 italic">Idle...</span>
-            )}
-          </p>
+  <span className="font-semibold">Status:</span>{" "}
+  {b.status === "await_prompt" ? (
+    <span className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+      Idle
+    </span>
+  ) : b.status === "pending" ? (
+    <span className="flex items-center gap-2 text-yellow italic">
+      <svg
+        className="animate-spin h-4 w-4 text-yellow"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v8H4z"
+        ></path>
+      </svg>
+      Generating…
+    </span>
+  ) : b.status === "failed" ? (
+    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+      Failed
+    </span>
+  ) : b.pages >= 750 ? (
+    <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
+      Completed
+    </span>
+  ) : b.pages > 0 ? (
+    <span className="bg-blue text-white px-2 py-1 rounded-full text-xs font-semibold">
+      In Progress
+    </span>
+  ) : (
+    <span className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+      Idle
+    </span>
+  )}
+</p>
+
 
           {/* Prompt */}
           <p className="text-sm text-silver mt-1">

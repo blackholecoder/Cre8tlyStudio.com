@@ -48,7 +48,7 @@ export default function PlansPage() {
         Choose Your Plan
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-6xl">
         {/* ---------- Basic Plan ---------- */}
         <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 shadow-[0_0_25px_rgba(147,51,234,0.4)] hover:shadow-[0_0_45px_rgba(147,51,234,0.7)] transition-all duration-500">
           <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
@@ -175,6 +175,45 @@ export default function PlansPage() {
             </button>
           </div>
         </div>
+        {/* ---------- Prompt Memory Subscription ---------- */}
+<div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 shadow-[0_0_25px_rgba(0,255,153,0.3)] hover:shadow-[0_0_45px_rgba(0,255,153,0.6)] transition-all duration-500">
+  <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
+    <div>
+      <h2 className="text-3xl font-semibold mb-3 text-green-300 design-text">
+        Prompt Memory
+      </h2>
+      <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+        Unlock <span className="text-white font-medium">AI Prompt Memory</span> your personalized creative memory that
+        remembers your tone, style, and preferences across every generation.
+        Stay consistent, save time, and build smarter prompts automatically.
+      </p>
+      <button
+        onClick={() => setSelectedPlan("prompt_memory")}
+        className="text-green-300 text-sm hover:underline mb-3"
+      >
+        Learn More
+      </button>
+      <p className="text-4xl font-extrabold mb-6 text-green-300 design-text">
+        $14.99<span className="text-lg font-normal text-gray-400"> / month</span>
+      </p>
+    </div>
+
+    <button
+      onClick={() => handleSelectPlan("prompt_memory")}
+      disabled={loadingPlan === "prompt_memory"}
+      className={`mt-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+        loadingPlan === "prompt_memory"
+          ? "opacity-50 cursor-not-allowed bg-gray-700"
+          : "bg-headerGreen hover:bg-green-700 hover:shadow-[0_0_25px_rgba(0,255,153,0.6)] text-black font-bold design-text"
+      }`}
+    >
+      {loadingPlan === "prompt_memory"
+        ? "Redirecting..."
+        : "Subscribe"}
+    </button>
+  </div>
+</div>
+
       </div>
 
       {selectedPlan && (

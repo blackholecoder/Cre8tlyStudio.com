@@ -82,7 +82,7 @@
   font-family: "Inter", serif;
 }
 .design-text {
-  font-family: "Ephesis", serif;
+  font-family: "Inter", serif;
 }
 
 /* Limit dropdown height and make it scroll after 10 items */
@@ -217,6 +217,19 @@ select.dropdown-scroll:focus option {
   border-radius: 9999px;
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 15s linear infinite;
+}
+
 
 .prompt-editor .ql-container {
   height: 100% !important;
@@ -309,18 +322,7 @@ select.dropdown-scroll:focus option {
 }
 
 
-/*   
-  html, body #root{
-  background-image: linear-gradient(to bottom, #000000, #111827, #000000);
-    color: #ffffff;
-  overscroll-behavior: none; 
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-blend-mode: normal !important;
-  overflow-x: hidden;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
-} */
+
  html, body, #root {
   min-height: 100%;
   background: linear-gradient(to bottom, #000000, #111827, #000000);

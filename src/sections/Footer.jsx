@@ -31,7 +31,7 @@ const Footer = () => {
               height={50}
             />
           </a>
-          <p>© {new Date().getFullYear()} Cre8tlyStudio</p>
+          <p>© {new Date().getFullYear()} Alure Digital. All rights reserved</p>
         </div>
 
         {/* Right: Links */}

@@ -128,7 +128,7 @@ export default function DashboardSettings() {
 
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
-      <div className="w-full max-w-[900px] p-10">
+      <div className="w-full max-w-[900px] p-5">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
           <h1 className="text-4xl font-bold text-white design-text">Brand Settings</h1>

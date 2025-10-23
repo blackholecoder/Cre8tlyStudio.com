@@ -73,12 +73,15 @@ export default function SupportTab() {
             onClick={(e) => e.stopPropagation()}
             className="bg-gray-900 text-white p-8 rounded-2xl w-full max-w-2xl border border-gray-700 shadow-2xl relative max-h-[80vh] overflow-y-auto"
           >
-            <button
-              onClick={() => setOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-400 text-xl"
-            >
-              ✕
-            </button>
+            {/* Close buttons (left + right for accessibility) */}
+            <div className="absolute top-4 left-4 right-4 flex justify-between">
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-400 hover:text-red-400 text-xl"
+              >
+                ✕
+              </button>
+            </div>
 
             <h2 className="text-2xl font-bold mb-6 text-center text-green">
               Frequently Asked Questions

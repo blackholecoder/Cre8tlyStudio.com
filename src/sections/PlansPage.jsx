@@ -87,7 +87,7 @@ export default function PlansPage() {
             <div>
               <h2 className="text-3xl font-semibold mb-3 text-green-400 design-text">Pro Covers</h2>
               <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                Everything in Basic plus <span className="text-white font-medium">unlimited custom cover uploads</span> for your lead magnets. Single purchase unlocks pro covers for lifetime.
+                Everything in Basic plus <span className="text-white font-medium">unlimited custom cover uploads</span>. Single purchase unlocks pro covers for lifetime.
               </p>
               <button
                 onClick={() => setSelectedPlan("pro")}
@@ -95,7 +95,7 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-green-400 design-text">$150 One-Time</p>
+              <p className="text-4xl font-extrabold mb-6 text-green-400 design-text">$150</p>
             </div>
 
             <button
@@ -107,7 +107,7 @@ export default function PlansPage() {
                   : "bg-headerGreen hover:bg-green-700 hover:shadow-[0_0_25px_rgba(0,255,153,0.6)] text-black design-text"
               }`}
             >
-              {loadingPlan === "pro" ? "Redirecting..." : "Upgrade to Pro Covers"}
+              {loadingPlan === "pro" ? "Redirecting..." : "Pro Covers"}
             </button>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function PlansPage() {
               >
                 Learn More
               </button>
-              <p className="text-4xl font-extrabold mb-6 text-pink-400 design-text">$850 One-Book</p>
+              <p className="text-4xl font-extrabold mb-6 text-pink-400 design-text">$850 </p>
             </div>
 
             <button
@@ -138,7 +138,7 @@ export default function PlansPage() {
                   : "bg-pink-600 hover:bg-pink-700 hover:shadow-[0_0_25px_rgba(255,105,180,0.6)] text-white design-text"
               }`}
             >
-              {loadingPlan === "author" ? "Redirecting..." : "Select Author’s Assistant"}
+              {loadingPlan === "author" ? "Redirecting..." : "Author’s Assistant"}
             </button>
           </div>
         </div>

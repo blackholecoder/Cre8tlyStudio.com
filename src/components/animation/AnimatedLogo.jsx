@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import headerLogo from "../../assets/images/Robot-AI-white.svg";
+import headerLogo from "../../assets/images/cre8tly-logo.svg";
 
 
 export default function AnimatedLogo() {
@@ -13,7 +13,7 @@ export default function AnimatedLogo() {
         scale: [1, 1.05, 1],
         filter: [
           "drop-shadow(0 0 0px rgba(0,255,204,0))",
-          "drop-shadow(0 0 12px rgba(0,255,204,0.8))",
+          "drop-shadow(0 0 12px rgba(24, 0, 156, 1))",
           "drop-shadow(0 0 0px rgba(0,255,204,0))",
         ],
       }}

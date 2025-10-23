@@ -39,14 +39,8 @@ async function login(email, password) {
       console.error("Failed to fetch fresh user data after login:", fetchErr);
     }
 
-    toast.success("🎉 Login successful!", {
-      className:
-        "bg-transparent !bg-transparent border-2 border-green text-white font-bold rounded-lg shadow-[0_0_15px_rgba(123,237,159,0.6)]",
-    });
   } catch (err) {
-    toast.error("❌ Login failed. Please check your credentials.", {
-      className: "bg-red-600 text-white font-semibold rounded-lg shadow-md",
-    });
+    throw err;
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 import Footer from "../sections/Footer.jsx";
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [fade, setFade] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,16 +21,32 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       await login(form.email, form.password);
       navigate("/dashboard");
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Invalid email or password. Please try again.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Login failed. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      setFade(false);
+      const fadeTimer = setTimeout(() => setFade(true), 4000);
+      const clearTimer = setTimeout(() => setError(""), 5000);
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(clearTimer);
+      };
+    }
+  }, [error]);
 
   return (
     <div
@@ -46,9 +64,19 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-gray-300 text-center mb-8">
-            Log in to your account to continue creating and managing your lead
-            magnets.
+            Log in to your account to continue creating and managing your
+            digital products.
           </p>
+
+          {error && (
+            <div
+              className={`bg-red-900/60 border border-red-500 text-red-200 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-1000 ${
+                fade ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input

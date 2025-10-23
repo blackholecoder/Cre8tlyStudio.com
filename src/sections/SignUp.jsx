@@ -1,17 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Footer from "../sections/Footer.jsx";
 import CustomCursor from "../components/CustomCursor.jsx";
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,17 +31,24 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
-      const res = await axios.post("https://cre8tlystudio.com/api/auth/signup", formData);
+      const res = await axios.post(
+        "https://cre8tlystudio.com/api/auth/signup",
+        formData
+      );
       if (res.status === 201) {
         await login(formData.email, formData.password);
         navigate("/dashboard");
       } else {
-        alert(res.data.message || "Something went wrong");
+        setError(res.data.message || "Something went wrong");
       }
     } catch (err) {
-      console.error(err);
-      alert("Signup failed. Please check your information.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Signup failed. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -51,8 +70,14 @@ export default function SignupPage() {
             Create Your Account
           </h1>
           <p className="text-gray-300 text-center mb-8">
-            Join Cre8tly Studio and start creating digital lead magnets instantly.
+            Join Cre8tly Studio and start creating digital products instantly.
           </p>
+
+          {error && (
+            <div className="bg-red-900/60 border border-red-500 text-red-200 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-700">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input

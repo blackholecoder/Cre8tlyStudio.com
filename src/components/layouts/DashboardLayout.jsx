@@ -45,14 +45,14 @@ export default function DashboardLayout({ children }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#030712] text-white relative overflow-hidden">
+    <div className="flex min-h-screen bg-[#030712] text-white relative">
       <CustomCursor />
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 bg-gray-900/95 border-r border-gray-800 
-                    flex flex-col justify-between transform transition-transform duration-300 z-50
-                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed top-0 left-0 w-64 h-full bg-gray-900/95 border-r border-gray-800 
+             flex flex-col justify-between transform transition-transform duration-300 z-[60]
+             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
         <div className="flex flex-col justify-between h-full p-6">
           {/* Top Section */}
@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }) {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-2">
                 <img src={headerLogo} alt="Cre8tly" className="w-8 h-8" />
-                <h1 className="relative inline-block text-2xl font-bold text-green design-text">
+                <h1 className="relative inline-block text-1xl font-bold text-white design-text">
                   Cre8tly Studio
                 </h1>
               </div>
@@ -130,6 +130,13 @@ export default function DashboardLayout({ children }) {
           </button>
         </div>
       </aside>
+
+      {isSidebarOpen && window.innerWidth < 1024 && (
+  <div
+    onClick={() => setIsSidebarOpen(false)}
+    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
+  />
+)}
 
       {/* Toggle button (mobile) */}
       <button

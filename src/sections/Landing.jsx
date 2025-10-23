@@ -27,7 +27,7 @@ const Landing = () => {
       <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-32 relative overflow-hidden">
         <AnimatedLogo />
 
-        <h1 className="relative inline-block text-green text-4xl sm:text-8xl font-extrabold design-text">
+        <h1 className="relative inline-block text-white text-3xl sm:text-6xl lg:text-8xl font-extrabold design-text ">
   Cre8tly Studio
   <span className="absolute -top-2 sm:-top-1 -right-8 sm:-right-10 text-green text-2xl sm:text-3xl font-bold lead-text">
     AI
@@ -61,10 +61,9 @@ const Landing = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          Cre8tly Studio is an <span className="text-green font-bold">AI-powered</span>  digital product builder that helps
-          creators, coaches, and entrepreneurs <span className="text-white font-bold">design professional digital
-          products</span>, eBooks, and <span className="text-hotPink font-bold">brand assets in seconds</span>. Boost conversions, grow
-          your email list, and sell faster with automated content creation,
+          Cre8tly Studio is an <span className="text-green font-bold">AI-powered</span>  digital product builder that helps <span className="text-white font-bold">creators, coaches, and entrepreneurs</span> design professional digital
+          products, eBooks, and brand assets in seconds. Boost conversions, grow
+          your email list, and sell faster with <span className="text-white font-bold">automated content creation</span>,
           pro-level cover design, and <span className="text-green font-bold">instant PDF generation</span> all in one platform
           built for modern online businesses.
         </motion.p>

@@ -131,7 +131,7 @@ export default function DashboardSettings() {
       <div className="w-full max-w-[900px] p-5">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-4xl font-bold text-white design-text">Brand Settings</h1>
+          <h1 className="text-3xl font-bold text-white design-text">Brand Settings</h1>
           <p className="text-gray-400 mt-2">
             Manage your brand tone and upload a reference file for AI
             generation.

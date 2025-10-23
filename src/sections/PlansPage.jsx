@@ -87,7 +87,7 @@ export default function PlansPage() {
             <div>
               <h2 className="text-3xl font-semibold mb-3 text-green-400 design-text">Pro Covers</h2>
               <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                Everything in Basic plus <span className="text-white font-medium">unlimited custom cover uploads</span>. Single purchase unlocks pro covers for lifetime.
+                Everything in Basic plus <span className="text-white font-medium">unlimited custom and unsplash cover uploads</span>. Single purchase unlocks pro covers for lifetime.
               </p>
               <button
                 onClick={() => setSelectedPlan("pro")}

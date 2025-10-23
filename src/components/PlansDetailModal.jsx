@@ -12,7 +12,7 @@ The Basic Creator Plan gives you 5 Lead Magnet Slots to design professional, con
     pro: {
       title: "Pro Covers",
       content: `
-The Pro Covers Plan includes everything in Basic, plus unlimited custom cover uploads for both books and lead magnets. Personalize your visuals with full creative control—upload, test, and update covers that match your unique style and brand.`,
+The Pro Covers Plan includes everything in Basic, plus unlimited custom cover uploads for both books and lead magnets. Personalize your visuals with full creative control—upload, test, and update covers that match your unique style and brand. You’ll also gain access to thousands of royalty-free Unsplash images, making it easy to design stunning, professional-quality covers in seconds without worrying about licensing or costs.`,
     },
     author: {
       title: "Author’s Assistant",

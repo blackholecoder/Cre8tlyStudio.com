@@ -45,15 +45,20 @@ export default function PromptMemoryDashboard() {
 
       {/* Content */}
       {loading ? (
-        <LoadingState />
-      ) : prompts.length === 0 ? (
-        <EmptyState
-          title="No Prompts Yet"
-          message="Your generated prompts will appear here once you’ve created some lead magnets."
-        />
-      ) : (
-        <PromptMemoryTable prompts={prompts} />
-      )}
+  <LoadingState />
+) : prompts.length === 0 ? (
+  <div className="text-center py-20 border border-gray-700 rounded-xl bg-gray-900/40">
+    <h2 className="text-2xl font-semibold text-white mb-2">
+      No Prompts Yet
+    </h2>
+    <p className="text-gray-400 max-w-md mx-auto">
+      You don’t have any saved prompts yet.  
+      Create your first <span className="text-green-400 font-semibold">Digital Product</span> to start building your prompt memory.
+    </p>
+  </div>
+) : (
+  <PromptMemoryTable prompts={prompts} />
+)}
     </div>
   );
 }

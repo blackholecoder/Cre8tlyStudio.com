@@ -10,6 +10,7 @@ import {
   LogOut,
   SquareTerminal,
   Package,
+  DollarSign
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 
@@ -42,6 +43,8 @@ export default function DashboardLayout({ children }) {
       path: "/prompts",
       icon: <SquareTerminal size={18} />,
     },
+    { label: "Plans", path: "/plans", icon: <DollarSign size={18} /> },
+
   ];
 
   return (

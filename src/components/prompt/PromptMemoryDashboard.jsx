@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext.jsx";
-import { getVersion } from "@tauri-apps/api/app";
 
 import api from "../../api/axios.jsx";
 import LoadingState from "../dashboard/LoadingState.jsx";
@@ -10,23 +8,9 @@ import PromptMemoryTable from "../dashboard/PromptMemoryTable.jsx";
 
 export default function PromptMemoryDashboard() {
   const { user } = useAuth();
-  const [prompts, setPrompts] = useState([]);
+  const [prompts, setPrompts] = useState([]); 
   const [loading, setLoading] = useState(true);
-  const [isApp, setIsApp] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  useEffect(() => {
-    async function detectApp() {
-      try {
-        await getVersion();
-        setIsApp(true);
-      } catch {
-        setIsApp(false);
-      }
-    }
-    detectApp();
-  }, []);
 
   useEffect(() => {
     if (!user?.id) return;

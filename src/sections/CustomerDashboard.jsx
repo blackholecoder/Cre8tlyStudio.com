@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useMagnets } from "../admin/MagnetContext.jsx"; 
-import { getVersion } from "@tauri-apps/api/app";
-// Components
 import PromptModal from "../components/PromptModal.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
@@ -25,7 +23,6 @@ export default function CustomerDashboard() {
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeMagnet, setActiveMagnet] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isApp, setIsApp] = useState(false);
   const [showGenerating, setShowGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -58,12 +55,8 @@ export default function CustomerDashboard() {
   }
 
   // ✅ Plan checkout
-  function handleCheckout() {
-    if (isApp) {
-      setShowOutOfSlots(true); // 👈 open info modal inside the app
-    } else {
-      navigate("/plans"); // 👈 normal Stripe checkout for web
-    }
+  function handleCheckout() { 
+      navigate("/plans"); 
   }
 
   // ✅ Pagination
@@ -99,20 +92,6 @@ export default function CustomerDashboard() {
   }
 }, [user]);
 
-  useEffect(() => {
-    async function checkIfApp() {
-      try {
-        await getVersion(); // ✅ This will succeed ONLY in Tauri
-        setIsApp(true);
-        console.log("✅ Running inside Tauri app");
-      } catch {
-        console.log("🌐 Running in browser");
-        setIsApp(false);
-      }
-    }
-    checkIfApp();
-    refreshUserSlots();
-  }, []);
 
 
 return (

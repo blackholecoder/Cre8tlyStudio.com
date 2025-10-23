@@ -1,6 +1,6 @@
 
 import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, useLocation, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
 import { MagnetProvider } from "./admin/MagnetContext.jsx";
@@ -24,7 +24,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-quill/dist/quill.snow.css";
 import "./index.css";
-import EntryRouter from "./EntryRouter.jsx";
 import ForgotPassword from "./admin/ForgotPassword.jsx";
 import ResetPassword from "./admin/ResetPassword.jsx";
 import EbooksStore from "./sections/EbookStore.jsx";
@@ -42,9 +41,8 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="sync">
       <Routes location={location} key={location.pathname}>
         {/* Public site */}
-        <Route path="/" element={<EntryRouter />} />
         <Route
-    path="/home"
+    path="/"
     element={
       <motion.div
         initial={{ opacity: 0 }}
@@ -56,6 +54,9 @@ const AnimatedRoutes = () => {
       </motion.div>
     }
   />
+
+  {/* Redirect old /home to / */}
+  <Route path="/home" element={<Navigate to="/" replace />} />
   <Route
   path="/settings"
   element={

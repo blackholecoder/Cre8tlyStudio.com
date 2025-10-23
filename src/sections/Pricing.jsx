@@ -1,33 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
-import { getVersion } from "@tauri-apps/api/app";
 import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal";
 
 const PricingSection = () => {
   const { user } = useAuth();
-   const [isApp, setIsApp] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handleSignUpRedirect = () => {
-    if (isApp) {
-      setShowModal(true); 
-    } else {
       window.location.href = "/sign-up"; 
-    }
   };
 
-  useEffect(() => {
-    async function checkIfApp() {
-      try {
-        await getVersion();
-        setIsApp(true);
-      } catch {
-        setIsApp(false);
-      }
-    }
-    checkIfApp();
-  }, []);
 
   return (
     <section id="pricing" className="px-6 py-24 text-center">

@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useBooks } from "../admin/BookContext.jsx";
-import { getVersion } from "@tauri-apps/api/app";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
 import EmptyState from "../components/dashboard/EmptyState.jsx";
@@ -24,7 +23,6 @@ export default function BooksDashboard() {
   const [activeBook, setActiveBook] = useState(null);
   const [showGenerating, setShowGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isApp, setIsApp] = useState(false);
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showNewBookModal, setShowNewBookModal] = useState(false);
@@ -32,7 +30,6 @@ export default function BooksDashboard() {
 
 
   const navigate = useNavigate();
-  const location = useLocation();
   const ITEMS_PER_PAGE = 10;
 
   // ✅ Pagination
@@ -132,17 +129,6 @@ function handleAddBookInfo({ title, authorName, bookType }) {
     }
   }
 
-  useEffect(() => {
-    async function detectApp() {
-      try {
-        await getVersion();
-        setIsApp(true);
-      } catch {
-        setIsApp(false);
-      }
-    }
-    detectApp();
-  }, []);
 
   // ✅ Render
 return (

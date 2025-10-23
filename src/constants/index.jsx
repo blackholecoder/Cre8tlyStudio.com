@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 
 export const navLinks = [
-  { href: "/home", label: "Home"},
+  { href: "/", label: "Home"},
   { href: "sign-up", label: "Sign Up"},
   { href: "contact", label: "Contact Us"},
   { href: "shop", label: "Shop"},

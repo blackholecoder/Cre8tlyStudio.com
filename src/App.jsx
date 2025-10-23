@@ -6,8 +6,6 @@ import Lenis from '@studio-freight/lenis'
 import CustomCursor from "./components/CustomCursor";
 
 
-const isTauri = Boolean(window.__TAURI__);
-
 const App = () => {
 
   const location = useLocation();
@@ -54,13 +52,6 @@ useEffect(() => {
   }, [location]);
 
   // 🧭 If running inside Tauri, don’t render marketing site
-  if (isTauri) {
-    return (
-      <main className="flex items-center justify-center min-h-screen bg-black text-white text-xl font-semibold">
-        Redirecting to app...
-      </main>
-    );
-  }
 
   // 🌐 Normal web visitors get the full landing site
   return (

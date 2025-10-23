@@ -1,25 +1,10 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
 import VideoPlayer from "../components/VideoPlayer";
 import PremiumEbooksCTA from "./PremiumEbooksCTA";
-import { getVersion } from "@tauri-apps/api/app";
 import AnimatedLogo from "../components/animation/AnimatedLogo";
 
 const Landing = () => {
-  const [isApp, setIsApp] = useState(false);
-
-  useEffect(() => {
-    async function checkIfApp() {
-      try {
-        await getVersion();
-        setIsApp(true);
-      } catch {
-        setIsApp(false);
-      }
-    }
-    checkIfApp();
-  }, []);
 
   return (
     <div className="min-h-screen w-full text-white flex flex-col font-sans overflow-x-hidden">
@@ -61,7 +46,7 @@ const Landing = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          Cre8tly Studio is an <span className="text-green font-bold">AI-powered</span>  digital product builder that helps <span className="text-white font-bold">creators, coaches, and entrepreneurs</span> design professional digital
+          Cre8tly Studio is an <span className="text-green font-bold">AI-powered  digital product builder</span> that helps <span className="text-white font-bold">creators, coaches, and entrepreneurs</span> design professional digital
           products, eBooks, and brand assets in seconds. Boost conversions, grow
           your email list, and sell faster with <span className="text-white font-bold">automated content creation</span>,
           pro-level cover design, and <span className="text-green font-bold">instant PDF generation</span> all in one platform
@@ -105,7 +90,7 @@ const Landing = () => {
 
 
       <HowItWorks />
-      {!isApp && <PremiumEbooksCTA />}
+      <PremiumEbooksCTA />
     </div>
   );
 };

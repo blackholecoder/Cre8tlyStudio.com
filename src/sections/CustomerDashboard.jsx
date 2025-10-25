@@ -25,6 +25,7 @@ export default function CustomerDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showGenerating, setShowGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [selectedContentType, setSelectedContentType] = useState("lead_magnet");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,8 +72,9 @@ export default function CustomerDashboard() {
   );
 
   // ✅ Prompt modal open
-  function openPromptModal(id) {
+  function openPromptModal(id, contentType = "lead_magnet") {
     setActiveMagnet(id);
+    setSelectedContentType(contentType);
     setOpenPrompt(true);
   }
 
@@ -126,6 +128,7 @@ return (
           onClose={() => setOpenPrompt(false)}
           magnetId={activeMagnet}
           accessToken={accessToken}
+          contentType={selectedContentType}
           setShowGenerating={setShowGenerating}
           setProgress={setProgress}
           onSubmitted={handlePromptSubmitted}

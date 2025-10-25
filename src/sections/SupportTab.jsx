@@ -26,9 +26,10 @@ export default function SupportTab() {
       a: "Absolutely. You can upload your own logo and link to your website or product page. Themes adjust automatically to fit your brand look.",
     },
     {
-      q: "What are Pro Covers?",
-      a: "Pro Covers is an exclusive upgrade that lets you upload custom cover images for your lead magnets. Your uploaded cover appears as the first page of your PDF, giving your content a professional, branded presentation. Available only for users with the Pro Covers plan.",
-    },
+  q: "What are Pro Covers?",
+  a: "Pro Covers is an exclusive upgrade that lets you upload custom cover images for your lead magnets. Your uploaded cover appears as the first page of your PDF, giving your content a professional, branded presentation. In addition to uploading your own designs, Pro Covers also includes access to thousands of royalty-free Unsplash images you can instantly use as backgrounds or full covers. This gives you unlimited creative flexibility without any licensing worries—available only with the Pro Covers plan.",
+},
+
     {
       q: "Can I edit or regenerate an existing PDF?",
       a: "No. Each slot is designed for a single finalized PDF to ensure fair usage and prevent system abuse. Allowing unlimited regenerations could cause performance issues and disrupt other users’ workflows. If you’d like to create a new version, please start a new lead magnet using a fresh slot.",

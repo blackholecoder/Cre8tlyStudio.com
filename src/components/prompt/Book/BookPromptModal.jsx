@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import BookPromptForm from "../Book/BookPromptForm";
-import PDFThemePreview from "../../PDFThemePreview";
-import ThemePreviewModal from "../ThemePreviewModal";
 
 
 export default function BookPromptModal({
@@ -166,15 +164,6 @@ async function handleSubmit(e) {
           setShowPreview={setShowPreview}
         />
       </div>
-
-      {/* Preview */}
-      {showPreview && (
-        <ThemePreviewModal
-          showPreview={showPreview}
-          onClose={() => setShowPreview(false)}
-          PDFThemePreview={PDFThemePreview}
-        />
-      )}
     </div>
   );
 }

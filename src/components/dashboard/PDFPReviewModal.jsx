@@ -16,6 +16,8 @@ export default function PDFPreviewModal({ fileUrl, fileTitle, partNumber, source
 
   const memoizedFile = useMemo(() => {
     if (!fileUrl) return null;
+
+
     return {
       url: `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}`,
     };

@@ -1,6 +1,11 @@
-
 import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  useLocation,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
 import { MagnetProvider } from "./admin/MagnetContext.jsx";
@@ -11,7 +16,6 @@ import Terms from "./documents/Terms.jsx";
 import Privacy from "./documents/Privacy.jsx";
 import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
-import SupportPage from "./sections/Support.jsx";
 import PromptPage from "./sections/PromptPage.jsx";
 import SignupPage from "./sections/SignUp.jsx";
 import { Login, Nav } from "./sections/index.js";
@@ -33,7 +37,6 @@ import SettingsPage from "./sections/SettingsPage.jsx";
 import DashboardLayout from "./components/layouts/DashboardLayout.jsx";
 import PromptMemoryDashboard from "./components/prompt/PromptMemoryDashboard.jsx";
 
-
 const AnimatedRoutes = () => {
   const location = useLocation();
 
@@ -42,72 +45,57 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         {/* Public site */}
         <Route
-    path="/"
-    element={
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-      >
-        <App />
-      </motion.div>
-    }
-  />
-
-  {/* Redirect old /home to / */}
-  <Route path="/home" element={<Navigate to="/" replace />} />
-  <Route
-  path="/settings"
-  element={
-    <PrivateRoute role={["customer", "admin"]}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="min-h-screen bg-[#030712]"
-      >
-        <DashboardLayout>
-        <SettingsPage />
-        </DashboardLayout>
-      </motion.div>
-    </PrivateRoute>
-  }
-/>
-  <Route
-  path="/prompts"
-  element={
-    <PrivateRoute role={["customer", "admin"]}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-      >
-        <DashboardLayout>
-        <PromptMemoryDashboard />
-        </DashboardLayout>
-      </motion.div>
-    </PrivateRoute>
-  }
-/>
-
-
-        <Route
-          path="/support"
+          path="/"
           element={
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="min-h-screen bg-[#030712]"
             >
-              <SupportPage />
+              <App />
             </motion.div>
           }
         />
+
+        {/* Redirect old /home to / */}
+        <Route path="/home" element={<Navigate to="/" replace />} />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute role={["customer", "admin"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <SettingsPage />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/prompts"
+          element={
+            <PrivateRoute role={["customer", "admin"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <DashboardLayout>
+                  <PromptMemoryDashboard />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+
         <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/shop" element={<EbooksStore />} />
@@ -121,26 +109,26 @@ const AnimatedRoutes = () => {
         {/* Auth */}
         <Route path="/sign-up" element={<SignupPage />} />
         <Route path="/login" element={<Login />} />
-        
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Private */}
         <Route
-  path="/plans"
-  element={
-    <PrivateRoute role={["customer", "admin"]}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-      >
-        <PlansPage />
-      </motion.div>
-    </PrivateRoute>
-  }
-/>
+          path="/plans"
+          element={
+            <PrivateRoute role={["customer", "admin"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <PlansPage />
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
@@ -210,20 +198,20 @@ const RootApp = () => {
     <Router>
       <AuthProviderWithRouter>
         <BookProvider>
-        <MagnetProvider>
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme="colored"
-        />
-        <Nav />
-        <AnimatedRoutes />
-        </MagnetProvider>
+          <MagnetProvider>
+            <ToastContainer
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              pauseOnHover
+              draggable
+              theme="colored"
+            />
+            <Nav />
+            <AnimatedRoutes />
+          </MagnetProvider>
         </BookProvider>
       </AuthProviderWithRouter>
     </Router>
@@ -234,4 +222,3 @@ const RootApp = () => {
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(<RootApp />);
-

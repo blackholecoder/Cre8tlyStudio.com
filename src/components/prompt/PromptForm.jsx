@@ -3,11 +3,11 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify"; 
 import LogoUploader from "./LogoUploader";
-import ThemeSelector from "./ThemeSelector";
 import CoverUpload from "./CoverUpload";
 import PromptSelect from "./PromptSelect";
 import ColorThemeChooser from "../ColorThemeChooser";
 import { useAuth } from "../../admin/AuthContext"; 
+import FontSelector from "./FontSelector";
 
 export default function PromptForm({
   text,
@@ -27,9 +27,9 @@ export default function PromptForm({
   setCover,
   cta,
   setCta,
-  setShowPreview,
   onSubmit,
   loading,
+  contentType,
 }) {
   const { user } = useAuth(); 
   const [warning, setWarning] = useState("");
@@ -72,7 +72,7 @@ useEffect(() => {
   }, [text]);
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={(e) => onSubmit(e, contentType)} className="space-y-6">
       {/* Pre-Made Prompt */}
       <PromptSelect setText={setText} />
 
@@ -169,10 +169,9 @@ useEffect(() => {
       <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} />
 
       {/* Theme Selector */}
-      <ThemeSelector
+      <FontSelector
         theme={theme}
         setTheme={setTheme}
-        setShowPreview={setShowPreview}
       />
 
       {/* Author Call-to-Action */}

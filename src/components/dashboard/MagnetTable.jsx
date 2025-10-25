@@ -2,10 +2,22 @@ import { themeStyles } from "../../constants/index";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { useState } from "react";
 import { CheckCircle, Download, Plus, Timer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import NewContentModal from "../NewContentModal";
 
 export default function MagnetTable({ magnets = [], onAddPrompt }) {
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [showNewModal, setShowNewModal] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const navigate = useNavigate();
+
   if (!Array.isArray(magnets) || magnets.length === 0) return null;
+
+  // ✅ handle modal "Continue"
+  function handleCreate(data) {
+    setShowNewModal(false);
+    onAddPrompt(selectedSlot, data.contentType); // pass to Dashboard logic
+  }
 
   return (
     <div className="bg-[#111] hidden md:block overflow-x-auto rounded-xl overflow-hidden border border-gray-700">
@@ -122,9 +134,12 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                 <div className="flex items-center justify-center gap-2">
                   {!m.prompt && (
                     <button
-                      onClick={() => onAddPrompt(m.id)}
+                      onClick={() => {
+                        setSelectedSlot(m.id);
+                        setShowNewModal(true);
+                      }}
                       className="flex items-center justify-center p-2 bg-headerGreen rounded"
-                      title="Add Prompt"
+                      title="Create New Document"
                     >
                       <Plus className="text-black" size={18} />
                     </button>
@@ -150,6 +165,14 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
           fileUrl={previewUrl}
           sourceType="magnet"
           onClose={() => setPreviewUrl(null)}
+        />
+      )}
+
+      {/* 🧠 New Project Modal */}
+      {showNewModal && (
+        <NewContentModal
+          onCreate={handleCreate}
+          onClose={() => setShowNewModal(false)}
         />
       )}
     </div>

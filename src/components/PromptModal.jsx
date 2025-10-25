@@ -8,9 +8,7 @@ import {
 } from "@headlessui/react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import PDFThemePreview from "./PDFThemePreview";
 import PromptForm from "./prompt/PromptForm";
-import ThemePreviewModal from "./prompt/ThemePreviewModal";
 import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
 import BookPromptForm from "./prompt/Book/BookPromptForm";
 
@@ -19,6 +17,7 @@ export default function PromptModal({
   onClose,
   magnetId,
   accessToken,
+  contentType, 
   onSubmitted,
   setShowGenerating,
   setProgress,
@@ -57,90 +56,89 @@ export default function PromptModal({
 
   const handleClose = () => onClose();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setProgress(0);
-    setShowGenerating(true); // ✅ show the global overlay
-    onClose(); // ✅ close modal right away
+  async function handleSubmit(e, contentType) {
+  e.preventDefault();
+  setLoading(true);
+  setProgress(0);
+  setShowGenerating(true);
+  onClose(); // ✅ close modal right away
 
-    let interval;
-    try {
-      interval = setInterval(() => {
-        setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
-      }, 300);
+  let interval;
+  try {
+    interval = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
+    }, 300);
 
-      console.log("📦 Sending to API:", { theme, bgTheme });
-
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/lead-magnets/prompt",
-        {
-          magnetId,
-          prompt: text,
-          theme,
-          bgTheme,
-          pages,
-          logo,
-          link,
-          coverImage: cover,
-          cta,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-
-      clearInterval(interval);
-      setProgress(100);
-      toast.success("🎉 Lead magnet generated successfully!");
-      setShowGenerating(false);
-
-      // ✅ Step 1: keep progress visible for a bit
-      await new Promise((r) => setTimeout(r, 1000));
-
-      // ✅ Step 2: close modal first (return to dashboard)
-      onClose();
-
-      // ✅ Step 3: trigger dashboard to refresh magnet list
-      setTimeout(() => {
-        if (typeof onSubmitted === "function") {
-          onSubmitted(magnetId, text, theme);
-        }
-      }, 2000); // wait 2s for backend to finalize upload
-    } catch (err) {
-      console.error("❌ Prompt submission error:", err);
-      clearInterval(interval);
-      setProgress(0);
-      setLoading(false);
-      setShowGenerating(false);
-
-      if (err.response) {
-        const { status, data } = err.response;
-        if (status === 413) {
-          toast.error(
-            data.message || "Your input is too long. Please shorten it."
-          );
-        } else if (status === 400) {
-          toast.error(data.message || "Missing required fields.");
-        } else {
-          toast.error(data.message || "Something went wrong on the server.");
-        }
-      } else {
-        toast.error(
-          "Network error — PDF is still being processed. Please refresh."
-        );
+    const res = await axios.post(
+      "https://cre8tlystudio.com/api/lead-magnets/prompt",
+      {
+        magnetId,
+        prompt: text,
+        theme,
+        bgTheme,
+        pages,
+        logo,
+        link,
+        coverImage: cover,
+        cta,
+        contentType,
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        timeout: 180000, // ⏰ allow up to 3 minutes
       }
+    );
 
-      // ✅ Close modal even if there's a "network error" (since backend succeeded)
-      onClose();
+    clearInterval(interval);
+    setProgress(100);
+    toast.success("🎉 Lead magnet generated successfully!");
+    setShowGenerating(false);
+
+    // ✅ Smooth UX: let the progress finish visually
+    await new Promise((r) => setTimeout(r, 1000));
+
+    onClose();
+
+    // ✅ Refresh magnet list after generation completes
+    setTimeout(() => {
       if (typeof onSubmitted === "function") {
-        setTimeout(() => onSubmitted(magnetId, text, theme), 3000);
+        onSubmitted(magnetId, text, theme);
       }
-    } finally {
-      setLoading(false);
-      onClose();
+    }, 2000);
+  } catch (err) {
+    console.error("❌ Prompt submission error:", err);
+    clearInterval(interval);
+    setProgress(0);
+    setLoading(false);
+    setShowGenerating(false);
+
+    if (err.code === "ECONNABORTED") {
+      // ⏳ Axios timeout reached, but backend probably still working
+      toast.info("⏳ Your PDF is still generating — it will appear shortly.");
+    } else if (err.response) {
+      const { status, data } = err.response;
+      if (status === 413) {
+        toast.error(data.message || "Your input is too long. Please shorten it.");
+      } else if (status === 400) {
+        toast.error(data.message || "Missing required fields.");
+      } else {
+        toast.error(data.message || "Something went wrong on the server.");
+      }
+    } else {
+      // Network disconnected or server still working silently
+      toast.info("⚙️ PDF generation still in progress. Please refresh in a minute.");
     }
+
+    // ✅ Still trigger dashboard refresh after short delay
+    onClose();
+    if (typeof onSubmitted === "function") {
+      setTimeout(() => onSubmitted(magnetId, text, theme), 5000);
+    }
+  } finally {
+    setLoading(false);
   }
+}
+
 
   async function handleBookSubmit(e) {
     e.preventDefault();
@@ -259,6 +257,7 @@ export default function PromptModal({
                     setShowPreview={setShowPreview}
                     onSubmit={handleSubmit}
                     loading={loading}
+                    contentType={contentType}
                   />
                 </div>
               )}
@@ -319,16 +318,6 @@ export default function PromptModal({
           </DialogPanel>
         </div>
       </Dialog>
-
-      {/* ✅ Separate Theme Preview Modal */}
-      {showPreview && (
-        <ThemePreviewModal
-          showPreview={showPreview}
-          onClose={() => setShowPreview(false)}
-          theme={theme}
-          PDFThemePreview={PDFThemePreview}
-        />
-      )}
     </Transition>
   );
 }

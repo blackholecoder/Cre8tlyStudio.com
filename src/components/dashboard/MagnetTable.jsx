@@ -1,13 +1,17 @@
 import { themeStyles } from "../../constants/index";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { useState } from "react";
-import { CheckCircle, Download, Plus, Timer } from "lucide-react";
+import { CheckCircle, Download, Edit, Plus, Timer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NewContentModal from "../NewContentModal";
 
-export default function MagnetTable({ magnets = [], onAddPrompt }) {
+export default function MagnetTable({
+  magnets = [],
+  onAddPrompt,
+  onOpenEditor,
+}) {
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [showNewModal, setShowNewModal] = useState(false)
+  const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const navigate = useNavigate();
 
@@ -39,11 +43,11 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
               <td className="px-4 py-2 text-center">{m.slot_number}</td>
               <td className="px-4 py-2 text-center">
                 <span className="text-xs text-gray-300">
-                {new Date(m.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}{" "}
+                  {new Date(m.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}{" "}
                 </span>
               </td>
               <td className="px-4 py-2 text-center">
@@ -153,7 +157,18 @@ export default function MagnetTable({ magnets = [], onAddPrompt }) {
                       <Download size={18} />
                     </button>
                   )}
+                  {m.pdf_url && !m.edit_used && (
+                  <button
+                    disabled={m.edit_used}
+                    onClick={() => onOpenEditor(m.id)}
+                    className="flex items-center justify-center p-2 bg-blue rounded"
+                    title="Open Editor"
+                  >
+                    <Edit size={18} />
+                  </button>
+                )}
                 </div>
+                
               </td>
             </tr>
           ))}

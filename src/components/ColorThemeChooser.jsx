@@ -23,7 +23,7 @@ export default function ColorThemeChooser({ bgTheme, setBgTheme }) {
             key={item.name}
             type="button"
             onClick={() => setBgTheme(item.name)}
-            className={`relative w-full h-12 rounded-lg transition-all duration-200 focus:outline-none border 
+            className={`relative w-full h-12 rounded-lg transition-all duration-200 focus:outline-none border shadow-[inset_0_1px_3px_rgba(255,255,255,0.2)] 
               ${
                 bgTheme === item.name
                   ? "border-green-400 ring-2 ring-green-500/60 scale-[1.05]"
@@ -33,6 +33,8 @@ export default function ColorThemeChooser({ bgTheme, setBgTheme }) {
               background: item.preview,
             }}
           >
+            <div className="glossy-overlay"></div>
+
             <span
               className={`absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase tracking-wide ${
                 item.name === "dark" || item.name === "graphite" || item.name === "royal"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../admin/AuthContext";
 
 export default function SmartPromptBuilder({ onPromptReady }) {
   const [audience, setAudience] = useState("");
@@ -9,9 +10,16 @@ export default function SmartPromptBuilder({ onPromptReady }) {
   const [offer, setOffer] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { user, accessToken } = useAuth(); 
+
   const handleGeneratePrompt = async () => {
     if (!audience || !pain || !promise) {
       toast.error("Please fill out all required fields.");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("You must be logged in to generate prompts.");
       return;
     }
 
@@ -19,7 +27,18 @@ export default function SmartPromptBuilder({ onPromptReady }) {
     try {
       const res = await axios.post(
         "https://cre8tlystudio.com/api/lead-magnets/prompt-builder",
-        { audience, pain, promise, offer }
+        {
+          userId: user.id, // ✅ include user ID for tone lookup
+          audience,
+          pain,
+          promise,
+          offer,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // ✅ optional, if route uses auth middleware
+          },
+        }
       );
 
       onPromptReady(res.data.prompt);

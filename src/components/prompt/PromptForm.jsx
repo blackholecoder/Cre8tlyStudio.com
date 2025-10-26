@@ -228,7 +228,7 @@ useEffect(() => {
           className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
         />
         <p className="text-xs text-gray-400 mt-1">
-          This link will appear at the bottom of your PDF.
+          This link will appear at the bottom of your PDF as a button.
         </p>
       </div>
 

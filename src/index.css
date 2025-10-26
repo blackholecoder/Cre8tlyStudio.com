@@ -321,6 +321,23 @@ select.dropdown-scroll:focus option {
   margin: 0 !important;
 }
 
+.glossy-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    rgba(255, 255, 255, 0.05) 60%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+}
+
 
 
  html, body, #root {

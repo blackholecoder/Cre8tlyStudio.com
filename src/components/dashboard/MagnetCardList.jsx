@@ -3,7 +3,11 @@ import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { themeStyles } from "../../constants/index";
 import { CheckCircle, Download, Timer, Plus } from "lucide-react";
 
-export default function MagnetCardList({ magnets = [], onAddPrompt }) {
+export default function MagnetCardList({
+  magnets = [],
+  onAddPrompt,
+  onOpenEditor,
+}) {
   const [previewUrl, setPreviewUrl] = useState(null);
 
   if (!Array.isArray(magnets) || magnets.length === 0) return null;
@@ -87,7 +91,7 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
             )}
           </p>
 
-          <p className="text-sm text-silver mt-1">
+          <div className="text-sm text-silver mt-1">
             {m.prompt ? (
               <div className="flex items-center text-headerGreen">
                 <CheckCircle size={18} className="mr-1" />
@@ -97,10 +101,10 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 <Timer size={18} className="mr-1" />
               </div>
             )}
-          </p>
+          </div>
           {m.created_at_prompt ? (
             <span className="text-xs text-gray-300">
-              <span className="text-green font-bold" >Created</span>{" "}
+              <span className="text-green font-bold">Created</span>{" "}
               {new Date(m.created_at_prompt).toLocaleDateString("en-US", {
                 month: "short",
                 day: "2-digit",
@@ -132,6 +136,19 @@ export default function MagnetCardList({ magnets = [], onAddPrompt }) {
                 className="flex items-center justify-center flex-1 px-3 py-2 bg-muteGrey text-white rounded"
               >
                 <Download size={18} />
+              </button>
+            )}
+            {m.pdf_url && (
+              <button
+                onClick={() => !m.edit_used && onOpenEditor(m.id)}
+                disabled={m.edit_used}
+                className={`flex items-center justify-center flex-1 px-3 py-2 rounded ${
+                  m.edit_used
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue text-white"
+                }`}
+              >
+                Editor
               </button>
             )}
           </div>

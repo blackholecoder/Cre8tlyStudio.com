@@ -362,3 +362,18 @@ export const colorThemes = [
   { name: "honey", label: "Honey", preview: "#facc15" },
   { name: "ultraviolet", label: "Ultraviolet", preview: "#6d28d9" },
 ];
+
+export const fontThemes = {
+  modern: {
+    name: "AdobeArabic",
+    file: "/fonts/AdobeArabic-Regular.ttf",
+  },
+  classic: {
+    name: "Bebas Neue",
+    file: "/fonts/Roboto-Regular.ttf",
+  },
+  bold: {
+    name: "Montserrat",
+    file: "/fonts/Montserrat-Regular.ttf",
+  },
+};

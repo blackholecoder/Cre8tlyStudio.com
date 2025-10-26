@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
@@ -9,6 +9,8 @@ export default function DashboardSettings() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [ctaSaved, setCtaSaved] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -60,6 +62,7 @@ export default function DashboardSettings() {
 
         toast.success("Brand file uploaded successfully!");
         setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       } catch (err) {
         console.error(err);
         toast.error("Upload failed. Please try again.");
@@ -71,27 +74,32 @@ export default function DashboardSettings() {
     reader.readAsDataURL(file);
   };
 
-  const handleRemove = async () => {
-    try {
-      const res = await api.delete(
-        `upload-data/user/settings/remove/${user.id}`
+const handleRemove = async () => {
+  try {
+    const res = await api.delete(`upload-data/user/settings/remove/${user.id}`);
+
+    if (res.data.success) {
+      // 🔥 Clear everything in sync: state, user, localStorage, and selected file
+      setSettings((prev) => ({ ...prev, brand_identity_file: null }));
+      setUser((prev) => ({ ...prev, brand_identity_file: null }));
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...user, brand_identity_file: null })
       );
-      if (res.data.success) {
-        setSettings((prev) => ({ ...prev, brand_identity_file: null }));
-        setUser((prev) => ({ ...prev, brand_identity_file: null }));
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...user, brand_identity_file: null })
-        );
-        toast.info("Brand identity file removed. Defaults restored.");
-      } else {
-        toast.warning("Failed to remove brand file. Try again.");
-      }
-    } catch (err) {
-      console.error("Error removing brand file:", err);
-      toast.error("Error removing file.");
+
+      toast.info("Brand identity file removed. Defaults restored.");
+    } else {
+      toast.warning("Failed to remove brand file. Try again.");
     }
-  };
+  } catch (err) {
+    console.error("Error removing brand file:", err);
+    toast.error("Error removing file.");
+  }
+};
+
 
   const handleSaveCTA = async () => {
     try {
@@ -332,6 +340,7 @@ export default function DashboardSettings() {
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
             <div className="flex-1 w-full">
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".pdf,.docx,.doc,.txt"
                 onChange={(e) => setFile(e.target.files[0])}

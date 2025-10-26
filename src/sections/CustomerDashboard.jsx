@@ -13,6 +13,7 @@ import SupportTab from "./SupportTab.jsx";
 import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
 import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
+import EditorModal from "../components/editor/EditorModal.jsx";
 
 
 
@@ -26,6 +27,13 @@ export default function CustomerDashboard() {
   const [showGenerating, setShowGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedContentType, setSelectedContentType] = useState("lead_magnet");
+
+ 
+  const [editorId, setEditorId] = useState(null);
+  function openEditor(id) { setEditorId(id); }
+
+   const activeMagnetData = magnets.find(m => m.id === editorId);
+
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -110,8 +118,8 @@ return (
         <EmptyState onCheckout={handleCheckout} type="magnet" />
       ) : (
         <>
-          <MagnetTable magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
-          <MagnetCardList magnets={paginatedMagnets} onAddPrompt={openPromptModal} />
+          <MagnetTable magnets={paginatedMagnets} onAddPrompt={openPromptModal} onOpenEditor={openEditor}/>
+          <MagnetCardList magnets={paginatedMagnets} onAddPrompt={openPromptModal} onOpenEditor={openEditor}/>
           <PaginationControls
             currentPage={currentPage}
             totalPages={totalPages}
@@ -147,6 +155,13 @@ return (
         progress={progress}
         type="lead"
       />
+      <EditorModal
+  leadMagnetId={editorId}
+  open={!!editorId}
+  onClose={() => setEditorId(null)}
+  onCommitted={(url) => fetchMagnets()}
+  bgTheme={activeMagnetData?.bg_theme || "modern"}
+/>
     </div>
   </DashboardLayout>
 );

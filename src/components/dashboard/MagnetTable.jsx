@@ -2,7 +2,6 @@ import { themeStyles } from "../../constants/index";
 import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
 import { useState } from "react";
 import { CheckCircle, Download, Edit, Plus, Timer } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import NewContentModal from "../NewContentModal";
 
 export default function MagnetTable({
@@ -13,7 +12,6 @@ export default function MagnetTable({
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const navigate = useNavigate();
 
   if (!Array.isArray(magnets) || magnets.length === 0) return null;
 

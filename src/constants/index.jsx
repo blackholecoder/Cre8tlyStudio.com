@@ -365,15 +365,15 @@ export const colorThemes = [
 
 export const fontThemes = {
   modern: {
+    name: "Montserrat",
+    file: "/fonts/Montserrat-Regular.ttf",
+  },
+  classic: {
     name: "AdobeArabic",
     file: "/fonts/AdobeArabic-Regular.ttf",
   },
-  classic: {
+  bold: {
     name: "Bebas Neue",
     file: "/fonts/Roboto-Regular.ttf",
-  },
-  bold: {
-    name: "Montserrat",
-    file: "/fonts/Montserrat-Regular.ttf",
   },
 };

@@ -145,7 +145,7 @@ export default function MagnetCardList({
                 className={`flex items-center justify-center flex-1 px-3 py-2 rounded ${
                   m.edit_used
                     ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                    : "bg-blue-500 hover:bg-blue text-white"
+                    : "bg-blue hover:bg-blue text-white"
                 }`}
               >
                 Editor

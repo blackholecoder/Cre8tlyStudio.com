@@ -267,6 +267,26 @@ select.dropdown-scroll:focus option {
 .quill-dark .ql-editor::before {
   color: #777; /* placeholder text color */
 }
+
+.tiptap-editor img {
+  max-width: 667px;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.tiptap-editor h1, .tiptap-editor h2, .tiptap-editor h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.tiptap-editor p {
+  margin-bottom: 1rem;
+}
+
+.tiptap-editor {
+  color: var(--editor-text-color);
+}
 /* ---- Base ProseMirror editor ---- */
 .ProseMirror {
   background: #111 !important;

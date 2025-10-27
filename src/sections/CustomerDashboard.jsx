@@ -27,8 +27,14 @@ export default function CustomerDashboard() {
   const [showGenerating, setShowGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedContentType, setSelectedContentType] = useState("lead_magnet");
+  const [editorRenderKey, setEditorRenderKey] = useState(0);
 
- 
+ function handleEditorClose() {
+  setEditorId(null);
+  // ✅ triggers full editor re-mount next time it opens
+  setTimeout(() => setEditorRenderKey((k) => k + 1), 100);
+}
+
   const [editorId, setEditorId] = useState(null);
   function openEditor(id) { setEditorId(id); }
 
@@ -156,9 +162,10 @@ return (
         type="lead"
       />
       <EditorModal
+  key={editorRenderKey} 
   leadMagnetId={editorId}
   open={!!editorId}
-  onClose={() => setEditorId(null)}
+  onClose={handleEditorClose}
   onCommitted={(url) => fetchMagnets()}
   bgTheme={activeMagnetData?.bg_theme || "modern"}
 />

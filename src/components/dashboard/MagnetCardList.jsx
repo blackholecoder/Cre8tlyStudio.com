@@ -169,6 +169,7 @@ export default function MagnetCardList({
         <PDFPreviewModal
           fileUrl={previewUrl}
           sourceType="magnet"
+          fileTitle={magnetList.find((m) => m.pdf_url === previewUrl)?.title || "Lead Magnet"}
           onClose={() => setPreviewUrl(null)}
         />
       )}

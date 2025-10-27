@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify"; 
@@ -12,6 +12,8 @@ import FontSelector from "./FontSelector";
 export default function PromptForm({
   text,
   setText,
+  title,
+  setTitle,
   theme,
   setTheme,
   bgTheme,
@@ -35,6 +37,7 @@ export default function PromptForm({
   const [warning, setWarning] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [tooLong, setTooLong] = useState(false);
+  const [error, setError] = useState("");
 
 useEffect(() => {
   if (user?.cta && (!cta || cta.trim() === "")) {
@@ -71,8 +74,39 @@ useEffect(() => {
     }
   }, [text]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const cleanPrompt = text.replace(/<[^>]+>/g, "").trim();
+
+    // Validation: ensure prompt not empty
+    if (!cleanPrompt) {
+      setError("Prompt is required before submission.");
+      toast.error("Please enter a prompt before submitting.");
+      return;
+    }
+
+    setError(""); // clear any prior error
+    onSubmit(e, contentType); // ✅ pass contentType as before
+  };
+
   return (
-    <form onSubmit={(e) => onSubmit(e, contentType)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+  <label className="block text-silver mb-2 font-medium">
+    Document Title
+  </label>
+  <input
+    type="text"
+    placeholder="Enter a title for your project or document..."
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+  />
+  <p className="text-xs text-gray-400 mt-1">
+    This title will appear at the top of your generated document.
+  </p>
+</div>
       {/* Pre-Made Prompt */}
       <PromptSelect setText={setText} />
 
@@ -85,12 +119,20 @@ useEffect(() => {
           <ReactQuill
             theme="snow"
             value={text}
-            onChange={setText}
+            onChange={(value) => {
+              setText(value);
+              if (error) setError(""); // clear inline error as user types
+            }}
             modules={{ toolbar: false }}
             placeholder="Write your prompt..."
             className="h-[250px]"
           />
         </div>
+
+         {/* Inline Error */}
+        {error && (
+          <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>
+        )}
 
         {/* Warning + Counter */}
         <div className="flex justify-between items-center mt-2">
@@ -127,19 +169,19 @@ useEffect(() => {
       {/* Pages */}
       <div>
         <label className="block text-silver mb-2 font-medium">
-          Number of Pages (50 max)
+          Number of Pages (25 max)
         </label>
 
         <div className="relative w-full max-w-xs">
           <input
             type="number"
             min="1"
-            max="50"
+            max="25"
             value={pages ?? ""}
             onChange={(e) => {
               const value = e.target.value;
               if (value === "") setPages("");
-              else setPages(Math.min(50, Math.max(1, Number(value))));
+              else setPages(Math.min(25, Math.max(1, Number(value))));
             }}
             className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
           />
@@ -157,7 +199,7 @@ useEffect(() => {
             <button
               type="button"
               onClick={() =>
-                setPages((prev) => Math.min(50, Number(prev || 1) + 1))
+                setPages((prev) => Math.min(25, Number(prev || 1) + 1))
               }
               className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
             >
@@ -234,12 +276,16 @@ useEffect(() => {
 
       {!loading && (
         <button
-          type="submit"
-          disabled={tooLong}
-          className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+          disabled={
+            !text.trim() ||
+            text === "<p><br></p>" ||
             tooLong
+          }
+          type="submit"
+          className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+            !text.trim() || text === "<p><br></p>" || tooLong
               ? "bg-gray-600 cursor-not-allowed text-gray-300"
-              : "bg-gradient-to-r from-green to-royalPurple text-white hover:opacity-90"
+              : "bg-green font-semibold text-black hover:opacity-90"
           }`}
         >
           🚀 Submit Prompt

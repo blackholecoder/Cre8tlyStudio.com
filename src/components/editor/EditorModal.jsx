@@ -21,6 +21,9 @@ export default function EditorModal({
   const [editableHtml, setEditableHtml] = useState("");
   const [iframeUrl, setIframeUrl] = useState("");
 
+
+  
+
   const iframeRef = useRef(null);
 
   const editor = useEditor({
@@ -73,7 +76,7 @@ export default function EditorModal({
       if (!iframeDoc || !iframeDoc.body) return;
 
       try {
-        const res = await fetch(`http://localhost:3001${selectedFont.file}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}${selectedFont.file}`);
         const buf = await res.arrayBuffer();
         const base64Font = btoa(
           new Uint8Array(buf).reduce(
@@ -203,6 +206,39 @@ export default function EditorModal({
   .footer-link .link-button {
     font-size: 1rem !important;
   }
+    pre {
+  background-color: #0f0f0f;
+  color: #f5f5f5;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0 0 1.5rem 0; /* remove top margin, only keep bottom spacing */
+  white-space: pre-wrap;
+  page-break-inside: avoid; /* keeps the block from splitting across PDF pages */
+  box-decoration-break: clone;
+}
+
+pre + pre {
+  margin-top: -0.25rem; /* closes any hairline gap between stacked blocks */
+}
+
+code {
+  background-color: #1a1a1a;
+  color: #00ff80;
+  padding: 0.2rem 0.4rem;
+  border-radius: 5px;
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+}
+
+/* Optional — better color contrast for multi-line snippets */
+pre code {
+  background: transparent; /* removes duplicate block background */
+  color: #f5f5f5;
+}
   }
 `;
         iframeDoc.head.appendChild(responsiveWidthStyle);

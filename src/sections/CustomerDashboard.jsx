@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
-import { useMagnets } from "../admin/MagnetContext.jsx"; 
+import { useMagnets } from "../admin/MagnetContext.jsx";
 import PromptModal from "../components/PromptModal.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
@@ -15,8 +15,6 @@ import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import EditorModal from "../components/editor/EditorModal.jsx";
 
-
-
 export default function CustomerDashboard() {
   const { user, accessToken, refreshUser } = useAuth();
   const { magnets, setMagnets, fetchMagnets, loading } = useMagnets(); // ✅ data from context
@@ -29,17 +27,20 @@ export default function CustomerDashboard() {
   const [selectedContentType, setSelectedContentType] = useState("lead_magnet");
   const [editorRenderKey, setEditorRenderKey] = useState(0);
 
- function handleEditorClose() {
-  setEditorId(null);
-  // ✅ triggers full editor re-mount next time it opens
-  setTimeout(() => setEditorRenderKey((k) => k + 1), 100);
-}
+  function handleEditorClose() {
+    setEditorId(null);
+    // ✅ triggers full editor re-mount next time it opens
+    setTimeout(() => setEditorRenderKey((k) => k + 1), 100);
+  }
 
   const [editorId, setEditorId] = useState(null);
-  function openEditor(id) { setEditorId(id); }
+  function openEditor(id) {
+    setEditorId(id);
+  }
 
-   const activeMagnetData = magnets.find(m => m.id === editorId);
-
+  const activeMagnetData = (magnets.magnets || []).find(
+    (m) => m.id === editorId
+  );
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,27 +58,31 @@ export default function CustomerDashboard() {
 
   // ✅ Update local state instantly after a new prompt is submitted
   function handlePromptSubmitted(magnetId, promptText, theme) {
-    setMagnets((prev) =>
-      prev.map((m) =>
+    setMagnets((prev) => {
+      const updatedMagnets = (prev.magnets || []).map((m) =>
         m.id === magnetId
           ? { ...m, prompt: promptText, status: "pending", theme }
           : m
-      )
-    );
+      );
+      return { ...prev, magnets: updatedMagnets };
+    });
 
-    // trigger refresh shortly after
+    // ✅ trigger refresh shortly after
     setTimeout(fetchMagnets, 3000);
   }
 
   // ✅ Plan checkout
-  function handleCheckout() { 
-      navigate("/plans"); 
+  function handleCheckout() {
+    navigate("/plans");
   }
 
-  // ✅ Pagination
-  const sortedMagnets = [...magnets].sort(
+  const magnetList = magnets?.magnets || [];
+
+  // ✅ Pagination-safe sorting
+  const sortedMagnets = [...magnetList].sort(
     (a, b) => (a.slot_number || 0) - (b.slot_number || 0)
   );
+
   const totalPages = Math.ceil(sortedMagnets.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedMagnets = sortedMagnets.slice(
@@ -93,84 +98,92 @@ export default function CustomerDashboard() {
   }
 
   async function refreshUserSlots() {
-  try {
-    await refreshUser();   // ✅ refreshes the logged-in user in AuthContext
-    await fetchMagnets();  // ✅ refreshes magnets with updated slot info
-  } catch (err) {
-    console.error("Failed to refresh user slots:", err);
+    try {
+      await refreshUser(); // ✅ refreshes the logged-in user in AuthContext
+      await fetchMagnets(); // ✅ refreshes magnets with updated slot info
+    } catch (err) {
+      console.error("Failed to refresh user slots:", err);
+    }
   }
-}
-
 
   useEffect(() => {
-  if (user?.has_book && !user?.has_magnet) {
-    navigate("/books");
-  }
-}, [user]);
+    if (user?.has_book && !user?.has_magnet) {
+      navigate("/books");
+    }
+  }, [user]);
 
-
-
-return (
-  <DashboardLayout>
-    <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
-      {/* Header */}
-      <DashboardHeader type="magnet" items={magnets} onCheckout={handleCheckout} />
-
-
-      {/* Content */}
-      {loading ? (
-        <LoadingState />
-      ) : magnets.length === 0 ? (
-        <EmptyState onCheckout={handleCheckout} type="magnet" />
-      ) : (
-        <>
-          <MagnetTable magnets={paginatedMagnets} onAddPrompt={openPromptModal} onOpenEditor={openEditor}/>
-          <MagnetCardList magnets={paginatedMagnets} onAddPrompt={openPromptModal} onOpenEditor={openEditor}/>
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-          <SupportTab />
-        </>
-      )}
-
-      {/* Modals */}
-      {activeMagnet && (
-        <PromptModal
-          isOpen={openPrompt}
-          onClose={() => setOpenPrompt(false)}
-          magnetId={activeMagnet}
-          accessToken={accessToken}
-          contentType={selectedContentType}
-          setShowGenerating={setShowGenerating}
-          setProgress={setProgress}
-          onSubmitted={handlePromptSubmitted}
+  return (
+    <DashboardLayout>
+      <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
+        {/* Header */}
+        <DashboardHeader
+          type="magnet"
+          items={magnets.magnets || []}
+          summary={magnets.summary || {}}
+          onCheckout={handleCheckout}
         />
-      )}
 
-      <OutOfSlotsModal
-        open={showOutOfSlots}
-        onClose={() => setShowOutOfSlots(false)}
-        onRefresh={refreshUserSlots}
-        isFirstTime={magnets.length === 0}
-      />
+        {/* Content */}
+        {loading ? (
+          <LoadingState />
+        ) : magnets.length === 0 ? (
+          <EmptyState onCheckout={handleCheckout} type="magnet" />
+        ) : (
+          <>
+            <MagnetTable
+              magnets={paginatedMagnets}
+              onAddPrompt={openPromptModal}
+              onOpenEditor={openEditor}
+            />
+            <MagnetCardList
+              magnets={paginatedMagnets}
+              onAddPrompt={openPromptModal}
+              onOpenEditor={openEditor}
+            />
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+            <SupportTab />
+          </>
+        )}
 
-      <GenerationOverlay
-        visible={showGenerating}
-        progress={progress}
-        type="lead"
-      />
-      <EditorModal
-  key={editorRenderKey} 
-  leadMagnetId={editorId}
-  open={!!editorId}
-  onClose={handleEditorClose}
-  onCommitted={(url) => fetchMagnets()}
-  bgTheme={activeMagnetData?.bg_theme || "modern"}
-/>
-    </div>
-  </DashboardLayout>
-);
+        {/* Modals */}
+        {activeMagnet && (
+          <PromptModal
+            isOpen={openPrompt}
+            onClose={() => setOpenPrompt(false)}
+            magnetId={activeMagnet}
+            accessToken={accessToken}
+            contentType={selectedContentType}
+            setShowGenerating={setShowGenerating}
+            setProgress={setProgress}
+            onSubmitted={handlePromptSubmitted}
+          />
+        )}
 
+        <OutOfSlotsModal
+          open={showOutOfSlots}
+          onClose={() => setShowOutOfSlots(false)}
+          onRefresh={refreshUserSlots}
+          isFirstTime={magnets.length === 0}
+        />
+
+        <GenerationOverlay
+          visible={showGenerating}
+          progress={progress}
+          type="lead"
+        />
+        <EditorModal
+          key={editorRenderKey}
+          leadMagnetId={editorId}
+          open={!!editorId}
+          onClose={handleEditorClose}
+          onCommitted={(url) => fetchMagnets()}
+          bgTheme={activeMagnetData?.bg_theme || "modern"}
+        />
+      </div>
+    </DashboardLayout>
+  );
 }

@@ -13,7 +13,9 @@ export default function MagnetTable({
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  if (!Array.isArray(magnets) || magnets.length === 0) return null;
+  const magnetList = Array.isArray(magnets) ? magnets : magnets?.magnets || [];
+
+  if (!Array.isArray(magnetList) || magnetList.length === 0) return null;
 
   // ✅ handle modal "Continue"
   function handleCreate(data) {
@@ -31,12 +33,13 @@ export default function MagnetTable({
             <th className="px-4 py-2 text-center">Status</th>
             <th className="px-4 py-2 text-center">Theme</th>
             <th className="px-4 py-2 text-center">Prompt</th>
+            <th className="px-4 py-2 text-center">Title</th>
             <th className="px-4 py-2 text-center">Created</th>
             <th className="px-4 py-2 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {magnets.map((m) => (
+          {magnetList.map((m) => (
             <tr key={m.id} className="border-t border-gray-700">
               <td className="px-4 py-2 text-center">{m.slot_number}</td>
               <td className="px-4 py-2 text-center">
@@ -79,7 +82,7 @@ export default function MagnetTable({
                         d="M4 12a8 8 0 018-8v8H4z"
                       ></path>
                     </svg>
-                    Generating your PDF…
+                    building...
                   </div>
                 ) : (
                   <span className="bg-black text-purple border border-white px-7 py-1 rounded-full text-xs font-semibold">
@@ -113,6 +116,17 @@ export default function MagnetTable({
                   <div className="flex items-center justify-center text-grey">
                     <Timer size={18} />
                   </div>
+                )}
+              </td>
+              <td className="px-4 py-[10px] text-center align-middle">
+                {m.title ? (
+                  <span className="text-xs text-gray-200 font-medium leading-tight truncate max-w-[200px] inline-block align-middle">
+                    {m.title}
+                  </span>
+                ) : (
+                  <span className="text-gray-500 italic text-xs leading-tight align-middle">
+                    Untitled
+                  </span>
                 )}
               </td>
               <td className="px-4 py-2 text-center">
@@ -152,21 +166,33 @@ export default function MagnetTable({
                       className="flex items-center justify-center p-2 bg-muteGrey text-white rounded"
                       title="Download"
                     >
-                      <Download size={18} />
+                      <Download
+                        size={18}
+                        className={`${m.status === "completed" ? "text-blue" : "text-white"} transition-colors`}
+                      />
                     </button>
                   )}
-                  {m.pdf_url && !m.edit_used && (
-                  <button
-                    disabled={m.edit_used}
-                    onClick={() => onOpenEditor(m.id)}
-                    className="flex items-center justify-center p-2 bg-blue rounded"
-                    title="Open Editor"
-                  >
-                    <Edit size={18} />
-                  </button>
-                )}
+                  {m.pdf_url && (
+                    <button
+                      onClick={() => {
+                        if (!m.edit_used) onOpenEditor(m.id);
+                      }}
+                      disabled={m.edit_used}
+                      className={`flex items-center justify-center w-[38px] h-[38px] rounded transition 
+      ${
+        m.edit_used
+          ? "bg-gray-600 cursor-not-allowed opacity-60"
+          : "bg-gray-700 hover:bg-gray-700"
+      }`}
+                      title="Open Editor"
+                    >
+                      <Edit
+                        size={18}
+                        className={`${m.edit_used ? "text-gray-700" : "text-green"} transition-colors`}
+                      />
+                    </button>
+                  )}
                 </div>
-                
               </td>
             </tr>
           ))}
@@ -177,6 +203,7 @@ export default function MagnetTable({
         <PDFPreviewModal
           fileUrl={previewUrl}
           sourceType="magnet"
+          fileTitle={magnetList.find((m) => m.pdf_url === previewUrl)?.title || "Lead Magnet"}
           onClose={() => setPreviewUrl(null)}
         />
       )}

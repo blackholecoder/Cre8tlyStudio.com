@@ -23,6 +23,7 @@ export default function PromptModal({
   setProgress,
 }) {
   const [text, setText] = useState("");
+  const [title, setTitle] = useState("");
   const [theme, setTheme] = useState("modern");
   const [pages, setPages] = useState(5);
   const [logo, setLogo] = useState(null);
@@ -40,6 +41,7 @@ export default function PromptModal({
   useEffect(() => {
     if (!isOpen) {
       setText("");
+      setTitle("");
       setTheme("modern");
       setPages(5);
       setLogo(null);
@@ -74,6 +76,7 @@ export default function PromptModal({
       {
         magnetId,
         prompt: text,
+        title,
         theme,
         bgTheme,
         pages,
@@ -237,6 +240,8 @@ export default function PromptModal({
                   <PromptForm
                     text={text}
                     setText={setText}
+                    title={title}
+                    setTitle={setTitle}
                     theme={theme}
                     setTheme={setTheme}
                     bgTheme={bgTheme}

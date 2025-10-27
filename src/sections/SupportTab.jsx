@@ -1,3 +1,4 @@
+import { MessageCircleQuestion } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -58,9 +59,9 @@ export default function SupportTab() {
       {/* Floating Tab Button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 bg-green text-black font-semibold px-5 py-3 rounded-full shadow-lg hover:opacity-90 transition-all z-50 design-text text-sm"
+        className="fixed bottom-6 right-6 bg-green text-black font-semibold px-2 py-2 rounded-full shadow-lg hover:opacity-90 transition-all z-50 design-text text-sm"
       >
-        💬 Support
+        <MessageCircleQuestion size={20} />
       </button>
 
       {/* Overlay */}

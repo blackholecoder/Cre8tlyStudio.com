@@ -54,39 +54,50 @@ export default function PDFPreviewModal({ fileUrl, fileTitle, partNumber, source
     return () => clearTimeout(timeout);
   }, [fileUrl]);
 
-  const handleDownload = async () => {
-    try {
-      setDownloading(true);
-      const res = await fetch(memoizedFile.url);
-      if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      // ✅ Use title and part number if available
-      if (sourceType === "book") {
+ const handleDownload = async () => {
+  try {
+    setDownloading(true);
+    const res = await fetch(memoizedFile.url);
+    if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+
+    // ✅ Use title and part number if available
+    if (sourceType === "book") {
       const safeTitle = (fileTitle || "Book")
         .replace(/[^\w\s-]/g, "")
         .trim()
         .replace(/\s+/g, "_");
       const safePart = partNumber ? `_Part_${partNumber}` : "";
       a.download = `${safeTitle}${safePart}.pdf`;
-    } else {
-      a.download = "lead-magnet.pdf";
+    } 
+    // ✅ Update for Lead Magnets only
+    else if (sourceType === "magnet") {
+      const safeTitle = (fileTitle || "Lead_Magnet")
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "_");
+      a.download = `${safeTitle}.pdf`;
+    } 
+    else {
+      a.download = "document.pdf";
     }
 
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      await new Promise((r) => setTimeout(r, 2000));
-    } catch (err) {
-      console.error("Download error:", err);
-      alert("❌ Download failed. Please try again.");
-    } finally {
-      setDownloading(false);
-    }
-  };
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    await new Promise((r) => setTimeout(r, 2000));
+  } catch (err) {
+    console.error("Download error:", err);
+    alert("❌ Download failed. Please try again.");
+  } finally {
+    setDownloading(false);
+  }
+};
+
 
   useEffect(() => {
     if (!fileUrl) {

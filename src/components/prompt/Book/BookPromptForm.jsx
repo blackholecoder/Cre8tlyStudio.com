@@ -78,10 +78,10 @@ export default function BookPromptForm({
         <div className="relative w-full max-w-xs">
           <input
             type="number"
-            min="10"
-            max="150"
+            min="1"
+            max="10"
             value={pages ?? ""}
-            onChange={(e) => setPages(Math.min(150, Math.max(10, Number(e.target.value))))}
+            onChange={(e) => setPages(Math.min(10, Math.max(10, Number(e.target.value))))}
             className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
           />
         </div>

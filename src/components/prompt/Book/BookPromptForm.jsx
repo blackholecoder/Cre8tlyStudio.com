@@ -101,7 +101,7 @@ export default function BookPromptForm({
       {!loading && (
         <button
           type="submit"
-          className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-green to-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition"
+          className="w-full px-6 py-3 rounded-xl bg-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition"
         >
           🚀 Generate Book PDF
         </button>

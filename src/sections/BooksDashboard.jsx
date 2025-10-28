@@ -15,6 +15,7 @@ import BookCardList from "../components/book/BookCardList.jsx";
 import NewBookModal from "../components/book/NewBookModal.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import axios from "axios";
+import BookGrid from "../components/book/BookGrid.jsx";
 
 export default function BooksDashboard() {
   const { user, accessToken } = useAuth();
@@ -147,7 +148,7 @@ return (
         <EmptyState onCheckout={() => navigate("/plans")} type="book" />
       ) : (
         <>
-          <BookTable
+          <BookGrid
             books={paginatedBooks}
             onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
             onGenerateNext={(id, partNumber) => openBookModal(id, partNumber)}

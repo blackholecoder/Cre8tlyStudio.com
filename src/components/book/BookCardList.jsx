@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { CheckCircle, Timer, Eye, Plus, Layers, Rocket } from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
-import { CheckCircle, Timer } from "lucide-react";
 
 export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -18,175 +19,181 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
   if (!Array.isArray(books) || books.length === 0) return null;
 
   return (
-    <div className="md:hidden space-y-4">
-      {books.map((b, i) => (
-        <div
+    <div className="md:hidden flex flex-col gap-4 p-4">
+      {books.map((b) => (
+        <motion.div
           key={b.id}
-          className="bg-neo p-4 rounded-xl shadow border border-gray-700"
+          whileTap={{ scale: 0.98 }}
+          className="bg-[#0a0a0a]/90 rounded-xl border border-gray-800 p-4 shadow hover:shadow-[0_0_10px_rgba(0,255,150,0.15)] transition-all"
         >
           {/* Title */}
-          <p className="text-sm text-white font-semibold mb-2">
-            {b.title || `Book #${i + 1}`}
-          </p>
+          <h3 className="text-white text-sm font-semibold truncate mb-1">
+            {b.book_name || "Untitled Book"}
+          </h3>
 
-          {/* Created */}
-          <p className="text-sm text-silver">
-            <span className="font-semibold">Created:</span>{" "}
-            {new Date(b.created_at).toLocaleDateString()}{" "}
-            {new Date(b.created_at).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
+          {/* Part + Date */}
+          <div className="text-[11px] text-gray-400 flex justify-between mb-2">
+            <span>Part {b.part_number || 1}</span>
+            <span>
+              {new Date(b.created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}
+            </span>
+          </div>
 
-          {/* Status */}
-          <p className="text-sm text-silver mt-1">
-  <span className="font-semibold">Status:</span>{" "}
-  {b.status === "await_prompt" ? (
-    <span className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-      Idle
-    </span>
-  ) : b.status === "pending" ? (
-    <span className="flex items-center gap-2 text-yellow italic">
-      <svg
-        className="animate-spin h-4 w-4 text-yellow"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v8H4z"
-        ></path>
-      </svg>
-      Generating…
-    </span>
-  ) : b.status === "failed" ? (
-    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-      Failed
-    </span>
-  ) : b.pages >= 750 ? (
-    <span className="bg-green text-black px-2 py-1 rounded-full text-xs font-semibold">
-      Completed
-    </span>
-  ) : b.pages > 0 ? (
-    <span className="bg-blue text-white px-2 py-1 rounded-full text-xs font-semibold">
-      In Progress
-    </span>
-  ) : (
-    <span className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-      Idle
-    </span>
-  )}
-</p>
+          {/* Progress */}
+          <div className="flex flex-col items-center mb-3">
+            <div className="w-full bg-gray-800 rounded-full overflow-hidden h-2">
+              <div
+                className="bg-gradient-to-r from-green to-royalPurple h-2"
+                style={{ width: `${Math.min((b.pages / 750) * 100, 100)}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1">{b.pages || 0}/750 pages</p>
+          </div>
 
-
-          {/* Prompt */}
-          <p className="text-sm text-silver mt-1">
-            {b.prompt ? (
-              <span className="inline-flex items-center text-headerGreen">
-                <CheckCircle size={18} className="mr-1" />
+          {/* ✅ Book Status Pills */}
+          <div className="book-status text-xs font-semibold text-center mt-3">
+            {b.status === "pending" ? (
+              <div className="flex items-center justify-center gap-2 text-yellow italic">
+                <svg
+                  className="animate-spin h-4 w-4 text-yellow"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+                Generating…
+              </div>
+            ) : b.status === "failed" ? (
+              <span className="bg-red-500 text-white px-3 py-[3px] rounded-full">
+                Failed
+              </span>
+            ) : b.pages >= 750 ? (
+              <span className="bg-green text-black px-3 py-[3px] rounded-full">
+                Completed
+              </span>
+            ) : b.pages > 0 ? (
+              <span className="bg-blue text-white px-3 py-[3px] rounded-full">
+                In Progress
               </span>
             ) : (
-              <span className="inline-flex items-center text-grey">
-                <Timer size={18} className="mr-1" />
+              <span className="bg-gray-600 text-white px-3 py-[3px] rounded-full">
+                Idle
               </span>
             )}
-          </p>
-          <p className="text-sm text-silver mt-1">
-            {b.created_at_prompt ? (
-                    <span className="text-xs text-gray-300">
-                      <span className="text-green font-bold">Created</span>{" "}
-                      {new Date(b.created_at_prompt).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "short",
-                          day: "2-digit",
-                          year: "numeric",
-                        }
-                      )}{" "}
-                      {new Date(b.created_at_prompt).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  ) : (
-                    <span className="text-gray-500 italic text-xs">N/A</span>
-                  )}
-          </p>
+          </div>
 
-          {/* Part number */}
-          {b.part_number && (
-            <p className="text-sm text-silver mt-1">
-              <span className="font-semibold">Part:</span> {b.part_number}
-            </p>
-          )}
+          {/* Prompt Indicator */}
+          <div className="flex justify-center items-center mt-3">
+            {b.prompt ? (
+              <CheckCircle size={18} className="text-headerGreen" />
+            ) : (
+              <Timer size={18} className="text-gray-500" />
+            )}
+          </div>
+
+          {/* Created Timestamp */}
+          <div className="text-[11px] text-gray-400 text-center mt-2">
+            {b.created_at_prompt ? (
+              <>
+                {new Date(b.created_at_prompt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                })}{" "}
+                {new Date(b.created_at_prompt).toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </>
+            ) : (
+              <span className="italic text-gray-500">N/A</span>
+            )}
+          </div>
 
           {/* Actions */}
-<div className="flex flex-col gap-2 mt-3">
-  {/* Add Prompt */}
-  {!b.prompt && (
-    <button
-      onClick={() => onAddPrompt(b.id, b.part_number)}
-      className="w-full px-3 py-2 bg-royalPurple text-white rounded"
-    >
-      Add Prompt
-    </button>
-  )}
+          <div className="flex flex-col items-stretch gap-2 mt-3 w-full">
+            {/* Add Chapter */}
+            {!b.prompt && (
+              <button
+                onClick={() => onAddPrompt(b.id, b.part_number)}
+                className="w-full bg-green text-black rounded-lg py-2 text-sm font-semibold hover:bg-green transition-all"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Plus size={16} />
+                  <span>Add Chapter</span>
+                </div>
+              </button>
+            )}
 
-  {/* Preview / Download */}
-  {b.pdf_url && (
-    <button
-      onClick={() =>
-        setPreviewUrl({
-          url: b.pdf_url,
-          title: b.title || b.book_name || "Untitled",
-          partNumber: b.part_number || 1,
-        })
-      }
-      className={`w-full px-3 py-2 rounded text-white ${
-        b.pages >= 750 ? "bg-green text-black" : "bg-blue"
-      }`}
-    >
-      {b.pages >= 750 ? "Download Book" : "Preview"}
-    </button>
-  )}
+            {/* Preview */}
+            {b.pdf_url && (
+              <button
+                onClick={() =>
+                  setPreviewUrl({
+                    url: b.pdf_url,
+                    title: b.book_name || "Untitled",
+                    partNumber: b.part_number || 1,
+                  })
+                }
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Eye
+                    size={16}
+                    className={`${b.pages >= 750 ? "text-green" : "text-white"}`}
+                  />
+                  <span>{b.pages >= 750 ? "Download Book" : "Preview"}</span>
+                </div>
+              </button>
+            )}
 
-  {/* View All Parts */}
-  {b.pdf_url && (
-    <button
-      onClick={() => openPartsModal(b.id)}
-      className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
-    >
-      View All Parts
-    </button>
-  )}
+            {/* View All Parts */}
+            {b.pdf_url && (
+              <button
+                onClick={() => openPartsModal(b.id)}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white rounded-lg py-2 text-sm flex items-center justify-center gap-2 transition"
+              >
+                <Layers size={16} />
+                <span>View All Parts</span>
+              </button>
+            )}
 
-  {/* Continue Story */}
-  {b.prompt && b.pages < 750 && (
-    <button
-      onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
-      className="w-full px-3 py-2 bg-gradient-to-r from-[#00E07A] to-[#6a5acd] text-black rounded hover:opacity-90 transition"
-    >
-      {b.pages >= 740
-        ? "🏁 Finish Book"
-        : `➕ Continue Story (Part ${(b.part_number || 1) + 1})`}
-    </button>
-  )}
-</div>
-        </div>
+            {/* Continue Story */}
+            {b.prompt && b.pages < 750 && (
+              <button
+                onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
+                className="w-full bg-gradient-to-r from-green to-royalPurple text-black rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              >
+                <Rocket size={16} />
+                <span>
+                  {b.pages >= 740
+                    ? "Finish Book"
+                    : `Continue (Part ${(b.part_number || 1) + 1})`}
+                </span>
+              </button>
+            )}
+          </div>
+        </motion.div>
       ))}
 
-      {/* ✅ Shared PDF Preview Modal */}
+      {/* ✅ PDF Preview Modal */}
       {previewUrl && (
         <PDFPreviewModal
           fileUrl={previewUrl.url}
@@ -197,7 +204,7 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
         />
       )}
 
-      {/* ✅ Shared Book Parts Modal */}
+      {/* ✅ Book Parts Modal */}
       {showPartsModal && (
         <BookPartsModal
           bookId={activeBookId}

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { themeStyles } from "../../constants/index";
 import { CheckCircle, Edit, Plus, Timer, Eye, Pencil } from "lucide-react";
 import NewContentModal from "../NewContentModal";
-import PDFPreviewModal from "../dashboard/PDFPReviewModal";
+import PDFPreviewModal from "../dashboard/PDFPreviewModal";
 
 export default function MagnetGrid({
   magnets = [],

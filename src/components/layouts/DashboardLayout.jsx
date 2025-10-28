@@ -52,21 +52,21 @@ export default function DashboardLayout({ children }) {
     {
       label: "Digital Products",
       path: "/dashboard",
-      icon: <Package size={18} />,
+      icon: <Package size={22} />,
     },
-    { label: "Assistant", path: "/books", icon: <BookOpen size={18} /> },
-    { label: "Settings", path: "/settings", icon: <Settings size={18} /> },
+    { label: "Assistant", path: "/books", icon: <BookOpen size={22} /> },
+    { label: "Settings", path: "/settings", icon: <Settings size={22} /> },
     {
       label: "Prompt Memory",
       path: "/prompts",
-      icon: <SquareTerminal size={18} />,
+      icon: <SquareTerminal size={22} />,
     },
     {
       label: "Inbox",
       path: "/notifications",
-      icon: <Inbox size={18} />,
+      icon: <Inbox size={22} />,
     },
-    { label: "Plans", path: "/plans", icon: <DollarSign size={18} /> },
+    { label: "Plans", path: "/plans", icon: <DollarSign size={22} /> },
   ];
 
   return (
@@ -75,18 +75,18 @@ export default function DashboardLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 w-64 h-full bg-gray-900/95 border-r border-gray-800 
-             flex flex-col justify-between transform transition-transform duration-300 z-[60]
-             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed top-0 left-0 w-[120px] h-full bg-gray-900/95 border-r border-gray-800 
+       flex flex-col justify-between transform transition-transform duration-300 z-[60]
+       ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
         <div className="flex flex-col justify-between h-full p-6">
           {/* Top Section */}
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                <img src={headerLogo} alt="Cre8tly" className="w-8 h-8" />
-                <h1 className="relative inline-block text-1xl font-bold text-white design-text">
+              <div className="flex flex-col items-center justify-center mt-6 mb-4">
+                <img src={headerLogo} alt="Cre8tly" className="w-16 h-16 mb-2" />
+                <h1 className="text-sm font-semibold text-white text-center tracking-wide">
                   Cre8tly Studio
                 </h1>
               </div>
@@ -98,18 +98,7 @@ export default function DashboardLayout({ children }) {
               </button>
             </div>
 
-            {/* User */}
-            {user && (
-              <div className="mb-6 text-sm text-gray-400">
-                Welcome,{" "}
-                <span className="font-semibold text-white">
-                  {user.name?.split(" ")[0] || "User"}
-                </span>
-              </div>
-            )}
-
-            {/* Nav */}
-            <nav className="space-y-3">
+            <nav className="flex flex-col items-center gap-5 mt-8">
               {menu.map((item) => {
                 const active = location.pathname === item.path;
                 const hasBrandFile =
@@ -122,28 +111,41 @@ export default function DashboardLayout({ children }) {
                       navigate(item.path);
                       if (window.innerWidth < 1024) setIsSidebarOpen(false);
                     }}
-                    className={`relative w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition
-                      ${
-                        active
-                          ? "bg-muteGrey text-white shadow-md"
-                          : "bg-gray-800/40 hover:bg-gray-800 text-gray-300"
-                      }`}
+                    className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
                   >
-                    {item.icon}
-                    {item.label}
+                    <div
+                      className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+            ${
+              active
+                ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
+                : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
+            }`}
+                    >
+                      {item.icon}
 
-                    {item.path === "/notifications" && unreadCount > 0 && (
-                      <span className="absolute right-3 top-2 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
-  {unreadCount > 9 ? "9+" : unreadCount}
-</span>
-                    )}
+                      {/* 🔔 Unread badge */}
+                      {item.path === "/notifications" && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex items-center justify-center w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
 
-                    {hasBrandFile && (
-                      <>
-                        <span className="absolute right-3 w-3 h-3 bg-green rounded-full opacity-75 animate-ping" />
-                        <span className="absolute right-3 w-3 h-3 bg-green rounded-full shadow-[0_0_6px_3px_rgba(34,197,94,0.8)]" />
-                      </>
-                    )}
+                      {/* 💚 Brand indicator */}
+                      {hasBrandFile && (
+                        <>
+                          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full opacity-75 animate-ping" />
+                          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full shadow-[0_0_6px_2px_rgba(34,197,94,0.8)]" />
+                        </>
+                      )}
+                    </div>
+
+                    {/* <span
+          className={`text-xs font-medium ${
+            active ? "text-green" : "text-gray-400"
+          }`}
+        >
+          {item.label}
+        </span> */}
                   </button>
                 );
               })}
@@ -153,11 +155,12 @@ export default function DashboardLayout({ children }) {
           {/* Logout */}
           <button
             onClick={logout}
-            className="w-full mt-8 text-sm font-semibold py-2 flex items-center justify-center gap-2 
-                       bg-red-600 text-white hover:bg-red-700 transition rounded-md"
+            className="relative flex items-center justify-center w-12 h-12 mx-auto mb-6 rounded-xl 
+             bg-red-600/20 border border-red-600/40 text-red-500 hover:text-white hover:bg-red-600/40 
+             hover:shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all"
+            title="Logout"
           >
-            <LogOut size={16} />
-            Logout
+            <LogOut size={20} />
           </button>
         </div>
       </aside>
@@ -178,7 +181,7 @@ export default function DashboardLayout({ children }) {
       </button>
 
       {/* Main content (scrolls independently) */}
-      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-64">
+      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-[120px]">
         {children}
       </main>
     </div>

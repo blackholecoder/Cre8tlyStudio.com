@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 
 export default function BookPartsModal({ bookId, accessToken, onClose }) {
   const [parts, setParts] = useState([]);

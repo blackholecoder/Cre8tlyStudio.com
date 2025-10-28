@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { themeStyles } from "../../constants/index";
 import { CheckCircle, Timer, Eye, Edit, Plus, Pencil } from "lucide-react";
-import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import NewContentModal from "../NewContentModal";
 
 export default function MagnetCardList({

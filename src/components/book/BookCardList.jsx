@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PDFPreviewModal from "../../components/dashboard/PDFPReviewModal";
+import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
 import { CheckCircle, Timer } from "lucide-react";

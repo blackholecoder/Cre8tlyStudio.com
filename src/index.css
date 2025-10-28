@@ -63,6 +63,10 @@
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.transition-all {
+  transition: all 0.25s ease-in-out;
+}
+
 .brand-image {
   filter: grayscale(100%);
   transition: filter 0.3s ease; /* Smooth transition */
@@ -228,6 +232,23 @@ select.dropdown-scroll:focus option {
 
 .animate-shimmer {
   animation: shimmer 15s linear infinite;
+}
+
+
+@keyframes glimmer {
+  0% {
+    transform: translateX(-100%) rotate(25deg);
+  }
+  50% {
+    transform: translateX(0%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(25deg);
+  }
+}
+
+.animate-glimmer {
+  animation: glimmer 2.5s linear infinite;
 }
 
 

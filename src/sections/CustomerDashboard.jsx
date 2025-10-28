@@ -6,7 +6,6 @@ import PromptModal from "../components/PromptModal.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
 import EmptyState from "../components/dashboard/EmptyState.jsx";
-import MagnetTable from "../components/dashboard/MagnetTable.jsx";
 import MagnetCardList from "../components/dashboard/MagnetCardList.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";
 import SupportTab from "./SupportTab.jsx";
@@ -14,6 +13,7 @@ import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal.jsx";
 import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import EditorModal from "../components/editor/EditorModal.jsx";
+import MagnetGrid from "../components/magnets/MagnetGrid.jsx";
 
 export default function CustomerDashboard() {
   const { user, accessToken, refreshUser } = useAuth();
@@ -130,7 +130,7 @@ export default function CustomerDashboard() {
           <EmptyState onCheckout={handleCheckout} type="magnet" />
         ) : (
           <>
-            <MagnetTable
+            <MagnetGrid
               magnets={paginatedMagnets}
               onAddPrompt={openPromptModal}
               onOpenEditor={openEditor}

@@ -36,7 +36,7 @@ const Nav = () => {
   }, [isOpen]);
 
   if (
-    ["/dashboard", "/books", "/settings", "/prompts"].includes(
+    ["/dashboard", "/books", "/settings", "/prompts", "/notifications"].includes(
       location.pathname
     )
   ) {

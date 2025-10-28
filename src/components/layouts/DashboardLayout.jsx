@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import { headerLogo } from "../../assets/images";
+import api from "../../api/axios";
 import {
   Menu,
   X,
@@ -10,7 +11,8 @@ import {
   LogOut,
   SquareTerminal,
   Package,
-  DollarSign
+  DollarSign,
+  Inbox,
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 
@@ -19,6 +21,7 @@ export default function DashboardLayout({ children }) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
@@ -29,6 +32,21 @@ export default function DashboardLayout({ children }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await api.get("/admin/messages/count");
+        setUnreadCount(res.data.count || 0);
+      } catch (err) {
+        console.error("Failed to fetch unread count:", err);
+      }
+    };
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000); // refresh every 30s
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
   const menu = [
     {
@@ -43,8 +61,12 @@ export default function DashboardLayout({ children }) {
       path: "/prompts",
       icon: <SquareTerminal size={18} />,
     },
+    {
+      label: "Inbox",
+      path: "/notifications",
+      icon: <Inbox size={18} />,
+    },
     { label: "Plans", path: "/plans", icon: <DollarSign size={18} /> },
-
   ];
 
   return (
@@ -110,6 +132,12 @@ export default function DashboardLayout({ children }) {
                     {item.icon}
                     {item.label}
 
+                    {item.path === "/notifications" && unreadCount > 0 && (
+                      <span className="absolute right-3 top-2 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
+  {unreadCount > 9 ? "9+" : unreadCount}
+</span>
+                    )}
+
                     {hasBrandFile && (
                       <>
                         <span className="absolute right-3 w-3 h-3 bg-green rounded-full opacity-75 animate-ping" />
@@ -135,11 +163,11 @@ export default function DashboardLayout({ children }) {
       </aside>
 
       {isSidebarOpen && window.innerWidth < 1024 && (
-  <div
-    onClick={() => setIsSidebarOpen(false)}
-    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
-  />
-)}
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
+        />
+      )}
 
       {/* Toggle button (mobile) */}
       <button

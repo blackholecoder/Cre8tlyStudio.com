@@ -404,6 +404,7 @@ const handleRemove = async () => {
             </button>
           </div>
           {user?.has_book ? (
+            <>
             <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">
               <h2 className="text-lg font-semibold text-gray-200 mb-2">
                 Guided Tour
@@ -439,7 +440,49 @@ const handleRemove = async () => {
                 Replay Book Tour
               </button>
             </div>
+            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+    <h2 className="text-lg font-semibold text-gray-200 mb-2">
+      ISBN Assistance
+    </h2>
+    <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+      Need an ISBN for your book? Cre8tly Studio can guide you through the
+      process. An ISBN (International Standard Book Number) identifies your
+      book worldwide and is required for publishing on major retailers like
+      Amazon, Apple Books, and Barnes & Noble.
+    </p>
+
+    <div className="flex flex-col sm:flex-row items-center gap-3">
+      <button
+        onClick={() =>
+          window.open("https://www.myidentifiers.com/", "_blank")
+        }
+        className="flex-1 bg-green text-black font-semibold py-2.5 rounded-lg shadow-md hover:opacity-90 transition text-center"
+      >
+        Get ISBN from Bowker
+      </button>
+
+      <button
+        onClick={() =>
+          toast.info(
+            "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!"
+          )
+        }
+        className="flex-1 bg-gray-800 text-gray-300 font-semibold py-2.5 rounded-lg border border-gray-700 hover:border-green hover:text-green transition"
+      >
+        Coming Soon: ISBN Concierge
+      </button>
+    </div>
+
+    <p className="text-xs text-gray-500 italic mt-3">
+      Available for Assistant Plan users. Stay tuned for automated ISBN
+      requests inside the dashboard.
+    </p>
+  </div>
+            </>
           ) : null}
+          
+
+          
         </div>
       </div>
     </div>

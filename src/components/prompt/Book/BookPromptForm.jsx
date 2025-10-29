@@ -24,6 +24,8 @@ export default function BookPromptForm({
   loading,
   bookId,
   setBookId, // may be undefined when editing existing book
+  partLocked,
+  partNumber,
 }) {
   const [saving, setSaving] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -35,75 +37,161 @@ export default function BookPromptForm({
   const [draftAuthor, setDraftAuthor] = useState(authorName || "");
 
   // ✅ Load saved draft when bookId is available
-  useEffect(() => {
-    async function loadDraft() {
-      if (!bookId) return;
-      try {
-        const res = await axiosInstance.get(`https://cre8tlystudio.com/api/books/draft/${bookId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        if (res.data?.draft_text) {
-          setText(res.data.draft_text);
-          if (res.data.title) setBookName(res.data.title);
-          if (res.data.link) setLink(res.data.link);
-          if (res.data.last_saved_at) setLastSavedAt(res.data.last_saved_at);
-          if (res.data.author_name) setDraftAuthor(res.data.author_name);
-          if (res.data.book_type) setBookType(res.data.book_type);
+  // useEffect(() => {
+  //   async function loadDraft() {
+  //     if (!bookId) return;
+  //     try {
+  //       const res = await axiosInstance.get(`https://cre8tlystudio.com/api/books/draft/${bookId}`, {
+  //         headers: { Authorization: `Bearer ${accessToken}` },
+  //       });
+  //       if (res.data?.draft_text) {
+  //         setText(res.data.draft_text);
+  //         if (res.data.title) setBookName(res.data.title);
+  //         if (res.data.link) setLink(res.data.link);
+  //         if (res.data.last_saved_at) setLastSavedAt(res.data.last_saved_at);
+  //         if (res.data.author_name) setDraftAuthor(res.data.author_name);
+  //         if (res.data.book_type) setBookType(res.data.book_type);
           
 
-          // ✅ Only show banner once per session
-          if (!hasShownBanner) {
-            setRestored(true);
-            toast.info("Loaded saved draft ✍️");
-            setTimeout(() => setRestored(false), 4000);
-            sessionStorage.setItem("shownDraftBanner", "true");
-            setHasShownBanner(true);
-          }
-        }
-      } catch (err) {
-        if (err.response?.status !== 404) {
-          console.error("Failed to load draft:", err);
-        }
-      }
-    }
-    loadDraft();
-  }, [bookId]);
-
-  // ✅ Save draft to backend
-  async function handleSaveDraft() {
-    if (!text?.trim()) {
-      toast.warn("Write something before saving!");
-      return;
-    }
-
-    setSaving(true);
+  //         // ✅ Only show banner once per session
+  //         if (!hasShownBanner) {
+  //           setRestored(true);
+  //           toast.info("Loaded saved draft ✍️");
+  //           setTimeout(() => setRestored(false), 4000);
+  //           sessionStorage.setItem("shownDraftBanner", "true");
+  //           setHasShownBanner(true);
+  //         }
+  //       }
+  //     } catch (err) {
+  //       if (err.response?.status !== 404) {
+  //         console.error("Failed to load draft:", err);
+  //       }
+  //     }
+  //   }
+  //   loadDraft();
+  // }, [bookId]);
+  useEffect(() => {
+  async function loadDraft() {
+    if (!bookId) return;
 
     try {
-      const res = await axiosInstance.post(
-        "https://cre8tlystudio.com/api/books/draft",
-        {
-          bookId,
-          draftText: text,
-          book_name: bookName,
-          link,
-          author_name: draftAuthor || authorName,
-          book_type: bookType,
+      // ✅ Decide which endpoint to hit based on part number
+      const endpoint =
+        partNumber > 1
+          ? `https://cre8tlystudio.com/api/books/${bookId}/part/${partNumber}/draft`
+          : `https://cre8tlystudio.com/api/books/draft/${bookId}`;
+
+      const res = await axiosInstance.get(endpoint, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (res.data?.draft_text) {
+        setText(res.data.draft_text);
+        if (res.data.title) setBookName(res.data.title);
+        if (res.data.link) setLink(res.data.link);
+        if (res.data.last_saved_at) setLastSavedAt(res.data.last_saved_at);
+        if (res.data.author_name) setDraftAuthor(res.data.author_name);
+        if (res.data.book_type) setBookType(res.data.book_type);
+
+        // ✅ Only show banner once per session
+        if (!hasShownBanner) {
+          setRestored(true);
+          toast.info("Loaded saved draft ✍️");
+          setTimeout(() => setRestored(false), 4000);
+          sessionStorage.setItem("shownDraftBanner", "true");
+          setHasShownBanner(true);
         }
-      );
-
-      // ✅ Only setBookId if prop exists and new id was returned
-      if (res.data.id && typeof setBookId === "function") {
-        setBookId(res.data.id);
+      } else {
+        console.log("No saved draft found for this book or part.");
       }
-
-      toast.success("Draft saved successfully 💾");
     } catch (err) {
-      console.error("Save draft failed:", err);
-      toast.error("Failed to save draft");
-    } finally {
-      setSaving(false);
+      if (err.response?.status !== 404) {
+        console.error("Failed to load draft:", err);
+      }
     }
   }
+
+  loadDraft();
+}, [bookId, partNumber]);
+
+
+  // ✅ Save draft to backend
+  // async function handleSaveDraft() {
+  //   if (!text?.trim()) {
+  //     toast.warn("Write something before saving!");
+  //     return;
+  //   }
+
+  //   setSaving(true);
+
+  //   try {
+  //     const res = await axiosInstance.post(
+  //       "https://cre8tlystudio.com/api/books/draft",
+  //       {
+  //         bookId,
+  //         draftText: text,
+  //         book_name: bookName,
+  //         link,
+  //         author_name: draftAuthor || authorName,
+  //         book_type: bookType,
+  //       }
+  //     );
+
+  //     // ✅ Only setBookId if prop exists and new id was returned
+  //     if (res.data.id && typeof setBookId === "function") {
+  //       setBookId(res.data.id);
+  //     }
+
+  //     toast.success("Draft saved successfully 💾");
+  //   } catch (err) {
+  //     console.error("Save draft failed:", err);
+  //     toast.error("Failed to save draft");
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // }
+  async function handleSaveDraft() {
+  if (!text?.trim()) {
+    toast.warn("Write something before saving!");
+    return;
+  }
+
+  setSaving(true);
+
+  try {
+    // ✅ Choose correct endpoint based on part number
+    const endpoint =
+      partNumber > 1
+        ? `https://cre8tlystudio.com/api/books/${bookId}/part/${partNumber}/draft`
+        : "https://cre8tlystudio.com/api/books/draft";
+
+    const res = await axiosInstance.post(
+      endpoint,
+      {
+        bookId,
+        draftText: text,
+        book_name: bookName,
+        link,
+        author_name: draftAuthor || authorName,
+        book_type: bookType,
+      },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    // ✅ Only setBookId if prop exists and new id was returned
+    if (res.data.id && typeof setBookId === "function") {
+      setBookId(res.data.id);
+    }
+
+    toast.success("Draft saved successfully 💾");
+  } catch (err) {
+    console.error("Save draft failed:", err);
+    toast.error("Failed to save draft");
+  } finally {
+    setSaving(false);
+  }
+}
+
 
   // ✅ Submit for generation (finalize book)
   async function handleSubmit(e) {
@@ -115,7 +203,7 @@ export default function BookPromptForm({
       const payload = {
         bookId,
         title,
-        draftText: text,
+        prompt: text, 
         pages,
         link,
         cover,
@@ -125,7 +213,7 @@ export default function BookPromptForm({
       };
 
       const res = await axiosInstance.post(
-        "https://cre8tlystudio.com/api/books",
+        "https://cre8tlystudio.com/api/books/prompt",
         payload
       );
       toast.success("Book generation started! 🚀");
@@ -258,18 +346,20 @@ export default function BookPromptForm({
 
         {/* ---------- Buttons ---------- */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={handleSaveDraft}
-            disabled={saving}
-            className={`flex-1 px-6 py-3 rounded-xl bg-green text-black font-semibold text-lg shadow-lg transition ${
-              saving
-                ? "opacity-70 cursor-not-allowed"
-                : "hover:bg-green hover:text-black"
-            }`}
-          >
-            {saving ? "Saving..." : "Save Draft"}
-          </button>
+          {!partLocked && (
+    <button
+      type="button"
+      onClick={handleSaveDraft}
+      disabled={saving}
+      className={`flex-1 px-6 py-3 rounded-xl bg-green text-black font-semibold text-lg shadow-lg transition ${
+        saving
+          ? "opacity-70 cursor-not-allowed"
+          : "hover:bg-green hover:text-black"
+      }`}
+    >
+      {saving ? "Saving..." : "Save Draft"}
+    </button>
+          )}
 
           {!loading && (
             <button

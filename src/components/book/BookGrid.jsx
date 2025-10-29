@@ -181,7 +181,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                 </button>
               )}
               {/* Continue Draft button */}
-              {(b.is_draft === 1 || b.draft_text) && (
+              {(b.has_part_1 === 0 && (b.is_draft === 1 || b.draft_text)) && (
                 <button
                   onClick={() => onAddPrompt(b.id, b.part_number || 1)}
                   className="w-full bg-blue hover:bg-blue text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all"

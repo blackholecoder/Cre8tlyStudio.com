@@ -53,13 +53,24 @@ export default function BookEditor({ content, setContent }) {
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
   });
 
+  useEffect(() => {
+  if (editor && content !== editor.getHTML()) {
+    editor.commands.setContent(content || "", false);
+  }
+}, [content, editor]);
+
+
   if (editor) window.__EDITOR = editor;
+  
 
   useEffect(() => {
     editorRef.current = editor;
   }, [editor]);
 
   if (!editor) return null;
+
+
+
 
   return (
     <>

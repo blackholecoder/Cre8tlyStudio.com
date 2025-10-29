@@ -52,6 +52,37 @@ export default function BookPromptModal({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+  async function fetchDraft() {
+    if (!bookId) return;
+    try {
+      const res = await axios.get(`https://cre8tlystudio.com/books/draft/${bookId}`);
+      const draft = res.data;
+
+      if (draft?.draft_text) {
+        setText(draft.draft_text);
+        if (draft.title) setBookName(draft.title); 
+        if (draft.link) setLink(draft.link);
+        if (draft.author_name) setAuthorName(draft.author_name);
+        if (draft.book_type) setBookType(draft.book_type);
+        toast.info(`Loaded last draft from ${new Date(draft.last_saved_at).toLocaleString()}`);
+      } else {
+        console.log("No draft found for this book.");
+      }
+    } catch (err) {
+      if (err.response?.status === 404) {
+        console.log("No saved draft yet.");
+      } else {
+        console.error("Failed to fetch draft:", err);
+        toast.error("Failed to fetch saved draft.");
+      }
+    }
+  }
+
+  fetchDraft();
+}, [bookId]);
+
+
   // ✅ Fetch book info
 
   async function handleSubmit(e) {
@@ -160,10 +191,13 @@ export default function BookPromptModal({
           bookName={bookName}
           setBookName={setBookName}
           bookType={bookType}
+          setBookType={setBookType}
           onSubmit={handleSubmit}
           loading={loading}
           showPreview={showPreview}
           setShowPreview={setShowPreview}
+          bookId={bookId}
+          setBookId={() => {}}
         />
       </div>
     </div>

@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useBooks } from "../admin/BookContext.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
 import EmptyState from "../components/dashboard/EmptyState.jsx";
-import BookTable from "../components/book/BookTable.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";
 import SupportTab from "./SupportTab.jsx";
 import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
@@ -18,7 +17,7 @@ import axios from "axios";
 import BookGrid from "../components/book/BookGrid.jsx";
 
 export default function BooksDashboard() {
-  const { user, accessToken } = useAuth();
+  const { accessToken } = useAuth();
   const { books, setBooks, fetchBooks, loading } = useBooks();
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeBook, setActiveBook] = useState(null);
@@ -28,6 +27,7 @@ export default function BooksDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showNewBookModal, setShowNewBookModal] = useState(false);
   const [newBookData, setNewBookData] = useState(null);
+
 
 
   const navigate = useNavigate();
@@ -140,7 +140,6 @@ return (
         items={books}
         onCheckout={() => navigate("/plans")}
       />
-
       {/* Content */}
       {loading ? (
         <LoadingState />

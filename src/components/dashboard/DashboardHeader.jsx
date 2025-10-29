@@ -38,6 +38,7 @@ export default function DashboardHeader({ items = [], onCheckout, type = "magnet
         <p className="text-silver mt-1">
           You currently have {availableSlots} of {totalSlots} slots remaining.
         </p>
+        
 
         {availableSlots === 0 && (
           <div className="mt-4">

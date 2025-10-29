@@ -58,7 +58,8 @@ export default function PromptModal({
 
   const handleClose = () => onClose();
 
-  async function handleSubmit(e, contentType) {
+
+async function handleSubmit(e, contentType) {
   e.preventDefault();
   setLoading(true);
   setProgress(0);
@@ -67,9 +68,20 @@ export default function PromptModal({
 
   let interval;
   try {
+     let progressValue = 0;
     interval = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + Math.random() * 5 : p));
-    }, 300);
+      // Smooth climb logic with slowdown near the end
+      progressValue +=
+        progressValue < 60
+          ? Math.random() * 4.5 // faster early
+          : progressValue < 85
+          ? Math.random() * 2.5 // steady middle
+          : Math.random() * 1.2; // slow near the end
+
+      if (progressValue >= 96) progressValue = 96; // hold near finish
+      setProgress(progressValue);
+    }, 200);
+
 
     const res = await axios.post(
       "https://cre8tlystudio.com/api/lead-magnets/prompt",
@@ -94,42 +106,59 @@ export default function PromptModal({
 
     clearInterval(interval);
     setProgress(100);
-    toast.success("🎉 Lead magnet generated successfully!");
+
+    toast.success("🎉 Your digital asset has been generated successfully!");
     setShowGenerating(false);
-
-    // ✅ Smooth UX: let the progress finish visually
-    await new Promise((r) => setTimeout(r, 1000));
-
     onClose();
 
-    // ✅ Refresh magnet list after generation completes
+    await new Promise((r) => setTimeout(r, 1000));
+
+    
+
+    // ✅ Refresh magnet list
     setTimeout(() => {
       if (typeof onSubmitted === "function") {
         onSubmitted(magnetId, text, theme);
       }
     }, 2000);
   } catch (err) {
-    console.error("❌ Prompt submission error:", err);
     clearInterval(interval);
     setProgress(0);
     setLoading(false);
     setShowGenerating(false);
 
-    if (err.code === "ECONNABORTED") {
-      // ⏳ Axios timeout reached, but backend probably still working
-      toast.info("⏳ Your PDF is still generating — it will appear shortly.");
-    } else if (err.response) {
+    console.error("❌ Prompt submission error:", err);
+
+    // 🧩 Distinguish between real failure and slow processing
+    if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+      toast.info("⏳ Please wait — your document is still being created. It will appear shortly.");
+    } 
+    else if (err.response) {
       const { status, data } = err.response;
+
       if (status === 413) {
         toast.error(data.message || "Your input is too long. Please shorten it.");
-      } else if (status === 400) {
+      } 
+      else if (status === 400) {
         toast.error(data.message || "Missing required fields.");
-      } else {
-        toast.error(data.message || "Something went wrong on the server.");
+      } 
+      else if (status === 429) {
+        toast.error("Rate limit reached. Please wait a moment and try again.");
       }
-    } else {
-      // Network disconnected or server still working silently
-      toast.info("⚙️ PDF generation still in progress. Please refresh in a minute.");
+      else if (
+        data.message?.includes("context_length_exceeded") ||
+        data.message?.includes("too large")
+      ) {
+        toast.error("⚠️ This document is too large. Try fewer pages or smaller content.");
+      } 
+      else {
+        // 🧠 Instead of "server error", assume it’s just taking time
+        toast.info("📄 Your document is still generating — it will appear soon.");
+      }
+    } 
+    else {
+      // 🌐 Network disconnection or backend still processing
+      toast.info("⚙️ Document generation still in progress. Please refresh your dashboard shortly.");
     }
 
     // ✅ Still trigger dashboard refresh after short delay
@@ -143,52 +172,122 @@ export default function PromptModal({
 }
 
 
+
+  // async function handleBookSubmit(e) {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setProgress(0);
+  //   setShowGenerating(true);
+  //   onClose();
+
+  //   let interval;
+  //   try {
+  //    let progressValue = 0;
+  //   interval = setInterval(() => {
+  //     // Smooth climb logic with slowdown near the end
+  //     progressValue +=
+  //       progressValue < 60
+  //         ? Math.random() * 4.5 // faster early
+  //         : progressValue < 85
+  //         ? Math.random() * 2.5 // steady middle
+  //         : Math.random() * 1.2; // slow near the end
+
+  //     if (progressValue >= 96) progressValue = 96; // hold near finish
+  //     setProgress(progressValue);
+  //   }, 200);
+  //     const res = await axios.post(
+  //       "https://cre8tlystudio.com/api/books/prompt",
+  //       {
+  //         prompt: text,
+  //         theme,
+  //         pages,
+  //         logo,
+  //         link,
+  //         coverImage: cover,
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${accessToken}` },
+  //       }
+  //     );
+
+  //     clearInterval(interval);
+  //     setProgress(100);
+
+
+  //     toast.success("📚 Your book was generated successfully!");
+  //     setShowGenerating(false);
+
+  //     await new Promise((r) => setTimeout(r, 1000));
+  //     onClose();
+  //   } catch (err) {
+  //     console.error("❌ Book generation error:", err);
+  //     clearInterval(interval);
+  //     setProgress(0);
+  //     setLoading(false);
+  //     setShowGenerating(false);
+  //     toast.error("Something went wrong while generating your book.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
   async function handleBookSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setProgress(0);
-    setShowGenerating(true);
+  e.preventDefault();
+  setLoading(true);
+  setProgress(0);
+  setShowGenerating(true);
+  onClose();
+
+  let interval;
+  try {
+    let progressValue = 0;
+    interval = setInterval(() => {
+      // Smooth climb logic with slowdown near the end
+      progressValue +=
+        progressValue < 60
+          ? Math.random() * 4.5 // faster early
+          : progressValue < 85
+          ? Math.random() * 2.5 // steady middle
+          : Math.random() * 1.2; // slow near the end
+
+      if (progressValue >= 96) progressValue = 96; // hold near finish
+      setProgress(progressValue);
+    }, 200);
+
+    const res = await axios.post(
+      "https://cre8tlystudio.com/api/books/prompt",
+      {
+        prompt: text,
+        theme,
+        pages,
+        logo,
+        link,
+        coverImage: cover,
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        timeout: 180000,
+      }
+    );
+
+    clearInterval(interval);
+    setProgress(100);
+
+    toast.success("📚 Your book was generated successfully!");
+    await new Promise((r) => setTimeout(r, 800));
+    setShowGenerating(false);
     onClose();
-
-    let interval;
-    try {
-      interval = setInterval(() => {
-        setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-      }, 350);
-
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/books/prompt",
-        {
-          prompt: text,
-          theme,
-          pages,
-          logo,
-          link,
-          coverImage: cover,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-
-      clearInterval(interval);
-      setProgress(100);
-      toast.success("📚 Your book was generated successfully!");
-      setShowGenerating(false);
-
-      await new Promise((r) => setTimeout(r, 1000));
-      onClose();
-    } catch (err) {
-      console.error("❌ Book generation error:", err);
-      clearInterval(interval);
-      setProgress(0);
-      setLoading(false);
-      setShowGenerating(false);
-      toast.error("Something went wrong while generating your book.");
-    } finally {
-      setLoading(false);
-    }
+  } catch (err) {
+    console.error("❌ Book generation error:", err);
+    clearInterval(interval);
+    setProgress(0);
+    setLoading(false);
+    setShowGenerating(false);
+    toast.error("Something went wrong while generating your book.");
+  } finally {
+    setLoading(false);
   }
+}
+
 
   return (
     <Transition show={isOpen} appear>

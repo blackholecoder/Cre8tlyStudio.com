@@ -266,10 +266,13 @@ useEffect(() => {
           loading={loading}
           showPreview={showPreview}
           setShowPreview={setShowPreview}
+          setShowGenerating={setShowGenerating}
           bookId={bookId}
           setBookId={() => {}}
           partLocked={partLocked}
           partNumber={partNumber} 
+          onClose={onClose}
+          setProgress={setProgress}
         />
       </div>
     </div>

@@ -97,7 +97,7 @@ export default function CoverUpload({ setCover }) {
           ${
             isLocked
               ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-headerGreen text-black hover:bg-green-500"
+              : "bg-green text-black hover:bg-green"
           }`}
       >
         <ImageIcon size={16} /> Choose File

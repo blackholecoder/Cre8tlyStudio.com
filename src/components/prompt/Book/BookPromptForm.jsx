@@ -152,7 +152,7 @@ export default function BookPromptForm({
 
     const payload = {
       bookId,
-      title,
+      book_name: bookName,
       prompt: text,
       pages,
       link,
@@ -160,6 +160,7 @@ export default function BookPromptForm({
       bookName,
       authorName,
       bookType,
+      title
     };
 
     const res = await axiosInstance.post(

@@ -93,7 +93,50 @@ useEffect(() => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-  <label className="block text-silver mb-2 font-medium">
+        
+         {/* Pages */}
+      <div>
+        <label className="block text-silver mb-2 font-medium">
+          Number of Pages (25 max)
+        </label>
+
+        <div className="relative w-full max-w-xs">
+          <input
+            type="number"
+            min="1"
+            max="25"
+            value={pages ?? ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "") setPages("");
+              else setPages(Math.min(25, Math.max(1, Number(value))));
+            }}
+            className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
+          />
+
+          <div className="absolute inset-y-0 right-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                setPages((prev) => Math.max(1, Number(prev || 1) - 1))
+              }
+              className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
+            >
+              ◀
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setPages((prev) => Math.min(25, Number(prev || 1) + 1))
+              }
+              className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
+            >
+              ▶
+            </button>
+          </div>
+        </div>
+      </div>
+  <label className="block text-silver mb-2 mt-4 font-medium">
     Document Title
   </label>
   <input
@@ -166,48 +209,7 @@ useEffect(() => {
         setLogoPreview={setLogoPreview}
       />
 
-      {/* Pages */}
-      <div>
-        <label className="block text-silver mb-2 font-medium">
-          Number of Pages (25 max)
-        </label>
-
-        <div className="relative w-full max-w-xs">
-          <input
-            type="number"
-            min="1"
-            max="25"
-            value={pages ?? ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === "") setPages("");
-              else setPages(Math.min(25, Math.max(1, Number(value))));
-            }}
-            className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
-          />
-
-          <div className="absolute inset-y-0 right-2 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                setPages((prev) => Math.max(1, Number(prev || 1) - 1))
-              }
-              className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
-            >
-              ◀
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setPages((prev) => Math.min(25, Number(prev || 1) + 1))
-              }
-              className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
-            >
-              ▶
-            </button>
-          </div>
-        </div>
-      </div>
+     
       <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} />
 
       {/* Theme Selector */}

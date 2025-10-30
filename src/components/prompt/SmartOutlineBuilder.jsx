@@ -96,7 +96,7 @@ export default function SmartPromptBuilder({ onPromptReady }) {
         <button
           onClick={handleGeneratePrompt}
           disabled={loading}
-          className="flex-1 px-6 py-2 bg-headerGreen text-black font-semibold rounded hover:bg-green-500 transition"
+          className="flex-1 px-6 py-2 bg-green text-black font-semibold rounded hover:bg-green-500 transition"
         >
           {loading ? "Generating..." : "Generate"}
         </button>

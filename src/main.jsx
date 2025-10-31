@@ -37,6 +37,8 @@ import SettingsPage from "./sections/SettingsPage.jsx";
 import DashboardLayout from "./components/layouts/DashboardLayout.jsx";
 import PromptMemoryDashboard from "./components/prompt/PromptMemoryDashboard.jsx";
 import Inbox from "./sections/Inbox.jsx";
+import useMaintenance from "./settings/UseMaintenance.jsx";
+import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -212,6 +214,16 @@ const AnimatedRoutes = () => {
 
 // 🔹 Root wrapper with Router outside (fixes useLocation error)
 const RootApp = () => {
+
+  const { maintenance, loading } = useMaintenance();
+
+  if (loading) return null; // optional spinner
+
+  if (maintenance) {
+    // 🛑 Show only this, hide Nav, Routes, etc.
+    return <MaintenanceScreen />;
+  }
+
   return (
     <Router>
       <AuthProviderWithRouter>

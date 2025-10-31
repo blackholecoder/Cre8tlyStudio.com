@@ -6,6 +6,8 @@ import {
 } from "../../api/leadMagnets";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Highlight from "@tiptap/extension-highlight";
+
 import Image from "@tiptap/extension-image";
 import { colorThemes, fontThemes } from "../../constants";
 
@@ -20,6 +22,8 @@ export default function EditorModal({
   const [meta, setMeta] = useState(null);
   const [editableHtml, setEditableHtml] = useState("");
   const [iframeUrl, setIframeUrl] = useState("");
+  const [highlightColor, setHighlightColor] = useState("#fff330");
+
 
 
   
@@ -27,7 +31,13 @@ export default function EditorModal({
   const iframeRef = useRef(null);
 
   const editor = useEditor({
-    extensions: [StarterKit, Image],
+    extensions: [
+    StarterKit,
+    Image,
+    Highlight.configure({
+      multicolor: true, // ✅ allows color parameter to work
+    }),
+  ],
     content: "",
     editable: true,
   });
@@ -243,6 +253,32 @@ pre code {
 `;
         iframeDoc.head.appendChild(responsiveWidthStyle);
 
+        const darkPreviewStyle = iframeDoc.createElement("style");
+darkPreviewStyle.id = "dark-preview-text";
+darkPreviewStyle.innerHTML = `
+  /* 🧠 Only affect text, not the background */
+  body, .page-inner, p, span, div, li, strong, b, h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* Keep background untouched (retain the original white page color) */
+  .page, .cover-page {
+    background-color: inherit !important;
+  }
+
+  /* Highlight and links remain readable */
+  a {
+    color: #4FC3F7 !important;
+  }
+  mark {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+`;
+iframeDoc.head.appendChild(darkPreviewStyle);
+
+
         // ✅ Force body re-render with same content
         const currentHTML = iframeDoc.body.innerHTML;
         iframeDoc.body.innerHTML = currentHTML;
@@ -254,6 +290,7 @@ pre code {
     };
 
     iframe.addEventListener("load", applyFontAfterLoad);
+    
     return () => iframe.removeEventListener("load", applyFontAfterLoad);
   }, [meta?.theme, iframeUrl]);
 
@@ -375,10 +412,38 @@ pre code {
       Replace All
     </button>
   </div>
+  <div className="flex items-center gap-3">
+    <label className="text-sm text-gray-300">Highlight color:</label>
+    <input
+      type="color"
+      value={highlightColor}
+      onChange={(e) => setHighlightColor(e.target.value)}
+      className="w-9 h-9 rounded-lg cursor-pointer shadow-inner shadow-black/40 bg-[#1a1a1a] hover:scale-105 transition-transform duration-150"
+
+    />
+    <button
+      onClick={() =>
+        editor.chain().focus().toggleHighlight({ color: highlightColor }).run()
+      }
+      className="px-5 py-2.5 rounded-lg bg-[#1e1e1e] text-white font-medium border border-gray-700 hover:border-emerald-400 hover:text-emerald-300 transition-all duration-200 shadow-sm"
+
+
+    >
+      Highlight
+    </button>
+  </div>
 </div>
+
+
 
           {/* --- Buttons --- */}
           <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2 w-full">
+            {/* <button
+  onClick={() => editor.chain().focus().toggleHighlight().run()}
+  className="px-3 py-2 bg-yellow text-black font-semibold rounded-md hover:bg-yellow"
+>
+  Highlight
+</button> */}
             <button
               className="px-4 py-2 bg-gray-700 rounded-lg w-full sm:w-auto"
               onClick={onClose}

@@ -3,7 +3,7 @@
     "titleBar.activeBackground": "#0652DD",
     "titleBar.activeForeground": "#FFFFFF",
     "titleBar.inactiveBackground": "#0652DD",
-    "titleBar.inactiveForeground": "#CCCCCC",
+    "titleBar.inactiveForeground": "#0652DD",
     // "editor.background": "#1E1E2E",
     "editor.foreground": "#F8F8F2"
   }

@@ -307,6 +307,19 @@ pre code {
     };
   }, [editor, iframeUrl]);
 
+   const [findText, setFindText] = useState("");
+   const [replaceText, setReplaceText] = useState("");
+
+   function handleFindReplaceAll() {
+  if (!editor || !findText) return;
+  const html = editor.getHTML();
+  const escaped = findText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex chars
+  const regex = new RegExp(escaped, "gi"); // global + case-insensitive
+  const newHtml = html.replace(regex, replaceText);
+  editor.commands.setContent(newHtml);
+  toast.success(`Replaced all "${findText}" with "${replaceText}"`);
+}
+
   return (
     <Dialog open={open} onClose={onClose} className="fixed inset-0 z-50">
       {/* Background overlay */}
@@ -336,6 +349,33 @@ pre code {
               }}
             />
           </div>
+
+          {/* 🔍 Find & Replace bar */}
+<div className="flex flex-wrap gap-2 items-center justify-between border border-gray-800 rounded-lg p-3 bg-[#1b1b1b]">
+  <div className="flex gap-2 items-center flex-wrap">
+    <input
+      type="text"
+      placeholder="Find..."
+      value={findText}
+      onChange={(e) => setFindText(e.target.value)}
+      className="px-3 py-2 rounded-md bg-[#0f0f10] text-white border border-gray-700 w-40 sm:w-56"
+    />
+    <input
+      type="text"
+      placeholder="Replace with..."
+      value={replaceText}
+      onChange={(e) => setReplaceText(e.target.value)}
+      className="px-3 py-2 rounded-md bg-[#0f0f10] text-white border border-gray-700 w-40 sm:w-56"
+    />
+    <button
+      onClick={handleFindReplaceAll}
+      disabled={!findText}
+      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
+    >
+      Replace All
+    </button>
+  </div>
+</div>
 
           {/* --- Buttons --- */}
           <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2 w-full">

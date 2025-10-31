@@ -75,7 +75,7 @@ export default function MagnetGrid({
 
           {/* Title */}
           <h3 className="text-white text-sm font-semibold mt-2 truncate">
-            {m.title || "Untitled Magnet"}
+            {m.title || "Digital Asset"}
           </h3>
 
           {/* Theme + Prompt */}

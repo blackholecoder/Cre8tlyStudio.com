@@ -48,7 +48,7 @@ export default function MagnetCardList({
           {/* Title + Theme */}
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-white text-sm font-semibold truncate max-w-[70%]">
-              {m.title || "Untitled Magnet"}
+              {m.title || "Digital Asset"}
             </h3>
             {m.theme ? (
               <span

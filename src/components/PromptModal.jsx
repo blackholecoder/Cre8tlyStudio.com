@@ -48,6 +48,7 @@ export default function PromptModal({
       setLogo(null);
       setLogoPreview(null);
       setLink("");
+      setCover(null);
       setProgress(0);
       setShowPreview(false);
       setPhase("questions"); // 👈 reset to Smart Builder every time modal closes

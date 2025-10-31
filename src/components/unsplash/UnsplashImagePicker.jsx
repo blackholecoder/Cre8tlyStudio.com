@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "../../api/axios";
+import { toast } from "react-toastify";
 
 export default function UnsplashImagePicker({ onSelect }) {
   const [query, setQuery] = useState("");
@@ -21,12 +22,25 @@ export default function UnsplashImagePicker({ onSelect }) {
       );
 
       const results = res.data.results || res.data;
+      if (!results || results.length === 0) {
+        toast.info("No results found", {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: true,
+          theme: "dark",
+        });
+      }
       setImages((prev) => (append ? [...prev, ...results] : results));
       setHasMore(results.length > 0);
       setPage(newPage);
     } catch (err) {
       console.error("Unsplash fetch failed:", err);
-      alert("Failed to fetch images");
+      toast.error("Failed to fetch images. Please try again.", {
+        position: "top-right",
+        autoClose: 2500,
+        hideProgressBar: true,
+        theme: "dark",
+      });
     } finally {
       setLoading(false);
     }

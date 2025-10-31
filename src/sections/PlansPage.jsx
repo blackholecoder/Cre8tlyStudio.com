@@ -55,7 +55,7 @@ export default function PlansPage() {
             <div>
               <h2 className="text-3xl font-semibold mb-3 text-white design-text">Basic Creator</h2>
               <p className="text-gray-400 mb-4 text-sm leading-relaxed">
-                Includes <span className="text-white font-medium">5 lead magnet slots</span> and access to all standard templates.
+                Includes <span className="text-white font-medium">5 digital asset slots</span> and access to all standard templates.
                 Turn ideas into irresistible lead magnets fast.
               </p>
               <button

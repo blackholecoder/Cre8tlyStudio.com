@@ -1,18 +1,28 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
+
 
 export default function NewContentModal({ onCreate, onClose }) {
   const [contentType, setContentType] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleContinue() {
-    if (!contentType) {
-      alert("Please select a document type.");
-      return;
-    }
-
-    setLoading(true);
-    onCreate({ contentType });
+  if (!contentType) {
+    toast.error("Please select a document type.", {
+      position: "top-right",
+      autoClose: 2500,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
+    return;
   }
+
+  setLoading(true);
+  onCreate({ contentType });
+}
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">

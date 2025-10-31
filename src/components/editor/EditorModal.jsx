@@ -11,6 +11,18 @@ import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import { colorThemes, fontThemes } from "../../constants";
 
+function isDarkColor(hex) {
+  if (!hex) return false;
+  const h = hex.replace("#", "");
+  const r = parseInt(h.length === 3 ? h[0] + h[0] : h.substring(0, 2), 16);
+  const g = parseInt(h.length === 3 ? h[1] + h[1] : h.substring(2, 4), 16);
+  const b = parseInt(h.length === 3 ? h[2] + h[2] : h.substring(4, 6), 16);
+  const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return brightness < 0.5; // true = dark
+}
+
+
+
 export default function EditorModal({
   leadMagnetId,
   open,
@@ -75,6 +87,33 @@ export default function EditorModal({
   }, [editableHtml]);
 
   useEffect(() => {
+  const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
+  if (!doc) return;
+  doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
+}, [highlightColor, iframeUrl]);
+
+useEffect(() => {
+  const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document;
+  if (!doc) return;
+   const bg = (colorThemes[meta?.bgTheme]?.background || "#ffffff").trim();
+  const dark = isDarkColor(bg);
+
+  // normal text adjusts automatically
+  doc.documentElement.style.setProperty("--text-color", dark ? "#ffffff" : "#000000");
+
+  // highlight background stays your selected color
+  doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
+
+  // highlighted text is always black for best readability
+  doc.documentElement.style.setProperty("--hl-text", "#000000");
+}, [meta?.bgTheme, highlightColor, iframeUrl]);
+
+
+
+
+
+
+  useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe || !meta?.theme) return;
 
@@ -86,6 +125,21 @@ export default function EditorModal({
       if (!iframeDoc || !iframeDoc.body) return;
 
       try {
+
+        const bgColor = (colorThemes[meta?.bgTheme]?.background || "#ffffff").trim();
+const isDark = isDarkColor(bgColor);
+
+// Normal text color depends on theme
+iframeDoc.documentElement.style.setProperty("--text-color", isDark ? "#ffffff" : "#000000");
+
+// Highlight background uses selected color
+iframeDoc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
+
+// Highlight text is always black for proper contrast on light backgrounds
+iframeDoc.documentElement.style.setProperty("--hl-text", "#000000");
+
+
+
         const res = await fetch(`${import.meta.env.VITE_API_URL}${selectedFont.file}`);
         const buf = await res.arrayBuffer();
         const base64Font = btoa(
@@ -258,9 +312,9 @@ darkPreviewStyle.id = "dark-preview-text";
 darkPreviewStyle.innerHTML = `
   /* 🧠 Only affect text, not the background */
   body, .page-inner, p, span, div, li, strong, b, h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-  }
+  color: var(--text-color, #000000) !important;
+  -webkit-text-fill-color: var(--text-color, #000000) !important;
+}
 
   /* Keep background untouched (retain the original white page color) */
   .page, .cover-page {
@@ -272,11 +326,17 @@ darkPreviewStyle.innerHTML = `
     color: #4FC3F7 !important;
   }
   mark {
-  color: #000 !important;
-  -webkit-text-fill-color: #000 !important;
+  background-color: var(--hl, #fff330) !important;
+  color: var(--hl-text, #000000) !important;
+  -webkit-text-fill-color: var(--hl-text, #000000) !important;
+  border-radius: 2px;
+  padding: 0 2px;
 }
 `;
 iframeDoc.head.appendChild(darkPreviewStyle);
+// set initial highlight color into the iframe
+iframeDoc.documentElement.style.setProperty("--hl", (typeof highlightColor === "string" && highlightColor) ? highlightColor : "#fff330");
+
 
 
         // ✅ Force body re-render with same content
@@ -418,7 +478,7 @@ iframeDoc.head.appendChild(darkPreviewStyle);
       type="color"
       value={highlightColor}
       onChange={(e) => setHighlightColor(e.target.value)}
-      className="w-9 h-9 rounded-lg cursor-pointer shadow-inner shadow-black/40 bg-[#1a1a1a] hover:scale-105 transition-transform duration-150"
+      className="w-9 h-9 rounded-lg cursor-pointer  shadow-inner shadow-black/40 bg-[#1a1a1a] hover:scale-105 transition-transform duration-150"
 
     />
     <button
@@ -426,7 +486,6 @@ iframeDoc.head.appendChild(darkPreviewStyle);
         editor.chain().focus().toggleHighlight({ color: highlightColor }).run()
       }
       className="px-5 py-2.5 rounded-lg bg-[#1e1e1e] text-white font-medium border border-gray-700 hover:border-emerald-400 hover:text-emerald-300 transition-all duration-200 shadow-sm"
-
 
     >
       Highlight
@@ -438,12 +497,6 @@ iframeDoc.head.appendChild(darkPreviewStyle);
 
           {/* --- Buttons --- */}
           <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2 w-full">
-            {/* <button
-  onClick={() => editor.chain().focus().toggleHighlight().run()}
-  className="px-3 py-2 bg-yellow text-black font-semibold rounded-md hover:bg-yellow"
->
-  Highlight
-</button> */}
             <button
               className="px-4 py-2 bg-gray-700 rounded-lg w-full sm:w-auto"
               onClick={onClose}

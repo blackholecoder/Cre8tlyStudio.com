@@ -276,6 +276,14 @@ select.dropdown-scroll:focus option {
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+.konvajs-content canvas:focus {
+  outline: none !important;
+}
+
+.konva-transformer-anchor {
+  filter: drop-shadow(0 0 3px #00e5ff);
+}
    
 .prompt-editor .ql-container {
   height: 100% !important;
@@ -403,6 +411,49 @@ select.dropdown-scroll:focus option {
     rgba(255, 255, 255, 0.0) 100%
   );
 }
+
+/* 🎚️ Cre8tly Studio Slider — clean, compact, and consistent */
+.cre8tly-slider {
+  @apply appearance-none w-full h-1 bg-gray-600 rounded-full cursor-pointer;
+  accent-color: #00b4ff; /* Fallback accent color */
+}
+
+.cre8tly-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border: 2px solid #00b4ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.cre8tly-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.cre8tly-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border: 2px solid #00b4ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.cre8tly-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}
+
+.cre8tly-slider::-webkit-slider-runnable-track,
+.cre8tly-slider::-moz-range-track {
+  height: 2px;
+  background: #555;
+  border-radius: 10px;
+}
+
 
 
 

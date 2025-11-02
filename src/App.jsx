@@ -3,7 +3,7 @@ import Nav from "./components/Nav";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Lenis from '@studio-freight/lenis'
-import CustomCursor from "./components/CustomCursor";
+// import CustomCursor from "./components/CustomCursor";
 
 
 const App = () => {
@@ -56,7 +56,7 @@ useEffect(() => {
   // 🌐 Normal web visitors get the full landing site
   return (
     <main className="relative min-h-screen bg-transparent">
-      <CustomCursor />
+      {/* <CustomCursor /> */}
       <Nav />
       <section id="landing" className="padding">
         <Landing />

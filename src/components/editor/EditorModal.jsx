@@ -7,12 +7,10 @@ import {
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
-
 import Image from "@tiptap/extension-image";
 import { colorThemes, fontThemes } from "../../constants";
-import PDFOverlayCanvas from "./PDFOverlayCanvas";
-import { Square, Circle, ArrowRight, Type } from "lucide-react";
-import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+
 
 function isDarkColor(hex) {
   if (!hex) return false;
@@ -22,56 +20,6 @@ function isDarkColor(hex) {
   const b = parseInt(h.length === 3 ? h[2] + h[2] : h.substring(4, 6), 16);
   const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return brightness < 0.5; // true = dark
-}
-
-function embedShapesIntoHTML(htmlString, shapes) {
-  if (!shapes || !shapes.length) return htmlString;
-
-  const svgShapes = shapes.map((s) => {
-    switch (s.type) {
-      case "rect":
-        const rx = s.cornerRadius ? `rx="${s.cornerRadius}" ry="${s.cornerRadius}"` : "";
-        return `<rect x="${s.x}" y="${s.y}" width="${s.width}" height="${s.height}" 
-          fill="${s.fill || "transparent"}" stroke="${s.stroke || "transparent"}"
-          stroke-width="${s.strokeWidth || 1}" opacity="${s.opacity || 1}" ${rx} />`;
-
-      case "circle":
-        return `<ellipse cx="${s.x}" cy="${s.y}" rx="${s.radiusX || s.radius}" ry="${s.radiusY || s.radius}"
-          fill="${s.fill || "transparent"}" stroke="${s.stroke || "transparent"}"
-          stroke-width="${s.strokeWidth || 1}" opacity="${s.opacity || 1}" />`;
-
-      case "arrow":
-        const [x2, y2] = s.points?.slice(-2) || [100, 0];
-        return `<line x1="${s.x}" y1="${s.y}" x2="${s.x + x2}" y2="${s.y + y2}"
-          stroke="${s.stroke || "#000"}" stroke-width="${s.strokeWidth || 2}"
-          marker-end="url(#cre8tly-arrowhead)" opacity="${s.opacity || 1}" />`;
-
-      case "text":
-        return `<text x="${s.x}" y="${s.y}" font-size="${s.fontSize || 18}"
-          font-family="${s.fontFamily || "Arial"}" fill="${s.fill || "#000"}"
-          opacity="${s.opacity || 1}">${s.text || ""}</text>`;
-
-      default:
-        return "";
-    }
-  }).join("\n");
-
-  const svgLayer = `
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"
-  id="cre8tly-overlay-svg">
-  <defs>
-    <marker id="cre8tly-arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
-    </marker>
-  </defs>
-  ${svgShapes}
-</svg>`;
-
-  // Insert before </body>
-  return htmlString.includes("</body>")
-    ? htmlString.replace("</body>", `${svgLayer}</body>`)
-    : htmlString + svgLayer;
 }
 
 
@@ -89,6 +37,46 @@ export default function EditorModal({
   const [highlightColor, setHighlightColor] = useState("#fff330");
   const [designMode, setDesignMode] = useState(false);
   const [shapes, setShapes] = useState([]);
+  const iconColors = "text-white";
+  const iconSize = 16;
+  const overlayRootRef = useRef(null);
+  const iframeRef = useRef(null);
+  const [selectedShape, setSelectedShape] = useState(null);
+const [panelOpen, setPanelOpen] = useState(false);
+
+
+
+
+
+useEffect(() => {
+  const iframe = iframeRef.current;
+  const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
+  if (!iframeDoc) return;
+
+  const blockers = iframeDoc.querySelectorAll(".page, .page-inner, .cover-page, .footer-link");
+  blockers.forEach((el) => (el.style.pointerEvents = designMode ? "none" : "auto"));
+}, [designMode, iframeUrl]);
+
+
+
+const iframeDoc = iframeRef.current?.contentDocument;
+if (iframeDoc) {
+  const host = iframeDoc.getElementById("cre8tly-overlay-container");
+  const stageHost = iframeDoc.getElementById("cre8tly-overlay-stage");
+  if (host) {
+    host.style.position = "absolute";
+    host.style.top = "0";
+    host.style.left = "0";
+    host.style.width = "100%";
+    host.style.height = "100%";
+    host.style.zIndex = "2147483647";
+    host.style.pointerEvents = "auto"; // 👈 always allow interaction
+    host.style.background = "transparent";
+  }
+  if (stageHost) {
+    stageHost.style.pointerEvents = "auto"; // 👈 ensures Konva gets events
+  }
+}
 
   const handleHighlightColorChange = (e) => {
     const c = e.target.value;
@@ -97,86 +85,13 @@ export default function EditorModal({
     // If selection already has highlight, update it; otherwise set it so the user sees the color live
     const chain = editor.chain().focus();
     // Try updating attributes on existing highlight first (no-op if none)
-    chain.updateAttributes('highlight', { color: c }).run();
+    chain.updateAttributes("highlight", { color: c }).run();
     // Ensure the selection (or stored mark) shows the color even if it wasn't highlighted yet
     editor.chain().focus().setHighlight({ color: c }).run();
   };
 
-  {
-    designMode && (
-      <div className="flex items-center gap-3 bg-[#2a2a2a]/90 backdrop-blur-md border border-gray-700/60 rounded-xl px-4 py-2 shadow-lg relative">
-        {[
-          {
-            icon: Square,
-            color: "bg-emerald-500 hover:bg-emerald-600",
-            title: "Add Rectangle",
-            type: "rect",
-          },
-          {
-            icon: Circle,
-            color: "bg-blue-400 hover:bg-blue-500",
-            title: "Add Circle",
-            type: "circle",
-          },
-          {
-            icon: ArrowRight,
-            color: "bg-yellow-400 hover:bg-yellow-500",
-            title: "Add Arrow",
-            type: "arrow",
-          },
-          {
-            icon: Type,
-            color: "bg-pink-400 hover:bg-pink-500",
-            title: "Add Text",
-            type: "text",
-          },
-        ].map(({ icon: Icon, color, title, type }) => (
-          <TooltipButton
-            key={type}
-            Icon={Icon}
-            color={color}
-            title={title}
-            onClick={() =>
-              window.dispatchEvent(
-                new CustomEvent("addShape", { detail: type })
-              )
-            }
-          />
-        ))}
-      </div>
-    );
-  }
+ 
 
-  function TooltipButton({ Icon, color, title, onClick }) {
-    const [show, setShow] = useState(false);
-    return (
-      <div
-        className="relative flex items-center justify-center"
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-      >
-        <button
-          onClick={onClick}
-          className={`w-8 h-8 flex items-center justify-center rounded-md shadow-sm ${color}`}
-        >
-          <Icon size={18} className="text-black" />
-        </button>
-        {show && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            transition={{ duration: 0.15 }}
-            className="absolute -top-8 px-2 py-1 bg-black/80 text-white text-xs rounded-md whitespace-nowrap pointer-events-none"
-          >
-            {title}
-          </motion.div>
-        )}
-      </div>
-    );
-  }
-
-  const iframeRef = useRef(null);
 
   const editor = useEditor({
     extensions: [
@@ -205,18 +120,7 @@ export default function EditorModal({
     setSaving(true);
     try {
       const updatedHtml = editor?.getHTML() || editableHtml;
-
-      // 🔹 Retrieve shapes from localStorage
-    const shapes = JSON.parse(localStorage.getItem("cre8tly_canvas_shapes") || "[]");
-
-     // 🔹 Merge shapes as SVG overlay into HTML
-    const htmlWithShapes = embedShapesIntoHTML(updatedHtml, shapes);
-
-      const data = await commitLeadMagnetEdit(leadMagnetId, token, htmlWithShapes);
-
-      localStorage.removeItem("cre8tly_canvas_shapes");
-
-
+      const data = await commitLeadMagnetEdit(leadMagnetId, token, updatedHtml);
       onCommitted(data.pdf_url);
       onClose();
     } finally {
@@ -241,67 +145,39 @@ export default function EditorModal({
     doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
   }, [highlightColor, iframeUrl]);
 
-  // useEffect(() => {
-  //   const doc =
-  //     iframeRef.current?.contentDocument ||
-  //     iframeRef.current?.contentWindow?.document;
+  useEffect(() => {
+    const doc =
+      iframeRef.current?.contentDocument ||
+      iframeRef.current?.contentWindow?.document;
+    if (!doc) return;
 
-  //   if (!doc) return;
+    const bgThemeName = meta?.bgTheme?.toLowerCase() || "";
+    const bg = (colorThemes[bgThemeName]?.background || "#ffffff").trim();
 
+    // ✅ Explicitly treat known dark themes as dark
+    const darkThemes = [
+      "dark",
+      "royal",
+      "navy",
+      "graphite",
+      "purple",
+      "lavender",
+    ];
+    const dark = darkThemes.includes(bgThemeName) || isDarkColor(bg);
+    const textColor = dark ? "#ffffff" : "#000000"; // ✅ You were missing this line
 
-  //   const bg = (colorThemes[meta?.bgTheme]?.background || "#ffffff").trim();
-  //   const dark = isDarkColor(bg);
+    // ✅ Apply the color variables
+    doc.documentElement.style.setProperty("--text-color", textColor);
+    doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
+    doc.documentElement.style.setProperty("--hl-text", "#000000");
 
-  //   console.log("🎨 BG Theme:", meta?.bgTheme);
-  // console.log("🎨 Resolved background:", bg);
-  // console.log("🎨 isDarkColor() →", dark);
-  // console.log("🎨 textColor set →", textColor);
+    // ✅ Add a diagnostic style block to enforce and visualize
+    const existing = doc.getElementById("color-fix");
+    if (existing) existing.remove();
 
-  // const appliedBefore = doc.documentElement.style.getPropertyValue("--text-color");
-  // console.log("🧩 Previously applied --text-color:", appliedBefore || "(none)");
-
-  //   // normal text adjusts automatically
-  //   doc.documentElement.style.setProperty(
-  //     "--text-color",
-  //     dark ? "#ffffff" : "#000000"
-  //   );
-    
-
-  //   // highlight background stays your selected color
-  //   doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
-
-  //   // highlighted text is always black for best readability
-  //   doc.documentElement.style.setProperty("--hl-text", "#000000");
-  // }, [meta?.bgTheme, highlightColor, iframeUrl]);
-
-
-useEffect(() => {
-  const doc =
-    iframeRef.current?.contentDocument ||
-    iframeRef.current?.contentWindow?.document;
-  if (!doc) return;
-
-  const bgThemeName = meta?.bgTheme?.toLowerCase() || "";
-const bg = (colorThemes[bgThemeName]?.background || "#ffffff").trim();
-
-// ✅ Explicitly treat known dark themes as dark
-const darkThemes = ["dark", "royal", "navy", "graphite", "purple", "lavender"];
-const dark = darkThemes.includes(bgThemeName) || isDarkColor(bg);
-  const textColor = dark ? "#ffffff" : "#000000"; // ✅ You were missing this line
-
-
-  // ✅ Apply the color variables
-  doc.documentElement.style.setProperty("--text-color", textColor);
-  doc.documentElement.style.setProperty("--hl", highlightColor || "#fff330");
-  doc.documentElement.style.setProperty("--hl-text", "#000000");
-
-  // ✅ Add a diagnostic style block to enforce and visualize
-  const existing = doc.getElementById("color-fix");
-  if (existing) existing.remove();
-
-  const colorFix = doc.createElement("style");
-  colorFix.id = "color-fix";
-  colorFix.innerHTML = `
+    const colorFix = doc.createElement("style");
+    colorFix.id = "color-fix";
+    colorFix.innerHTML = `
     body, .page-inner, .page, .cover-page,
     h1, h2, h3, h4, h5, h6,
     p, div, span, strong, b, em, li {
@@ -309,18 +185,9 @@ const dark = darkThemes.includes(bgThemeName) || isDarkColor(bg);
       -webkit-text-fill-color: var(--text-color, ${textColor}) !important;
     }
   `;
-  doc.head.appendChild(colorFix);
+    doc.head.appendChild(colorFix);
 
-  
-  // 🧩 Check computed color
-  const computed = doc.defaultView.getComputedStyle(doc.body).color;
-  console.log("✅ Computed color in iframe body:", computed);
-}, [meta?.bgTheme, highlightColor, iframeUrl]);
-
-
-
-
-
+  }, [meta?.bgTheme, highlightColor, iframeUrl]);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -559,10 +426,11 @@ pre code {
         );
 
         // ✅ Force body re-render with same content
-        const currentHTML = iframeDoc.body.innerHTML;
-        iframeDoc.body.innerHTML = currentHTML;
-        console.log("🎯 Font applied & body refreshed:", selectedFont.name);
-        console.log("🧱 BODY HTML:", iframeDoc.body.innerHTML.slice(0, 500));
+        // const currentHTML = iframeDoc.body.innerHTML;
+        // iframeDoc.body.innerHTML = currentHTML;
+        try {
+          mountOverlayOnce();
+        } catch {}
       } catch (err) {
         console.error("⚠️ Font apply failed:", err);
       }
@@ -572,6 +440,15 @@ pre code {
 
     return () => iframe.removeEventListener("load", applyFontAfterLoad);
   }, [meta?.theme, iframeUrl]);
+
+useEffect(() => {
+  const iframeDoc = iframeRef.current?.contentDocument;
+  if (!iframeDoc) return;
+
+  const overlay = iframeDoc.getElementById("cre8tly-overlay-container");
+  if (overlay) overlay.style.pointerEvents = designMode ? "auto" : "none";
+}, [designMode]);
+
 
   useEffect(() => {
     if (!editor || !iframeRef.current) return;
@@ -635,9 +512,7 @@ pre code {
     editor.commands.setContent(newHtml);
     toast.success(`Replaced all "${findText}" with "${replaceText}"`);
   }
-
-
-
+  
 
   return (
     <Dialog open={open} onClose={onClose} className="fixed inset-0 z-50">
@@ -647,87 +522,6 @@ pre code {
       {/* Center modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
         <DialogPanel className="w-full max-w-[1650px] bg-[#0f0f10] rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-6 overflow-y-auto max-h-[95vh]">
-          <div className="flex justify-end items-center mb-2 gap-3">
-            <button
-  onClick={() => {
-    // 🧹 Clear from local storage
-    localStorage.removeItem("cre8tly_canvas_shapes");
-    
-    // 🧹 Reset state in parent
-    setShapes([]);
-
-    // 🧹 Notify any open canvas to clear its drawings
-    window.dispatchEvent(new CustomEvent("clearCanvasShapes"));
-
-    // Optional: give feedback
-    console.log("🧼 Cleared all overlay shapes");
-  }}
-  className="mt-2 text-xs text-gray-400 hover:text-red-400 transition"
->
-  Clear Design
-</button>
-            {designMode && (
-              <div className="flex items-center gap-2 bg-[#2a2a2a]/90 backdrop-blur-md border border-gray-700/60 rounded-xl px-4 py-2 shadow-lg">
-                <button
-                  onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("addShape", { detail: "rect" })
-                    )
-                  }
-                  className="w-8 h-8 flex items-center justify-center bg-black rounded-md shadow-sm"
-                  title="Add Rectangle"
-                >
-                  <Square size={18} className="text-hotPink" />
-                </button>
-
-                <button
-                  onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("addShape", { detail: "circle" })
-                    )
-                  }
-                  className="w-8 h-8 flex items-center justify-center bg-black rounded-md shadow-sm"
-                  title="Add Circle"
-                >
-                  <Circle size={18} className="text-hotPink" />
-                </button>
-
-                <button
-                  onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("addShape", { detail: "arrow" })
-                    )
-                  }
-                  className="w-8 h-8 flex items-center justify-center bg-black rounded-md shadow-sm"
-                  title="Add Arrow"
-                >
-                  <ArrowRight size={18} className="text-hotPink" />
-                </button>
-
-                <button
-                  onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("addShape", { detail: "text" })
-                    )
-                  }
-                  className="w-8 h-8 flex items-center justify-center bg-black rounded-md shadow-sm"
-                  title="Add Text"
-                >
-                  <Type size={18} className="text-hotPink" />
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={() => setDesignMode(!designMode)}
-              className={`px-3 py-2 rounded-md ${
-                designMode ? "bg-royalPurple" : "bg-gray-600"
-              } text-white`}
-            >
-              {designMode ? "Exit Design Mode" : "Design Mode"}
-            </button>
-          </div>
-
           {/* --- Editor + Preview --- */}
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 w-full">
             {/* ✏️ Left: Editor */}
@@ -737,25 +531,32 @@ pre code {
 
             {/* 📄 Right: Preview */}
             <div className="w-full flex-1 relative min-h-[50vh] lg:h-[70vh] rounded-xl overflow-hidden">
-              
               <iframe
-  ref={iframeRef}
-  title="preview"
-  src={iframeUrl}
-  className="w-full flex-1 border border-gray-800 rounded-xl overflow-hidden min-h-[50vh] lg:h-[70vh]"
-  sandbox="allow-same-origin allow-popups allow-forms allow-scripts"
-  style={{
-    width: "100%",
-    borderRadius: "0.75rem",
-    background: colorThemes[meta?.bgTheme]?.background || "#fff",
-    color: ["dark", "royal", "navy", "graphite", "purple", "lavender"].includes(
-      meta?.bgTheme?.toLowerCase?.() || ""
-    )
-      ? "#ffffff"
-      : "#000000",
-  }}
-/>
-              {designMode && <PDFOverlayCanvas shapes={shapes} setShapes={setShapes} />}
+                ref={iframeRef}
+                title="preview"
+                src={iframeUrl}
+                allowTransparency={true}
+                className="w-full flex-1 border border-gray-800 rounded-xl overflow-hidden min-h-[50vh] lg:h-[70vh]"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-pointer-lock allow-popups-to-escape-sandbox allow-modals"
+
+                style={{
+                  position: "relative",
+                  zIndex: 0, // 👈 ensures overlay (z-index 2147483647) sits above
+                  width: "100%",
+                  borderRadius: "0.75rem",
+                  background: colorThemes[meta?.bgTheme]?.background || "#fff",
+                  color: [
+                    "dark",
+                    "royal",
+                    "navy",
+                    "graphite",
+                    "purple",
+                    "lavender",
+                  ].includes(meta?.bgTheme?.toLowerCase?.() || "")
+                    ? "#ffffff"
+                    : "#000000",
+                }}
+              />
             </div>
           </div>
 
@@ -789,7 +590,7 @@ pre code {
               <input
                 type="color"
                 value={highlightColor}
-                 onInput={handleHighlightColorChange}
+                onInput={handleHighlightColorChange}
                 className="w-9 h-9 rounded-lg cursor-pointer  shadow-inner shadow-black/40 bg-[#1a1a1a] hover:scale-105 transition-transform duration-150"
               />
               <button

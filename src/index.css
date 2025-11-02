@@ -454,7 +454,11 @@ select.dropdown-scroll:focus option {
   border-radius: 10px;
 }
 
-
+.konvajs-content {
+  position: absolute !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+}
 
 
  html, body, #root {

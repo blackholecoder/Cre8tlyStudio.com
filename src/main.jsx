@@ -39,6 +39,7 @@ import PromptMemoryDashboard from "./components/prompt/PromptMemoryDashboard.jsx
 import Inbox from "./sections/Inbox.jsx";
 import useMaintenance from "./settings/UseMaintenance.jsx";
 import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
+import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -63,6 +64,7 @@ const AnimatedRoutes = () => {
 
         {/* Redirect old /home to / */}
         <Route path="/home" element={<Navigate to="/" replace />} />
+        <Route path="/canvas-editor" element={<CanvasEditor />} />
         <Route
           path="/settings"
           element={

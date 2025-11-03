@@ -10,6 +10,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import { colorThemes, fontThemes } from "../../constants";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 
 function isDarkColor(hex) {
@@ -35,48 +36,12 @@ export default function EditorModal({
   const [editableHtml, setEditableHtml] = useState("");
   const [iframeUrl, setIframeUrl] = useState("");
   const [highlightColor, setHighlightColor] = useState("#fff330");
-  const [designMode, setDesignMode] = useState(false);
-  const [shapes, setShapes] = useState([]);
-  const iconColors = "text-white";
-  const iconSize = 16;
-  const overlayRootRef = useRef(null);
   const iframeRef = useRef(null);
-  const [selectedShape, setSelectedShape] = useState(null);
-const [panelOpen, setPanelOpen] = useState(false);
+  const navigate = useNavigate();
 
 
 
 
-
-useEffect(() => {
-  const iframe = iframeRef.current;
-  const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
-  if (!iframeDoc) return;
-
-  const blockers = iframeDoc.querySelectorAll(".page, .page-inner, .cover-page, .footer-link");
-  blockers.forEach((el) => (el.style.pointerEvents = designMode ? "none" : "auto"));
-}, [designMode, iframeUrl]);
-
-
-
-const iframeDoc = iframeRef.current?.contentDocument;
-if (iframeDoc) {
-  const host = iframeDoc.getElementById("cre8tly-overlay-container");
-  const stageHost = iframeDoc.getElementById("cre8tly-overlay-stage");
-  if (host) {
-    host.style.position = "absolute";
-    host.style.top = "0";
-    host.style.left = "0";
-    host.style.width = "100%";
-    host.style.height = "100%";
-    host.style.zIndex = "2147483647";
-    host.style.pointerEvents = "auto"; // 👈 always allow interaction
-    host.style.background = "transparent";
-  }
-  if (stageHost) {
-    stageHost.style.pointerEvents = "auto"; // 👈 ensures Konva gets events
-  }
-}
 
   const handleHighlightColorChange = (e) => {
     const c = e.target.value;
@@ -221,9 +186,10 @@ if (iframeDoc) {
         // Highlight text is always black for proper contrast on light backgrounds
         iframeDoc.documentElement.style.setProperty("--hl-text", "#000000");
 
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}${selectedFont.file}`
-        );
+        // const res = await fetch(
+        //   `${import.meta.env.VITE_API_URL}${selectedFont.file}`
+        // );
+        const res = await fetch(selectedFont.file);
         const buf = await res.arrayBuffer();
         const base64Font = btoa(
           new Uint8Array(buf).reduce(
@@ -429,7 +395,7 @@ pre code {
         // const currentHTML = iframeDoc.body.innerHTML;
         // iframeDoc.body.innerHTML = currentHTML;
         try {
-          mountOverlayOnce();
+          
         } catch {}
       } catch (err) {
         console.error("⚠️ Font apply failed:", err);
@@ -440,14 +406,6 @@ pre code {
 
     return () => iframe.removeEventListener("load", applyFontAfterLoad);
   }, [meta?.theme, iframeUrl]);
-
-useEffect(() => {
-  const iframeDoc = iframeRef.current?.contentDocument;
-  if (!iframeDoc) return;
-
-  const overlay = iframeDoc.getElementById("cre8tly-overlay-container");
-  if (overlay) overlay.style.pointerEvents = designMode ? "auto" : "none";
-}, [designMode]);
 
 
   useEffect(() => {
@@ -518,10 +476,30 @@ useEffect(() => {
     <Dialog open={open} onClose={onClose} className="fixed inset-0 z-50">
       {/* Background overlay */}
       <div className="fixed inset-0 bg-black/60" />
+      
 
       {/* Center modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
         <DialogPanel className="w-full max-w-[1650px] bg-[#0f0f10] rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-6 overflow-y-auto max-h-[95vh]">
+          <div className="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+  <h2 className="text-lg font-semibold text-white">Live Editor</h2>
+  <button
+  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-medium transition-all duration-150"
+  onClick={() => {
+    const pdfUrl = meta?.pdf_url;
+
+    if (!pdfUrl) {
+      // fallback: try checking if one exists in meta or show a clearer message
+      toast.error("No PDF found for this lead magnet.");
+      return;
+    }
+
+    navigate(`/canvas-editor?pdf=${encodeURIComponent(pdfUrl)}`);
+  }}
+>
+  Open Canvas Editor
+</button>
+</div>
           {/* --- Editor + Preview --- */}
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 w-full">
             {/* ✏️ Left: Editor */}

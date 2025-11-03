@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import { pdfjs } from "react-pdf";
@@ -118,7 +118,6 @@ export default function CanvasEditor() {
       try {
         // ✅ Same proxy as your PDFPreviewModal uses
         const proxyUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`;
-        console.log("🔗 Loading via same proxy as PDFPreview:", proxyUrl);
 
         // ✅ Request as blob (same as react-pdf)
         const response = await axiosInstance.get(proxyUrl, {
@@ -129,7 +128,6 @@ export default function CanvasEditor() {
         const buffer = await response.data.arrayBuffer();
 
         const pdf = await pdfjs.getDocument({ data: buffer }).promise;
-        console.log("✅ PDF loaded, pages:", pdf.numPages);
 
         const imgs = [];
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -142,8 +140,6 @@ export default function CanvasEditor() {
           await page.render({ canvasContext: ctx, viewport }).promise;
           imgs.push(canvas.toDataURL());
         }
-
-        console.log("🖼️ Rendered images:", imgs.length);
         setPages(imgs);
       } catch (err) {
         console.error("❌ PDF load error:", err);
@@ -157,8 +153,73 @@ export default function CanvasEditor() {
 
   const handleSelectTool = (type) => {
     setSelectedTool((prev) => (prev === type ? null : type)); // toggle same tool off
-    console.log("🧰 Tool selected:", type);
   };
+
+  // history manager
+const historyRef = useRef({}); // { [page]: { past: [], future: [] } }
+
+function getStacks(page) {
+  if (!historyRef.current[page]) {
+    historyRef.current[page] = { past: [], future: [] };
+  }
+  return historyRef.current[page];
+}
+
+// Call this *before* you set a new shapes array for a page
+function pushPast(page, currentShapes) {
+  const { past } = getStacks(page);
+  // store a deep copy so future edits don't mutate history
+  past.push(JSON.parse(JSON.stringify(currentShapes || [])));
+  // whenever we push, clear future (standard undo/redo behavior)
+  historyRef.current[page].future = [];
+}
+
+const undo = useCallback(() => {
+  const page = selectedPage;
+  const { past, future } = getStacks(page);
+  if (past.length === 0) return;
+
+  const current = shapesByPage[page] || [];
+  const previous = past.pop();
+  future.push(JSON.parse(JSON.stringify(current)));
+
+  setShapesByPage(prev => ({ ...prev, [page]: previous }));
+  setSelectedIds([]); // optional but helpful
+}, [selectedPage, shapesByPage, setShapesByPage]);
+
+const redo = useCallback(() => {
+  const page = selectedPage;
+  const { past, future } = getStacks(page);
+  if (future.length === 0) return;
+
+  const current = shapesByPage[page] || [];
+  const next = future.pop();
+  past.push(JSON.parse(JSON.stringify(current)));
+
+  setShapesByPage(prev => ({ ...prev, [page]: next }));
+  setSelectedIds([]); // optional
+}, [selectedPage, shapesByPage, setShapesByPage]);
+
+
+
+  useEffect(() => {
+  function onKeyDown(e) {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+
+    const isMac = navigator.platform.toUpperCase().includes('MAC');
+    const mod = isMac ? e.metaKey : e.ctrlKey;
+
+    if (mod && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      e.shiftKey ? redo() : undo();
+    }
+  }
+  window.addEventListener('keydown', onKeyDown);
+  return () => window.removeEventListener('keydown', onKeyDown);
+}, [undo, redo]);
+ // selectedPage matters for per-page stacks
+
 
 
 function handleBoolean(op) {
@@ -166,7 +227,6 @@ function handleBoolean(op) {
   const sel = selectedIds.map(String);
   const picked = current.filter(s => sel.includes(String(s.id)));
 
-  console.log("✅ selectedIds:", sel, " -> picked:", picked.map(s => s.id));
 
   if (picked.length !== 2) {
     alert("Select exactly 2 shapes to combine.");
@@ -184,6 +244,7 @@ function handleBoolean(op) {
     stroke: "#00b4ff",
     strokeWidth: 1,
   };
+  pushPast(selectedPage, current);
 
   setShapesByPage(prev => ({
     ...prev,
@@ -319,31 +380,29 @@ function handleBoolean(op) {
               })()}{" "}
               {/* ✅ Set active page */}
               <PDFPage
-                imageUrl={pages[selectedPage]}
-                shapes={shapesByPage[selectedPage] || []}
-                setShapes={(s) => {
-                  console.log("🧩 CanvasEditor setShapes() called with:", s);
+  imageUrl={pages[selectedPage]}
+  shapes={shapesByPage[selectedPage] || []}
+  setShapes={(updater) => {
+    setShapesByPage((prev) => {
+      const current = Array.isArray(prev[selectedPage]) ? prev[selectedPage] : [];
 
-                  setShapesByPage((prev) => {
-                    const current = Array.isArray(prev[selectedPage])
-                      ? prev[selectedPage]
-                      : [];
+      // compute next from updater/function/array
+      const next =
+        typeof updater === "function" ? updater(current)
+        : Array.isArray(updater) ? updater
+        : [];
 
-                    // 🧠 If s is a function, run it with the current array
-                    const next =
-                      typeof s === "function"
-                        ? s(current)
-                        : Array.isArray(s)
-                          ? s
-                          : [];
+      // ✅ record current into undo history BEFORE we set next
+      pushPast(selectedPage, current);
 
-                    return { ...prev, [selectedPage]: next };
-                  });
-                }}
-                selectedIds={selectedIds}
-                setSelectedIds={setSelectedIds}
-                selectedTool={selectedTool}
-              />
+      return { ...prev, [selectedPage]: next };
+    });
+  }}
+  selectedIds={selectedIds}
+  setSelectedIds={setSelectedIds}
+  selectedTool={selectedTool}
+/>
+
             </>
           )}
         </div>

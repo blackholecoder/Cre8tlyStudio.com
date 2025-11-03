@@ -8,10 +8,12 @@ import {
   Text,
   Transformer,
   Path,
+  Line,
 } from "react-konva";
 
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 import { handleShapeDuplicate } from "../../helpers/handleShapeDuplicates";
+import { getGuides } from "../../helpers/guides";
 
 export default function PDFOverlayCanvas({
   shapes,
@@ -29,6 +31,7 @@ export default function PDFOverlayCanvas({
   const [previewShape, setPreviewShape] = useState(null);
   const [selectionBox, setSelectionBox] = useState(null);
   const selectionStart = useRef(null);
+  const [guides, setGuides] = useState({ vertical: [], horizontal: [] });
 
   const stageRef = useRef(null);
   const isDuplicating = useRef(false);
@@ -122,18 +125,18 @@ export default function PDFOverlayCanvas({
   };
 
   const updateSelected = (updates) => {
-  setShapes((prevShapes) =>
-    prevShapes.map((shape) => {
-      if (selectedIds.includes(shape.id)) {
-        return {
-          ...shape,
-          ...updates,
-        };
-      }
-      return shape;
-    })
-  );
-};
+    setShapes((prevShapes) =>
+      prevShapes.map((shape) => {
+        if (selectedIds.includes(shape.id)) {
+          return {
+            ...shape,
+            ...updates,
+          };
+        }
+        return shape;
+      })
+    );
+  };
   useEffect(() => {
     const tr = trRef.current;
     const stage = tr?.getStage();
@@ -211,6 +214,29 @@ export default function PDFOverlayCanvas({
 
     // 🖌️ Tool is active and we clicked empty → start drawing a new shape
     if (selectedTool && clickedEmpty) {
+      // 🅰️ Text tool — click and drag to create a text box
+      if (selectedTool === "text") {
+        isDrawing.current = true;
+        startPos.current = pos;
+        setPreviewShape({
+          id: "preview-text",
+          type: "text",
+          x: pos.x,
+          y: pos.y,
+          width: 0,
+          height: 0,
+          text: "A",
+          textMode: "line",
+          fontSize: 20,
+          fill: "#ffffff",
+          stroke: "transparent",
+          strokeWidth: 0,
+          opacity: 0.9,
+          fontFamily: "Inter",
+          draggable: false,
+        });
+        return;
+      }
       isDrawing.current = true;
       startPos.current = pos;
       setPreviewShape({
@@ -239,89 +265,108 @@ export default function PDFOverlayCanvas({
     // (Optional) clicked on a node while no tool active → leave to node onClick
   };
 
- const handleMouseMove = (e) => {
-  const stage = e.target.getStage();
-  const pos = stage.getPointerPosition();
-  if (!pos) return;
+  const handleMouseMove = (e) => {
+    const stage = e.target.getStage();
+    const pos = stage.getPointerPosition();
+    if (!pos) return;
 
-  // 🖌 drawing preview
-  if (isDrawing.current && previewShape) {
-    const dx = pos.x - startPos.current.x;
-    const dy = pos.y - startPos.current.y;
-    const isShift = e.evt.shiftKey; // ✅ detect Shift
+    // 🖌 drawing preview
+    if (isDrawing.current && previewShape) {
+      const dx = pos.x - startPos.current.x;
+      const dy = pos.y - startPos.current.y;
+      const isShift = e.evt.shiftKey; // ✅ detect Shift
 
-    // ▢ Rectangle / Square
-    if (previewShape.type === "rect") {
-      let width = Math.abs(dx);
-      let height = Math.abs(dy);
+      // ▢ Rectangle / Square
+      if (previewShape.type === "rect") {
+        let width = Math.abs(dx);
+        let height = Math.abs(dy);
 
-      // ✅ Hold Shift → perfect square
-      if (isShift) {
-        const size = Math.max(width, height);
-        width = height = size;
+        // ✅ Hold Shift → perfect square
+        if (isShift) {
+          const size = Math.max(width, height);
+          width = height = size;
+        }
+
+        const x = Math.min(startPos.current.x, pos.x);
+        const y = Math.min(startPos.current.y, pos.y);
+
+        setPreviewShape((prev) => ({
+          ...prev,
+          x,
+          y,
+          width,
+          height,
+        }));
+        return;
       }
 
-      const x = Math.min(startPos.current.x, pos.x);
-      const y = Math.min(startPos.current.y, pos.y);
+      // ⚪ Ellipse / Circle
+      if (previewShape.type === "circle") {
+        let rx = Math.abs(dx) / 2;
+        let ry = Math.abs(dy) / 2;
 
-      setPreviewShape((prev) => ({
-        ...prev,
-        x,
-        y,
-        width,
-        height,
-      }));
-      return;
-    }
+        // ✅ Hold Shift → perfect circle
+        if (isShift) {
+          const r = Math.max(rx, ry);
+          rx = ry = r;
+        }
 
-    // ⚪ Ellipse / Circle
-    if (previewShape.type === "circle") {
-      let rx = Math.abs(dx) / 2;
-      let ry = Math.abs(dy) / 2;
+        const cx = startPos.current.x + dx / 2;
+        const cy = startPos.current.y + dy / 2;
 
-      // ✅ Hold Shift → perfect circle
-      if (isShift) {
-        const r = Math.max(rx, ry);
-        rx = ry = r;
+        setPreviewShape((prev) => ({
+          ...prev,
+          x: cx,
+          y: cy,
+          radiusX: rx,
+          radiusY: ry,
+        }));
+        return;
       }
 
-      const cx = startPos.current.x + dx / 2;
-      const cy = startPos.current.y + dy / 2;
+      // ➡️ Arrow (unchanged)
+      if (previewShape.type === "arrow") {
+        setPreviewShape((prev) => ({
+          ...prev,
+          points: [startPos.current.x, startPos.current.y, pos.x, pos.y],
+        }));
+        return;
+      }
+      // 🅰️ Drawing text box
+      if (previewShape.type === "text") {
+        const dx = pos.x - startPos.current.x;
+        const dy = pos.y - startPos.current.y;
 
-      setPreviewShape((prev) => ({
-        ...prev,
-        x: cx,
-        y: cy,
-        radiusX: rx,
-        radiusY: ry,
-      }));
-      return;
+        const x = Math.min(startPos.current.x, pos.x);
+        const y = Math.min(startPos.current.y, pos.y);
+        const width = Math.abs(dx);
+        const height = Math.abs(dy);
+
+        setPreviewShape((prev) => ({
+          ...prev,
+          x,
+          y,
+          width,
+          height,
+        }));
+        return;
+      }
     }
 
-    // ➡️ Arrow (unchanged)
-    if (previewShape.type === "arrow") {
-      setPreviewShape((prev) => ({
-        ...prev,
-        points: [startPos.current.x, startPos.current.y, pos.x, pos.y],
-      }));
-      return;
+    // 🟦 selection box (keep as is)
+    if (selectionBox && selectionStart.current) {
+      const x = Math.min(pos.x, selectionStart.current.x);
+      const y = Math.min(pos.y, selectionStart.current.y);
+      const width = Math.abs(pos.x - selectionStart.current.x);
+      const height = Math.abs(pos.y - selectionStart.current.y);
+      setSelectionBox({ x, y, width, height });
     }
-  }
-
-  // 🟦 selection box (keep as is)
-  if (selectionBox && selectionStart.current) {
-    const x = Math.min(pos.x, selectionStart.current.x);
-    const y = Math.min(pos.y, selectionStart.current.y);
-    const width = Math.abs(pos.x - selectionStart.current.x);
-    const height = Math.abs(pos.y - selectionStart.current.y);
-    setSelectionBox({ x, y, width, height });
-  }
-};
-
+  };
 
   const handleMouseUp = (e) => {
     const stage = e.target.getStage();
 
+    // ✅ Handle selection box first
     if (selectionBox) {
       const scaleX = stage.scaleX();
       const scaleY = stage.scaleY();
@@ -343,20 +388,14 @@ export default function PDFOverlayCanvas({
       const selected = shapes
         .filter((s) => {
           const node = stage.findOne(`#${s.id}`);
-          if (!node) {
-            console.log("⚠️ Shape node not found:", s.id);
-            return false;
-          }
-
+          if (!node) return false;
           const rect = node.getClientRect({ relativeTo: stage });
-
           const intersects = !(
             rect.x + rect.width < box.x ||
             rect.x > box.x2 ||
             rect.y + rect.height < box.y ||
             rect.y > box.y2
           );
-
           return intersects;
         })
         .map((s) => s.id);
@@ -364,42 +403,68 @@ export default function PDFOverlayCanvas({
       setSelectedIds(selected);
       setPanelOpen(selected.length === 1);
       setSelectionBox(null);
+      setGuides({ vertical: [], horizontal: [], active: false });
       selectionStart.current = null;
-
-      if (selected.length === 0) {
-        console.log("❌ No shapes selected by box.");
-      }
       return;
     }
 
-    // 🖌 finalize a drawn shape
+    // 🅰️ Finalize Text Shape (dragged out text box)
+    if (previewShape && previewShape.type === "text") {
+      isDrawing.current = false;
+
+      const tiny = previewShape.width < 5 || previewShape.height < 5;
+      if (!tiny) {
+        const newText = {
+          ...previewShape,
+          id: `text-${Date.now()}`,
+          isEditing: true,
+          text: "A",
+          draggable: true,
+        };
+
+        setShapes((prev) => [...prev, newText]);
+        setSelectedIds([newText.id]);
+        setPanelOpen(true);
+
+        // 🔥 Auto open edit mode
+        setTimeout(() => {
+          const stage = stageRef.current?.getStage();
+          const node = stage?.findOne(`#${newText.id}`);
+          if (node) node.fire("dblclick");
+        }, 50);
+      }
+
+      setPreviewShape(null);
+      setSelectedTool(null);
+      return;
+    }
+
+    // 🖌 Finalize other shapes
     if (isDrawing.current && previewShape) {
       isDrawing.current = false;
 
-      // ignore accidental clicks / tiny shapes
       const tiny =
         (previewShape.type === "rect" &&
           (previewShape.width < 2 || previewShape.height < 2)) ||
         (previewShape.type === "circle" &&
           (previewShape.radiusX < 1 || previewShape.radiusY < 1)) ||
         (previewShape.type === "arrow" && !previewShape.points);
+
       if (!tiny) {
         setShapes((prev) => [
           ...prev,
           {
             ...previewShape,
             id: `shape-${Date.now()}`,
-            // default stroke off on creation
             strokeWidth: previewShape.type === "arrow" ? 2 : 0,
           },
         ]);
       }
 
       setPreviewShape(null);
-      setSelectedTool(null); // <-- important
-
+      setSelectedTool(null);
       const container = stageRef.current?.getStage()?.container();
-      if (container) container.style.cursor = "default"; // <-- force reset
+      if (container) container.style.cursor = "default";
     }
   };
 
@@ -470,6 +535,7 @@ export default function PDFOverlayCanvas({
       selectionStart.current = null;
       setSelectedIds([]);
       setPanelOpen(false);
+      setGuides({ vertical: [], horizontal: [], active: false });
 
       // reset cursor to default
       const stage = trRef.current?.getStage();
@@ -482,6 +548,86 @@ export default function PDFOverlayCanvas({
     window.addEventListener("canvas:resetTool", handleReset);
     return () => window.removeEventListener("canvas:resetTool", handleReset);
   }, [setSelectedTool, setSelectedIds]);
+
+  useEffect(() => {
+    const stage = stageRef.current?.getStage();
+    if (!stage) return;
+
+    const handleDblClick = (e) => {
+      const node = e.target;
+      if (node.className !== "Text") return;
+
+      const absPos = node.getAbsolutePosition();
+      const stageBox = stage.container().getBoundingClientRect();
+
+      // Create editable textarea overlay
+      const textarea = document.createElement("textarea");
+      textarea.value = node.text();
+      textarea.style.position = "absolute";
+      textarea.style.top = stageBox.top + absPos.y + "px";
+      textarea.style.left = stageBox.left + absPos.x + "px";
+      textarea.style.width = node.width() ? node.width() + "px" : "auto";
+      textarea.style.height = node.height() ? node.height() + "px" : "auto";
+      textarea.style.fontSize = node.fontSize() + "px";
+      const scale = stage.scaleX();
+      textarea.style.transform = `scale(${scale}) rotate(${node.rotation()}deg)`;
+      textarea.style.transformOrigin = "left top";
+
+      textarea.style.fontFamily = node.fontFamily();
+      textarea.style.color = node.fill();
+      textarea.style.background = "transparent";
+      textarea.style.border = "none";
+      textarea.style.outline = "none";
+      textarea.style.overflow = "hidden";
+      textarea.style.resize = "none";
+      textarea.style.lineHeight = "1.2";
+      textarea.style.zIndex = 1000;
+      textarea.style.whiteSpace = "pre-wrap";
+      textarea.style.textAlign = node.align?.() ?? "left";
+      textarea.style.fontWeight = node.fontStyle?.().includes("bold")
+        ? "bold"
+        : "normal";
+      textarea.style.transformOrigin = "left top";
+      textarea.style.transform = `rotate(${node.rotation()}deg)`;
+      textarea.style.pointerEvents = "auto";
+
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      });
+
+      // Prevent dragging while editing
+      node.draggable(false);
+
+      const removeTextarea = () => {
+        const newText = textarea.value;
+        node.text(newText);
+        textarea.remove();
+        node.draggable(true);
+        stage.batchDraw();
+
+        // update the shape in React state
+        setShapes((prev) =>
+          prev.map((s) =>
+            s.id === node.id() ? { ...s, text: newText, isEditing: false } : s
+          )
+        );
+      };
+
+      textarea.addEventListener("blur", removeTextarea);
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          textarea.blur();
+        }
+      });
+    };
+
+    stage.on("dblclick", handleDblClick);
+    return () => stage.off("dblclick", handleDblClick);
+  }, [setShapes]);
 
   return (
     <div
@@ -531,8 +677,8 @@ export default function PDFOverlayCanvas({
                       fill={shape.fill ?? "rgba(0,128,255,0.25)"}
                       stroke={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 2}
-                       perfectDrawEnabled={false}
-                       strokeScaleEnabled={false}
+                      perfectDrawEnabled={false}
+                      strokeScaleEnabled={false}
                       opacity={shape.opacity ?? 1}
                       shadowColor={shape.shadowColor || "transparent"}
                       shadowBlur={
@@ -552,7 +698,6 @@ export default function PDFOverlayCanvas({
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
                       shadowEnabled={adjusted > 0.01}
-                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -575,6 +720,53 @@ export default function PDFOverlayCanvas({
                           isDuplicating,
                         })
                       }
+                      onDragMove={(e) => {
+                        const node = e.target;
+                        const { x, y } = node.position();
+                        const width =
+                          (node.radiusX?.() || shape.radiusX || 50) * 2;
+                        const height =
+                          (node.radiusY?.() || shape.radiusY || 50) * 2;
+
+                        // 🧠 Adjust for ellipse center — convert to top-left reference
+                        const movingShape = {
+                          id: shape.id,
+                          x: x - width / 2,
+                          y: y - height / 2,
+                          width,
+                          height,
+                          type: shape.type,
+                        };
+
+                        const stage = node.getStage();
+                        const g = getGuides(
+                          movingShape,
+                          shapes,
+                          stage.width(),
+                          stage.height(),
+                          {
+                            GAP: 6,
+                            grid: Array.from(
+                              { length: Math.floor(stage.width() / 50) },
+                              (_, i) => i * 50
+                            ),
+                          }
+                        );
+
+                        // 🧲 apply magnet snap
+                        if (g.snapPosition.x !== undefined)
+                          node.x(g.snapPosition.x + width / 2);
+                        if (g.snapPosition.y !== undefined)
+                          node.y(g.snapPosition.y + height / 2);
+
+                        const isSnapping =
+                          g.vertical.length > 0 || g.horizontal.length > 0;
+                        setGuides({
+                          vertical: g.vertical,
+                          horizontal: g.horizontal,
+                          active: isSnapping,
+                        });
+                      }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
                           const { x, y } = e.target.position();
@@ -585,6 +777,7 @@ export default function PDFOverlayCanvas({
                           );
                         }
                         isDuplicating.current = false;
+                        setGuides({ vertical: [], horizontal: [] });
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -646,7 +839,6 @@ export default function PDFOverlayCanvas({
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
                       shadowEnabled={adjusted > 0.01}
-                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -669,6 +861,57 @@ export default function PDFOverlayCanvas({
                           isDuplicating,
                         })
                       }
+                      onDragMove={(e) => {
+                        const node = e.target;
+                        const stage = node.getStage();
+
+                        // ✅ Get the real bounding box, rotation-aware
+                        const clientRect = node.getClientRect({
+                          relativeTo: stage,
+                        });
+                        const { x, y, width, height } = clientRect;
+
+                        // 🧩 Represent the arrow as its bounding box for snapping
+                        const movingShape = {
+                          id: shape.id,
+                          x,
+                          y,
+                          width,
+                          height,
+                          type: shape.type,
+                        };
+
+                        const g = getGuides(
+                          movingShape,
+                          shapes,
+                          stage.width(),
+                          stage.height(),
+                          {
+                            GAP: 6,
+                            grid: Array.from(
+                              { length: Math.floor(stage.width() / 50) },
+                              (_, i) => i * 50
+                            ),
+                          }
+                        );
+
+                        // 🧲 Apply magnet snap — adjusted by rotation-safe offset
+                        const offsetX = node.x() - x;
+                        const offsetY = node.y() - y;
+
+                        if (g.snapPosition.x !== undefined)
+                          node.x(g.snapPosition.x + offsetX);
+                        if (g.snapPosition.y !== undefined)
+                          node.y(g.snapPosition.y + offsetY);
+
+                        const isSnapping =
+                          g.vertical.length > 0 || g.horizontal.length > 0;
+                        setGuides({
+                          vertical: g.vertical,
+                          horizontal: g.horizontal,
+                          active: isSnapping,
+                        });
+                      }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
                           const { x, y } = e.target.position();
@@ -679,6 +922,7 @@ export default function PDFOverlayCanvas({
                           );
                         }
                         isDuplicating.current = false;
+                        setGuides({ vertical: [], horizontal: [] });
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -710,6 +954,21 @@ export default function PDFOverlayCanvas({
                       fill={shape.fill}
                       stroke={shape.stroke}
                       strokeWidth={shape.strokeWidth ?? 1}
+                      fontSize={shape.fontSize ?? 20}
+                      fontFamily={shape.fontFamily ?? "Inter"}
+                      width={
+                        shape.textMode === "box"
+                          ? shape.width || undefined
+                          : undefined
+                      }
+                      height={
+                        shape.textMode === "box"
+                          ? shape.height || undefined
+                          : undefined
+                      }
+                      wrap={shape.textMode === "box" ? "word" : "none"}
+                      align={shape.align || "left"}
+                      ellipsis={shape.textMode === "line"}
                       shadowColor={shape.shadowColor || "transparent"}
                       shadowBlur={
                         (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
@@ -751,6 +1010,60 @@ export default function PDFOverlayCanvas({
                           isDuplicating,
                         })
                       }
+                      onDragMove={(e) => {
+                        const node = e.target;
+                        const { x, y } = node.position();
+                        const width =
+                          node.width?.() ||
+                          node.radiusX?.() * 2 ||
+                          shape.width ||
+                          0;
+                        const height =
+                          node.height?.() ||
+                          node.radiusY?.() * 2 ||
+                          shape.height ||
+                          0;
+
+                        // 🧩 use a different name to avoid shadowing
+                        const movingShape = {
+                          id: shape.id,
+                          x,
+                          y,
+                          width,
+                          height,
+                          type: shape.type,
+                        };
+
+                        const stage = node.getStage();
+
+                        const g = getGuides(
+                          movingShape,
+                          shapes,
+                          stage.width(),
+                          stage.height(),
+                          {
+                            GAP: 6,
+                            grid: Array.from(
+                              { length: Math.floor(stage.width() / 50) },
+                              (_, i) => i * 50
+                            ),
+                          }
+                        );
+
+                        // 🧲 apply magnet snap
+                        if (g.snapPosition.x !== undefined)
+                          node.x(g.snapPosition.x);
+                        if (g.snapPosition.y !== undefined)
+                          node.y(g.snapPosition.y);
+
+                        const isSnapping =
+                          g.vertical.length > 0 || g.horizontal.length > 0;
+                        setGuides({
+                          vertical: g.vertical,
+                          horizontal: g.horizontal,
+                          active: isSnapping,
+                        });
+                      }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
                           const { x, y } = e.target.position();
@@ -761,6 +1074,7 @@ export default function PDFOverlayCanvas({
                           );
                         }
                         isDuplicating.current = false;
+                        setGuides({ vertical: [], horizontal: [] });
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -823,6 +1137,60 @@ export default function PDFOverlayCanvas({
                           isDuplicating,
                         })
                       }
+                      onDragMove={(e) => {
+                        const node = e.target;
+                        const { x, y } = node.position();
+                        const width =
+                          node.width?.() ||
+                          node.radiusX?.() * 2 ||
+                          shape.width ||
+                          0;
+                        const height =
+                          node.height?.() ||
+                          node.radiusY?.() * 2 ||
+                          shape.height ||
+                          0;
+
+                        // 🧩 use a different name to avoid shadowing
+                        const movingShape = {
+                          id: shape.id,
+                          x,
+                          y,
+                          width,
+                          height,
+                          type: shape.type,
+                        };
+
+                        const stage = node.getStage();
+
+                        const g = getGuides(
+                          movingShape,
+                          shapes,
+                          stage.width(),
+                          stage.height(),
+                          {
+                            GAP: 6,
+                            grid: Array.from(
+                              { length: Math.floor(stage.width() / 50) },
+                              (_, i) => i * 50
+                            ),
+                          }
+                        );
+
+                        // 🧲 apply magnet snap
+                        if (g.snapPosition.x !== undefined)
+                          node.x(g.snapPosition.x);
+                        if (g.snapPosition.y !== undefined)
+                          node.y(g.snapPosition.y);
+
+                        const isSnapping =
+                          g.vertical.length > 0 || g.horizontal.length > 0;
+                        setGuides({
+                          vertical: g.vertical,
+                          horizontal: g.horizontal,
+                          active: isSnapping,
+                        });
+                      }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
                           const { x, y } = e.target.position();
@@ -833,6 +1201,7 @@ export default function PDFOverlayCanvas({
                           );
                         }
                         isDuplicating.current = false;
+                        setGuides({ vertical: [], horizontal: [] });
                       }}
                     />
                   );
@@ -867,7 +1236,6 @@ export default function PDFOverlayCanvas({
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
                       shadowEnabled={adjusted > 0.01}
-                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -890,6 +1258,60 @@ export default function PDFOverlayCanvas({
                           isDuplicating,
                         })
                       }
+                      onDragMove={(e) => {
+                        const node = e.target;
+                        const { x, y } = node.position();
+                        const width =
+                          node.width?.() ||
+                          node.radiusX?.() * 2 ||
+                          shape.width ||
+                          0;
+                        const height =
+                          node.height?.() ||
+                          node.radiusY?.() * 2 ||
+                          shape.height ||
+                          0;
+
+                        // 🧩 use a different name to avoid shadowing
+                        const movingShape = {
+                          id: shape.id,
+                          x,
+                          y,
+                          width,
+                          height,
+                          type: shape.type,
+                        };
+
+                        const stage = node.getStage();
+
+                        const g = getGuides(
+                          movingShape,
+                          shapes,
+                          stage.width(),
+                          stage.height(),
+                          {
+                            GAP: 6,
+                            grid: Array.from(
+                              { length: Math.floor(stage.width() / 50) },
+                              (_, i) => i * 50
+                            ),
+                          }
+                        );
+
+                        // 🧲 apply magnet snap
+                        if (g.snapPosition.x !== undefined)
+                          node.x(g.snapPosition.x);
+                        if (g.snapPosition.y !== undefined)
+                          node.y(g.snapPosition.y);
+
+                        const isSnapping =
+                          g.vertical.length > 0 || g.horizontal.length > 0;
+                        setGuides({
+                          vertical: g.vertical,
+                          horizontal: g.horizontal,
+                          active: isSnapping,
+                        });
+                      }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
                           const { x, y } = e.target.position();
@@ -900,6 +1322,7 @@ export default function PDFOverlayCanvas({
                           );
                         }
                         isDuplicating.current = false;
+                        setGuides({ vertical: [], horizontal: [] });
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -951,6 +1374,56 @@ export default function PDFOverlayCanvas({
                 dash={[4, 4]}
                 listening={false}
               />
+            )}
+            {Array.from(
+              { length: Math.floor(stageSize.width / 50) },
+              (_, i) => (
+                <Line
+                  key={`grid-v-${i}`}
+                  points={[i * 50, 0, i * 50, stageSize.height]}
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={0.5}
+                  listening={false}
+                />
+              )
+            )}
+            {Array.from(
+              { length: Math.floor(stageSize.height / 50) },
+              (_, i) => (
+                <Line
+                  key={`grid-h-${i}`}
+                  points={[0, i * 50, stageSize.width, i * 50]}
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={0.5}
+                  listening={false}
+                />
+              )
+            )}
+
+            {[...new Set(guides.vertical.map((v) => Math.round(v)))].map(
+              (x) => (
+                <Line
+                  key={`v-${x}`}
+                  points={[x, 0, x, stageSize.height]}
+                  stroke="#00b4ff"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                  listening={false}
+                />
+              )
+            )}
+
+            {[...new Set(guides.horizontal.map((h) => Math.round(h)))].map(
+              (y) => (
+                <Line
+                  key={`h-${y}`}
+                  points={[0, y, stageSize.width, y]}
+                  stroke="#00b4ff"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                  listening={false}
+                />
+              )
             )}
 
             <Transformer

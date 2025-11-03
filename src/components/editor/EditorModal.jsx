@@ -483,7 +483,7 @@ pre code {
         <DialogPanel className="w-full max-w-[1650px] bg-[#0f0f10] rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-6 overflow-y-auto max-h-[95vh]">
           <div className="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
   <h2 className="text-lg font-semibold text-white">Live Editor</h2>
-  <button
+  {/* <button
   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-medium transition-all duration-150"
   onClick={() => {
     const pdfUrl = meta?.pdf_url;
@@ -498,7 +498,7 @@ pre code {
   }}
 >
   Open Canvas Editor
-</button>
+</button> */}
 </div>
           {/* --- Editor + Preview --- */}
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 w-full">

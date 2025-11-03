@@ -15,6 +15,7 @@ import {
   Slash,
   Combine,
   Divide,
+  MousePointerClick
 } from "lucide-react";
 import { performBooleanOperation } from "../../helpers/booleanOps";
 
@@ -268,8 +269,8 @@ export default function CanvasEditor() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-gray-300">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-400 mb-3"></div>
-        <p>Rendering PDF pages...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-green mb-3"></div>
+        <p>Opening design portal...</p>
       </div>
     );
   }
@@ -303,12 +304,24 @@ export default function CanvasEditor() {
         </div>
 
         {/* ✅ Drawing area */}
-        <div className="flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
+        <div className="relative flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
+          
           <div
-            className="absolute top-12 right-4 flex flex-col gap-2 ml-0 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar"
+           className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+    onClick={() => {
+      window.dispatchEvent(new CustomEvent("canvas:resetTool"));
+      setSelectedTool(null);
+      setSelectedIds([]);
+    }}
+    title="Reset to Default"
+    className="bg-black rounded-md w-8 h-8 flex items-center justify-center mb-1 border border-gray-700/40 hover:border-cyan-400/40 transition"
+  >
+    <MousePointerClick size={16} className="text-white" />
+  </button>
             {[
               {
                 icon: Square,
@@ -341,10 +354,10 @@ export default function CanvasEditor() {
                 className={`w-8 h-8 flex items-center justify-center rounded-md ${color} transition`}
                 title={title}
               >
-                <Icon size={18} className="text-grey-700" />
+                <Icon size={18} className="text-white" />
               </button>
             ))}
-            <div className="flex flex-col gap-2 ml-0">
+            <div className="flex gap-2 ml-0">
               <button onClick={() => handleBoolean("union")} title="Add" className="bg-black rounded-md w-8 h-8 flex items-center justify-center">
                 <Plus className="text-cyan-400" size={18} />
               </button>
@@ -381,7 +394,7 @@ export default function CanvasEditor() {
               localStorage.removeItem("cre8tly_canvas_shapes");
               window.dispatchEvent(new CustomEvent("clearCanvasShapes"));
             }}
-            className="absolute bottom-4 right-4 flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#1a1a1a]/90 text-gray-300 hover:text-red-400 border border-gray-700/50 text-xs transition"
+            className="absolute bottom-6 right-6 flex items-center gap-1 px-3 py-1.5 rounded-md bg-red-600 text-white hover:text-red-400 border border-gray-700/50 text-xs transition"
           >
             <Trash2 size={14} />
             Clear

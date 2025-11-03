@@ -7,10 +7,11 @@ import {
   Ellipse,
   Text,
   Transformer,
-  Path
+  Path,
 } from "react-konva";
 
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
+import { handleShapeDuplicate } from "../../helpers/handleShapeDuplicates";
 
 export default function PDFOverlayCanvas({
   shapes,
@@ -30,9 +31,10 @@ export default function PDFOverlayCanvas({
   const selectionStart = useRef(null);
 
   const stageRef = useRef(null);
+  const isDuplicating = useRef(false);
+  const hasLoadedPage = useRef(false);
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
-
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -97,6 +99,14 @@ export default function PDFOverlayCanvas({
   }, [pageKey]);
 
   useEffect(() => {
+    // mark page as loaded after initial restore
+    hasLoadedPage.current = true;
+  }, [pageKey]);
+
+  useEffect(() => {
+    // prevent writing shapes before the correct page is fully loaded
+    if (!hasLoadedPage.current) return;
+
     if (shapes.length > 0) {
       localStorage.setItem(pageKey, JSON.stringify(shapes));
     } else {
@@ -112,10 +122,18 @@ export default function PDFOverlayCanvas({
   };
 
   const updateSelected = (updates) => {
-    setShapes((prev) =>
-      prev.map((s) => (selectedIds.includes(s.id) ? { ...s, ...updates } : s))
-    );
-  };
+  setShapes((prevShapes) =>
+    prevShapes.map((shape) => {
+      if (selectedIds.includes(shape.id)) {
+        return {
+          ...shape,
+          ...updates,
+        };
+      }
+      return shape;
+    })
+  );
+};
   useEffect(() => {
     const tr = trRef.current;
     const stage = tr?.getStage();
@@ -133,103 +151,143 @@ export default function PDFOverlayCanvas({
   }, [shapes]);
 
   useEffect(() => {
-  const handleOutsideClick = (e) => {
-    // 👇 ignore clicks on the canvas toolbar
-    if (e.target.closest('.canvas-toolbar')) return;
+    const handleOutsideClick = (e) => {
+      // 👇 ignore clicks on the canvas toolbar
+      if (e.target.closest(".canvas-toolbar")) return;
 
-    if (!containerRef.current?.contains(e.target)) {
-      setSelectedIds([]);
-      setPanelOpen(false);
-    }
-  };
+      if (!containerRef.current?.contains(e.target)) {
+        setSelectedIds([]);
+        setPanelOpen(false);
+      }
+    };
+    // use capture so this runs before other handlers
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
-  // use capture so this runs before other handlers
-  document.addEventListener('mousedown', handleOutsideClick);
-  return () =>
-    document.removeEventListener('mousedown', handleOutsideClick);
-}, []);
+  useEffect(() => {
+    if (!trRef.current) return;
 
+    const stage = trRef.current.getStage();
+    if (!stage) return;
+
+    // Find all shapes that are currently selected
+    const selectedNodes = shapes
+      .filter((s) => selectedIds.includes(s.id))
+      .map((s) => stage.findOne(`#${s.id}`))
+      .filter(Boolean); // remove nulls
+
+    trRef.current.nodes(selectedNodes);
+    trRef.current.getLayer()?.batchDraw();
+  }, [selectedIds, shapes]);
 
   const isDrawing = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
 
-const handleMouseDown = (e) => {
-  // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
-  if (e?.evt?.target?.closest && e.evt.target.closest('.canvas-toolbar')) {
-    return;
-  }
+  const handleMouseDown = (e) => {
+    // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
+    if (e?.evt?.target?.closest && e.evt.target.closest(".canvas-toolbar")) {
+      return;
+    }
 
+    const stage = e.target.getStage();
+    const clickedEmpty =
+      e.target === stage || e.target.getParent() === stage.findOne("Layer");
+
+    const pos = stage.getPointerPosition();
+
+    // 🟦 No active tool → start lasso selection
+    if (!selectedTool && clickedEmpty) {
+      // make sure we are NOT in draw mode anymore
+      setSelectedTool?.(null);
+      setPreviewShape(null);
+      isDrawing.current = false;
+
+      // begin lasso
+      selectionStart.current = pos;
+      setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0 });
+      return;
+    }
+
+    // 🖌️ Tool is active and we clicked empty → start drawing a new shape
+    if (selectedTool && clickedEmpty) {
+      isDrawing.current = true;
+      startPos.current = pos;
+      setPreviewShape({
+        id: "preview-shape",
+        type: selectedTool,
+        x: pos.x,
+        y: pos.y,
+        width: 0,
+        height: 0,
+        radiusX: 0,
+        radiusY: 0,
+        fill: "rgba(0,128,255,0.15)",
+        stroke: "#00b4ff",
+        strokeWidth: 0,
+        opacity: 0.6,
+        shadowColor: "#000000",
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        shadowOffset: 5,
+        shadowAngle: 315,
+        shadowIntensity: 100,
+      });
+      return;
+    }
+
+    // (Optional) clicked on a node while no tool active → leave to node onClick
+  };
+
+ const handleMouseMove = (e) => {
   const stage = e.target.getStage();
-  const clickedEmpty =
-    e.target === stage || e.target.getParent() === stage.findOne('Layer');
-
   const pos = stage.getPointerPosition();
-
-  // 🟦 No active tool → start lasso selection
-  if (!selectedTool && clickedEmpty) {
-    // make sure we are NOT in draw mode anymore
-    setSelectedTool?.(null);
-    setPreviewShape(null);
-    isDrawing.current = false;
-
-    // begin lasso
-    selectionStart.current = pos;
-    setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0 });
-    return;
-  }
-
-  // 🖌️ Tool is active and we clicked empty → start drawing a new shape
-  if (selectedTool && clickedEmpty) {
-    isDrawing.current = true;
-    startPos.current = pos;
-    setPreviewShape({
-      id: 'preview-shape',
-      type: selectedTool,
-      x: pos.x,
-      y: pos.y,
-      width: 0,
-      height: 0,
-      radiusX: 0,
-      radiusY: 0,
-      fill: 'rgba(0,128,255,0.15)',
-      stroke: '#00b4ff',
-      strokeWidth: 0,
-      opacity: 0.6,
-    });
-    return;
-  }
-
-  // (Optional) clicked on a node while no tool active → leave to node onClick
-};
-
-
-  const handleMouseMove = (e) => {
-  const stage = e.target.getStage();
-  const pos = stage.getPointerPosition();
-  
   if (!pos) return;
 
   // 🖌 drawing preview
   if (isDrawing.current && previewShape) {
     const dx = pos.x - startPos.current.x;
     const dy = pos.y - startPos.current.y;
+    const isShift = e.evt.shiftKey; // ✅ detect Shift
 
+    // ▢ Rectangle / Square
     if (previewShape.type === "rect") {
-      // normalize so rect always has positive width/height
+      let width = Math.abs(dx);
+      let height = Math.abs(dy);
+
+      // ✅ Hold Shift → perfect square
+      if (isShift) {
+        const size = Math.max(width, height);
+        width = height = size;
+      }
+
       const x = Math.min(startPos.current.x, pos.x);
       const y = Math.min(startPos.current.y, pos.y);
-      const width  = Math.abs(dx);
-      const height = Math.abs(dy);
-      setPreviewShape((prev) => ({ ...prev, x, y, width, height }));
+
+      setPreviewShape((prev) => ({
+        ...prev,
+        x,
+        y,
+        width,
+        height,
+      }));
       return;
     }
 
+    // ⚪ Ellipse / Circle
     if (previewShape.type === "circle") {
-      // Ellipse needs center + radii
+      let rx = Math.abs(dx) / 2;
+      let ry = Math.abs(dy) / 2;
+
+      // ✅ Hold Shift → perfect circle
+      if (isShift) {
+        const r = Math.max(rx, ry);
+        rx = ry = r;
+      }
+
       const cx = startPos.current.x + dx / 2;
       const cy = startPos.current.y + dy / 2;
-      const rx = Math.abs(dx) / 2;
-      const ry = Math.abs(dy) / 2;
+
       setPreviewShape((prev) => ({
         ...prev,
         x: cx,
@@ -240,6 +298,7 @@ const handleMouseDown = (e) => {
       return;
     }
 
+    // ➡️ Arrow (unchanged)
     if (previewShape.type === "arrow") {
       setPreviewShape((prev) => ({
         ...prev,
@@ -249,146 +308,180 @@ const handleMouseDown = (e) => {
     }
   }
 
-  // 🟦 selection box
+  // 🟦 selection box (keep as is)
   if (selectionBox && selectionStart.current) {
     const x = Math.min(pos.x, selectionStart.current.x);
     const y = Math.min(pos.y, selectionStart.current.y);
-    const width  = Math.abs(pos.x - selectionStart.current.x);
+    const width = Math.abs(pos.x - selectionStart.current.x);
     const height = Math.abs(pos.y - selectionStart.current.y);
     setSelectionBox({ x, y, width, height });
   }
 };
 
-const handleMouseUp = (e) => {
-  const stage = e.target.getStage();
 
+  const handleMouseUp = (e) => {
+    const stage = e.target.getStage();
 
-  if (selectionBox) {
-    const scaleX = stage.scaleX();
-    const scaleY = stage.scaleY();
+    if (selectionBox) {
+      const scaleX = stage.scaleX();
+      const scaleY = stage.scaleY();
 
-    const normBox = {
-      x: selectionBox.x / scaleX,
-      y: selectionBox.y / scaleY,
-      width: selectionBox.width / scaleX,
-      height: selectionBox.height / scaleY,
-    };
+      const normBox = {
+        x: selectionBox.x / scaleX,
+        y: selectionBox.y / scaleY,
+        width: selectionBox.width / scaleX,
+        height: selectionBox.height / scaleY,
+      };
 
-    const box = {
-      x: Math.min(normBox.x, normBox.x + normBox.width),
-      y: Math.min(normBox.y, normBox.y + normBox.height),
-      x2: Math.max(normBox.x, normBox.x + normBox.width),
-      y2: Math.max(normBox.y, normBox.y + normBox.height),
-    };
+      const box = {
+        x: Math.min(normBox.x, normBox.x + normBox.width),
+        y: Math.min(normBox.y, normBox.y + normBox.height),
+        x2: Math.max(normBox.x, normBox.x + normBox.width),
+        y2: Math.max(normBox.y, normBox.y + normBox.height),
+      };
 
+      const selected = shapes
+        .filter((s) => {
+          const node = stage.findOne(`#${s.id}`);
+          if (!node) {
+            console.log("⚠️ Shape node not found:", s.id);
+            return false;
+          }
 
-    const selected = shapes
-      .filter((s) => {
-        const node = stage.findOne(`#${s.id}`);
-        if (!node) {
-          console.log("⚠️ Shape node not found:", s.id);
-          return false;
-        }
+          const rect = node.getClientRect({ relativeTo: stage });
 
-        const rect = node.getClientRect({ relativeTo: stage });
+          const intersects = !(
+            rect.x + rect.width < box.x ||
+            rect.x > box.x2 ||
+            rect.y + rect.height < box.y ||
+            rect.y > box.y2
+          );
 
-        const intersects = !(
-          rect.x + rect.width < box.x ||
-          rect.x > box.x2 ||
-          rect.y + rect.height < box.y ||
-          rect.y > box.y2
-        );
+          return intersects;
+        })
+        .map((s) => s.id);
 
-        return intersects;
-      })
-      .map((s) => s.id);
+      setSelectedIds(selected);
+      setPanelOpen(selected.length === 1);
+      setSelectionBox(null);
+      selectionStart.current = null;
 
-    setSelectedIds(selected);
-    setPanelOpen(selected.length === 1);
-    setSelectionBox(null);
-    selectionStart.current = null;
-
-    if (selected.length === 0) {
-      console.log("❌ No shapes selected by box.");
-    }
-    return;
-  }
-
-  // 🖌 finalize a drawn shape
-  if (isDrawing.current && previewShape) {
-    isDrawing.current = false;
-
-    // ignore accidental clicks / tiny shapes
-    const tiny =
-      (previewShape.type === "rect"   && (previewShape.width < 2 || previewShape.height < 2)) ||
-      (previewShape.type === "circle" && (previewShape.radiusX < 1 || previewShape.radiusY < 1)) ||
-      (previewShape.type === "arrow"  && !previewShape.points);
-    if (!tiny) {
-      setShapes((prev) => [
-        ...prev,
-        {
-          ...previewShape,
-          id: `shape-${Date.now()}`,
-          // default stroke off on creation
-          strokeWidth: previewShape.type === "arrow" ? 2 : 0,
-        },
-      ]);
+      if (selected.length === 0) {
+        console.log("❌ No shapes selected by box.");
+      }
+      return;
     }
 
-    setPreviewShape(null);
-    setSelectedTool(null);            // <-- important
+    // 🖌 finalize a drawn shape
+    if (isDrawing.current && previewShape) {
+      isDrawing.current = false;
 
-  const container = stageRef.current?.getStage()?.container();
-  if (container) container.style.cursor = "default";  // <-- force reset
-  }
-};
+      // ignore accidental clicks / tiny shapes
+      const tiny =
+        (previewShape.type === "rect" &&
+          (previewShape.width < 2 || previewShape.height < 2)) ||
+        (previewShape.type === "circle" &&
+          (previewShape.radiusX < 1 || previewShape.radiusY < 1)) ||
+        (previewShape.type === "arrow" && !previewShape.points);
+      if (!tiny) {
+        setShapes((prev) => [
+          ...prev,
+          {
+            ...previewShape,
+            id: `shape-${Date.now()}`,
+            // default stroke off on creation
+            strokeWidth: previewShape.type === "arrow" ? 2 : 0,
+          },
+        ]);
+      }
 
-// keep cursor in sync with tool
-useEffect(() => {
-  const container = stageRef.current?.getStage()?.container();
-  if (!container) return;
-  container.style.cursor = selectedTool ? "crosshair" : "default";
-}, [selectedTool]);
+      setPreviewShape(null);
+      setSelectedTool(null); // <-- important
 
-// if mouse leaves the stage while drawing, stop and reset cursor
-const handleMouseLeave = () => {
-  if (isDrawing.current) {
-    isDrawing.current = false;
-    setPreviewShape(null);
-  }
-  const container = stageRef.current?.getStage()?.container();
-  if (container) container.style.cursor = "default";
-};
-// Sometimes mouseup fires outside the Stage. Add a document-level listener that cancels drawing:
-useEffect(() => {
-  const endDrawingOutside = () => {
-    if (!isDrawing.current) return;
-    isDrawing.current = false;
-    setPreviewShape(null);
-    setSelectedTool(null);
-    const c = stageRef.current?.getStage()?.container();
-    if (c) c.style.cursor = "default";
-  };
-  document.addEventListener("mouseup", endDrawingOutside);
-  return () => document.removeEventListener("mouseup", endDrawingOutside);
-}, [setSelectedTool]);
-
-useEffect(() => {
-  const onKeyDown = (e) => {
-    // don’t delete while typing
-    const t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds?.length) {
-      e.preventDefault(); // stop browser “back” on Backspace
-      deleteSelected(selectedIds); // you already have this helper in PDFOverlayCanvas
+      const container = stageRef.current?.getStage()?.container();
+      if (container) container.style.cursor = "default"; // <-- force reset
     }
   };
 
-  window.addEventListener('keydown', onKeyDown);
-  return () => window.removeEventListener('keydown', onKeyDown);
-}, [selectedIds, deleteSelected]);
+  // keep cursor in sync with tool
+  useEffect(() => {
+    const container = stageRef.current?.getStage()?.container();
+    if (!container) return;
+    container.style.cursor = selectedTool ? "crosshair" : "default";
+  }, [selectedTool]);
 
+  // if mouse leaves the stage while drawing, stop and reset cursor
+  const handleMouseLeave = () => {
+    if (isDrawing.current) {
+      isDrawing.current = false;
+      setPreviewShape(null);
+    }
+    const container = stageRef.current?.getStage()?.container();
+    if (container) container.style.cursor = "default";
+  };
+  // Sometimes mouseup fires outside the Stage. Add a document-level listener that cancels drawing:
+  useEffect(() => {
+    const endDrawingOutside = () => {
+      if (!isDrawing.current) return;
+      isDrawing.current = false;
+      setPreviewShape(null);
+      setSelectedTool(null);
+      const c = stageRef.current?.getStage()?.container();
+      if (c) c.style.cursor = "default";
+    };
+    document.addEventListener("mouseup", endDrawingOutside);
+    return () => document.removeEventListener("mouseup", endDrawingOutside);
+  }, [setSelectedTool]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      // don’t delete while typing
+      const t = e.target;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.isContentEditable)
+      )
+        return;
+
+      if (
+        (e.key === "Delete" || e.key === "Backspace") &&
+        selectedIds?.length
+      ) {
+        e.preventDefault(); // stop browser “back” on Backspace
+        deleteSelected(selectedIds); // you already have this helper in PDFOverlayCanvas
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedIds, deleteSelected]);
+
+  // inside PDFOverlayCanvas
+  useEffect(() => {
+    function handleReset() {
+      // stop any drawing in progress
+      isDrawing.current = false;
+
+      // clear UI state
+      setPreviewShape(null);
+      setSelectionBox(null);
+      selectionStart.current = null;
+      setSelectedIds([]);
+      setPanelOpen(false);
+
+      // reset cursor to default
+      const stage = trRef.current?.getStage();
+      if (stage?.container()) stage.container().style.cursor = "default";
+
+      // also make sure the tool is not active in this component (if you pass setter)
+      if (typeof setSelectedTool === "function") setSelectedTool(null);
+    }
+
+    window.addEventListener("canvas:resetTool", handleReset);
+    return () => window.removeEventListener("canvas:resetTool", handleReset);
+  }, [setSelectedTool, setSelectedIds]);
 
   return (
     <div
@@ -398,7 +491,7 @@ useEffect(() => {
     >
       {stageSize.width > 0 && (
         <Stage
-        ref={stageRef}
+          ref={stageRef}
           width={stageSize.width}
           height={stageSize.height}
           className="absolute inset-0"
@@ -413,7 +506,10 @@ useEffect(() => {
         >
           <Layer>
             {shapes.map((shape) => {
-              const isSelected = selectedIds.includes(shape.id);
+              // const isSelected = selectedIds.includes(shape.id);
+
+              const intensity = (shape.shadowIntensity ?? 50) / 100; // 0–1 range
+              const adjusted = Math.pow(intensity, 1.5);
 
               // ✅ Ensure cornerRadius exists for rectangles
               if (
@@ -435,10 +531,28 @@ useEffect(() => {
                       fill={shape.fill ?? "rgba(0,128,255,0.25)"}
                       stroke={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 2}
-                      shadowEnabled={isSelected}
-                      shadowColor="#00b4ff"
-                      shadowBlur={isSelected ? 10 : 0}
-                      shadowOpacity={isSelected ? 0.8 : 0}
+                       perfectDrawEnabled={false}
+                       strokeScaleEnabled={false}
+                      opacity={shape.opacity ?? 1}
+                      shadowColor={shape.shadowColor || "transparent"}
+                      shadowBlur={
+                        (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
+                      }
+                      shadowOffset={{
+                        x:
+                          (shape.shadowOffset ?? 0) *
+                          Math.cos(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                        y:
+                          (shape.shadowOffset ?? 0) *
+                          Math.sin(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                      }}
+                      shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
+                      shadowEnabled={adjusted > 0.01}
+                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -451,13 +565,26 @@ useEffect(() => {
                         );
                       }}
                       draggable
+                      onDragStart={(e) =>
+                        handleShapeDuplicate({
+                          e,
+                          shapes,
+                          selectedIds,
+                          setShapes,
+                          setSelectedIds,
+                          isDuplicating,
+                        })
+                      }
                       onDragEnd={(e) => {
-                        const { x, y } = e.target.position();
-                        setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id ? { ...s, x, y } : s
-                          )
-                        );
+                        if (!isDuplicating.current) {
+                          const { x, y } = e.target.position();
+                          setShapes((prev) =>
+                            prev.map((s) =>
+                              s.id === shape.id ? { ...s, x, y } : s
+                            )
+                          );
+                        }
+                        isDuplicating.current = false;
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -498,10 +625,28 @@ useEffect(() => {
                       fill={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 3}
                       hitStrokeWidth={20}
-                      shadowEnabled={isSelected}
-                      shadowColor="#00b4ff"
-                      shadowBlur={isSelected ? 10 : 0}
-                      shadowOpacity={isSelected ? 0.8 : 0}
+                      opacity={shape.opacity ?? 1}
+                      perfectDrawEnabled={false}
+                      strokeScaleEnabled={false}
+                      shadowColor={shape.shadowColor || "transparent"}
+                      shadowBlur={
+                        (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
+                      }
+                      shadowOffset={{
+                        x:
+                          (shape.shadowOffset ?? 0) *
+                          Math.cos(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                        y:
+                          (shape.shadowOffset ?? 0) *
+                          Math.sin(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                      }}
+                      shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
+                      shadowEnabled={adjusted > 0.01}
+                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -514,13 +659,26 @@ useEffect(() => {
                         );
                       }}
                       draggable
+                      onDragStart={(e) =>
+                        handleShapeDuplicate({
+                          e,
+                          shapes,
+                          selectedIds,
+                          setShapes,
+                          setSelectedIds,
+                          isDuplicating,
+                        })
+                      }
                       onDragEnd={(e) => {
-                        const { x, y } = e.target.position();
-                        setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id ? { ...s, x, y } : s
-                          )
-                        );
+                        if (!isDuplicating.current) {
+                          const { x, y } = e.target.position();
+                          setShapes((prev) =>
+                            prev.map((s) =>
+                              s.id === shape.id ? { ...s, x, y } : s
+                            )
+                          );
+                        }
+                        isDuplicating.current = false;
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -552,11 +710,26 @@ useEffect(() => {
                       fill={shape.fill}
                       stroke={shape.stroke}
                       strokeWidth={shape.strokeWidth ?? 1}
-                      shadowEnabled={isSelected}
-                      shadowColor="#00b4ff"
-                      shadowBlur={isSelected ? 10 : 0}
-                      shadowOpacity={isSelected ? 0.8 : 0}
+                      shadowColor={shape.shadowColor || "transparent"}
+                      shadowBlur={
+                        (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
+                      }
+                      shadowOffset={{
+                        x:
+                          (shape.shadowOffset ?? 0) *
+                          Math.cos(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                        y:
+                          (shape.shadowOffset ?? 0) *
+                          Math.sin(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                      }}
+                      shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
+                      shadowEnabled={adjusted > 0.01}
                       draggable={!shape.isEditing}
+                      opacity={shape.opacity ?? 1}
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -567,6 +740,27 @@ useEffect(() => {
                               : [...prev, shape.id]
                             : [shape.id]
                         );
+                      }}
+                      onDragStart={(e) =>
+                        handleShapeDuplicate({
+                          e,
+                          shapes,
+                          selectedIds,
+                          setShapes,
+                          setSelectedIds,
+                          isDuplicating,
+                        })
+                      }
+                      onDragEnd={(e) => {
+                        if (!isDuplicating.current) {
+                          const { x, y } = e.target.position();
+                          setShapes((prev) =>
+                            prev.map((s) =>
+                              s.id === shape.id ? { ...s, x, y } : s
+                            )
+                          );
+                        }
+                        isDuplicating.current = false;
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -592,6 +786,25 @@ useEffect(() => {
                       fill={shape.fill}
                       stroke={shape.stroke}
                       strokeWidth={shape.strokeWidth}
+                      opacity={shape.opacity ?? 1}
+                      shadowColor={shape.shadowColor || "transparent"}
+                      shadowBlur={
+                        (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
+                      }
+                      shadowOffset={{
+                        x:
+                          (shape.shadowOffset ?? 0) *
+                          Math.cos(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                        y:
+                          (shape.shadowOffset ?? 0) *
+                          Math.sin(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                      }}
+                      shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
+                      shadowEnabled={adjusted > 0.01}
                       draggable
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
@@ -599,6 +812,27 @@ useEffect(() => {
                           isShift ? [...prev, shape.id] : [shape.id]
                         );
                         setPanelOpen(true);
+                      }}
+                      onDragStart={(e) =>
+                        handleShapeDuplicate({
+                          e,
+                          shapes,
+                          selectedIds,
+                          setShapes,
+                          setSelectedIds,
+                          isDuplicating,
+                        })
+                      }
+                      onDragEnd={(e) => {
+                        if (!isDuplicating.current) {
+                          const { x, y } = e.target.position();
+                          setShapes((prev) =>
+                            prev.map((s) =>
+                              s.id === shape.id ? { ...s, x, y } : s
+                            )
+                          );
+                        }
+                        isDuplicating.current = false;
                       }}
                     />
                   );
@@ -612,8 +846,28 @@ useEffect(() => {
                       fill={shape.fill ?? "rgba(0,128,255,0.25)"}
                       stroke={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 2}
+                      opacity={shape.opacity ?? 1}
                       perfectDrawEnabled={false}
                       strokeScaleEnabled={false}
+                      shadowColor={shape.shadowColor || "transparent"}
+                      shadowBlur={
+                        (shape.shadowRadius ?? 10) * (0.5 + adjusted * 1.5)
+                      }
+                      shadowOffset={{
+                        x:
+                          (shape.shadowOffset ?? 0) *
+                          Math.cos(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                        y:
+                          (shape.shadowOffset ?? 0) *
+                          Math.sin(
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                          ),
+                      }}
+                      shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
+                      shadowEnabled={adjusted > 0.01}
+                      
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
@@ -626,13 +880,26 @@ useEffect(() => {
                         );
                       }}
                       draggable
+                      onDragStart={(e) =>
+                        handleShapeDuplicate({
+                          e,
+                          shapes,
+                          selectedIds,
+                          setShapes,
+                          setSelectedIds,
+                          isDuplicating,
+                        })
+                      }
                       onDragEnd={(e) => {
-                        const { x, y } = e.target.position();
-                        setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id ? { ...s, x, y } : s
-                          )
-                        );
+                        if (!isDuplicating.current) {
+                          const { x, y } = e.target.position();
+                          setShapes((prev) =>
+                            prev.map((s) =>
+                              s.id === shape.id ? { ...s, x, y } : s
+                            )
+                          );
+                        }
+                        isDuplicating.current = false;
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -682,6 +949,7 @@ useEffect(() => {
                 stroke="#00b4ff"
                 strokeWidth={1}
                 dash={[4, 4]}
+                listening={false}
               />
             )}
 

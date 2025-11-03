@@ -9,7 +9,10 @@ export default function ShapePropertiesPanel({
   updateSelected,
   deleteSelected,
 }) {
-  
+  useEffect(() => {
+  window.onShapeDrawn = () => setSelectedTool(null);
+  return () => (window.onShapeDrawn = null);
+}, []);
 
   const selectedShape = shapes.find((s) => s.id === selectedId);
   const [isDragging, setIsDragging] = useState(false);

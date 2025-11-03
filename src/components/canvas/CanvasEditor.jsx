@@ -12,11 +12,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 // one page view
-function PDFPage({ imageUrl, shapes, setShapes }) {
+function PDFPage({ imageUrl, shapes, setShapes, selectedTool }) {
   const [img] = useImage(imageUrl);
   const containerRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
+  
 
   // Auto-scale to fit container size
   useEffect(() => {
@@ -66,7 +67,7 @@ function PDFPage({ imageUrl, shapes, setShapes }) {
               height: `${stageSize.height}px`,
             }}
           >
-            <PDFOverlayCanvas shapes={shapes} setShapes={setShapes} />
+            <PDFOverlayCanvas shapes={shapes} setShapes={setShapes} selectedTool={selectedTool}/>
           </div>
         </>
       )}
@@ -80,15 +81,14 @@ export default function CanvasEditor() {
   const [shapesByPage, setShapesByPage] = useState({});
   const pdfUrl = new URLSearchParams(window.location.search).get("pdf");
   const [loading, setLoading] = useState(true);
+  const [selectedTool, setSelectedTool] = useState(null);
 
-  // --- before return() ---
-  const memoizedShapes = useMemo(
-    () =>
-      Array.isArray(shapesByPage[selectedPage])
-        ? shapesByPage[selectedPage]
-        : [],
-    [shapesByPage, selectedPage]
-  );
+  useEffect(() => {
+  const handleClearSelectedTool = () => setSelectedTool(null);
+  window.addEventListener("clearSelectedTool", handleClearSelectedTool);
+  return () => window.removeEventListener("clearSelectedTool", handleClearSelectedTool);
+}, []);
+
 
   // load pdf pages
   useEffect(() => {
@@ -136,31 +136,10 @@ export default function CanvasEditor() {
     loadPDF();
   }, [pdfUrl]);
 
-  // add shape for current page
-  const handleAddShape = (type) => {
-    console.log("🎨 Adding shape of type:", type);
-
-    setShapesByPage((prev) => {
-      const current = Array.isArray(prev[selectedPage])
-        ? prev[selectedPage]
-        : [];
-      const newShape = {
-        id: `shape-${Date.now()}`,
-        type,
-        x: 100 + current.length * 20,
-        y: 100 + current.length * 20,
-        draggable: true,
-        fill: "rgba(0,128,255,0.25)",
-        stroke: "#00b4ff",
-        strokeWidth: 0,
-        opacity: 0.8,
-        width: 120,
-        height: 80,
-      };
-      console.log("✨ New shape added:", newShape);
-      return { ...prev, [selectedPage]: [...current, newShape] };
-    });
-  };
+  const handleSelectTool = (type) => {
+  setSelectedTool((prev) => (prev === type ? null : type)); // toggle same tool off
+  console.log("🧰 Tool selected:", type);
+};
 
   if (loading) {
     return (
@@ -229,7 +208,7 @@ export default function CanvasEditor() {
             ].map(({ icon: Icon, type, color }) => (
               <button
                 key={type}
-                onClick={() => handleAddShape(type)}
+                onClick={() => handleSelectTool(type)}
                 className={`w-8 h-8 flex items-center justify-center rounded-md ${color} transition`}
                 title={`Add ${type}`}
               >
@@ -279,6 +258,7 @@ export default function CanvasEditor() {
                     return { ...prev, [selectedPage]: next };
                   });
                 }}
+                selectedTool={selectedTool}
               />
             </>
           )}

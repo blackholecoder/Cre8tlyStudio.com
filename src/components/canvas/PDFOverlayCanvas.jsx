@@ -11,13 +11,14 @@ import {
 
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 
-export default function PDFOverlayCanvas({ shapes, setShapes }) {
+export default function PDFOverlayCanvas({ shapes, setShapes, selectedTool }) {
   shapes = Array.isArray(shapes) ? shapes : [];
   const containerRef = useRef(null);
   const trRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [selectedId, setSelectedId] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [previewShape, setPreviewShape] = useState(null);
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
 
@@ -123,15 +124,130 @@ export default function PDFOverlayCanvas({ shapes, setShapes }) {
   }, [shapes]);
 
   useEffect(() => {
-  const handleOutsideClick = (e) => {
-    if (!containerRef.current?.contains(e.target)) {
-      setSelectedId(null);
-      setPanelOpen(false);
+    const handleOutsideClick = (e) => {
+      if (!containerRef.current?.contains(e.target)) {
+        setSelectedId(null);
+        setPanelOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const isDrawing = useRef(false);
+  const startPos = useRef({ x: 0, y: 0 });
+
+const handleMouseDown = (e) => {
+  const stage = e.target.getStage();
+  const clickedEmpty =
+    e.target === stage || e.target.getParent() === stage.findOne("Layer");
+
+  // 🧹 If not in drawing mode and clicked empty area → deselect shape
+  if (!selectedTool && clickedEmpty) {
+    setSelectedId(null);
+    setPanelOpen(false);
+    return;
+  }
+
+  // 🖌️ If drawing tool is active but clicked on a shape → skip
+  if (!clickedEmpty) return;
+
+  // 🧩 Begin drawing a new shape
+  isDrawing.current = true;
+  const pos = stage.getPointerPosition();
+  startPos.current = pos;
+
+  setPreviewShape({
+    id: "preview-shape",
+    type: selectedTool,
+    x: pos.x,
+    y: pos.y,
+    width: 0,
+    height: 0,
+    radiusX: 0,
+    radiusY: 0,
+    fill: "rgba(0,128,255,0.15)",
+    stroke: "#00b4ff",
+    strokeWidth: 0,
+    opacity: 0.6,
+  });
+};
+
+
+  const handleMouseMove = (e) => {
+  if (!isDrawing.current || !previewShape) return;
+
+  const stage = e.target.getStage();
+  const pos = stage.getPointerPosition();
+  const dx = pos.x - startPos.current.x;
+  const dy = pos.y - startPos.current.y;
+
+  const updated = { ...previewShape };
+
+  // ✅ Detect if Shift is held for perfect proportions
+  const shiftPressed = e.evt.shiftKey;
+
+  if (selectedTool === "rect") {
+    let width = dx;
+    let height = dy;
+
+    if (shiftPressed) {
+      // Keep it a perfect square
+      const size = Math.max(Math.abs(dx), Math.abs(dy));
+      width = dx < 0 ? -size : size;
+      height = dy < 0 ? -size : size;
     }
+
+    updated.width = width;
+    updated.height = height;
+  } else if (selectedTool === "circle") {
+    let radiusX = Math.abs(dx / 2);
+    let radiusY = Math.abs(dy / 2);
+
+    if (shiftPressed) {
+      // Keep it a perfect circle
+      const radius = Math.max(radiusX, radiusY);
+      radiusX = radiusY = radius;
+    }
+
+    updated.radiusX = radiusX;
+    updated.radiusY = radiusY;
+    updated.x = startPos.current.x + dx / 2;
+    updated.y = startPos.current.y + dy / 2;
+  } else if (selectedTool === "arrow") {
+    updated.points = [startPos.current.x, startPos.current.y, pos.x, pos.y];
+  }
+
+  setPreviewShape(updated);
+};
+
+
+  const handleMouseUp = () => {
+    if (!isDrawing.current || !previewShape) return;
+
+    isDrawing.current = false;
+
+    // Finalize shape into real shapes array
+    setShapes((prev) => [
+  ...prev,
+  {
+    ...previewShape,
+    id: `shape-${Date.now()}`,
+    strokeWidth: 2,
+    opacity: 0.9,
+  },
+]);
+
+// ✅ Clear preview + exit drawing mode
+setPreviewShape(null);
+isDrawing.current = false;
+
+// 🧹 Exit tool mode after one draw (optional but preferred)
+if (selectedTool) {
+  const event = new CustomEvent("clearSelectedTool");
+  window.dispatchEvent(event);
+}
   };
-  document.addEventListener("mousedown", handleOutsideClick);
-  return () => document.removeEventListener("mousedown", handleOutsideClick);
-}, []);
 
   return (
     <div
@@ -144,15 +260,13 @@ export default function PDFOverlayCanvas({ shapes, setShapes }) {
           width={stageSize.width}
           height={stageSize.height}
           className="absolute inset-0"
-          style={{ background: "transparent" }}
-          onMouseDown={(e) => {
-            const clickedOnEmpty = e.target === e.target.getStage();
-
-            if (clickedOnEmpty) {
-              setSelectedId(null);
-              setPanelOpen(false);
-            }
+          style={{
+            background: "transparent",
+            cursor: selectedTool ? "crosshair" : "default",
           }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
         >
           <Layer>
             {shapes.map((shape) => {
@@ -359,6 +473,14 @@ export default function PDFOverlayCanvas({ shapes, setShapes }) {
                   );
               }
             })}
+            {previewShape &&
+              (previewShape.type === "rect" ? (
+                <Rect {...previewShape} />
+              ) : previewShape.type === "circle" ? (
+                <Ellipse {...previewShape} />
+              ) : previewShape.type === "arrow" ? (
+                <Arrow {...previewShape} />
+              ) : null)}
 
             <Transformer
               ref={trRef}

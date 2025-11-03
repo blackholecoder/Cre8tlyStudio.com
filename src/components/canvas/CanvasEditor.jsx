@@ -24,7 +24,15 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 // one page view
-function PDFPage({ imageUrl, shapes, setShapes, setSelectedTool, selectedTool, selectedIds, setSelectedIds }) {
+function PDFPage({
+  imageUrl,
+  shapes,
+  setShapes,
+  setSelectedTool,
+  selectedTool,
+  selectedIds,
+  setSelectedIds,
+}) {
   const [img] = useImage(imageUrl);
   const containerRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
@@ -82,7 +90,7 @@ function PDFPage({ imageUrl, shapes, setShapes, setSelectedTool, selectedTool, s
               shapes={shapes}
               setShapes={setShapes}
               selectedTool={selectedTool}
-              setSelectedTool={setSelectedTool} 
+              setSelectedTool={setSelectedTool}
               selectedIds={selectedIds}
               setSelectedIds={setSelectedIds}
             />
@@ -156,109 +164,106 @@ export default function CanvasEditor() {
   };
 
   // history manager
-const historyRef = useRef({}); // { [page]: { past: [], future: [] } }
+  const historyRef = useRef({}); // { [page]: { past: [], future: [] } }
 
-function getStacks(page) {
-  if (!historyRef.current[page]) {
-    historyRef.current[page] = { past: [], future: [] };
+  function getStacks(page) {
+    if (!historyRef.current[page]) {
+      historyRef.current[page] = { past: [], future: [] };
+    }
+    return historyRef.current[page];
   }
-  return historyRef.current[page];
-}
 
-// Call this *before* you set a new shapes array for a page
-function pushPast(page, currentShapes) {
-  const { past } = getStacks(page);
-  // store a deep copy so future edits don't mutate history
-  past.push(JSON.parse(JSON.stringify(currentShapes || [])));
-  // whenever we push, clear future (standard undo/redo behavior)
-  historyRef.current[page].future = [];
-}
+  // Call this *before* you set a new shapes array for a page
+  function pushPast(page, currentShapes) {
+    const { past } = getStacks(page);
+    // store a deep copy so future edits don't mutate history
+    past.push(JSON.parse(JSON.stringify(currentShapes || [])));
+    // whenever we push, clear future (standard undo/redo behavior)
+    historyRef.current[page].future = [];
+  }
 
-const undo = useCallback(() => {
-  const page = selectedPage;
-  const { past, future } = getStacks(page);
-  if (past.length === 0) return;
+  const undo = useCallback(() => {
+    const page = selectedPage;
+    const { past, future } = getStacks(page);
+    if (past.length === 0) return;
 
-  const current = shapesByPage[page] || [];
-  const previous = past.pop();
-  future.push(JSON.parse(JSON.stringify(current)));
+    const current = shapesByPage[page] || [];
+    const previous = past.pop();
+    future.push(JSON.parse(JSON.stringify(current)));
 
-  setShapesByPage(prev => ({ ...prev, [page]: previous }));
-  setSelectedIds([]); // optional but helpful
-}, [selectedPage, shapesByPage, setShapesByPage]);
+    setShapesByPage((prev) => ({ ...prev, [page]: previous }));
+    setSelectedIds([]); // optional but helpful
+  }, [selectedPage, shapesByPage, setShapesByPage]);
 
-const redo = useCallback(() => {
-  const page = selectedPage;
-  const { past, future } = getStacks(page);
-  if (future.length === 0) return;
+  const redo = useCallback(() => {
+    const page = selectedPage;
+    const { past, future } = getStacks(page);
+    if (future.length === 0) return;
 
-  const current = shapesByPage[page] || [];
-  const next = future.pop();
-  past.push(JSON.parse(JSON.stringify(current)));
+    const current = shapesByPage[page] || [];
+    const next = future.pop();
+    past.push(JSON.parse(JSON.stringify(current)));
 
-  setShapesByPage(prev => ({ ...prev, [page]: next }));
-  setSelectedIds([]); // optional
-}, [selectedPage, shapesByPage, setShapesByPage]);
-
-
+    setShapesByPage((prev) => ({ ...prev, [page]: next }));
+    setSelectedIds([]); // optional
+  }, [selectedPage, shapesByPage, setShapesByPage]);
 
   useEffect(() => {
-  function onKeyDown(e) {
-    const t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    function onKeyDown(e) {
+      const t = e.target;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.isContentEditable)
+      )
+        return;
 
-    const isMac = navigator.platform.toUpperCase().includes('MAC');
-    const mod = isMac ? e.metaKey : e.ctrlKey;
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
 
-    if (mod && e.key.toLowerCase() === 'z') {
-      e.preventDefault();
-      e.shiftKey ? redo() : undo();
+      if (mod && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        e.shiftKey ? redo() : undo();
+      }
     }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [undo, redo]);
+  // selectedPage matters for per-page stacks
+
+  function handleBoolean(op) {
+    const current = shapesByPage[selectedPage] || [];
+    const sel = selectedIds.map(String);
+    const picked = current.filter((s) => sel.includes(String(s.id)));
+
+    if (picked.length !== 2) {
+      alert("Select exactly 2 shapes to combine.");
+      return;
+    }
+
+    const svgPath = performBooleanOperation(picked, op);
+    if (!svgPath) return;
+
+    const newShape = {
+      id: `shape-${Date.now()}`,
+      type: "path",
+      data: svgPath,
+      fill: "rgba(0,128,255,0.25)",
+      stroke: "#00b4ff",
+      strokeWidth: 1,
+    };
+    pushPast(selectedPage, current);
+
+    setShapesByPage((prev) => ({
+      ...prev,
+      [selectedPage]: [
+        ...current.filter((s) => !sel.includes(String(s.id))),
+        newShape,
+      ],
+    }));
+    setSelectedIds([newShape.id]);
   }
-  window.addEventListener('keydown', onKeyDown);
-  return () => window.removeEventListener('keydown', onKeyDown);
-}, [undo, redo]);
- // selectedPage matters for per-page stacks
-
-
-
-function handleBoolean(op) {
-  const current = shapesByPage[selectedPage] || [];
-  const sel = selectedIds.map(String);
-  const picked = current.filter(s => sel.includes(String(s.id)));
-
-
-  if (picked.length !== 2) {
-    alert("Select exactly 2 shapes to combine.");
-    return;
-  }
-
-  const svgPath = performBooleanOperation(picked, op);
-  if (!svgPath) return;
-
-  const newShape = {
-    id: `shape-${Date.now()}`,
-    type: "path",
-    data: svgPath,
-    fill: "rgba(0,128,255,0.25)",
-    stroke: "#00b4ff",
-    strokeWidth: 1,
-  };
-  pushPast(selectedPage, current);
-
-  setShapesByPage(prev => ({
-    ...prev,
-    [selectedPage]: [
-      ...current.filter(s => !sel.includes(String(s.id))),
-      newShape,
-    ],
-  }));
-  setSelectedIds([newShape.id]);
-}
-
-
-
-
 
   if (loading) {
     return (
@@ -299,62 +304,72 @@ function handleBoolean(op) {
 
         {/* ✅ Drawing area */}
         <div className="flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
-          <div className="absolute top-4 right-4 flex gap-2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar" onMouseDown={(e) => e.stopPropagation()}
-  onClick={(e) => e.stopPropagation()}>
+          <div
+            className="absolute top-12 right-4 flex flex-col gap-2 ml-0 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar"
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             {[
               {
                 icon: Square,
                 type: "rect",
                 color: "bg-black",
+                title: "Rectangle Tool",
               },
               {
                 icon: Circle,
                 type: "circle",
                 color: "bg-black",
+                title: "Ellipse Tool",
               },
               {
                 icon: ArrowRight,
                 type: "arrow",
                 color: "bg-black",
+                title: "Arrow Tool",
               },
               {
                 icon: Type,
                 type: "text",
                 color: "bg-black",
+                title: "Artistic Text Tool",
               },
-            ].map(({ icon: Icon, type, color }) => (
+            ].map(({ icon: Icon, type, color, title }) => (
               <button
                 key={type}
                 onClick={() => handleSelectTool(type)}
                 className={`w-8 h-8 flex items-center justify-center rounded-md ${color} transition`}
-                title={`Add ${type}`}
+                title={title}
               >
-                <Icon size={18} className="text-green" />
+                <Icon size={18} className="text-grey-700" />
               </button>
             ))}
-            <div className="flex gap-2 ml-3">
-              <button onClick={() => handleBoolean("union")} title="Add">
+            <div className="flex flex-col gap-2 ml-0">
+              <button onClick={() => handleBoolean("union")} title="Add" className="bg-black rounded-md w-8 h-8 flex items-center justify-center">
                 <Plus className="text-cyan-400" size={18} />
               </button>
               <button
                 onClick={() => handleBoolean("subtract")}
                 title="Subtract"
+                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
               >
                 <Minus className="text-cyan-400" size={18} />
               </button>
               <button
                 onClick={() => handleBoolean("intersect")}
                 title="Intersect"
+                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
               >
                 <Combine className="text-cyan-400" size={18} />
               </button>
               <button
                 onClick={() => handleBoolean("xor")}
                 title="XOR / Exclude"
+                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
               >
                 <Slash className="text-cyan-400" size={18} />
               </button>
-              <button onClick={() => handleBoolean("divide")} title="Divide">
+              <button onClick={() => handleBoolean("divide")} title="Divide" className="bg-black rounded-md w-8 h-8 flex items-center justify-center">
                 <Divide className="text-cyan-400" size={18} />
               </button>
             </div>
@@ -380,29 +395,32 @@ function handleBoolean(op) {
               })()}{" "}
               {/* ✅ Set active page */}
               <PDFPage
-  imageUrl={pages[selectedPage]}
-  shapes={shapesByPage[selectedPage] || []}
-  setShapes={(updater) => {
-    setShapesByPage((prev) => {
-      const current = Array.isArray(prev[selectedPage]) ? prev[selectedPage] : [];
+                imageUrl={pages[selectedPage]}
+                shapes={shapesByPage[selectedPage] || []}
+                setShapes={(updater) => {
+                  setShapesByPage((prev) => {
+                    const current = Array.isArray(prev[selectedPage])
+                      ? prev[selectedPage]
+                      : [];
 
-      // compute next from updater/function/array
-      const next =
-        typeof updater === "function" ? updater(current)
-        : Array.isArray(updater) ? updater
-        : [];
+                    // compute next from updater/function/array
+                    const next =
+                      typeof updater === "function"
+                        ? updater(current)
+                        : Array.isArray(updater)
+                          ? updater
+                          : [];
 
-      // ✅ record current into undo history BEFORE we set next
-      pushPast(selectedPage, current);
+                    // ✅ record current into undo history BEFORE we set next
+                    pushPast(selectedPage, current);
 
-      return { ...prev, [selectedPage]: next };
-    });
-  }}
-  selectedIds={selectedIds}
-  setSelectedIds={setSelectedIds}
-  selectedTool={selectedTool}
-/>
-
+                    return { ...prev, [selectedPage]: next };
+                  });
+                }}
+                selectedIds={selectedIds}
+                setSelectedIds={setSelectedIds}
+                selectedTool={selectedTool}
+              />
             </>
           )}
         </div>

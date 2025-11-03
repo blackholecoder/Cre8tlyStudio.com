@@ -144,50 +144,64 @@ export default function PDFOverlayCanvas({
   };
 
   // use capture so this runs before other handlers
-  document.addEventListener('mousedown', handleOutsideClick, true);
+  document.addEventListener('mousedown', handleOutsideClick);
   return () =>
-    document.removeEventListener('mousedown', handleOutsideClick, true);
+    document.removeEventListener('mousedown', handleOutsideClick);
 }, []);
 
 
   const isDrawing = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
-    const stage = e.target.getStage();
-    const clickedEmpty =
-      e.target === stage || e.target.getParent() === stage.findOne("Layer");
+const handleMouseDown = (e) => {
+  // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
+  if (e?.evt?.target?.closest && e.evt.target.closest('.canvas-toolbar')) {
+    return;
+  }
 
-    const pos = stage.getPointerPosition();
+  const stage = e.target.getStage();
+  const clickedEmpty =
+    e.target === stage || e.target.getParent() === stage.findOne('Layer');
 
-    // 🟦 If no active tool → start selection box
-    if (!selectedTool && clickedEmpty) {
-      selectionStart.current = pos;
-      setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0 });
-      isDrawing.current = false; // stop any shape drawing
-      return;
-    }
+  const pos = stage.getPointerPosition();
 
-    // 🖌️ If tool is active → start drawing shape
-    if (selectedTool && clickedEmpty) {
-      isDrawing.current = true;
-      startPos.current = pos;
-      setPreviewShape({
-        id: "preview-shape",
-        type: selectedTool,
-        x: pos.x,
-        y: pos.y,
-        width: 0,
-        height: 0,
-        radiusX: 0,
-        radiusY: 0,
-        fill: "rgba(0,128,255,0.15)",
-        stroke: "#00b4ff",
-        strokeWidth: 0,
-        opacity: 0.6,
-      });
-    }
-  };
+  // 🟦 No active tool → start lasso selection
+  if (!selectedTool && clickedEmpty) {
+    // make sure we are NOT in draw mode anymore
+    setSelectedTool?.(null);
+    setPreviewShape(null);
+    isDrawing.current = false;
+
+    // begin lasso
+    selectionStart.current = pos;
+    setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0 });
+    return;
+  }
+
+  // 🖌️ Tool is active and we clicked empty → start drawing a new shape
+  if (selectedTool && clickedEmpty) {
+    isDrawing.current = true;
+    startPos.current = pos;
+    setPreviewShape({
+      id: 'preview-shape',
+      type: selectedTool,
+      x: pos.x,
+      y: pos.y,
+      width: 0,
+      height: 0,
+      radiusX: 0,
+      radiusY: 0,
+      fill: 'rgba(0,128,255,0.15)',
+      stroke: '#00b4ff',
+      strokeWidth: 0,
+      opacity: 0.6,
+    });
+    return;
+  }
+
+  // (Optional) clicked on a node while no tool active → leave to node onClick
+};
+
 
   const handleMouseMove = (e) => {
   const stage = e.target.getStage();
@@ -359,6 +373,22 @@ useEffect(() => {
   return () => document.removeEventListener("mouseup", endDrawingOutside);
 }, [setSelectedTool]);
 
+useEffect(() => {
+  const onKeyDown = (e) => {
+    // don’t delete while typing
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds?.length) {
+      e.preventDefault(); // stop browser “back” on Backspace
+      deleteSelected(selectedIds); // you already have this helper in PDFOverlayCanvas
+    }
+  };
+
+  window.addEventListener('keydown', onKeyDown);
+  return () => window.removeEventListener('keydown', onKeyDown);
+}, [selectedIds, deleteSelected]);
+
 
   return (
     <div
@@ -379,6 +409,7 @@ useEffect(() => {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          handleMouseLeave={handleMouseLeave}
         >
           <Layer>
             {shapes.map((shape) => {

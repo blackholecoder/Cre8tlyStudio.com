@@ -7,20 +7,32 @@ import {
   Ellipse,
   Text,
   Transformer,
+  Path
 } from "react-konva";
 
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 
-export default function PDFOverlayCanvas({ shapes, setShapes, selectedTool }) {
+export default function PDFOverlayCanvas({
+  shapes,
+  setShapes,
+  selectedTool,
+  setSelectedTool,
+  selectedIds,
+  setSelectedIds,
+}) {
   shapes = Array.isArray(shapes) ? shapes : [];
   const containerRef = useRef(null);
   const trRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
-  const [selectedId, setSelectedId] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [previewShape, setPreviewShape] = useState(null);
+  const [selectionBox, setSelectionBox] = useState(null);
+  const selectionStart = useRef(null);
+
+  const stageRef = useRef(null);
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
+
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -92,162 +104,261 @@ export default function PDFOverlayCanvas({ shapes, setShapes, selectedTool }) {
     }
   }, [shapes, pageKey]);
 
-  const deleteSelected = () => {
-    if (!selectedId) return;
-    setShapes((prev) => prev.filter((s) => s.id !== selectedId));
-    setSelectedId(null);
+  const deleteSelected = (ids = []) => {
+    if (!ids.length) return;
+    setShapes((prev) => prev.filter((s) => !ids.includes(s.id)));
+    setSelectedIds([]);
     setPanelOpen(false);
   };
 
   const updateSelected = (updates) => {
     setShapes((prev) =>
-      prev.map((s) => (s.id === selectedId ? { ...s, ...updates } : s))
+      prev.map((s) => (selectedIds.includes(s.id) ? { ...s, ...updates } : s))
     );
   };
-
   useEffect(() => {
     const tr = trRef.current;
     const stage = tr?.getStage();
     if (!stage) return;
 
-    const selectedNode = stage.findOne(`#${selectedId}`);
-    if (selectedNode) {
-      tr.nodes([selectedNode]);
-    } else {
-      tr.nodes([]);
-    }
+    const nodes = selectedIds
+      .map((id) => stage.findOne(`#${id}`))
+      .filter(Boolean);
+    tr.nodes(nodes);
     tr.getLayer()?.batchDraw();
-  }, [selectedId, shapes]);
+  }, [selectedIds, shapes]);
 
   useEffect(() => {
     localStorage.setItem("cre8tly_canvas_shapes", JSON.stringify(shapes));
   }, [shapes]);
 
   useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (!containerRef.current?.contains(e.target)) {
-        setSelectedId(null);
-        setPanelOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
+  const handleOutsideClick = (e) => {
+    // 👇 ignore clicks on the canvas toolbar
+    if (e.target.closest('.canvas-toolbar')) return;
+
+    if (!containerRef.current?.contains(e.target)) {
+      setSelectedIds([]);
+      setPanelOpen(false);
+    }
+  };
+
+  // use capture so this runs before other handlers
+  document.addEventListener('mousedown', handleOutsideClick, true);
+  return () =>
+    document.removeEventListener('mousedown', handleOutsideClick, true);
+}, []);
+
 
   const isDrawing = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
 
-const handleMouseDown = (e) => {
-  const stage = e.target.getStage();
-  const clickedEmpty =
-    e.target === stage || e.target.getParent() === stage.findOne("Layer");
+  const handleMouseDown = (e) => {
+    const stage = e.target.getStage();
+    const clickedEmpty =
+      e.target === stage || e.target.getParent() === stage.findOne("Layer");
 
-  // 🧹 If not in drawing mode and clicked empty area → deselect shape
-  if (!selectedTool && clickedEmpty) {
-    setSelectedId(null);
-    setPanelOpen(false);
+    const pos = stage.getPointerPosition();
+
+    // 🟦 If no active tool → start selection box
+    if (!selectedTool && clickedEmpty) {
+      selectionStart.current = pos;
+      setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0 });
+      isDrawing.current = false; // stop any shape drawing
+      return;
+    }
+
+    // 🖌️ If tool is active → start drawing shape
+    if (selectedTool && clickedEmpty) {
+      isDrawing.current = true;
+      startPos.current = pos;
+      setPreviewShape({
+        id: "preview-shape",
+        type: selectedTool,
+        x: pos.x,
+        y: pos.y,
+        width: 0,
+        height: 0,
+        radiusX: 0,
+        radiusY: 0,
+        fill: "rgba(0,128,255,0.15)",
+        stroke: "#00b4ff",
+        strokeWidth: 0,
+        opacity: 0.6,
+      });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+  const stage = e.target.getStage();
+  const pos = stage.getPointerPosition();
+  
+  if (!pos) return;
+
+  // 🖌 drawing preview
+  if (isDrawing.current && previewShape) {
+    const dx = pos.x - startPos.current.x;
+    const dy = pos.y - startPos.current.y;
+
+    if (previewShape.type === "rect") {
+      // normalize so rect always has positive width/height
+      const x = Math.min(startPos.current.x, pos.x);
+      const y = Math.min(startPos.current.y, pos.y);
+      const width  = Math.abs(dx);
+      const height = Math.abs(dy);
+      setPreviewShape((prev) => ({ ...prev, x, y, width, height }));
+      return;
+    }
+
+    if (previewShape.type === "circle") {
+      // Ellipse needs center + radii
+      const cx = startPos.current.x + dx / 2;
+      const cy = startPos.current.y + dy / 2;
+      const rx = Math.abs(dx) / 2;
+      const ry = Math.abs(dy) / 2;
+      setPreviewShape((prev) => ({
+        ...prev,
+        x: cx,
+        y: cy,
+        radiusX: rx,
+        radiusY: ry,
+      }));
+      return;
+    }
+
+    if (previewShape.type === "arrow") {
+      setPreviewShape((prev) => ({
+        ...prev,
+        points: [startPos.current.x, startPos.current.y, pos.x, pos.y],
+      }));
+      return;
+    }
+  }
+
+  // 🟦 selection box
+  if (selectionBox && selectionStart.current) {
+    const x = Math.min(pos.x, selectionStart.current.x);
+    const y = Math.min(pos.y, selectionStart.current.y);
+    const width  = Math.abs(pos.x - selectionStart.current.x);
+    const height = Math.abs(pos.y - selectionStart.current.y);
+    setSelectionBox({ x, y, width, height });
+  }
+};
+
+const handleMouseUp = (e) => {
+  const stage = e.target.getStage();
+
+
+  if (selectionBox) {
+    const scaleX = stage.scaleX();
+    const scaleY = stage.scaleY();
+
+    const normBox = {
+      x: selectionBox.x / scaleX,
+      y: selectionBox.y / scaleY,
+      width: selectionBox.width / scaleX,
+      height: selectionBox.height / scaleY,
+    };
+
+    const box = {
+      x: Math.min(normBox.x, normBox.x + normBox.width),
+      y: Math.min(normBox.y, normBox.y + normBox.height),
+      x2: Math.max(normBox.x, normBox.x + normBox.width),
+      y2: Math.max(normBox.y, normBox.y + normBox.height),
+    };
+
+
+    const selected = shapes
+      .filter((s) => {
+        const node = stage.findOne(`#${s.id}`);
+        if (!node) {
+          console.log("⚠️ Shape node not found:", s.id);
+          return false;
+        }
+
+        const rect = node.getClientRect({ relativeTo: stage });
+
+        const intersects = !(
+          rect.x + rect.width < box.x ||
+          rect.x > box.x2 ||
+          rect.y + rect.height < box.y ||
+          rect.y > box.y2
+        );
+
+        return intersects;
+      })
+      .map((s) => s.id);
+
+    setSelectedIds(selected);
+    setPanelOpen(selected.length === 1);
+    setSelectionBox(null);
+    selectionStart.current = null;
+
+    if (selected.length === 0) {
+      console.log("❌ No shapes selected by box.");
+    }
     return;
   }
 
-  // 🖌️ If drawing tool is active but clicked on a shape → skip
-  if (!clickedEmpty) return;
-
-  // 🧩 Begin drawing a new shape
-  isDrawing.current = true;
-  const pos = stage.getPointerPosition();
-  startPos.current = pos;
-
-  setPreviewShape({
-    id: "preview-shape",
-    type: selectedTool,
-    x: pos.x,
-    y: pos.y,
-    width: 0,
-    height: 0,
-    radiusX: 0,
-    radiusY: 0,
-    fill: "rgba(0,128,255,0.15)",
-    stroke: "#00b4ff",
-    strokeWidth: 0,
-    opacity: 0.6,
-  });
-};
-
-
-  const handleMouseMove = (e) => {
-  if (!isDrawing.current || !previewShape) return;
-
-  const stage = e.target.getStage();
-  const pos = stage.getPointerPosition();
-  const dx = pos.x - startPos.current.x;
-  const dy = pos.y - startPos.current.y;
-
-  const updated = { ...previewShape };
-
-  // ✅ Detect if Shift is held for perfect proportions
-  const shiftPressed = e.evt.shiftKey;
-
-  if (selectedTool === "rect") {
-    let width = dx;
-    let height = dy;
-
-    if (shiftPressed) {
-      // Keep it a perfect square
-      const size = Math.max(Math.abs(dx), Math.abs(dy));
-      width = dx < 0 ? -size : size;
-      height = dy < 0 ? -size : size;
-    }
-
-    updated.width = width;
-    updated.height = height;
-  } else if (selectedTool === "circle") {
-    let radiusX = Math.abs(dx / 2);
-    let radiusY = Math.abs(dy / 2);
-
-    if (shiftPressed) {
-      // Keep it a perfect circle
-      const radius = Math.max(radiusX, radiusY);
-      radiusX = radiusY = radius;
-    }
-
-    updated.radiusX = radiusX;
-    updated.radiusY = radiusY;
-    updated.x = startPos.current.x + dx / 2;
-    updated.y = startPos.current.y + dy / 2;
-  } else if (selectedTool === "arrow") {
-    updated.points = [startPos.current.x, startPos.current.y, pos.x, pos.y];
-  }
-
-  setPreviewShape(updated);
-};
-
-
-  const handleMouseUp = () => {
-    if (!isDrawing.current || !previewShape) return;
-
+  // 🖌 finalize a drawn shape
+  if (isDrawing.current && previewShape) {
     isDrawing.current = false;
 
-    // Finalize shape into real shapes array
-    setShapes((prev) => [
-  ...prev,
-  {
-    ...previewShape,
-    id: `shape-${Date.now()}`,
-    strokeWidth: 2,
-    opacity: 0.9,
-  },
-]);
+    // ignore accidental clicks / tiny shapes
+    const tiny =
+      (previewShape.type === "rect"   && (previewShape.width < 2 || previewShape.height < 2)) ||
+      (previewShape.type === "circle" && (previewShape.radiusX < 1 || previewShape.radiusY < 1)) ||
+      (previewShape.type === "arrow"  && !previewShape.points);
+    if (!tiny) {
+      setShapes((prev) => [
+        ...prev,
+        {
+          ...previewShape,
+          id: `shape-${Date.now()}`,
+          // default stroke off on creation
+          strokeWidth: previewShape.type === "arrow" ? 2 : 0,
+        },
+      ]);
+    }
 
-// ✅ Clear preview + exit drawing mode
-setPreviewShape(null);
-isDrawing.current = false;
+    setPreviewShape(null);
+    setSelectedTool(null);            // <-- important
 
-// 🧹 Exit tool mode after one draw (optional but preferred)
-if (selectedTool) {
-  const event = new CustomEvent("clearSelectedTool");
-  window.dispatchEvent(event);
-}
+  const container = stageRef.current?.getStage()?.container();
+  if (container) container.style.cursor = "default";  // <-- force reset
+  }
+};
+
+// keep cursor in sync with tool
+useEffect(() => {
+  const container = stageRef.current?.getStage()?.container();
+  if (!container) return;
+  container.style.cursor = selectedTool ? "crosshair" : "default";
+}, [selectedTool]);
+
+// if mouse leaves the stage while drawing, stop and reset cursor
+const handleMouseLeave = () => {
+  if (isDrawing.current) {
+    isDrawing.current = false;
+    setPreviewShape(null);
+  }
+  const container = stageRef.current?.getStage()?.container();
+  if (container) container.style.cursor = "default";
+};
+// Sometimes mouseup fires outside the Stage. Add a document-level listener that cancels drawing:
+useEffect(() => {
+  const endDrawingOutside = () => {
+    if (!isDrawing.current) return;
+    isDrawing.current = false;
+    setPreviewShape(null);
+    setSelectedTool(null);
+    const c = stageRef.current?.getStage()?.container();
+    if (c) c.style.cursor = "default";
   };
+  document.addEventListener("mouseup", endDrawingOutside);
+  return () => document.removeEventListener("mouseup", endDrawingOutside);
+}, [setSelectedTool]);
+
 
   return (
     <div
@@ -257,6 +368,7 @@ if (selectedTool) {
     >
       {stageSize.width > 0 && (
         <Stage
+        ref={stageRef}
           width={stageSize.width}
           height={stageSize.height}
           className="absolute inset-0"
@@ -270,7 +382,7 @@ if (selectedTool) {
         >
           <Layer>
             {shapes.map((shape) => {
-              const isSelected = selectedId === shape.id;
+              const isSelected = selectedIds.includes(shape.id);
 
               // ✅ Ensure cornerRadius exists for rectangles
               if (
@@ -296,9 +408,16 @@ if (selectedTool) {
                       shadowColor="#00b4ff"
                       shadowBlur={isSelected ? 10 : 0}
                       shadowOpacity={isSelected ? 0.8 : 0}
-                      onClick={() => {
-                        setSelectedId(shape.id);
+                      onClick={(e) => {
+                        const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
+                        setSelectedIds((prev) =>
+                          isShift
+                            ? prev.includes(shape.id)
+                              ? prev.filter((id) => id !== shape.id)
+                              : [...prev, shape.id]
+                            : [shape.id]
+                        );
                       }}
                       draggable
                       onDragEnd={(e) => {
@@ -352,9 +471,16 @@ if (selectedTool) {
                       shadowColor="#00b4ff"
                       shadowBlur={isSelected ? 10 : 0}
                       shadowOpacity={isSelected ? 0.8 : 0}
-                      onClick={() => {
-                        setSelectedId(shape.id);
+                      onClick={(e) => {
+                        const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
+                        setSelectedIds((prev) =>
+                          isShift
+                            ? prev.includes(shape.id)
+                              ? prev.filter((id) => id !== shape.id)
+                              : [...prev, shape.id]
+                            : [shape.id]
+                        );
                       }}
                       draggable
                       onDragEnd={(e) => {
@@ -400,9 +526,16 @@ if (selectedTool) {
                       shadowBlur={isSelected ? 10 : 0}
                       shadowOpacity={isSelected ? 0.8 : 0}
                       draggable={!shape.isEditing}
-                      onClick={() => {
-                        setSelectedId(shape.id);
+                      onClick={(e) => {
+                        const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
+                        setSelectedIds((prev) =>
+                          isShift
+                            ? prev.includes(shape.id)
+                              ? prev.filter((id) => id !== shape.id)
+                              : [...prev, shape.id]
+                            : [shape.id]
+                        );
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
@@ -419,6 +552,26 @@ if (selectedTool) {
                     />
                   );
 
+                case "path":
+                  return (
+                    <Path
+                      key={shape.id}
+                      id={shape.id.toString()}
+                      data={shape.data}
+                      fill={shape.fill}
+                      stroke={shape.stroke}
+                      strokeWidth={shape.strokeWidth}
+                      draggable
+                      onClick={(e) => {
+                        const isShift = e.evt.shiftKey;
+                        setSelectedIds((prev) =>
+                          isShift ? [...prev, shape.id] : [shape.id]
+                        );
+                        setPanelOpen(true);
+                      }}
+                    />
+                  );
+
                 default:
                   return (
                     <Rect
@@ -430,9 +583,16 @@ if (selectedTool) {
                       strokeWidth={shape.strokeWidth ?? 2}
                       perfectDrawEnabled={false}
                       strokeScaleEnabled={false}
-                      onClick={() => {
-                        setSelectedId(shape.id);
+                      onClick={(e) => {
+                        const isShift = e.evt.shiftKey;
                         setPanelOpen(true);
+                        setSelectedIds((prev) =>
+                          isShift
+                            ? prev.includes(shape.id)
+                              ? prev.filter((id) => id !== shape.id)
+                              : [...prev, shape.id]
+                            : [shape.id]
+                        );
                       }}
                       draggable
                       onDragEnd={(e) => {
@@ -481,6 +641,18 @@ if (selectedTool) {
               ) : previewShape.type === "arrow" ? (
                 <Arrow {...previewShape} />
               ) : null)}
+            {selectionBox && (
+              <Rect
+                x={selectionBox.x}
+                y={selectionBox.y}
+                width={selectionBox.width}
+                height={selectionBox.height}
+                fill="rgba(0, 128, 255, 0.1)"
+                stroke="#00b4ff"
+                strokeWidth={1}
+                dash={[4, 4]}
+              />
+            )}
 
             <Transformer
               ref={trRef}
@@ -514,7 +686,7 @@ if (selectedTool) {
       {/* 🎛 Shape Properties Panel */}
       <ShapePropertiesPanel
         panelOpen={panelOpen}
-        selectedId={selectedId}
+        selectedIds={selectedIds}
         shapes={shapes}
         updateSelected={updateSelected}
         deleteSelected={deleteSelected}

@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 
 export default function ShapePropertiesPanel({
   panelOpen,
-  selectedId,
+  selectedIds = [],
   shapes,
   updateSelected,
   deleteSelected,
@@ -14,7 +14,8 @@ export default function ShapePropertiesPanel({
   return () => (window.onShapeDrawn = null);
 }, []);
 
-  const selectedShape = shapes.find((s) => s.id === selectedId);
+  const selectedShapes = shapes.filter((s) => selectedIds.includes(s.id));
+const selectedShape = selectedShapes.length === 1 ? selectedShapes[0] : null;
   const [isDragging, setIsDragging] = useState(false);
 
   // 🧭 Persistent position
@@ -37,7 +38,6 @@ export default function ShapePropertiesPanel({
     setIsDragging(false);
   }, []);
 
-  console.log("🧩 panel render", { panelOpen, selectedId, selectedShape });
 
   return (
     <AnimatePresence>
@@ -179,7 +179,7 @@ export default function ShapePropertiesPanel({
           <button
             onMouseDown={disableDrag}
             onMouseUp={enableDrag}
-            onClick={deleteSelected}
+            onClick={() => deleteSelected(selectedIds)}
             className="self-end mt-2 p-1 bg-white/5 hover:bg-red-700/20 text-white rounded-md flex items-center justify-center transition-all duration-150"
             title="Delete shape"
           >

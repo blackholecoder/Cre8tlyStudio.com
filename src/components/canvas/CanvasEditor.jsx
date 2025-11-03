@@ -4,7 +4,19 @@ import useImage from "use-image";
 import { pdfjs } from "react-pdf";
 import axiosInstance from "../../api/axios";
 import PDFOverlayCanvas from "./PDFOverlayCanvas";
-import { Square, Circle, ArrowRight, Type, Trash2 } from "lucide-react";
+import {
+  Square,
+  Circle,
+  ArrowRight,
+  Type,
+  Trash2,
+  Plus,
+  Minus,
+  Slash,
+  Combine,
+  Divide,
+} from "lucide-react";
+import { performBooleanOperation } from "../../helpers/booleanOps";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
@@ -12,12 +24,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 // one page view
-function PDFPage({ imageUrl, shapes, setShapes, selectedTool }) {
+function PDFPage({ imageUrl, shapes, setShapes, setSelectedTool, selectedTool, selectedIds, setSelectedIds }) {
   const [img] = useImage(imageUrl);
   const containerRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
-  
 
   // Auto-scale to fit container size
   useEffect(() => {
@@ -67,7 +78,14 @@ function PDFPage({ imageUrl, shapes, setShapes, selectedTool }) {
               height: `${stageSize.height}px`,
             }}
           >
-            <PDFOverlayCanvas shapes={shapes} setShapes={setShapes} selectedTool={selectedTool}/>
+            <PDFOverlayCanvas
+              shapes={shapes}
+              setShapes={setShapes}
+              selectedTool={selectedTool}
+              setSelectedTool={setSelectedTool} 
+              selectedIds={selectedIds}
+              setSelectedIds={setSelectedIds}
+            />
           </div>
         </>
       )}
@@ -82,13 +100,14 @@ export default function CanvasEditor() {
   const pdfUrl = new URLSearchParams(window.location.search).get("pdf");
   const [loading, setLoading] = useState(true);
   const [selectedTool, setSelectedTool] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
-  const handleClearSelectedTool = () => setSelectedTool(null);
-  window.addEventListener("clearSelectedTool", handleClearSelectedTool);
-  return () => window.removeEventListener("clearSelectedTool", handleClearSelectedTool);
-}, []);
-
+    const handleClearSelectedTool = () => setSelectedTool(null);
+    window.addEventListener("clearSelectedTool", handleClearSelectedTool);
+    return () =>
+      window.removeEventListener("clearSelectedTool", handleClearSelectedTool);
+  }, []);
 
   // load pdf pages
   useEffect(() => {
@@ -137,9 +156,48 @@ export default function CanvasEditor() {
   }, [pdfUrl]);
 
   const handleSelectTool = (type) => {
-  setSelectedTool((prev) => (prev === type ? null : type)); // toggle same tool off
-  console.log("🧰 Tool selected:", type);
-};
+    setSelectedTool((prev) => (prev === type ? null : type)); // toggle same tool off
+    console.log("🧰 Tool selected:", type);
+  };
+
+
+function handleBoolean(op) {
+  const current = shapesByPage[selectedPage] || [];
+  const sel = selectedIds.map(String);
+  const picked = current.filter(s => sel.includes(String(s.id)));
+
+  console.log("✅ selectedIds:", sel, " -> picked:", picked.map(s => s.id));
+
+  if (picked.length !== 2) {
+    alert("Select exactly 2 shapes to combine.");
+    return;
+  }
+
+  const svgPath = performBooleanOperation(picked, op);
+  if (!svgPath) return;
+
+  const newShape = {
+    id: `shape-${Date.now()}`,
+    type: "path",
+    data: svgPath,
+    fill: "rgba(0,128,255,0.25)",
+    stroke: "#00b4ff",
+    strokeWidth: 1,
+  };
+
+  setShapesByPage(prev => ({
+    ...prev,
+    [selectedPage]: [
+      ...current.filter(s => !sel.includes(String(s.id))),
+      newShape,
+    ],
+  }));
+  setSelectedIds([newShape.id]);
+}
+
+
+
+
 
   if (loading) {
     return (
@@ -149,9 +207,6 @@ export default function CanvasEditor() {
       </div>
     );
   }
-
-  console.log("📄 [CanvasEditor] current page:", selectedPage);
-  console.log("🧩 Shapes on current page:", shapesByPage[selectedPage]);
 
   return (
     <div className="flex h-screen bg-[#111] text-white">
@@ -183,7 +238,8 @@ export default function CanvasEditor() {
 
         {/* ✅ Drawing area */}
         <div className="flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
-          <div className="absolute top-4 right-4 flex gap-2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md">
+          <div className="absolute top-4 right-4 flex gap-2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar" onMouseDown={(e) => e.stopPropagation()}
+  onClick={(e) => e.stopPropagation()}>
             {[
               {
                 icon: Square,
@@ -215,6 +271,32 @@ export default function CanvasEditor() {
                 <Icon size={18} className="text-green" />
               </button>
             ))}
+            <div className="flex gap-2 ml-3">
+              <button onClick={() => handleBoolean("union")} title="Add">
+                <Plus className="text-cyan-400" size={18} />
+              </button>
+              <button
+                onClick={() => handleBoolean("subtract")}
+                title="Subtract"
+              >
+                <Minus className="text-cyan-400" size={18} />
+              </button>
+              <button
+                onClick={() => handleBoolean("intersect")}
+                title="Intersect"
+              >
+                <Combine className="text-cyan-400" size={18} />
+              </button>
+              <button
+                onClick={() => handleBoolean("xor")}
+                title="XOR / Exclude"
+              >
+                <Slash className="text-cyan-400" size={18} />
+              </button>
+              <button onClick={() => handleBoolean("divide")} title="Divide">
+                <Divide className="text-cyan-400" size={18} />
+              </button>
+            </div>
           </div>
 
           {/* 🔹 Clear Design Button */}
@@ -258,6 +340,8 @@ export default function CanvasEditor() {
                     return { ...prev, [selectedPage]: next };
                   });
                 }}
+                selectedIds={selectedIds}
+                setSelectedIds={setSelectedIds}
                 selectedTool={selectedTool}
               />
             </>

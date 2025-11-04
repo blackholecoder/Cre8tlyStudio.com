@@ -10,7 +10,7 @@ import {
   Path,
   Line,
 } from "react-konva";
-
+import { Html } from "react-konva-utils";
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 import { handleShapeDuplicate } from "../../helpers/handleShapeDuplicates";
 import { getGuides } from "../../helpers/guides";
@@ -223,17 +223,42 @@ export default function PDFOverlayCanvas({
           type: "text",
           x: pos.x,
           y: pos.y,
-          width: 0,
-          height: 0,
-          text: "A",
-          textMode: "line",
+          width: 200, // ✅ Give it a default width so it’s not auto-wrapping
+          height: 40,
+          text: "Type here",
+          wrap: "none", // ✅ disables line wrapping
+          align: "left",
+          verticalAlign: "top",
           fontSize: 20,
+          fillType: "solid",
           fill: "#ffffff",
+          gradient: { from: "#00b4ff", to: "#ff00ff", angle: 90 },
           stroke: "transparent",
           strokeWidth: 0,
           opacity: 0.9,
           fontFamily: "Inter",
           draggable: false,
+          isRichEditing: false, // initially false
+          html: null,
+        });
+        return;
+      }
+      if (selectedTool === "arrow") {
+        isDrawing.current = true;
+        startPos.current = pos;
+        setPreviewShape({
+          id: "preview-arrow",
+          type: "arrow",
+          points: [pos.x, pos.y, pos.x, pos.y], // ← just points, no x/y
+          pointerLength: 15,
+          pointerWidth: 15,
+          strokeWidth: 4,
+          fillType: "gradient",
+          gradient: { from: "#00b4ff", to: "#ff00ff", angle: 0 },
+          shadowColor: "#000000",
+          shadowOpacity: 0.5,
+          shadowRadius: 10,
+          opacity: 1,
         });
         return;
       }
@@ -258,6 +283,12 @@ export default function PDFOverlayCanvas({
         shadowOffset: 5,
         shadowAngle: 315,
         shadowIntensity: 100,
+        fillType: "solid", // can switch to "gradient" later
+        gradient: {
+          from: "#00b4ff",
+          to: "#ff00ff",
+          angle: 0,
+        },
       });
       return;
     }
@@ -324,7 +355,7 @@ export default function PDFOverlayCanvas({
         return;
       }
 
-      // ➡️ Arrow (unchanged)
+      // ➡️ Arrow (Path-based with gradient + scaling)
       if (previewShape.type === "arrow") {
         setPreviewShape((prev) => ({
           ...prev,
@@ -332,6 +363,7 @@ export default function PDFOverlayCanvas({
         }));
         return;
       }
+
       // 🅰️ Drawing text box
       if (previewShape.type === "text") {
         const dx = pos.x - startPos.current.x;
@@ -549,86 +581,6 @@ export default function PDFOverlayCanvas({
     return () => window.removeEventListener("canvas:resetTool", handleReset);
   }, [setSelectedTool, setSelectedIds]);
 
-  useEffect(() => {
-    const stage = stageRef.current?.getStage();
-    if (!stage) return;
-
-    const handleDblClick = (e) => {
-      const node = e.target;
-      if (node.className !== "Text") return;
-
-      const absPos = node.getAbsolutePosition();
-      const stageBox = stage.container().getBoundingClientRect();
-
-      // Create editable textarea overlay
-      const textarea = document.createElement("textarea");
-      textarea.value = node.text();
-      textarea.style.position = "absolute";
-      textarea.style.top = stageBox.top + absPos.y + "px";
-      textarea.style.left = stageBox.left + absPos.x + "px";
-      textarea.style.width = node.width() ? node.width() + "px" : "auto";
-      textarea.style.height = node.height() ? node.height() + "px" : "auto";
-      textarea.style.fontSize = node.fontSize() + "px";
-      const scale = stage.scaleX();
-      textarea.style.transform = `scale(${scale}) rotate(${node.rotation()}deg)`;
-      textarea.style.transformOrigin = "left top";
-
-      textarea.style.fontFamily = node.fontFamily();
-      textarea.style.color = node.fill();
-      textarea.style.background = "transparent";
-      textarea.style.border = "none";
-      textarea.style.outline = "none";
-      textarea.style.overflow = "hidden";
-      textarea.style.resize = "none";
-      textarea.style.lineHeight = "1.2";
-      textarea.style.zIndex = 1000;
-      textarea.style.whiteSpace = "pre-wrap";
-      textarea.style.textAlign = node.align?.() ?? "left";
-      textarea.style.fontWeight = node.fontStyle?.().includes("bold")
-        ? "bold"
-        : "normal";
-      textarea.style.transformOrigin = "left top";
-      textarea.style.transform = `rotate(${node.rotation()}deg)`;
-      textarea.style.pointerEvents = "auto";
-
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.addEventListener("input", () => {
-        textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
-      });
-
-      // Prevent dragging while editing
-      node.draggable(false);
-
-      const removeTextarea = () => {
-        const newText = textarea.value;
-        node.text(newText);
-        textarea.remove();
-        node.draggable(true);
-        stage.batchDraw();
-
-        // update the shape in React state
-        setShapes((prev) =>
-          prev.map((s) =>
-            s.id === node.id() ? { ...s, text: newText, isEditing: false } : s
-          )
-        );
-      };
-
-      textarea.addEventListener("blur", removeTextarea);
-      textarea.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          textarea.blur();
-        }
-      });
-    };
-
-    stage.on("dblclick", handleDblClick);
-    return () => stage.off("dblclick", handleDblClick);
-  }, [setShapes]);
-
   return (
     <div
       ref={containerRef}
@@ -674,7 +626,32 @@ export default function PDFOverlayCanvas({
                       {...shape}
                       radiusX={shape.radiusX ?? shape.radius ?? 50}
                       radiusY={shape.radiusY ?? shape.radius ?? 50}
-                      fill={shape.fill ?? "rgba(0,128,255,0.25)"}
+                      fill={
+                        shape.fillType === "gradient"
+                          ? undefined
+                          : (shape.fill ?? "rgba(0,128,255,0.25)")
+                      }
+                      fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                      fillLinearGradientEndPoint={{
+                        x:
+                          Math.cos(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) *
+                          (shape.radiusX ?? 50) *
+                          2,
+                        y:
+                          Math.sin(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) *
+                          (shape.radiusY ?? 50) *
+                          2,
+                      }}
+                      fillLinearGradientColorStops={[
+                        0,
+                        shape.gradient?.from ?? "#00b4ff",
+                        1,
+                        shape.gradient?.to ?? "#ff00ff",
+                      ]}
                       stroke={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 2}
                       perfectDrawEnabled={false}
@@ -783,39 +760,115 @@ export default function PDFOverlayCanvas({
                         const node = e.target;
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
+
                         setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id
-                              ? {
-                                  ...s,
-                                  x: node.x(),
-                                  y: node.y(),
-                                  radiusX:
-                                    (s.radiusX ?? s.radius ?? 50) * scaleX,
-                                  radiusY:
-                                    (s.radiusY ?? s.radius ?? 50) * scaleY,
-                                  rotation: node.rotation(),
-                                }
-                              : s
-                          )
+                          prev.map((s) => {
+                            if (s.id !== shape.id) return s;
+
+                            // 🟢 Circle / Ellipse – keep proportions
+                            if (s.type === "circle") {
+                              const avgScale = (scaleX + scaleY) / 2;
+                              const newRadius = (s.radius ?? 50) * avgScale;
+                              return {
+                                ...s,
+                                x: node.x(),
+                                y: node.y(),
+                                radius: newRadius,
+                                radiusX: newRadius,
+                                radiusY: newRadius,
+                                width: newRadius * 2,
+                                height: newRadius * 2,
+                                rotation: node.rotation(),
+                              };
+                            }
+
+                            // 🟦 Rectangles and others
+                            const newWidth = Math.max(
+                              20,
+                              (s.width ?? 100) * scaleX
+                            );
+                            const newHeight = Math.max(
+                              20,
+                              (s.height ?? 100) * scaleY
+                            );
+
+                            return {
+                              ...s,
+                              x: node.x(),
+                              y: node.y(),
+                              width: newWidth,
+                              height: newHeight,
+                              rotation: node.rotation(),
+                              cornerRadius: s.cornerRadius
+                                ? Math.min(newWidth, newHeight) * 0.1
+                                : 0,
+                            };
+                          })
                         );
+
+                        // ✅ Reset transforms so no “jump” occurs
                         node.scaleX(1);
                         node.scaleY(1);
                       }}
                     />
                   );
 
-                case "arrow":
+                case "arrow": {
+                  const pts = shape.points ?? [0, 0, 100, 0];
+
+                  // ✅ Define defaults up front
+                  let gradientAngle = 0;
+                  let gradientEnd = { x: 200, y: 0 };
+
+                  if (pts.length >= 4) {
+                    const [x1, y1, x2, y2] = pts;
+                    const dx = x2 - x1;
+                    const dy = y2 - y1;
+
+                    // Compute actual arrow angle (for debugging or future use)
+                    gradientAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+                    // Normalize to arrow direction for gradient vector
+                    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+                    gradientEnd = { x: (dx / len) * 200, y: (dy / len) * 200 };
+                  }
+
                   return (
                     <Arrow
                       key={shape.id}
                       id={shape.id.toString()}
-                      {...shape}
                       points={shape.points ?? [0, 0, 100, 0]}
+                      {...shape}
                       pointerLength={shape.pointerLength ?? 15}
                       pointerWidth={shape.pointerWidth ?? 15}
-                      stroke={shape.stroke ?? "#00b4ff"}
-                      fill={shape.stroke ?? "#00b4ff"}
+                      stroke={
+                        shape.fillType === "gradient"
+                          ? undefined
+                          : (shape.stroke ?? "#00b4ff")
+                      }
+                      fill={
+                        shape.fillType === "gradient"
+                          ? undefined // gradient handled below
+                          : (shape.fill ?? shape.stroke ?? "#00b4ff")
+                      }
+                      fillLinearGradientStartPoint={
+                        shape.fillType === "gradient"
+                          ? { x: 0, y: 0 }
+                          : undefined
+                      }
+                      fillLinearGradientEndPoint={
+                        shape.fillType === "gradient" ? gradientEnd : undefined
+                      }
+                      fillLinearGradientColorStops={
+                        shape.fillType === "gradient"
+                          ? [
+                              0,
+                              shape.gradient?.from ?? "#00b4ff",
+                              1,
+                              shape.gradient?.to ?? "#ff00ff",
+                            ]
+                          : undefined
+                      }
                       strokeWidth={shape.strokeWidth ?? 3}
                       hitStrokeWidth={20}
                       opacity={shape.opacity ?? 1}
@@ -898,7 +951,6 @@ export default function PDFOverlayCanvas({
                         // 🧲 Apply magnet snap — adjusted by rotation-safe offset
                         const offsetX = node.x() - x;
                         const offsetY = node.y() - y;
-
                         if (g.snapPosition.x !== undefined)
                           node.x(g.snapPosition.x + offsetX);
                         if (g.snapPosition.y !== undefined)
@@ -926,6 +978,13 @@ export default function PDFOverlayCanvas({
                       }}
                       onTransformEnd={(e) => {
                         const node = e.target;
+                        const scaleX = node.scaleX();
+                        const scaleY = node.scaleY();
+
+                        const newPoints = (shape.points || [0, 0, 100, 0]).map(
+                          (p, i) => (i % 2 === 0 ? p * scaleX : p * scaleY)
+                        );
+
                         setShapes((prev) =>
                           prev.map((s) =>
                             s.id === shape.id
@@ -933,38 +992,161 @@ export default function PDFOverlayCanvas({
                                   ...s,
                                   x: node.x(),
                                   y: node.y(),
-                                  scaleX: node.scaleX(),
-                                  scaleY: node.scaleY(),
+                                  points: newPoints,
+                                  rotation: node.rotation(),
                                 }
                               : s
                           )
                         );
+
                         node.scaleX(1);
                         node.scaleY(1);
                       }}
                     />
                   );
+                }
 
                 case "text":
+                  if (shape.isRichEditing) {
+                    // 1️⃣ define inverted scale values right here
+                    const scaleX = stageRef.current?.scaleX() ?? 1;
+                    const scaleY = stageRef.current?.scaleY() ?? 1;
+                    const invertedScaleX = 1 / scaleX;
+                    const invertedScaleY = 1 / scaleY;
+
+                    return (
+                      <Html
+                        key={shape.id}
+                        groupProps={{
+                          x: shape.x,
+                          y: shape.y,
+                          rotation: shape.rotation || 0,
+                        }}
+                      >
+                        <div
+                          contentEditable
+                          suppressContentEditableWarning
+                          dangerouslySetInnerHTML={{
+                            __html: shape.html || shape.text || "",
+                          }}
+                          style={{
+                            display: "inline-block",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            minWidth: "10px",
+                            minHeight: `${shape.fontSize * 1.2}px`,
+                            fontSize: `${shape.fontSize || 20}px`,
+                            fontFamily: shape.fontFamily || "Inter",
+                            color: shape.fill || "#fff",
+                            background: "transparent",
+                            outline: "none",
+                            border: "none",
+                            padding: "0",
+                            margin: "0",
+                            userSelect: "text",
+                            textAlign: shape.align || "left",
+                            lineHeight: "1.2",
+                            transformOrigin: "top left",
+                            // 2️⃣ use inverted scale values here so text isn’t mirrored
+                            transform: `scale(${invertedScaleX}, ${invertedScaleY})`,
+                          }}
+                          onInput={(e) => {
+                            const textEl = e.currentTarget;
+                            const plainText = textEl.innerText || "";
+
+                            // ✨ Auto width resizing like Canva
+                            const tmp = document.createElement("span");
+                            tmp.style.font = `${shape.fontSize || 20}px ${shape.fontFamily || "Inter"}`;
+                            tmp.style.whiteSpace = "nowrap";
+                            tmp.style.visibility = "hidden";
+                            tmp.textContent = plainText || " ";
+                            document.body.appendChild(tmp);
+                            const newWidth = tmp.offsetWidth + 10;
+                            document.body.removeChild(tmp);
+
+                            textEl.style.width = `${newWidth}px`;
+
+                            setShapes((prev) =>
+                              prev.map((s) =>
+                                s.id === shape.id
+                                  ? { ...s, text: plainText, width: newWidth }
+                                  : s
+                              )
+                            );
+                          }}
+                          onBlur={(e) => {
+                            const textEl = e.currentTarget;
+                            const newHTML = textEl.innerHTML;
+                            const plainText = textEl.innerText || "";
+
+                            // Extract first inline color if any
+                            const tempDiv = document.createElement("div");
+                            tempDiv.innerHTML = newHTML;
+                            const coloredEl =
+                              tempDiv.querySelector("[style*='color']");
+                            const extractedColor =
+                              coloredEl?.style.color || shape.fill || "#fff";
+
+                            setShapes((prev) =>
+                              prev.map((s) =>
+                                s.id === shape.id
+                                  ? {
+                                      ...s,
+                                      html: newHTML,
+                                      text: plainText,
+                                      fill: extractedColor,
+                                      isRichEditing: false,
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                        />
+                      </Html>
+                    );
+                  }
+
                   return (
                     <Text
                       key={shape.id}
                       id={shape.id.toString()}
                       {...shape}
-                      fill={shape.fill}
+                      fill={
+                        shape.fillType === "gradient"
+                          ? undefined
+                          : (shape.fill ?? "#ffffff")
+                      }
+                      fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                      fillLinearGradientEndPoint={{
+                        x:
+                          Math.cos(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.width ?? 200),
+                        y:
+                          Math.sin(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.height ?? 50),
+                      }}
+                      fillLinearGradientColorStops={[
+                        0,
+                        shape.gradient?.from ?? "#00b4ff",
+                        1,
+                        shape.gradient?.to ?? "#ff00ff",
+                      ]}
                       stroke={shape.stroke}
                       strokeWidth={shape.strokeWidth ?? 1}
                       fontSize={shape.fontSize ?? 20}
                       fontFamily={shape.fontFamily ?? "Inter"}
                       width={
                         shape.textMode === "box"
-                          ? shape.width || undefined
-                          : undefined
+                          ? shape.width || 200 // use saved or fallback width
+                          : shape.width || 300 // ✅ ensure single-line has a base width too
                       }
                       height={
                         shape.textMode === "box"
-                          ? shape.height || undefined
-                          : undefined
+                          ? shape.height || shape.fontSize * 1.5
+                          : shape.fontSize * 1.5 // ✅ match height for line mode
                       }
                       wrap={shape.textMode === "box" ? "word" : "none"}
                       align={shape.align || "left"}
@@ -1000,6 +1182,15 @@ export default function PDFOverlayCanvas({
                             : [shape.id]
                         );
                       }}
+                      onDblClick={(e) => {
+                        setShapes((prev) =>
+                          prev.map((s) =>
+                            s.id === shape.id
+                              ? { ...s, isRichEditing: true }
+                              : s
+                          )
+                        );
+                      }}
                       onDragStart={(e) =>
                         handleShapeDuplicate({
                           e,
@@ -1012,19 +1203,15 @@ export default function PDFOverlayCanvas({
                       }
                       onDragMove={(e) => {
                         const node = e.target;
-                        const { x, y } = node.position();
-                        const width =
-                          node.width?.() ||
-                          node.radiusX?.() * 2 ||
-                          shape.width ||
-                          0;
-                        const height =
-                          node.height?.() ||
-                          node.radiusY?.() * 2 ||
-                          shape.height ||
-                          0;
+                        const stage = node.getStage();
 
-                        // 🧩 use a different name to avoid shadowing
+                        // ✅ Use the real visual bounding box (includes text, rotation, etc.)
+                        const clientRect = node.getClientRect({
+                          relativeTo: stage,
+                        });
+                        const { x, y, width, height } = clientRect;
+
+                        // 🧩 Represent shape with top-left + dimensions
                         const movingShape = {
                           id: shape.id,
                           x,
@@ -1033,8 +1220,6 @@ export default function PDFOverlayCanvas({
                           height,
                           type: shape.type,
                         };
-
-                        const stage = node.getStage();
 
                         const g = getGuides(
                           movingShape,
@@ -1050,14 +1235,18 @@ export default function PDFOverlayCanvas({
                           }
                         );
 
-                        // 🧲 apply magnet snap
+                        // 🧲 Adjust position for snapping to centers and edges
+                        const offsetX = node.x() - x;
+                        const offsetY = node.y() - y;
+
                         if (g.snapPosition.x !== undefined)
-                          node.x(g.snapPosition.x);
+                          node.x(g.snapPosition.x + offsetX);
                         if (g.snapPosition.y !== undefined)
-                          node.y(g.snapPosition.y);
+                          node.y(g.snapPosition.y + offsetY);
 
                         const isSnapping =
                           g.vertical.length > 0 || g.horizontal.length > 0;
+
                         setGuides({
                           vertical: g.vertical,
                           horizontal: g.horizontal,
@@ -1097,7 +1286,28 @@ export default function PDFOverlayCanvas({
                       key={shape.id}
                       id={shape.id.toString()}
                       data={shape.data}
-                      fill={shape.fill}
+                      fill={
+                        shape.fillType === "gradient"
+                          ? undefined
+                          : (shape.fill ?? "rgba(0,128,255,0.25)")
+                      }
+                      fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                      fillLinearGradientEndPoint={{
+                        x:
+                          Math.cos(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.width ?? 100),
+                        y:
+                          Math.sin(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.height ?? 100),
+                      }}
+                      fillLinearGradientColorStops={[
+                        0,
+                        shape.gradient?.from ?? "#00b4ff",
+                        1,
+                        shape.gradient?.to ?? "#ff00ff",
+                      ]}
                       stroke={shape.stroke}
                       strokeWidth={shape.strokeWidth}
                       opacity={shape.opacity ?? 1}
@@ -1203,6 +1413,27 @@ export default function PDFOverlayCanvas({
                         isDuplicating.current = false;
                         setGuides({ vertical: [], horizontal: [] });
                       }}
+                      onTransformEnd={(e) => {
+                        const node = e.target;
+                        const scaleX = node.scaleX();
+                        const scaleY = node.scaleY();
+                        setShapes((prev) =>
+                          prev.map((s) =>
+                            s.id === shape.id
+                              ? {
+                                  ...s,
+                                  x: node.x(),
+                                  y: node.y(),
+                                  width: (s.width ?? 100) * scaleX,
+                                  height: (s.height ?? 20) * scaleY,
+                                  rotation: node.rotation(),
+                                }
+                              : s
+                          )
+                        );
+                        node.scaleX(1);
+                        node.scaleY(1);
+                      }}
                     />
                   );
 
@@ -1212,7 +1443,28 @@ export default function PDFOverlayCanvas({
                       key={shape.id}
                       id={shape.id.toString()}
                       {...shape}
-                      fill={shape.fill ?? "rgba(0,128,255,0.25)"}
+                      fill={
+                        shape.fillType === "gradient"
+                          ? undefined
+                          : (shape.fill ?? "rgba(0,128,255,0.25)")
+                      }
+                      fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                      fillLinearGradientEndPoint={{
+                        x:
+                          Math.cos(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.width ?? 100),
+                        y:
+                          Math.sin(
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                          ) * (shape.height ?? 100),
+                      }}
+                      fillLinearGradientColorStops={[
+                        0,
+                        shape.gradient?.from ?? "#00b4ff",
+                        1,
+                        shape.gradient?.to ?? "#ff00ff",
+                      ]}
                       stroke={shape.stroke ?? "#00b4ff"}
                       strokeWidth={shape.strokeWidth ?? 2}
                       opacity={shape.opacity ?? 1}
@@ -1328,25 +1580,42 @@ export default function PDFOverlayCanvas({
                         const node = e.target;
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
-                        const newWidth = Math.max(20, node.width() * scaleX);
-                        const newHeight = Math.max(20, node.height() * scaleY);
+
                         setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id
-                              ? {
-                                  ...s,
-                                  x: node.x(),
-                                  y: node.y(),
-                                  width: newWidth,
-                                  height: newHeight,
-                                  rotation: node.rotation(),
-                                  cornerRadius: shape.cornerRadius
-                                    ? Math.min(newWidth, newHeight) * 0.1
-                                    : 0,
-                                }
-                              : s
-                          )
+                          prev.map((s) => {
+                            if (s.id !== shape.id) return s;
+
+                            const newWidth = Math.max(
+                              20,
+                              (s.width ?? 100) * scaleX
+                            );
+                            const newHeight = Math.max(
+                              20,
+                              (s.height ?? 100) * scaleY
+                            );
+
+                            // 🟢 Preserve user-defined corner radius
+                            let newCornerRadius = s.cornerRadius ?? 0;
+
+                            // optional: scale corner radius proportionally to resize
+                            if (newCornerRadius > 0) {
+                              const avgScale = (scaleX + scaleY) / 2;
+                              newCornerRadius = newCornerRadius * avgScale;
+                            }
+
+                            return {
+                              ...s,
+                              x: node.x(),
+                              y: node.y(),
+                              width: newWidth,
+                              height: newHeight,
+                              rotation: node.rotation(),
+                              cornerRadius: newCornerRadius,
+                            };
+                          })
                         );
+
+                        // ✅ reset transform scaling to prevent jump
                         node.scaleX(1);
                         node.scaleY(1);
                       }}

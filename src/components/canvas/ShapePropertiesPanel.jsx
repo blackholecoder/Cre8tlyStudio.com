@@ -51,6 +51,96 @@ export default function ShapePropertiesPanel({
               />
             </div>
           </div>
+          {/* 🎨 Gradient Fill */}
+          {selectedShape && (
+            <div className="flex flex-col gap-2 mt-3 border-t border-gray-700/40 pt-3">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-gray-300">Fill Type</label>
+                <select
+                  value={selectedShape.fillType || "solid"}
+                  onChange={(e) => updateSelected({ fillType: e.target.value })}
+                  onMouseDown={disableDrag}
+                  onMouseUp={enableDrag}
+                  className="bg-[#1a1a1a] border border-gray-700 text-gray-300 text-xs rounded-md px-2 py-1"
+                >
+                  <option value="solid">Solid</option>
+                  <option value="gradient">Gradient</option>
+                </select>
+              </div>
+
+              {selectedShape.fillType === "gradient" && (
+                <>
+                  {/* From Color */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-300">From</label>
+                    <input
+                      type="color"
+                      value={selectedShape.gradient?.from || "#00b4ff"}
+                      onMouseDown={disableDrag}
+                      onMouseUp={enableDrag}
+                      onChange={(e) =>
+                        updateSelected({
+                          gradient: {
+                            ...selectedShape.gradient,
+                            from: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-6 h-6 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  {/* To Color */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-300">To</label>
+                    <input
+                      type="color"
+                      value={selectedShape.gradient?.to || "#ff00ff"}
+                      onMouseDown={disableDrag}
+                      onMouseUp={enableDrag}
+                      onChange={(e) =>
+                        updateSelected({
+                          gradient: {
+                            ...selectedShape.gradient,
+                            to: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-6 h-6 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Angle */}
+                  <div className="flex flex-col gap-1 mt-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-gray-300">Angle</label>
+                      <span className="text-[11px] text-gray-400">
+                        {Math.round(selectedShape.gradient?.angle ?? 0)}°
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="360"
+                      step="1"
+                      onMouseDown={disableDrag}
+                      onMouseUp={enableDrag}
+                      value={selectedShape.gradient?.angle ?? 0}
+                      onChange={(e) =>
+                        updateSelected({
+                          gradient: {
+                            ...selectedShape.gradient,
+                            angle: parseInt(e.target.value),
+                          },
+                        })
+                      }
+                      className="cre8tly-slider w-full"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           <hr className="border-gray-700/40" />
 
@@ -126,26 +216,61 @@ export default function ShapePropertiesPanel({
           </div>
 
           {selectedShape.type === "text" && (
-  <div className="flex items-center justify-between mt-2">
-    <label className="text-xs text-gray-300">Word Wrap</label>
-    <button
-      onMouseDown={disableDrag}
-      onMouseUp={enableDrag}
-      onClick={() =>
-        updateSelected({
-          textMode: selectedShape.textMode === "box" ? "line" : "box",
-        })
-      }
-      className={`px-2 py-1 text-xs rounded-md transition-all duration-150 ${
-        selectedShape.textMode === "box"
-          ? "bg-blue-600 text-white"
-          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-      }`}
-    >
-      {selectedShape.textMode === "box" ? "Box" : "Line"}
-    </button>
-  </div>
+            <div className="flex items-center justify-between mt-2">
+              <label className="text-xs text-gray-300">Word Wrap</label>
+              <button
+                onMouseDown={disableDrag}
+                onMouseUp={enableDrag}
+                onClick={() =>
+                  updateSelected({
+                    textMode: selectedShape.textMode === "box" ? "line" : "box",
+                  })
+                }
+                className={`px-2 py-1 text-xs rounded-md transition-all duration-150 ${
+                  selectedShape.textMode === "box"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
+              >
+                {selectedShape.textMode === "box" ? "Box" : "Line"}
+              </button>
+            </div>
+          )}
+
+          {selectedShape.type === "text" && (
+  <>
+    <div className="flex items-center justify-between mt-2">
+      <label className="text-xs text-gray-300">Font Size</label>
+      <input
+        type="number"
+        value={selectedShape.fontSize || 20}
+        onMouseDown={disableDrag}
+        onMouseUp={enableDrag}
+        onChange={(e) =>
+          updateSelected({ fontSize: parseFloat(e.target.value) })
+        }
+        className="w-16 bg-[#1a1a1a] border border-gray-700 rounded-md text-gray-300 text-xs text-center px-2 py-1"
+      />
+    </div>
+    <div className="flex items-center justify-between mt-2">
+      <label className="text-xs text-gray-300">Font</label>
+      <select
+        value={selectedShape.fontFamily || "Inter"}
+        onChange={(e) => updateSelected({ fontFamily: e.target.value })}
+        onMouseDown={disableDrag}
+        onMouseUp={enableDrag}
+        className="bg-[#1a1a1a] border border-gray-700 text-gray-300 text-xs rounded-md px-2 py-1"
+      >
+        <option value="Inter">Inter</option>
+        <option value="Palanquin">Palanquin</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Cormorant">Cormorant</option>
+        <option value="Ephesis">Ephesis</option>
+      </select>
+    </div>
+  </>
 )}
+
 
           {/* 🟣 Corners */}
           {selectedShape.type === "rect" && (
@@ -464,7 +589,6 @@ export default function ShapePropertiesPanel({
               </div>
             </div>
           )}
-         
 
           {/* 🗑️ Delete */}
           <button

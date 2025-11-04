@@ -67,7 +67,7 @@ export function getGuides(
     }
   }
 
-  // 🧲 Snap to other shapes
+  // 🧲 Snap to other shapes (edges + centers)
   if (snapToEdges) {
     for (const s of allShapes) {
       if (s.id === shape.id) continue;
@@ -79,7 +79,7 @@ export function getGuides(
       const sMidX = s.x + s.width / 2;
       const sMidY = s.y + s.height / 2;
 
-      // vertical edges
+      // Vertical (left, right, center)
       if (Math.abs(left - sLeft) < GAP) {
         result.vertical.push(sLeft);
         snapPosition.x = sLeft;
@@ -91,7 +91,7 @@ export function getGuides(
         snapPosition.x = sMidX - shape.width / 2;
       }
 
-      // horizontal edges
+      // Horizontal (top, bottom, center)
       if (Math.abs(top - sTop) < GAP) {
         result.horizontal.push(sTop);
         snapPosition.y = sTop;
@@ -103,10 +103,13 @@ export function getGuides(
         snapPosition.y = sMidY - shape.height / 2;
       }
 
-      // 🪶 Text baseline alignment
-      if (s.type === "text" && Math.abs(bottom - (s.y + s.fontSize)) < GAP) {
-        result.horizontal.push(s.y + s.fontSize);
-        snapPosition.y = s.y + s.fontSize - shape.height;
+      // 🪶 Text baseline alignment (optional)
+      if (s.type === "text" && s.fontSize) {
+        const sBaseline = s.y + s.fontSize;
+        if (Math.abs(bottom - sBaseline) < GAP) {
+          result.horizontal.push(sBaseline);
+          snapPosition.y = sBaseline - shape.height;
+        }
       }
     }
   }

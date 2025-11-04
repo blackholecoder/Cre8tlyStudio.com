@@ -14,6 +14,7 @@ import { Html } from "react-konva-utils";
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 import { handleShapeDuplicate } from "../../helpers/handleShapeDuplicates";
 import { getGuides } from "../../helpers/guides";
+import { createPortal } from "react-dom";
 
 export default function PDFOverlayCanvas({
   shapes,
@@ -188,6 +189,7 @@ export default function PDFOverlayCanvas({
   const startPos = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e) => {
+    e.evt.preventDefault();
     // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
     if (e?.evt?.target?.closest && e.evt.target.closest(".canvas-toolbar")) {
       return;
@@ -600,7 +602,7 @@ export default function PDFOverlayCanvas({
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          handleMouseLeave={handleMouseLeave}
+          onMouseLeave={handleMouseLeave}
         >
           <Layer>
             {shapes.map((shape) => {
@@ -1008,9 +1010,9 @@ export default function PDFOverlayCanvas({
 
                 case "text":
                   if (shape.isRichEditing) {
-                    // 1️⃣ define inverted scale values right here
-                    const scaleX = stageRef.current?.scaleX() ?? 1;
-                    const scaleY = stageRef.current?.scaleY() ?? 1;
+                    const stage = stageRef.current?.getStage();
+                    const scaleX = stage?.scaleX() ?? 1;
+                    const scaleY = stage?.scaleY() ?? 1;
                     const invertedScaleX = 1 / scaleX;
                     const invertedScaleY = 1 / scaleY;
 
@@ -1022,6 +1024,7 @@ export default function PDFOverlayCanvas({
                           y: shape.y,
                           rotation: shape.rotation || 0,
                         }}
+                        divProps={{ style: { pointerEvents: "none" } }}
                       >
                         <div
                           contentEditable
@@ -1033,7 +1036,6 @@ export default function PDFOverlayCanvas({
                             display: "inline-block",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
-                            textOverflow: "ellipsis",
                             minWidth: "10px",
                             minHeight: `${shape.fontSize * 1.2}px`,
                             fontSize: `${shape.fontSize || 20}px`,
@@ -1044,18 +1046,23 @@ export default function PDFOverlayCanvas({
                             border: "none",
                             padding: "0",
                             margin: "0",
-                            userSelect: "text",
+                            direction: "ltr",
                             textAlign: shape.align || "left",
                             lineHeight: "1.2",
                             transformOrigin: "top left",
-                            // 2️⃣ use inverted scale values here so text isn’t mirrored
-                            transform: `scale(${invertedScaleX}, ${invertedScaleY})`,
+                            transform: `scale(${invertedScaleX}, ${invertedScaleY})`, // ✅ fix mirrored typing
+                            pointerEvents: shape.isRichEditing
+                              ? "auto"
+                              : "none",
+                            cursor: shape.isRichEditing ? "text" : "move",
+                          }}
+                          onFocus={() => {
+                            const node = stage?.findOne(`#${shape.id}`);
+                            if (node) node.draggable(false);
                           }}
                           onInput={(e) => {
                             const textEl = e.currentTarget;
                             const plainText = textEl.innerText || "";
-
-                            // ✨ Auto width resizing like Canva
                             const tmp = document.createElement("span");
                             tmp.style.font = `${shape.fontSize || 20}px ${shape.fontFamily || "Inter"}`;
                             tmp.style.whiteSpace = "nowrap";
@@ -1064,9 +1071,7 @@ export default function PDFOverlayCanvas({
                             document.body.appendChild(tmp);
                             const newWidth = tmp.offsetWidth + 10;
                             document.body.removeChild(tmp);
-
                             textEl.style.width = `${newWidth}px`;
-
                             setShapes((prev) =>
                               prev.map((s) =>
                                 s.id === shape.id
@@ -1077,17 +1082,17 @@ export default function PDFOverlayCanvas({
                           }}
                           onBlur={(e) => {
                             const textEl = e.currentTarget;
+                            textEl.style.pointerEvents = "none";
                             const newHTML = textEl.innerHTML;
                             const plainText = textEl.innerText || "";
-
-                            // Extract first inline color if any
                             const tempDiv = document.createElement("div");
                             tempDiv.innerHTML = newHTML;
                             const coloredEl =
                               tempDiv.querySelector("[style*='color']");
                             const extractedColor =
                               coloredEl?.style.color || shape.fill || "#fff";
-
+                            const node = stage?.findOne(`#${shape.id}`);
+                            if (node) node.draggable(true);
                             setShapes((prev) =>
                               prev.map((s) =>
                                 s.id === shape.id
@@ -1097,10 +1102,12 @@ export default function PDFOverlayCanvas({
                                       text: plainText,
                                       fill: extractedColor,
                                       isRichEditing: false,
+                                      draggable: true,
                                     }
                                   : s
                               )
                             );
+                            setTimeout(() => stage?.batchDraw(), 20);
                           }}
                         />
                       </Html>
@@ -1725,13 +1732,16 @@ export default function PDFOverlayCanvas({
       )}
 
       {/* 🎛 Shape Properties Panel */}
-      <ShapePropertiesPanel
-        panelOpen={panelOpen}
-        selectedIds={selectedIds}
-        shapes={shapes}
-        updateSelected={updateSelected}
-        deleteSelected={deleteSelected}
-      />
+      {createPortal(
+  <ShapePropertiesPanel
+    panelOpen={panelOpen}
+    selectedIds={selectedIds}
+    shapes={shapes}
+    updateSelected={updateSelected}
+    deleteSelected={deleteSelected}
+  />,
+  document.body
+)}
     </div>
   );
 }

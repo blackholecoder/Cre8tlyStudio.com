@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import { pdfjs } from "react-pdf";
-import { PDFDocument } from "pdf-lib";
+  import { PDFDocument } from "pdf-lib";
 import axiosInstance from "../../api/axios";
 import { useAuth } from "../../admin/AuthContext";
 import PDFOverlayCanvas from "./PDFOverlayCanvas";
@@ -29,8 +29,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   window.location.origin
 ).toString();
 
+// one page view
 function PDFPage({
-  pageIndex,
   imageUrl,
   shapes,
   setShapes,
@@ -44,13 +44,14 @@ function PDFPage({
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
 
+  // Auto-scale to fit container size
   useEffect(() => {
     const handleResize = () => {
       if (!containerRef.current || !img) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const scaleX = rect.width / img.width;
-      const scaleY = rect.height / img.height;
+      const containerWidth = containerRef.current.offsetWidth;
+      const containerHeight = containerRef.current.offsetHeight;
+      const scaleX = containerWidth / img.width;
+      const scaleY = containerHeight / img.height;
       const newScale = Math.min(scaleX, scaleY);
 
       setScale(newScale);
@@ -59,7 +60,6 @@ function PDFPage({
         height: img.height * newScale,
       });
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -67,41 +67,30 @@ function PDFPage({
 
   return (
     <div
+      // data-pdf-page={i}
       ref={containerRef}
-      data-pdf-page={pageIndex}
-      className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
+      className="relative flex justify-center items-center w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
     >
       {img && (
-        <div
-          className="absolute top-1/2 left-1/2"
-          style={{
-            transform: "translate(-50%, -50%)",
-            width: `${stageSize.width}px`,
-            height: `${stageSize.height}px`,
-          }}
-        >
-          {/* PDF Image Layer */}
+        <>
+          {/* PDF Page Rendered as Image */}
           <Stage
             width={stageSize.width}
             height={stageSize.height}
             scaleX={scale}
             scaleY={scale}
-            className="absolute"
-            style={{ zIndex: 0 }}
           >
-            <Layer listening={false}>
+            <Layer>
               <KonvaImage image={img} />
             </Layer>
           </Stage>
 
-          {/* Overlay Layer */}
+          {/* ✅ Overlay synced to the exact same size and position */}
           <div
-            className="absolute top-0 left-0 z-30"
+            className="absolute"
             style={{
               width: `${stageSize.width}px`,
               height: `${stageSize.height}px`,
-              pointerEvents: "auto",
-              zIndex: 10,
             }}
           >
             <PDFOverlayCanvas
@@ -113,7 +102,7 @@ function PDFPage({
               setSelectedIds={setSelectedIds}
             />
           </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -285,93 +274,96 @@ export default function CanvasEditor() {
     setSelectedIds([newShape.id]);
   }
 
-  async function handleSaveFinalPDF() {
-    try {
-      if (!pages.length) throw new Error("No pages loaded");
 
-      toast.info("🧩 Saving your design… Please wait.", {
-        position: "top-right",
-        autoClose: 2500,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
 
-      // ✅ 1. Fetch the original PDF
-      const res = await fetch(
-        `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`
+async function handleSaveFinalPDF() {
+  try {
+    if (!pages.length) throw new Error("No pages loaded");
+
+    toast.info("🧩 Saving your design… Please wait.", {
+      position: "top-right",
+      autoClose: 2500,
+      hideProgressBar: false,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
+
+    // ✅ 1. Fetch the original PDF
+    const res = await fetch(
+      `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`
+    );
+    const original = await res.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(original);
+
+    // ✅ 2. Apply overlays from each page
+    for (let i = 0; i < pages.length; i++) {
+      const overlayCanvas = document.querySelector(
+        `[data-pdf-page="${i}"] .konvajs-content canvas`
       );
-      const original = await res.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(original);
+      if (!overlayCanvas) continue;
 
-      // ✅ 2. Apply overlays from each page
-      for (let i = 0; i < pages.length; i++) {
-        const overlayCanvas = document.querySelector(
-          `[data-pdf-page="${i}"] .konvajs-content canvas`
-        );
-        if (!overlayCanvas) continue;
+      const imgData = overlayCanvas.toDataURL("image/png");
+      const png = await pdfDoc.embedPng(imgData);
 
-        const imgData = overlayCanvas.toDataURL("image/png");
-        const png = await pdfDoc.embedPng(imgData);
-
-        const page = pdfDoc.getPages()[i];
-        const { width, height } = page.getSize();
-        page.drawImage(png, { x: 0, y: 0, width, height });
-      }
-
-      // ✅ 3. Generate the new PDF blob
-      const finalBytes = await pdfDoc.save();
-      const finalBlob = new Blob([finalBytes], { type: "application/pdf" });
-
-      // ✅ 4. Upload and commit
-      const formData = new FormData();
-      formData.append("file", finalBlob, "final.pdf");
-
-      const uploadRes = await axiosInstance.put(
-        `https://cre8tlystudio.com/api/lead-magnets/${leadMagnetId}/editor/commit`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const title = uploadRes.data?.title || "Lead Magnet";
-
-      toast.success(`✅ "${title}" saved and committed successfully!`, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
-
-      // Redirect after short delay
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 2000);
-    } catch (err) {
-      console.error("❌ Save failed:", err);
-
-      toast.error(
-        `❌ Failed to save final PDF. ${
-          err.response?.data?.error || "Check console for details."
-        }`,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "dark",
-        }
-      );
+      const page = pdfDoc.getPages()[i];
+      const { width, height } = page.getSize();
+      page.drawImage(png, { x: 0, y: 0, width, height });
     }
+
+    // ✅ 3. Generate the new PDF blob
+    const finalBytes = await pdfDoc.save();
+    const finalBlob = new Blob([finalBytes], { type: "application/pdf" });
+
+    // ✅ 4. Upload and commit
+    const formData = new FormData();
+    formData.append("file", finalBlob, "final.pdf");
+
+    const uploadRes = await axiosInstance.put(
+      `https://cre8tlystudio.com/api/lead-magnets/${leadMagnetId}/editor/commit`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    const title = uploadRes.data?.title || "Lead Magnet";
+
+    toast.success(`✅ "${title}" saved and committed successfully!`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
+
+    // Redirect after short delay
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 2000);
+  } catch (err) {
+    console.error("❌ Save failed:", err);
+
+    toast.error(
+      `❌ Failed to save final PDF. ${
+        err.response?.data?.error || "Check console for details."
+      }`,
+      {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      }
+    );
   }
+}
+
 
   if (loading) {
     return (
@@ -428,7 +420,7 @@ export default function CanvasEditor() {
         </div>
 
         {/* ✅ Drawing area */}
-        <div className="flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
+        <div className="relative flex-1 flex items-center justify-center overflow-auto bg-[#0f0f10] rounded-lg border border-gray-800">
           <div
             className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/60 shadow-md canvas-toolbar"
             onMouseDown={(e) => e.stopPropagation()}
@@ -539,7 +531,6 @@ export default function CanvasEditor() {
               })()}{" "}
               {/* ✅ Set active page */}
               <PDFPage
-                pageIndex={selectedPage}
                 imageUrl={pages[selectedPage]}
                 shapes={shapesByPage[selectedPage] || []}
                 setShapes={(updater) => {

@@ -1,22 +1,31 @@
 import { Document, Page, pdfjs } from "react-pdf";
 import { useState, useMemo, useEffect } from "react";
-import { X, Download, ZoomIn, ZoomOut } from "lucide-react";
+import { X, Download, ZoomIn, ZoomOut, PaintBucket } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
   window.location.origin
 ).toString();
 
-export default function PDFPreviewModal({ fileUrl, fileTitle, partNumber, sourceType = "magnet", onClose }) {
+export default function PDFPreviewModal({
+  fileUrl,
+  fileTitle,
+  partNumber,
+  sourceType = "magnet",
+  onClose,
+}) {
   const [numPages, setNumPages] = useState(null);
   const [scale, setScale] = useState(1.2);
   const [pdfReady, setPdfReady] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [params] = useSearchParams();
+  const pdfUrl = params.get("pdf");
+
   const memoizedFile = useMemo(() => {
     if (!fileUrl) return null;
-
 
     return {
       url: `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}`,
@@ -54,50 +63,49 @@ export default function PDFPreviewModal({ fileUrl, fileTitle, partNumber, source
     return () => clearTimeout(timeout);
   }, [fileUrl]);
 
- const handleDownload = async () => {
-  try {
-    setDownloading(true);
-    const res = await fetch(memoizedFile.url);
-    if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      const res = await fetch(memoizedFile.url);
+      if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
 
-    // ✅ Use title and part number if available
-    if (sourceType === "book") {
-      const safeTitle = (fileTitle || "Book")
-        .replace(/[^\w\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "_");
-      const safePart = partNumber ? `_Part_${partNumber}` : "";
-      a.download = `${safeTitle}${safePart}.pdf`;
-    } 
-    // ✅ Update for Lead Magnets only
-    else if (sourceType === "magnet") {
-      const safeTitle = (fileTitle || "Lead_Magnet")
-        .replace(/[^\w\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "_");
-      a.download = `${safeTitle}.pdf`;
-    } 
-    else {
-      a.download = "document.pdf";
+      // ✅ Use title and part number if available
+      if (sourceType === "book") {
+        const safeTitle = (fileTitle || "Book")
+          .replace(/[^\w\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "_");
+        const safePart = partNumber ? `_Part_${partNumber}` : "";
+        a.download = `${safeTitle}${safePart}.pdf`;
+      }
+      // ✅ Update for Lead Magnets only
+      else if (sourceType === "magnet") {
+        const safeTitle = (fileTitle || "Lead_Magnet")
+          .replace(/[^\w\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "_");
+        a.download = `${safeTitle}.pdf`;
+      } else {
+        a.download = "document.pdf";
+      }
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      await new Promise((r) => setTimeout(r, 2000));
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("❌ Download failed. Please try again.");
+    } finally {
+      setDownloading(false);
     }
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    await new Promise((r) => setTimeout(r, 2000));
-  } catch (err) {
-    console.error("Download error:", err);
-    alert("❌ Download failed. Please try again.");
-  } finally {
-    setDownloading(false);
-  }
-};
-
+  };
+  
 
   useEffect(() => {
     if (!fileUrl) {
@@ -143,6 +151,18 @@ export default function PDFPreviewModal({ fileUrl, fileTitle, partNumber, source
           >
             <ZoomOut size={20} />
           </button>
+          {/* <button
+            onClick={() => {
+              window.open(
+  `/canvas-editor?pdf=${memoizedFile.url}`,
+  "_blank"
+);
+            }}
+            className="p-2 rounded-lg text-white transition"
+            title="Open in Canvas Editor"
+          >
+            <PaintBucket className="text-green" size={20} />
+          </button> */}
           <button
             onClick={handleDownload}
             disabled={downloading}

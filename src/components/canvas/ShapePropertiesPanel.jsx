@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
@@ -27,7 +27,8 @@ export default function ShapePropertiesPanel({
           animate={{ x: 0 }}
           exit={{ x: 300 }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="fixed top-0 right-0 h-full w-80 bg-[#111]/95 backdrop-blur-md border-l border-gray-700/60 p-5 flex flex-col gap-4 shadow-2xl overflow-y-auto z-[9999] select-none"
+          className="fixed top-0 right-0 h-screen w-96 bg-[#111]/95 backdrop-blur-md border-l border-gray-700/60 p-5 flex flex-col gap-4 shadow-[0_0_25px_rgba(0,0,0,0.6)] overflow-y-auto z-[9999] select-none"
+
         >
           <h3 className="text-white font-semibold text-sm mb-1 sticky top-0 bg-[#111]/95 py-1 z-10">
             Shape Properties

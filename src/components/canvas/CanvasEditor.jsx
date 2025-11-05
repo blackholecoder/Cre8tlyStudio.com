@@ -4,7 +4,6 @@ import useImage from "use-image";
 import { pdfjs } from "react-pdf";
 import { PDFDocument } from "pdf-lib";
 import axiosInstance from "../../api/axios";
-import { useAuth } from "../../admin/AuthContext";
 import PDFOverlayCanvas from "./PDFOverlayCanvas";
 import { toast } from "react-toastify";
 import {
@@ -120,12 +119,14 @@ function PDFPage({
 }
 
 export default function CanvasEditor() {
-  const { accessToken } = useAuth();
-  const leadMagnetId = new URLSearchParams(window.location.search).get("id");
+  const params = new URLSearchParams(window.location.search);
+const leadMagnetId = params.get("id");
+const pdfUrl = decodeURIComponent(params.get("pdf") || "");
+  
   const [pages, setPages] = useState([]); // all page images
   const [selectedPage, setSelectedPage] = useState(0);
   const [shapesByPage, setShapesByPage] = useState({});
-  const pdfUrl = new URLSearchParams(window.location.search).get("pdf");
+  
   const [loading, setLoading] = useState(true);
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -287,6 +288,11 @@ export default function CanvasEditor() {
 
   async function handleSaveFinalPDF() {
     try {
+      if (!pdfUrl) {
+  toast.error("No PDF URL provided — cannot save.");
+  return;
+}
+
       if (!pages.length) throw new Error("No pages loaded");
 
       toast.info("🧩 Saving your design… Please wait.", {
@@ -308,9 +314,13 @@ export default function CanvasEditor() {
       // ✅ 2. Apply overlays from each page
       for (let i = 0; i < pages.length; i++) {
         const overlayCanvas = document.querySelector(
-          `[data-pdf-page="${i}"] .konvajs-content canvas`
-        );
+  `[data-pdf-page="${i}"] .konva-overlay .konvajs-content canvas:first-child`
+);
+
         if (!overlayCanvas) continue;
+
+        console.log("🎨 Exporting overlay for page", i, overlayCanvas);
+document.body.appendChild(overlayCanvas.cloneNode(true));
 
         const imgData = overlayCanvas.toDataURL("image/png");
         const png = await pdfDoc.embedPng(imgData);
@@ -329,11 +339,10 @@ export default function CanvasEditor() {
       formData.append("file", finalBlob, "final.pdf");
 
       const uploadRes = await axiosInstance.put(
-        `https://cre8tlystudio.com/api/lead-magnets/${leadMagnetId}/editor/commit`,
+        `https://cre8tlystudio.com/api/edit/${leadMagnetId}/editor/commit`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "multipart/form-data",
           },
         }

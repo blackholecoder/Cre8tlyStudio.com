@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { themeStyles } from "../../constants/index";
-import { CheckCircle, Edit, Plus, Timer, Eye, Pencil } from "lucide-react";
+import { CheckCircle, Edit, Plus, Timer, Eye, Pencil, Package } from "lucide-react";
 import NewContentModal from "../NewContentModal";
 import PDFPreviewModal from "../dashboard/PDFPreviewModal";
 
@@ -32,8 +32,8 @@ export default function MagnetGrid({
           className="relative group bg-[#0a0a0a]/90 rounded-2xl p-4 border border-gray-800 hover:border-green hover:shadow-[0_0_15px_rgba(0,255,150,0.25)] transition-all"
         >
           <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden">
-    <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent rotate-[25deg] opacity-0 group-hover:opacity-100 animate-glimmer" />
-  </div>
+            <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent rotate-[25deg] opacity-0 group-hover:opacity-100 animate-glimmer" />
+          </div>
           {/* Glow accent */}
           <motion.div
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl -z-10 transition-all"
@@ -216,6 +216,23 @@ export default function MagnetGrid({
                     } transition-colors`}
                   />
                   <span>{m.edit_used ? "Closed" : "Edit"}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!m.id || !m.pdf_url) {
+                      alert("Missing lead magnet ID or PDF URL.");
+                      return;
+                    }
+                    const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
+                      m.pdf_url
+                    )}`;
+                    window.open(canvasUrl, "_blank");
+                  }}
+                  className="hidden md:flex w-full bg-hotPink text-white font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all"
+                  title="Edit in Canvas Editor"
+                >
+                  <Package size={16} />
+                  <span>Canvas Editor</span>
                 </button>
               </>
             )}

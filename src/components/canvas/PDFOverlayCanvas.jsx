@@ -594,7 +594,7 @@ export default function PDFOverlayCanvas({
           ref={stageRef}
           width={stageSize.width}
           height={stageSize.height}
-          className="absolute inset-0"
+          className="absolute inset-0 konva-overlay"
           style={{
             background: "transparent",
             cursor: selectedTool ? "crosshair" : "default",

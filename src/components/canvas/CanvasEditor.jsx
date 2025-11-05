@@ -20,6 +20,7 @@ import {
   MousePointerClick,
   ArrowLeft,
   Package,
+  ZoomIn,
 } from "lucide-react";
 import { performBooleanOperation } from "../../helpers/booleanOps";
 
@@ -28,6 +29,205 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   window.location.origin
 ).toString();
 
+
+
+// #1
+// function PDFPage({
+//   pageIndex,
+//   imageUrl,
+//   shapes,
+//   setShapes,
+//   setSelectedTool,
+//   selectedTool,
+//   selectedIds,
+//   setSelectedIds,
+// }) {
+//   const [img] = useImage(imageUrl);
+//   const containerRef = useRef(null);
+//   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+//   const [scale, setScale] = useState(1);
+//   const [zoom, setZoom] = useState(1);
+//   const [offset, setOffset] = useState({ x: 0, y: 0 });
+//   const [dragStart, setDragStart] = useState(null);
+//   const [isPanning, setIsPanning] = useState(false);
+//   const [spacePressed, setSpacePressed] = useState(false);
+
+//   // Fit PDF initially
+//   useEffect(() => {
+//     if (!img || !containerRef.current) return;
+//     const rect = containerRef.current.getBoundingClientRect();
+//     const scaleX = rect.width / img.width;
+//     const scaleY = rect.height / img.height;
+//     const newScale = Math.min(scaleX, scaleY);
+//     setScale(newScale);
+//     setStageSize({ width: img.width * newScale, height: img.height * newScale });
+//   }, [img]);
+
+//   // Spacebar pan activation
+//   useEffect(() => {
+//     const down = (e) => e.code === "Space" && setSpacePressed(true);
+//     const up = (e) => e.code === "Space" && setSpacePressed(false);
+//     window.addEventListener("keydown", down);
+//     window.addEventListener("keyup", up);
+//     return () => {
+//       window.removeEventListener("keydown", down);
+//       window.removeEventListener("keyup", up);
+//     };
+//   }, []);
+
+//   // Zoom helper
+//   const applyZoom = (direction, e) => {
+//     const bounds = containerRef.current.getBoundingClientRect();
+//     const clickX = e.clientX - bounds.left - bounds.width / 2 - offset.x;
+//     const clickY = e.clientY - bounds.top - bounds.height / 2 - offset.y;
+//     const step = 1.5;
+//     const maxZoom = 8;
+//     const minZoom = 1;
+
+//     setZoom((prev) => {
+//       let nextZoom =
+//         direction === "in"
+//           ? Math.min(prev * step, maxZoom)
+//           : Math.max(prev / step, minZoom);
+
+//       if (nextZoom === prev) return prev; // no change
+//       // Adjust offset to zoom into/out from click
+//       setOffset({
+//         x: offset.x - clickX * (nextZoom - prev) * 0.3,
+//         y: offset.y - clickY * (nextZoom - prev) * 0.3,
+//       });
+//       return nextZoom;
+//     });
+//   };
+
+//   // Left click zoom in / right click or alt click zoom out
+//   const handleClick = (e) => {
+//     if (selectedTool !== "magnify") return;
+//     e.preventDefault();
+//     if (e.button === 2 || e.altKey) {
+//       // right-click or alt-click
+//       applyZoom("out", e);
+//     } else {
+//       applyZoom("in", e);
+//     }
+//   };
+
+//   // Pan when zoomed or space pressed
+//   const handleMouseDown = (e) => {
+//     const shouldPan =
+//       zoom > 1 &&
+//       (spacePressed ||
+//         selectedTool === "magnify" ||
+//         selectedTool === null);
+//     if (shouldPan && e.button === 0) {
+//       e.preventDefault();
+//       setIsPanning(true);
+//       setDragStart({
+//         x: e.clientX,
+//         y: e.clientY,
+//         startOffset: { ...offset },
+//       });
+//     }
+//   };
+
+//   const handleMouseMove = (e) => {
+//     if (!isPanning || !dragStart) return;
+//     const dx = e.clientX - dragStart.x;
+//     const dy = e.clientY - dragStart.y;
+//     setOffset({
+//       x: dragStart.startOffset.x + dx,
+//       y: dragStart.startOffset.y + dy,
+//     });
+//   };
+
+//   const handleMouseUp = () => setIsPanning(false);
+//   const handleDoubleClick = () => {
+//     setZoom(1);
+//     setOffset({ x: 0, y: 0 });
+//   };
+
+//   // Disable context menu (for right-click zoom out)
+//   useEffect(() => {
+//     const preventContext = (e) => e.preventDefault();
+//     document.addEventListener("contextmenu", preventContext);
+//     return () => document.removeEventListener("contextmenu", preventContext);
+//   }, []);
+
+//   return (
+//     <div
+//       ref={containerRef}
+//       data-pdf-page={pageIndex}
+//       onMouseDown={handleMouseDown}
+//       onMouseMove={handleMouseMove}
+//       onMouseUp={handleMouseUp}
+//       onClick={handleClick}
+//       onDoubleClick={handleDoubleClick}
+//       className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
+//       style={{
+//         cursor:
+//           zoom > 1
+//             ? isPanning
+//               ? "grabbing"
+//               : "grab"
+//             : selectedTool === "magnify"
+//             ? "zoom-in"
+//             : spacePressed
+//             ? "grab"
+//             : "default",
+//       }}
+//     >
+//       {img && (
+//         <div
+//           className="absolute top-1/2 left-1/2"
+//           style={{
+//             transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${zoom})`,
+//             transformOrigin: "center center",
+//             width: `${stageSize.width}px`,
+//             height: `${stageSize.height}px`,
+//             transition: isPanning ? "none" : "transform 0.2s ease-out",
+//           }}
+//         >
+//           {/* PDF Image */}
+//           <Stage
+//             width={stageSize.width}
+//             height={stageSize.height}
+//             scaleX={scale}
+//             scaleY={scale}
+//             className="absolute"
+//             style={{
+//               zIndex: 0,
+//               pointerEvents: "none",
+//             }}
+//           >
+//             <Layer listening={false}>
+//               <KonvaImage image={img} />
+//             </Layer>
+//           </Stage>
+
+//           {/* Drawing Layer */}
+//           <div
+//             className="absolute top-0 left-0 z-30"
+//             style={{
+//               width: `${stageSize.width}px`,
+//               height: `${stageSize.height}px`,
+//               pointerEvents: "auto",
+//             }}
+//           >
+//             <PDFOverlayCanvas
+//               shapes={shapes}
+//               setShapes={setShapes}
+//               selectedTool={selectedTool}
+//               setSelectedTool={setSelectedTool}
+//               selectedIds={selectedIds}
+//               setSelectedIds={setSelectedIds}
+//               zoom={zoom}
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 function PDFPage({
   pageIndex,
   imageUrl,
@@ -42,75 +242,180 @@ function PDFPage({
   const containerRef = useRef(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [dragStart, setDragStart] = useState(null);
+  const [isPanning, setIsPanning] = useState(false);
+  const [spacePressed, setSpacePressed] = useState(false);
+
+  // Fit image once loaded
+  useEffect(() => {
+    if (!img || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const scaleX = rect.width / img.width;
+    const scaleY = rect.height / img.height;
+    const newScale = Math.min(scaleX, scaleY);
+    setScale(newScale);
+    setStageSize({
+      width: img.width * newScale,
+      height: img.height * newScale,
+    });
+  }, [img]);
+
+  // Spacebar to pan
+  useEffect(() => {
+    const down = (e) => e.code === "Space" && setSpacePressed(true);
+    const up = (e) => e.code === "Space" && setSpacePressed(false);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    };
+  }, []);
+
+  // Zoom logic
+  const applyZoom = (direction, e) => {
+    const bounds = containerRef.current.getBoundingClientRect();
+    const clickX = e.clientX - bounds.left;
+    const clickY = e.clientY - bounds.top;
+    const step = 1.5;
+    const maxZoom = 8;
+    const minZoom = 1;
+
+    setZoom((prev) => {
+      let next =
+        direction === "in"
+          ? Math.min(prev * step, maxZoom)
+          : Math.max(prev / step, minZoom);
+
+      if (next === prev) return prev;
+      // Adjust pan offset relative to click position
+      setOffset({
+        x: offset.x - (clickX - stageSize.width / 2) * (next - prev) * 0.3,
+        y: offset.y - (clickY - stageSize.height / 2) * (next - prev) * 0.3,
+      });
+      return next;
+    });
+  };
+
+  const handleClick = (e) => {
+    if (selectedTool !== "magnify") return;
+    e.preventDefault();
+    if (e.button === 2 || e.altKey) applyZoom("out", e);
+    else applyZoom("in", e);
+  };
+
+  const handleMouseDown = (e) => {
+    const shouldPan =
+      zoom > 1 &&
+      (spacePressed || selectedTool === "magnify" || selectedTool === null);
+    if (shouldPan && e.button === 0) {
+      e.preventDefault();
+      setIsPanning(true);
+      setDragStart({
+        x: e.clientX,
+        y: e.clientY,
+        startOffset: { ...offset },
+      });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isPanning || !dragStart) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    setOffset({
+      x: dragStart.startOffset.x + dx,
+      y: dragStart.startOffset.y + dy,
+    });
+  };
+
+  const handleMouseUp = () => setIsPanning(false);
+  const handleDoubleClick = () => {
+    setZoom(1);
+    setOffset({ x: 0, y: 0 });
+  };
 
   useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current || !img) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const scaleX = rect.width / img.width;
-      const scaleY = rect.height / img.height;
-      const newScale = Math.min(scaleX, scaleY);
-
-      setScale(newScale);
-      setStageSize({
-        width: img.width * newScale,
-        height: img.height * newScale,
-      });
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [img]);
+    const preventContext = (e) => e.preventDefault();
+    document.addEventListener("contextmenu", preventContext);
+    return () => document.removeEventListener("contextmenu", preventContext);
+  }, []);
 
   return (
     <div
       ref={containerRef}
       data-pdf-page={pageIndex}
-      className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onDoubleClick={handleDoubleClick}
+      className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg flex items-center justify-center"
+      style={{
+        cursor:
+          zoom > 1
+            ? isPanning
+              ? "grabbing"
+              : "grab"
+            : selectedTool === "magnify"
+            ? "zoom-in"
+            : spacePressed
+            ? "grab"
+            : "default",
+      }}
     >
       {img && (
         <div
-          className="absolute top-1/2 left-1/2"
+          className="relative"
           style={{
-            transform: "translate(-50%, -50%)",
             width: `${stageSize.width}px`,
             height: `${stageSize.height}px`,
+            overflow: "hidden", // 🧩 keeps everything within bounds
           }}
         >
-          {/* PDF Image Layer */}
-          <Stage
-            width={stageSize.width}
-            height={stageSize.height}
-            scaleX={scale}
-            scaleY={scale}
-            className="absolute"
-            style={{ zIndex: 0 }}
-          >
-            <Layer listening={false}>
-              <KonvaImage image={img} />
-            </Layer>
-          </Stage>
-
-          {/* Overlay Layer */}
+          {/* Stage + Overlay scaled together */}
           <div
-            className="absolute top-0 left-0 z-30"
             style={{
-              width: `${stageSize.width}px`,
-              height: `${stageSize.height}px`,
-              pointerEvents: "auto",
-              zIndex: 10,
+              transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+              transformOrigin: "center center",
+              transition: isPanning ? "none" : "transform 0.2s ease-out",
             }}
           >
-            <PDFOverlayCanvas
-              shapes={shapes}
-              setShapes={setShapes}
-              selectedTool={selectedTool}
-              setSelectedTool={setSelectedTool}
-              selectedIds={selectedIds}
-              setSelectedIds={setSelectedIds}
-            />
+            <Stage
+              width={stageSize.width}
+              height={stageSize.height}
+              scaleX={scale}
+              scaleY={scale}
+              style={{ pointerEvents: "none", zIndex: 0 }}
+            >
+              <Layer listening={false}>
+                <KonvaImage image={img} />
+              </Layer>
+            </Stage>
+
+            <div
+              style={{
+                width: `${stageSize.width}px`,
+                height: `${stageSize.height}px`,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                pointerEvents: "auto",
+                zIndex: 10,
+              }}
+            >
+              <PDFOverlayCanvas
+                shapes={shapes}
+                setShapes={setShapes}
+                selectedTool={selectedTool}
+                setSelectedTool={setSelectedTool}
+                selectedIds={selectedIds}
+                setSelectedIds={setSelectedIds}
+                zoom={zoom}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -118,15 +423,24 @@ function PDFPage({
   );
 }
 
+
+
+
+
+
+
+
+
+
 export default function CanvasEditor() {
   const params = new URLSearchParams(window.location.search);
-const leadMagnetId = params.get("id");
-const pdfUrl = decodeURIComponent(params.get("pdf") || "");
-  
+  const leadMagnetId = params.get("id");
+  const pdfUrl = decodeURIComponent(params.get("pdf") || "");
+
   const [pages, setPages] = useState([]); // all page images
   const [selectedPage, setSelectedPage] = useState(0);
   const [shapesByPage, setShapesByPage] = useState({});
-  
+
   const [loading, setLoading] = useState(true);
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -289,9 +603,9 @@ const pdfUrl = decodeURIComponent(params.get("pdf") || "");
   async function handleSaveFinalPDF() {
     try {
       if (!pdfUrl) {
-  toast.error("No PDF URL provided — cannot save.");
-  return;
-}
+        toast.error("No PDF URL provided — cannot save.");
+        return;
+      }
 
       if (!pages.length) throw new Error("No pages loaded");
 
@@ -314,13 +628,13 @@ const pdfUrl = decodeURIComponent(params.get("pdf") || "");
       // ✅ 2. Apply overlays from each page
       for (let i = 0; i < pages.length; i++) {
         const overlayCanvas = document.querySelector(
-  `[data-pdf-page="${i}"] .konva-overlay .konvajs-content canvas:first-child`
-);
+          `[data-pdf-page="${i}"] .konva-overlay .konvajs-content canvas:first-child`
+        );
 
         if (!overlayCanvas) continue;
 
         console.log("🎨 Exporting overlay for page", i, overlayCanvas);
-document.body.appendChild(overlayCanvas.cloneNode(true));
+        document.body.appendChild(overlayCanvas.cloneNode(true));
 
         const imgData = overlayCanvas.toDataURL("image/png");
         const png = await pdfDoc.embedPng(imgData);
@@ -455,6 +769,12 @@ document.body.appendChild(overlayCanvas.cloneNode(true));
               <MousePointerClick size={16} className="text-white" />
             </button>
             {[
+              {
+                icon: ZoomIn, // or replace with a ZoomIn icon if you import it
+                type: "magnify",
+                color: "bg-black",
+                title: "Magnify Tool (click & drag to zoom)",
+              },
               {
                 icon: Square,
                 type: "rect",

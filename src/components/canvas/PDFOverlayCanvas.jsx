@@ -40,15 +40,34 @@ export default function PDFOverlayCanvas({
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
 
+  // useEffect(() => {
+  //   if (!containerRef.current) return;
+  //   const observer = new ResizeObserver(([entry]) => {
+  //     const { width, height } = entry.contentRect;
+  //     setStageSize({ width, height });
+  //   });
+  //   observer.observe(containerRef.current);
+  //   return () => observer.disconnect();
+  // }, []);
   useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      setStageSize({ width, height });
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const el = containerRef.current;
+  if (!el || !(el instanceof Element)) return; // 🧩 Guard against invalid refs
+
+  const observer = new ResizeObserver((entries) => {
+    if (!entries.length) return;
+    const { width, height } = entries[0].contentRect;
+    setStageSize({ width, height });
+  });
+
+  try {
+    observer.observe(el);
+  } catch (err) {
+    console.warn("ResizeObserver failed to attach:", err);
+  }
+
+  return () => observer.disconnect();
+}, []);
+
 
   useEffect(() => {
     const handleClear = () => {

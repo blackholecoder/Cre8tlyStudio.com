@@ -9,12 +9,11 @@ import {
 } from "react-icons/fa";
 
 export const navLinks = [
-  { href: "/", label: "Home"},
-  { href: "sign-up", label: "Sign Up"},
-  { href: "contact", label: "Contact Us"},
-  { href: "shop", label: "Shop"},
-  { href: "login", label: "Login"},
-
+  { href: "/", label: "Home" },
+  { href: "sign-up", label: "Sign Up" },
+  { href: "contact", label: "Contact Us" },
+  { href: "shop", label: "Shop" },
+  { href: "login", label: "Login" },
 ];
 
 export const footerLinks2 = [
@@ -289,9 +288,7 @@ export const themes = [
   },
 ];
 
-export const themeStyles = [
-  
-]
+export const themeStyles = [];
 
 export const colorThemes = [
   { name: "modern", label: "Modern", preview: "#e2e8f0" },
@@ -363,17 +360,96 @@ export const colorThemes = [
   { name: "ultraviolet", label: "Ultraviolet", preview: "#6d28d9" },
 ];
 
-export const fontThemes = {
-  modern: {
-    name: "Montserrat",
-    file: "/fonts/Montserrat-Regular.ttf",
+export const fontThemes = [
+  { name: "Roboto", label: "Appeal", file: "/fonts/Roboto-Regular.ttf" },
+
+  {
+    name: "Academy",
+    label: "Academy",
+    file: "/fonts/Academy-Engraved LET-Fonts.ttf",
   },
-  classic: {
+
+  {
+    name: "Aloevera-Regular",
+    label: "Big Win",
+    file: "/fonts/Aloevera-Regular.ttf",
+  },
+
+  {
+    name: "ACaslonPro",
+    label: "Blissful",
+    file: "/fonts/ACaslonPro-Regular.ttf",
+  },
+
+  { name: "Baskerville", label: "Brilliance", file: "/fonts/Baskerville.ttf" },
+
+  { name: "Frank", label: "Business", file: "/fonts/frank.ttf" },
+
+  { name: "Butler_Medium", label: "Butler", file: "/fonts/Butler_Medium.ttf" },
+
+  {
     name: "AdobeArabic",
+    label: "Classic",
     file: "/fonts/AdobeArabic-Regular.ttf",
   },
-  bold: {
-    name: "Bebas Neue",
-    file: "/fonts/Roboto-Regular.ttf",
+
+  { name: "agencyfb", label: "Dazzle", file: "/fonts/agencyfb-bold.ttf" },
+
+  { name: "Aloevera", label: "Excellence", file: "/fonts/Aloevera-Thin.ttf" },
+
+  { name: "ChopinScript", label: "Fancy", file: "/fonts/ChopinScript.ttf" },
+
+  { name: "Acens", label: "Financial", file: "/fonts/Acens.ttf" },
+
+  { name: "cambriab", label: "Footloose", file: "/fonts/cambriab.ttf" },
+
+  { name: "Archivo", label: "Gorgeous", file: "/fonts/Archivo-Regular.ttf" },
+
+  { name: "Berylium", label: "Guru", file: "/fonts/Berylium.ttf" },
+
+  { name: "Impact", label: "Impactful", file: "/fonts/impact.ttf" },
+
+  { name: "Absalom", label: "Lovely", file: "/fonts/Absalom.ttf" },
+
+  {
+    name: "Montserrat",
+    label: "Modern",
+    file: "/fonts/Montserrat-Regular.ttf",
   },
-};
+
+  {
+    name: "Altoysitalic",
+    label: "Mountain",
+    file: "/fonts/Altoysitalic_personal_only.ttf",
+  },
+
+  {
+    name: "BigShouldersDisplay",
+    label: "Paradise",
+    file: "/fonts/BigShouldersDisplay-Regular.ttf",
+  },
+
+  { name: "Bodoni_72", label: "Radiance", file: "/fonts/Bodoni_72.ttf" },
+
+  { name: "Alipne", label: "Showcase", file: "/fonts/Alpine.ttf" },
+
+  { name: "cordia", label: "Spontaneous", file: "/fonts/cordia.ttf" },
+
+  {
+    name: "Bebas Neue",
+    label: "Statement",
+    file: "/fonts/BebasNeue-Regular.ttf",
+  },
+
+  { name: "Advert", label: "Sunshine", file: "/fonts/Advert.ttf" },
+
+  {
+    name: "AdobeNaskh",
+    label: "Urgency",
+    file: "/fonts/AdobeNaskh-Medium.ttf",
+  },
+
+  { name: "Cochin", label: "Wonder", file: "/fonts/Cochin.ttf" },
+
+  { name: "Galvji", label: "Vexar", file: "/fonts/Galvji.ttf" },
+];

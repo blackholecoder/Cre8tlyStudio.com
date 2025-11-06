@@ -25,7 +25,6 @@ export default function PromptModal({
 }) {
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
-  const [theme, setTheme] = useState("modern");
   const [pages, setPages] = useState(5);
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -38,12 +37,14 @@ export default function PromptModal({
   const [phase, setPhase] = useState("questions");
   const [bgTheme, setBgTheme] = useState("#ffffff");
 
+  const [fontName, setFontName] = useState("Montserrat");
+  const [fontFile, setFontFile] = useState("/fonts/Montserrat-Regular.ttf");
+
   // ✅ Reset form on close
   useEffect(() => {
     if (!isOpen) {
       setText("");
       setTitle("");
-      setTheme("modern");
       setPages(5);
       setLogo(null);
       setLogoPreview(null);
@@ -89,7 +90,8 @@ export default function PromptModal({
           magnetId,
           prompt: text,
           title,
-          theme,
+          font_name: fontName,
+          font_file: fontFile,
           bgTheme,
           pages,
           logo,
@@ -116,7 +118,7 @@ export default function PromptModal({
       // ✅ Refresh magnet list
       setTimeout(() => {
         if (typeof onSubmitted === "function") {
-          onSubmitted(magnetId, text, theme);
+          onSubmitted(magnetId, text, fontName);
         }
       }, 2000);
     } catch (err) {
@@ -168,69 +170,13 @@ export default function PromptModal({
       // ✅ Still trigger dashboard refresh after short delay
       onClose();
       if (typeof onSubmitted === "function") {
-        setTimeout(() => onSubmitted(magnetId, text, theme), 5000);
+        setTimeout(() => onSubmitted(magnetId, text, fontName), 5000);
       }
     } finally {
       setLoading(false);
     }
   }
 
-  // async function handleBookSubmit(e) {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setProgress(0);
-  //   setShowGenerating(true);
-  //   onClose();
-
-  //   let interval;
-  //   try {
-  //    let progressValue = 0;
-  //   interval = setInterval(() => {
-  //     // Smooth climb logic with slowdown near the end
-  //     progressValue +=
-  //       progressValue < 60
-  //         ? Math.random() * 4.5 // faster early
-  //         : progressValue < 85
-  //         ? Math.random() * 2.5 // steady middle
-  //         : Math.random() * 1.2; // slow near the end
-
-  //     if (progressValue >= 96) progressValue = 96; // hold near finish
-  //     setProgress(progressValue);
-  //   }, 200);
-  //     const res = await axios.post(
-  //       "https://cre8tlystudio.com/api/books/prompt",
-  //       {
-  //         prompt: text,
-  //         theme,
-  //         pages,
-  //         logo,
-  //         link,
-  //         coverImage: cover,
-  //       },
-  //       {
-  //         headers: { Authorization: `Bearer ${accessToken}` },
-  //       }
-  //     );
-
-  //     clearInterval(interval);
-  //     setProgress(100);
-
-  //     toast.success("📚 Your book was generated successfully!");
-  //     setShowGenerating(false);
-
-  //     await new Promise((r) => setTimeout(r, 1000));
-  //     onClose();
-  //   } catch (err) {
-  //     console.error("❌ Book generation error:", err);
-  //     clearInterval(interval);
-  //     setProgress(0);
-  //     setLoading(false);
-  //     setShowGenerating(false);
-  //     toast.error("Something went wrong while generating your book.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
   async function handleBookSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -258,11 +204,12 @@ export default function PromptModal({
         "https://cre8tlystudio.com/api/books/prompt",
         {
           prompt: text,
-          theme,
           pages,
           logo,
           link,
           coverImage: cover,
+          font_name: fontName,
+          font_file: fontFile,
         },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -327,14 +274,12 @@ export default function PromptModal({
                   }`}
                 >
                   {/* 👇 Add Back Button */}
-                  
+
                   <PromptForm
                     text={text}
                     setText={setText}
                     title={title}
                     setTitle={setTitle}
-                    theme={theme}
-                    setTheme={setTheme}
                     bgTheme={bgTheme}
                     setBgTheme={setBgTheme}
                     pages={pages}
@@ -354,6 +299,10 @@ export default function PromptModal({
                     onSubmit={handleSubmit}
                     loading={loading}
                     contentType={contentType}
+                    fontName={fontName}
+                    setFontName={setFontName}
+                    fontFile={fontFile}
+                    setFontFile={setFontFile}
                   />
                 </div>
               )}
@@ -378,8 +327,6 @@ export default function PromptModal({
                   <BookPromptForm
                     text={text}
                     setText={setText}
-                    theme={theme}
-                    setTheme={setTheme}
                     pages={pages}
                     setPages={setPages}
                     logo={logo}
@@ -396,6 +343,10 @@ export default function PromptModal({
                     setShowPreview={setShowPreview}
                     onSubmit={handleBookSubmit}
                     loading={loading}
+                    fontName={fontName}
+                    setFontName={setFontName}
+                    fontFile={fontFile}
+                    setFontFile={setFontFile}
                   />
                 </div>
               )}
@@ -403,15 +354,15 @@ export default function PromptModal({
 
             {/* Close button (disabled while loading) */}
             {phase !== "questions" && (
-    <button
-      type="button"
-      onClick={() => setPhase("questions")}
-      className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md transition-all hover:bg-green/90 hover:text-white active:scale-95 z-20"
-    >
-      <ArrowLeft size={16} />
-      <span>Back</span>
-    </button>
-  )}
+              <button
+                type="button"
+                onClick={() => setPhase("questions")}
+                className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md transition-all hover:bg-green/90 hover:text-white active:scale-95 z-20"
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
+            )}
 
             <button
               onClick={!loading ? handleClose : undefined}
@@ -422,7 +373,6 @@ export default function PromptModal({
             >
               ✕
             </button>
-
           </DialogPanel>
         </div>
       </Dialog>

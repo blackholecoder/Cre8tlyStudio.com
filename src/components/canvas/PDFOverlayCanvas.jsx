@@ -9,12 +9,15 @@ import {
   Transformer,
   Path,
   Line,
+  Group,
+  Image as KonvaImage,
 } from "react-konva";
 import { Html } from "react-konva-utils";
 import ShapePropertiesPanel from "./ShapePropertiesPanel";
 import { handleShapeDuplicate } from "../../helpers/handleShapeDuplicates";
 import { getGuides } from "../../helpers/guides";
 import { createPortal } from "react-dom";
+import useImage from "use-image";
 
 export default function PDFOverlayCanvas({
   shapes,
@@ -40,34 +43,156 @@ export default function PDFOverlayCanvas({
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
 
-  // useEffect(() => {
-  //   if (!containerRef.current) return;
-  //   const observer = new ResizeObserver(([entry]) => {
-  //     const { width, height } = entry.contentRect;
-  //     setStageSize({ width, height });
-  //   });
-  //   observer.observe(containerRef.current);
-  //   return () => observer.disconnect();
-  // }, []);
+
+
+
+function ImageShape({
+  shape,
+  setShapes,
+  setSelectedIds, 
+  setPanelOpen,
+  isDuplicating,
+}) {
+  const [img, status] = useImage(shape.src, "anonymous");
+  // const isSelected = selectedIds?.includes(shape.id);
+
   useEffect(() => {
-  const el = containerRef.current;
-  if (!el || !(el instanceof Element)) return; // 🧩 Guard against invalid refs
+    console.log("🖼 Loading image:", shape.id, status);
+  }, [status, shape.id]);
 
-  const observer = new ResizeObserver((entries) => {
-    if (!entries.length) return;
-    const { width, height } = entries[0].contentRect;
-    setStageSize({ width, height });
-  });
+  if (!shape?.src || status !== "loaded" || !img) return null;
 
-  try {
-    observer.observe(el);
-  } catch (err) {
-    console.warn("ResizeObserver failed to attach:", err);
-  }
+  // ✅ Compute shadow offset from angle + distance
+  const shadowOffsetX =
+    shape.shadowOffset && shape.shadowAngle !== undefined
+      ? Math.cos((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
+      : 0;
 
-  return () => observer.disconnect();
-}, []);
+  const shadowOffsetY =
+    shape.shadowOffset && shape.shadowAngle !== undefined
+      ? Math.sin((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
+      : 0;
 
+  return (
+    <Group
+      key={shape.id}
+      id={String(shape.id)}
+      x={shape.x ?? 0}
+      y={shape.y ?? 0}
+      draggable
+      rotation={shape.rotation ?? 0}
+      onClick={(e) => {
+        e.cancelBubble = true;
+        const isShift = e.evt.shiftKey;
+        setPanelOpen(true);
+        setSelectedIds((prev) =>
+          isShift
+            ? prev.includes(shape.id)
+              ? prev.filter((id) => id !== shape.id)
+              : [...prev, shape.id]
+            : [shape.id]
+        );
+      }}
+      onDragStart={(e) => {
+        if (isDuplicating?.current) return;
+        e.cancelBubble = true;
+        e.target.moveToTop();
+      }}
+      onDragEnd={(e) => {
+        const node = e.target;
+        const { x, y } = node.position();
+        setShapes((prev) =>
+          prev.map((s) => (s.id === shape.id ? { ...s, x, y } : s))
+        );
+      }}
+      onTransformEnd={(e) => {
+        const node = e.target;
+        const scaleX = node.scaleX();
+        const scaleY = node.scaleY();
+
+        const newWidth = Math.max(20, (shape.width ?? 200) * scaleX);
+        const newHeight = Math.max(20, (shape.height ?? 200) * scaleY);
+
+        setShapes((prev) =>
+          prev.map((s) =>
+            s.id === shape.id
+              ? {
+                  ...s,
+                  x: node.x(),
+                  y: node.y(),
+                  width: newWidth,
+                  height: newHeight,
+                }
+              : s
+          )
+        );
+
+        node.scaleX(1);
+        node.scaleY(1);
+      }}
+    >
+      {/* 🖼️ Actual image */}
+      <KonvaImage
+        image={img}
+        width={shape.width ?? img.width ?? 200}
+        height={shape.height ?? img.height ?? 200}
+        opacity={shape.opacity ?? 1}
+        cornerRadius={shape.cornerRadius ?? 0}
+        shadowEnabled={true}
+        shadowColor={shape.shadowColor ?? "transparent"}
+        shadowBlur={(shape.shadowRadius ?? 0) * 1.5}
+        shadowOpacity={shape.shadowOpacity ?? 0.5}
+        shadowOffsetX={shadowOffsetX}
+        shadowOffsetY={shadowOffsetY}
+        filters={shape.tint ? [Konva.Filters.RGBA] : []}
+        red={shape.tint ? parseInt(shape.tint.slice(1, 3), 16) : 255}
+        green={shape.tint ? parseInt(shape.tint.slice(3, 5), 16) : 255}
+        blue={shape.tint ? parseInt(shape.tint.slice(5, 7), 16) : 255}
+        alpha={1}
+      />
+
+      {/* 🟩 Real stroke only (no selection highlight) */}
+      {shape.strokeWidth > 0 && (
+        <Rect
+          width={shape.width ?? img.width ?? 200}
+          height={shape.height ?? img.height ?? 200}
+          stroke={
+      shape.strokeWidth > 0
+        ? shape.stroke || "#000000" // ✅ fallback to black if no color chosen
+        : "transparent"
+    }
+          strokeWidth={shape.strokeWidth ?? 0}
+          cornerRadius={shape.cornerRadius ?? 0}
+          listening={false}
+        />
+      )}
+    </Group>
+  );
+}
+
+
+
+
+
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !(el instanceof Element)) return; // 🧩 Guard against invalid refs
+
+    const observer = new ResizeObserver((entries) => {
+      if (!entries.length) return;
+      const { width, height } = entries[0].contentRect;
+      setStageSize({ width, height });
+    });
+
+    try {
+      observer.observe(el);
+    } catch (err) {
+      console.warn("ResizeObserver failed to attach:", err);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleClear = () => {
@@ -114,6 +239,7 @@ export default function PDFOverlayCanvas({
     if (savedShapes) {
       try {
         setShapes(JSON.parse(savedShapes));
+
         console.log(`✅ Restored shapes for page ${window.currentPDFPage}`);
       } catch (err) {
         console.error("⚠️ Failed to parse saved shapes:", err);
@@ -157,17 +283,46 @@ export default function PDFOverlayCanvas({
       })
     );
   };
-  useEffect(() => {
-    const tr = trRef.current;
-    const stage = tr?.getStage();
-    if (!stage) return;
+  // useEffect(() => {
+  //   const tr = trRef.current;
+  //   const stage = tr?.getStage();
+  //   if (!stage) return;
 
+  //   const nodes = selectedIds
+  //     .map((id) => stage.findOne(`#${id}`))
+  //     .filter(Boolean);
+  //   tr.nodes(nodes);
+  //   tr.getLayer()?.batchDraw();
+  // }, [selectedIds, shapes]);
+
+useEffect(() => {
+  const tr = trRef.current;
+  const stage = stageRef.current?.getStage();
+  if (!tr || !stage) return;
+
+  requestAnimationFrame(() => {
+    // find selected shape nodes
     const nodes = selectedIds
       .map((id) => stage.findOne(`#${id}`))
       .filter(Boolean);
-    tr.nodes(nodes);
+
+    // 🧠 log safely
+    console.log("Transformer nodes:", nodes.map(n => n.id()));
+
+    if (nodes.length > 0) {
+      tr.nodes(nodes);
+      tr.moveToTop(); // keep on top of all shapes
+    } else {
+      tr.nodes([]);
+    }
+
     tr.getLayer()?.batchDraw();
-  }, [selectedIds, shapes]);
+  });
+}, [selectedIds, shapes]);
+
+
+
+
 
   useEffect(() => {
     localStorage.setItem("cre8tly_canvas_shapes", JSON.stringify(shapes));
@@ -208,6 +363,12 @@ export default function PDFOverlayCanvas({
   const startPos = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e) => {
+    const clickedShape = e.target;
+if (clickedShape && clickedShape.getClassName && clickedShape.getClassName() !== "Stage") {
+  // user clicked on a shape, let Konva handle its own drag/transform
+  return;
+}
+
     e.evt.preventDefault();
     // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
     if (e?.evt?.target?.closest && e.evt.target.closest(".canvas-toolbar")) {
@@ -461,6 +622,7 @@ export default function PDFOverlayCanvas({
       return;
     }
 
+
     // 🅰️ Finalize Text Shape (dragged out text box)
     if (previewShape && previewShape.type === "text") {
       isDrawing.current = false;
@@ -608,6 +770,7 @@ export default function PDFOverlayCanvas({
       className="absolute inset-0 pointer-events-auto"
       style={{ zIndex: 50 }}
     >
+
       {stageSize.width > 0 && (
         <Stage
           ref={stageRef}
@@ -625,7 +788,11 @@ export default function PDFOverlayCanvas({
         >
           <Layer>
             {shapes.map((shape) => {
-              // const isSelected = selectedIds.includes(shape.id);
+
+              console.groupCollapsed("🧩 Rendering shapes batch");
+console.table(shapes.map(s => ({ id: s.id, type: s.type, src: s.src?.slice(0, 60) })));
+console.groupEnd();
+
 
               const intensity = (shape.shadowIntensity ?? 50) / 100; // 0–1 range
               const adjusted = Math.pow(intensity, 1.5);
@@ -767,10 +934,26 @@ export default function PDFOverlayCanvas({
                       }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
-                          const { x, y } = e.target.position();
+                          const node = e.target;
+                          const { x, y } = node.position();
+
+                          const radiusX = node.radiusX();
+                          const radiusY = node.radiusY();
+
+                          // Ellipse uses center-based coordinates — keep consistent
                           setShapes((prev) =>
                             prev.map((s) =>
-                              s.id === shape.id ? { ...s, x, y } : s
+                              s.id === shape.id
+                                ? {
+                                    ...s,
+                                    x,
+                                    y,
+                                    radiusX,
+                                    radiusY,
+                                    width: radiusX * 2,
+                                    height: radiusY * 2,
+                                  }
+                                : s
                             )
                           );
                         }
@@ -786,24 +969,28 @@ export default function PDFOverlayCanvas({
                           prev.map((s) => {
                             if (s.id !== shape.id) return s;
 
-                            // 🟢 Circle / Ellipse – keep proportions
+                            // 🟢 Circle / Ellipse — fix jump & preserve proportions
                             if (s.type === "circle") {
-                              const avgScale = (scaleX + scaleY) / 2;
-                              const newRadius = (s.radius ?? 50) * avgScale;
+                              const newRadiusX =
+                                (s.radiusX ?? s.radius ?? 50) * scaleX;
+                              const newRadiusY =
+                                (s.radiusY ?? s.radius ?? 50) * scaleY;
+
+                              // Ellipse x/y are CENTER coordinates
                               return {
                                 ...s,
                                 x: node.x(),
                                 y: node.y(),
-                                radius: newRadius,
-                                radiusX: newRadius,
-                                radiusY: newRadius,
-                                width: newRadius * 2,
-                                height: newRadius * 2,
+                                radiusX: newRadiusX,
+                                radiusY: newRadiusY,
+                                radius: Math.max(newRadiusX, newRadiusY), // keep for backward compatibility
+                                width: newRadiusX * 2,
+                                height: newRadiusY * 2,
                                 rotation: node.rotation(),
                               };
                             }
 
-                            // 🟦 Rectangles and others
+                            // 🟦 Rectangles and others (same as before)
                             const newWidth = Math.max(
                               20,
                               (s.width ?? 100) * scaleX
@@ -827,7 +1014,7 @@ export default function PDFOverlayCanvas({
                           })
                         );
 
-                        // ✅ Reset transforms so no “jump” occurs
+                        // ✅ Reset transforms so no “jump” occurs visually
                         node.scaleX(1);
                         node.scaleY(1);
                       }}
@@ -1306,6 +1493,22 @@ export default function PDFOverlayCanvas({
                     />
                   );
 
+                case "image":
+  return (
+    <ImageShape
+      key={shape.id}
+      shape={shape}
+      setShapes={setShapes}
+      setSelectedIds={setSelectedIds}
+      setPanelOpen={setPanelOpen}
+       selectedIds={selectedIds}
+      isDuplicating={isDuplicating}
+    />
+  );
+
+
+
+
                 case "path":
                   return (
                     <Path
@@ -1429,13 +1632,28 @@ export default function PDFOverlayCanvas({
                       }}
                       onDragEnd={(e) => {
                         if (!isDuplicating.current) {
-                          const { x, y } = e.target.position();
+                          const node = e.target;
+                          const stage = node.getStage();
+                          const clientRect = node.getClientRect({
+                            relativeTo: stage,
+                          });
+
+                          // Save top-left based coordinates consistently
                           setShapes((prev) =>
                             prev.map((s) =>
-                              s.id === shape.id ? { ...s, x, y } : s
+                              s.id === shape.id
+                                ? {
+                                    ...s,
+                                    x: clientRect.x,
+                                    y: clientRect.y,
+                                    width: clientRect.width ?? s.width,
+                                    height: clientRect.height ?? s.height,
+                                  }
+                                : s
                             )
                           );
                         }
+
                         isDuplicating.current = false;
                         setGuides({ vertical: [], horizontal: [] });
                       }}
@@ -1443,20 +1661,34 @@ export default function PDFOverlayCanvas({
                         const node = e.target;
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
+
+                        // get bounding box before reset
+                        const box = node.getClientRect({
+                          relativeTo: node.getStage(),
+                        });
+
                         setShapes((prev) =>
-                          prev.map((s) =>
-                            s.id === shape.id
-                              ? {
-                                  ...s,
-                                  x: node.x(),
-                                  y: node.y(),
-                                  width: (s.width ?? 100) * scaleX,
-                                  height: (s.height ?? 20) * scaleY,
-                                  rotation: node.rotation(),
-                                }
-                              : s
-                          )
+                          prev.map((s) => {
+                            if (s.id !== shape.id) return s;
+
+                            const newWidth = (s.width ?? box.width) * scaleX;
+                            const newHeight = (s.height ?? box.height) * scaleY;
+
+                            // adjust x/y so shape stays visually fixed
+                            const newX = box.x + box.width / 2 - newWidth / 2;
+                            const newY = box.y + box.height / 2 - newHeight / 2;
+
+                            return {
+                              ...s,
+                              x: newX,
+                              y: newY,
+                              width: newWidth,
+                              height: newHeight,
+                              rotation: node.rotation(),
+                            };
+                          })
                         );
+
                         node.scaleX(1);
                         node.scaleY(1);
                       }}
@@ -1752,15 +1984,15 @@ export default function PDFOverlayCanvas({
 
       {/* 🎛 Shape Properties Panel */}
       {createPortal(
-  <ShapePropertiesPanel
-    panelOpen={panelOpen}
-    selectedIds={selectedIds}
-    shapes={shapes}
-    updateSelected={updateSelected}
-    deleteSelected={deleteSelected}
-  />,
-  document.body
-)}
+        <ShapePropertiesPanel
+          panelOpen={panelOpen}
+          selectedIds={selectedIds}
+          shapes={shapes}
+          updateSelected={updateSelected}
+          deleteSelected={deleteSelected}
+        />,
+        document.body
+      )}
     </div>
   );
 }

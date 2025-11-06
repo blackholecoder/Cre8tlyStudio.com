@@ -11,6 +11,7 @@ export default function ShapePropertiesPanel({
 }) {
   const selectedShapes = shapes.filter((s) => selectedIds.includes(s.id));
   const selectedShape = selectedShapes.length === 1 ? selectedShapes[0] : null;
+
   const [isDragging, setIsDragging] = useState(false);
 
   const disableDrag = useCallback((e) => {
@@ -18,6 +19,401 @@ export default function ShapePropertiesPanel({
     setIsDragging(true);
   }, []);
   const enableDrag = useCallback(() => setIsDragging(false), []);
+
+  if (selectedShape?.type === "image") {
+  return (
+    <AnimatePresence>
+      {panelOpen && (
+        <motion.div
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          initial={{ x: 300 }}
+          animate={{ x: 0 }}
+          exit={{ x: 300 }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          className="fixed top-0 right-0 h-screen w-96 bg-[#111]/95 backdrop-blur-md border-l border-gray-700/60 p-5 flex flex-col gap-4 shadow-[0_0_25px_rgba(0,0,0,0.6)] overflow-y-auto z-[9999]"
+        >
+          <h3 className="text-white font-semibold text-sm mb-1 sticky top-0 bg-[#111]/95 py-1 z-10">
+            Image Properties
+          </h3>
+
+          {/* Size */}
+          <div className="flex flex-col gap-2 mt-3">
+            <label className="text-xs text-gray-300">Width</label>
+            <input
+              type="range"
+              min="10"
+              max="2000"
+              step="1"
+              value={selectedShape.width ?? 200}
+              onChange={(e) =>
+                updateSelected({ width: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+            <input
+              type="number"
+              value={selectedShape.width ?? 200}
+              onChange={(e) =>
+                updateSelected({ width: parseFloat(e.target.value) || 200 })
+              }
+              className="w-full bg-[#1a1a1a] border border-gray-700 text-gray-300 text-xs rounded-md px-2 py-1 text-center"
+            />
+
+            <label className="text-xs text-gray-300 mt-3">Height</label>
+            <input
+              type="range"
+              min="10"
+              max="2000"
+              step="1"
+              value={selectedShape.height ?? 200}
+              onChange={(e) =>
+                updateSelected({ height: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+            <input
+              type="number"
+              value={selectedShape.height ?? 200}
+              onChange={(e) =>
+                updateSelected({ height: parseFloat(e.target.value) || 200 })
+              }
+              className="w-full bg-[#1a1a1a] border border-gray-700 text-gray-300 text-xs rounded-md px-2 py-1 text-center"
+            />
+          </div>
+
+          {/* Rotation */}
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Rotation</label>
+              <span className="text-[11px] text-gray-400">
+                {Math.round(selectedShape.rotation ?? 0)}°
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              step="1"
+              value={selectedShape.rotation ?? 0}
+              onChange={(e) =>
+                updateSelected({ rotation: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Opacity */}
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Opacity</label>
+              <span className="text-[11px] text-gray-400">
+                {(selectedShape.opacity ?? 1).toFixed(2)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={selectedShape.opacity ?? 1}
+              onChange={(e) =>
+                updateSelected({ opacity: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Corner Radius */}
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Corner Radius</label>
+              <span className="text-[11px] text-gray-400">
+                {selectedShape.cornerRadius ?? 0}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="1"
+              value={selectedShape.cornerRadius ?? 0}
+              onChange={(e) =>
+                updateSelected({ cornerRadius: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Tint */}
+          <div className="flex items-center justify-between mt-3">
+            <label className="text-xs text-gray-300">Tint</label>
+            <input
+              type="color"
+              value={selectedShape.tint || "#ffffff"}
+              onChange={(e) => updateSelected({ tint: e.target.value })}
+              className="w-6 h-6 rounded cursor-pointer"
+            />
+          </div>
+
+          {/* Stroke */}
+          <hr className="border-gray-700/40 mt-4" />
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-300">Stroke</label>
+            <div className="relative w-5 h-5">
+              <input
+                type="color"
+                value={selectedShape.stroke || "#000000"}
+                onMouseDown={disableDrag}
+                onMouseUp={enableDrag}
+                onChange={(e) => updateSelected({ stroke: e.target.value })}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+              <div
+                className="w-full h-full rounded-full border border-gray-500 shadow-inner"
+                style={{ backgroundColor: selectedShape.stroke || "#000000" }}
+              />
+            </div>
+          </div>
+
+          <hr className="border-gray-700/40" />
+           {/* Stroke Width*/}
+           <div className="flex flex-col gap-2 mt-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Width</label>
+              <span className="text-[11px] text-gray-400 w-8 text-right">
+                {(selectedShape.strokeWidth || 0).toFixed(1)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="0.01"
+              onMouseDown={disableDrag}
+              onMouseUp={enableDrag}
+              onTouchStart={disableDrag}
+              onTouchEnd={enableDrag}
+              value={selectedShape.strokeWidth || 2}
+              onChange={(e) =>
+                updateSelected({ strokeWidth: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Shadow */}
+          <hr className="border-gray-700/40 mt-4" />
+          <h4 className="text-white text-sm font-semibold">Shadow</h4>
+
+          {/* Blend Mode */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-300">Blend Mode</label>
+            <select
+              value={selectedShape.shadowBlend || "multiply"}
+              onChange={(e) =>
+                updateSelected({ shadowBlend: e.target.value })
+              }
+              className="bg-[#1a1a1a] border border-gray-700 text-gray-300 text-xs rounded-md px-2 py-1"
+            >
+              <option value="multiply">Multiply</option>
+              <option value="overlay">Overlay</option>
+              <option value="soft-light">Soft Light</option>
+              <option value="hard-light">Hard Light</option>
+              <option value="normal">Normal</option>
+            </select>
+          </div>
+
+          {/* Opacity */}
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Opacity</label>
+              <span className="text-[11px] text-gray-400">
+                {Math.round((selectedShape.shadowOpacity ?? 0.5) * 100)}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={selectedShape.shadowOpacity ?? 0.5}
+              onChange={(e) =>
+                updateSelected({ shadowOpacity: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Radius */}
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Radius</label>
+              <span className="text-[11px] text-gray-400">
+                {selectedShape.shadowRadius ?? 0}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="1"
+              value={selectedShape.shadowRadius ?? 0}
+              onChange={(e) =>
+                updateSelected({ shadowRadius: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Offset */}
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-300">Offset</label>
+              <span className="text-[11px] text-gray-400">
+                {selectedShape.shadowOffset ?? 0}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="1"
+              value={selectedShape.shadowOffset ?? 0}
+              onChange={(e) =>
+                updateSelected({ shadowOffset: parseFloat(e.target.value) })
+              }
+              className="cre8tly-slider w-full"
+            />
+          </div>
+
+          {/* Color */}
+          <div className="flex items-center justify-between mt-3">
+            <label className="text-xs text-gray-300">Color</label>
+            <input
+              type="color"
+              value={selectedShape.shadowColor || "#000000"}
+              onChange={(e) =>
+                updateSelected({ shadowColor: e.target.value })
+              }
+              className="w-6 h-6 rounded cursor-pointer"
+            />
+          </div>
+
+          {/* Angle Dial */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs text-gray-300">Angle</label>
+                <div className="flex items-center justify-between">
+                  <div className="relative w-16 h-16">
+                    <svg
+                      viewBox="0 0 100 100"
+                      className="w-full h-full text-gray-500 cursor-pointer select-none"
+                      onMouseDown={(e) => {
+                        disableDrag();
+
+                        const handleMove = (moveEvent) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const cx = rect.left + rect.width / 2;
+                          const cy = rect.top + rect.height / 2;
+
+                          // Compute angle based on mouse position
+                          const dx = moveEvent.clientX - cx;
+                          const dy = moveEvent.clientY - cy;
+
+                          // Convert radians → degrees (0° = up)
+                          const angle =
+                            (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+                          const normalized = ((angle % 360) + 360) % 360;
+
+                          // Update immediately for live feedback
+                          updateSelected({ shadowAngle: normalized });
+                        };
+
+                        const handleUp = () => {
+                          enableDrag();
+                          window.removeEventListener("mousemove", handleMove);
+                          window.removeEventListener("mouseup", handleUp);
+                        };
+
+                        // Attach listeners globally
+                        window.addEventListener("mousemove", handleMove);
+                        window.addEventListener("mouseup", handleUp);
+                      }}
+                    >
+                      {/* Dial circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="48"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth="3"
+                        fill="none"
+                      />
+                      {/* Needle */}
+                      <line
+                        x1="50"
+                        y1="50"
+                        x2={
+                          50 +
+                          40 *
+                            Math.sin(
+                              ((selectedShape.shadowAngle ?? 315) * Math.PI) /
+                                180
+                            )
+                        }
+                        y2={
+                          50 -
+                          40 *
+                            Math.cos(
+                              ((selectedShape.shadowAngle ?? 315) * Math.PI) /
+                                180
+                            )
+                        }
+                        stroke="#3b82f6"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+
+                    {/* Center angle label */}
+                    <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-300 font-medium">
+                      {Math.round(selectedShape.shadowAngle ?? 315)}°
+                    </div>
+                  </div>
+
+                  {/* Numeric input fallback */}
+                  <input
+                    type="number"
+                    min="0"
+                    max="360"
+                    step="1"
+                    value={Math.round(selectedShape.shadowAngle ?? 315)}
+                    onMouseDown={disableDrag}
+                    onMouseUp={enableDrag}
+                    onChange={(e) =>
+                      updateSelected({
+                        shadowAngle: Number(e.target.value) || 0, // ✅ stays shadowAngle
+                      })
+                    }
+                    className="w-16 bg-[#1a1a1a] border border-gray-700 rounded-md text-gray-300 text-xs text-center px-2 py-1"
+                  />
+                </div>
+              </div>
+
+          {/* Delete */}
+          <button
+            onClick={() => deleteSelected(selectedIds)}
+            className="self-end mt-6 p-1.5 bg-white/5 hover:bg-red-700/20 text-white rounded-md flex items-center justify-center transition-all duration-150"
+            title="Delete image"
+          >
+            <Trash2 className="text-red-500" size={16} />
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 
   return (
     <AnimatePresence>

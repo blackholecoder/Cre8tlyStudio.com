@@ -21,6 +21,9 @@ import {
   ArrowLeft,
   Package,
   ZoomIn,
+  Undo2,
+  Redo2,
+  ImageIcon,
 } from "lucide-react";
 import { performBooleanOperation } from "../../helpers/booleanOps";
 
@@ -29,205 +32,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   window.location.origin
 ).toString();
 
-
-
-// #1
-// function PDFPage({
-//   pageIndex,
-//   imageUrl,
-//   shapes,
-//   setShapes,
-//   setSelectedTool,
-//   selectedTool,
-//   selectedIds,
-//   setSelectedIds,
-// }) {
-//   const [img] = useImage(imageUrl);
-//   const containerRef = useRef(null);
-//   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
-//   const [scale, setScale] = useState(1);
-//   const [zoom, setZoom] = useState(1);
-//   const [offset, setOffset] = useState({ x: 0, y: 0 });
-//   const [dragStart, setDragStart] = useState(null);
-//   const [isPanning, setIsPanning] = useState(false);
-//   const [spacePressed, setSpacePressed] = useState(false);
-
-//   // Fit PDF initially
-//   useEffect(() => {
-//     if (!img || !containerRef.current) return;
-//     const rect = containerRef.current.getBoundingClientRect();
-//     const scaleX = rect.width / img.width;
-//     const scaleY = rect.height / img.height;
-//     const newScale = Math.min(scaleX, scaleY);
-//     setScale(newScale);
-//     setStageSize({ width: img.width * newScale, height: img.height * newScale });
-//   }, [img]);
-
-//   // Spacebar pan activation
-//   useEffect(() => {
-//     const down = (e) => e.code === "Space" && setSpacePressed(true);
-//     const up = (e) => e.code === "Space" && setSpacePressed(false);
-//     window.addEventListener("keydown", down);
-//     window.addEventListener("keyup", up);
-//     return () => {
-//       window.removeEventListener("keydown", down);
-//       window.removeEventListener("keyup", up);
-//     };
-//   }, []);
-
-//   // Zoom helper
-//   const applyZoom = (direction, e) => {
-//     const bounds = containerRef.current.getBoundingClientRect();
-//     const clickX = e.clientX - bounds.left - bounds.width / 2 - offset.x;
-//     const clickY = e.clientY - bounds.top - bounds.height / 2 - offset.y;
-//     const step = 1.5;
-//     const maxZoom = 8;
-//     const minZoom = 1;
-
-//     setZoom((prev) => {
-//       let nextZoom =
-//         direction === "in"
-//           ? Math.min(prev * step, maxZoom)
-//           : Math.max(prev / step, minZoom);
-
-//       if (nextZoom === prev) return prev; // no change
-//       // Adjust offset to zoom into/out from click
-//       setOffset({
-//         x: offset.x - clickX * (nextZoom - prev) * 0.3,
-//         y: offset.y - clickY * (nextZoom - prev) * 0.3,
-//       });
-//       return nextZoom;
-//     });
-//   };
-
-//   // Left click zoom in / right click or alt click zoom out
-//   const handleClick = (e) => {
-//     if (selectedTool !== "magnify") return;
-//     e.preventDefault();
-//     if (e.button === 2 || e.altKey) {
-//       // right-click or alt-click
-//       applyZoom("out", e);
-//     } else {
-//       applyZoom("in", e);
-//     }
-//   };
-
-//   // Pan when zoomed or space pressed
-//   const handleMouseDown = (e) => {
-//     const shouldPan =
-//       zoom > 1 &&
-//       (spacePressed ||
-//         selectedTool === "magnify" ||
-//         selectedTool === null);
-//     if (shouldPan && e.button === 0) {
-//       e.preventDefault();
-//       setIsPanning(true);
-//       setDragStart({
-//         x: e.clientX,
-//         y: e.clientY,
-//         startOffset: { ...offset },
-//       });
-//     }
-//   };
-
-//   const handleMouseMove = (e) => {
-//     if (!isPanning || !dragStart) return;
-//     const dx = e.clientX - dragStart.x;
-//     const dy = e.clientY - dragStart.y;
-//     setOffset({
-//       x: dragStart.startOffset.x + dx,
-//       y: dragStart.startOffset.y + dy,
-//     });
-//   };
-
-//   const handleMouseUp = () => setIsPanning(false);
-//   const handleDoubleClick = () => {
-//     setZoom(1);
-//     setOffset({ x: 0, y: 0 });
-//   };
-
-//   // Disable context menu (for right-click zoom out)
-//   useEffect(() => {
-//     const preventContext = (e) => e.preventDefault();
-//     document.addEventListener("contextmenu", preventContext);
-//     return () => document.removeEventListener("contextmenu", preventContext);
-//   }, []);
-
-//   return (
-//     <div
-//       ref={containerRef}
-//       data-pdf-page={pageIndex}
-//       onMouseDown={handleMouseDown}
-//       onMouseMove={handleMouseMove}
-//       onMouseUp={handleMouseUp}
-//       onClick={handleClick}
-//       onDoubleClick={handleDoubleClick}
-//       className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
-//       style={{
-//         cursor:
-//           zoom > 1
-//             ? isPanning
-//               ? "grabbing"
-//               : "grab"
-//             : selectedTool === "magnify"
-//             ? "zoom-in"
-//             : spacePressed
-//             ? "grab"
-//             : "default",
-//       }}
-//     >
-//       {img && (
-//         <div
-//           className="absolute top-1/2 left-1/2"
-//           style={{
-//             transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${zoom})`,
-//             transformOrigin: "center center",
-//             width: `${stageSize.width}px`,
-//             height: `${stageSize.height}px`,
-//             transition: isPanning ? "none" : "transform 0.2s ease-out",
-//           }}
-//         >
-//           {/* PDF Image */}
-//           <Stage
-//             width={stageSize.width}
-//             height={stageSize.height}
-//             scaleX={scale}
-//             scaleY={scale}
-//             className="absolute"
-//             style={{
-//               zIndex: 0,
-//               pointerEvents: "none",
-//             }}
-//           >
-//             <Layer listening={false}>
-//               <KonvaImage image={img} />
-//             </Layer>
-//           </Stage>
-
-//           {/* Drawing Layer */}
-//           <div
-//             className="absolute top-0 left-0 z-30"
-//             style={{
-//               width: `${stageSize.width}px`,
-//               height: `${stageSize.height}px`,
-//               pointerEvents: "auto",
-//             }}
-//           >
-//             <PDFOverlayCanvas
-//               shapes={shapes}
-//               setShapes={setShapes}
-//               selectedTool={selectedTool}
-//               setSelectedTool={setSelectedTool}
-//               selectedIds={selectedIds}
-//               setSelectedIds={setSelectedIds}
-//               zoom={zoom}
-//             />
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 function PDFPage({
   pageIndex,
   imageUrl,
@@ -307,9 +111,21 @@ function PDFPage({
   };
 
   const handleMouseDown = (e) => {
+    // Only pan if the click didn’t originate from inside the overlay’s Konva stage
+    const target = e.target;
+
+    // Check if the event target is inside Konva’s actual shape layer or transformer
+    const isInsideOverlay =
+      target.closest(".konvajs-content") && selectedTool !== "magnify";
+
+    // Allow resize/move when zoomed if the click is on a shape
+    if (isInsideOverlay) return; // ⛔ Let Konva handle it (resizing or drawing)
+
+    // Otherwise, enable panning
     const shouldPan =
       zoom > 1 &&
       (spacePressed || selectedTool === "magnify" || selectedTool === null);
+
     if (shouldPan && e.button === 0) {
       e.preventDefault();
       setIsPanning(true);
@@ -347,12 +163,12 @@ function PDFPage({
     <div
       ref={containerRef}
       data-pdf-page={pageIndex}
-      onClick={handleClick}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onClick={handleClick}
       onDoubleClick={handleDoubleClick}
-      className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg flex items-center justify-center"
+      className="relative w-full h-[80vh] overflow-hidden bg-[#0f0f10] rounded-lg"
       style={{
         cursor:
           zoom > 1
@@ -360,77 +176,64 @@ function PDFPage({
               ? "grabbing"
               : "grab"
             : selectedTool === "magnify"
-            ? "zoom-in"
-            : spacePressed
-            ? "grab"
-            : "default",
+              ? "zoom-in"
+              : spacePressed
+                ? "grab"
+                : "default",
       }}
     >
       {img && (
         <div
-          className="relative"
+          className="absolute top-1/2 left-1/2"
           style={{
+            transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${zoom})`,
+            transformOrigin: "center center",
             width: `${stageSize.width}px`,
             height: `${stageSize.height}px`,
-            overflow: "hidden", // 🧩 keeps everything within bounds
+            transition: isPanning ? "none" : "transform 0.2s ease-out",
           }}
         >
-          {/* Stage + Overlay scaled together */}
-          <div
+          {/* PDF Background */}
+          <Stage
+            width={stageSize.width}
+            height={stageSize.height}
+            scaleX={scale}
+            scaleY={scale}
+            className="absolute"
             style={{
-              transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
-              transformOrigin: "center center",
-              transition: isPanning ? "none" : "transform 0.2s ease-out",
+              zIndex: 0,
+              pointerEvents: "none",
             }}
           >
-            <Stage
-              width={stageSize.width}
-              height={stageSize.height}
-              scaleX={scale}
-              scaleY={scale}
-              style={{ pointerEvents: "none", zIndex: 0 }}
-            >
-              <Layer listening={false}>
-                <KonvaImage image={img} />
-              </Layer>
-            </Stage>
+            <Layer listening={false}>
+              <KonvaImage image={img} />
+            </Layer>
+          </Stage>
 
-            <div
-              style={{
-                width: `${stageSize.width}px`,
-                height: `${stageSize.height}px`,
-                position: "absolute",
-                top: 0,
-                left: 0,
-                pointerEvents: "auto",
-                zIndex: 10,
-              }}
-            >
-              <PDFOverlayCanvas
-                shapes={shapes}
-                setShapes={setShapes}
-                selectedTool={selectedTool}
-                setSelectedTool={setSelectedTool}
-                selectedIds={selectedIds}
-                setSelectedIds={setSelectedIds}
-                zoom={zoom}
-              />
-            </div>
+          {/* Drawing Layer */}
+          <div
+            className="absolute top-0 left-0 z-30"
+            style={{
+              width: `${stageSize.width}px`,
+              height: `${stageSize.height}px`,
+              pointerEvents: "auto",
+            }}
+          >
+            <PDFOverlayCanvas
+              shapes={shapes}
+              setShapes={setShapes}
+              selectedTool={selectedTool}
+              setSelectedTool={setSelectedTool}
+              selectedIds={selectedIds}
+              setSelectedIds={setSelectedIds}
+              zoom={zoom}
+            />
           </div>
         </div>
       )}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
 
 export default function CanvasEditor() {
   const params = new URLSearchParams(window.location.search);
@@ -705,8 +508,54 @@ export default function CanvasEditor() {
     );
   }
 
+ 
+
   return (
     <div className="flex h-screen bg-[#111] text-white">
+       <input
+    id="hiddenImageUpload"
+    type="file"
+    accept="image/*"
+    style={{ display: "none" }}
+    onChange={(e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // ✅ use blob URL instead of base64 (much lighter for React)
+      const objectUrl = URL.createObjectURL(file);
+
+      // ✅ get current canvas size for auto-centering
+      const canvasWidth =
+        document.querySelector(".konva-overlay")?.clientWidth || 600;
+      const canvasHeight =
+        document.querySelector(".konva-overlay")?.clientHeight || 800;
+
+      const newShape = {
+        id: `image-${Date.now()}`,
+        type: "image",
+        src: objectUrl,
+        // ✅ auto-center
+        x: canvasWidth / 2 - 100,
+        y: canvasHeight / 2 - 100,
+        width: 200,
+        height: 200,
+        draggable: true,
+      };
+
+      console.log("✅ Added image shape:", newShape);
+
+      // ✅ add to current page (preserving undo)
+      setShapesByPage((prev) => {
+        const current = prev[selectedPage] || [];
+        const next = [...current, newShape];
+        pushPast(selectedPage, current);
+        return { ...prev, [selectedPage]: next };
+      });
+
+      toast.success("🖼 Image added to canvas!");
+      e.target.value = ""; // reset file input
+    }}
+  />
       {/* ✅ Left sidebar thumbnails */}
       <div className="w-28 flex-shrink-0 overflow-y-auto p-3 border-r border-gray-800">
         <h1 className="text-sm font-semibold mb-3 text-gray-300">Pages</h1>
@@ -764,13 +613,47 @@ export default function CanvasEditor() {
                 setSelectedIds([]);
               }}
               title="Reset to Default"
-              className="bg-black rounded-md w-8 h-8 flex items-center justify-center mb-1 border border-gray-700/40 hover:border-cyan-400/40 transition"
+              className={`w-8 h-8 flex items-center justify-center rounded-md border transition-all duration-150
+    ${
+      !selectedTool
+        ? "bg-[#0f0f10] border-green shadow-[0_0_8px_rgba(0,255,0,0.4)] scale-105"
+        : "bg-black border-gray-700/50 hover:border-green hover:bg-[#1a1a1a]"
+    }`}
             >
-              <MousePointerClick size={16} className="text-white" />
+              <MousePointerClick
+                size={16}
+                className={`${!selectedTool ? "text-green" : "text-gray-300"} transition-colors`}
+              />
             </button>
+
+            {/* 🔁 Undo / Redo */}
+            <div className="flex gap-2 justify-center mb-1 mt-0 border-b border-gray-700/40 pb-1">
+              <button
+                onClick={undo}
+                title="Undo"
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-700/50 bg-black hover:border-green hover:bg-[#1a1a1a] active:scale-95 transition-all duration-150"
+              >
+                <Undo2
+                  size={18}
+                  className="text-green transition-transform group-hover:scale-110"
+                />
+              </button>
+
+              <button
+                onClick={redo}
+                title="Redo"
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-700/50 bg-black hover:border-green hover:bg-[#1a1a1a] active:scale-95 transition-all duration-150"
+              >
+                <Redo2
+                  size={18}
+                  className="text-green transition-transform group-hover:scale-110"
+                />
+              </button>
+            </div>
+
             {[
               {
-                icon: ZoomIn, // or replace with a ZoomIn icon if you import it
+                icon: ZoomIn,
                 type: "magnify",
                 color: "bg-black",
                 title: "Magnify Tool (click & drag to zoom)",
@@ -799,52 +682,67 @@ export default function CanvasEditor() {
                 color: "bg-black",
                 title: "Artistic Text Tool",
               },
+              {
+                icon: ImageIcon, // import { Image as ImageIcon } from "lucide-react"
+                type: "image",
+                color: "bg-black",
+                title: "Image Tool",
+              },
             ].map(({ icon: Icon, type, color, title }) => (
               <button
                 key={type}
-                onClick={() => handleSelectTool(type)}
-                className={`w-8 h-8 flex items-center justify-center rounded-md ${color} transition`}
+                onClick={() => {
+                  if (type === "image") {
+                    // 👇 Directly open the hidden file input
+                    document.getElementById("hiddenImageUpload")?.click();
+                    return;
+                  }
+                  handleSelectTool(type);
+                }}
                 title={title}
+                className={`w-8 h-8 flex items-center justify-center rounded-md border transition-all duration-150
+      ${
+        selectedTool === type
+          ? "bg-[#0f0f10] border-green shadow-[0_0_8px_rgba(0,255,0,0.4)] scale-105"
+          : `${color} border-gray-700/50 hover:border-green hover:bg-[#1a1a1a]`
+      }`}
               >
-                <Icon size={18} className="text-white" />
+                <Icon
+                  size={18}
+                  className={`${
+                    selectedTool === type ? "text-green" : "text-gray-300"
+                  } transition-colors`}
+                />
               </button>
             ))}
+
             <div className="flex gap-2 ml-0">
-              <button
-                onClick={() => handleBoolean("union")}
-                title="Add"
-                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
-              >
-                <Plus className="text-cyan-400" size={18} />
-              </button>
-              <button
-                onClick={() => handleBoolean("subtract")}
-                title="Subtract"
-                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
-              >
-                <Minus className="text-cyan-400" size={18} />
-              </button>
-              <button
-                onClick={() => handleBoolean("intersect")}
-                title="Intersect"
-                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
-              >
-                <Combine className="text-cyan-400" size={18} />
-              </button>
-              <button
-                onClick={() => handleBoolean("xor")}
-                title="XOR / Exclude"
-                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
-              >
-                <Slash className="text-cyan-400" size={18} />
-              </button>
-              <button
-                onClick={() => handleBoolean("divide")}
-                title="Divide"
-                className="bg-black rounded-md w-8 h-8 flex items-center justify-center"
-              >
-                <Divide className="text-cyan-400" size={18} />
-              </button>
+              {[
+                { icon: Plus, title: "Add", action: "union" },
+                { icon: Minus, title: "Subtract", action: "subtract" },
+                { icon: Combine, title: "Intersect", action: "intersect" },
+                { icon: Slash, title: "XOR / Exclude", action: "xor" },
+                { icon: Divide, title: "Divide", action: "divide" },
+              ].map(({ icon: Icon, title, action }) => (
+                <button
+                  key={action}
+                  onClick={() => handleBoolean(action)}
+                  title={title}
+                  className={`w-8 h-8 flex items-center justify-center rounded-md border transition-all duration-150
+      bg-black border-gray-700/50 hover:border-cyan-400 hover:bg-[#1a1a1a]
+      active:scale-95 focus:outline-none
+      ${selectedTool === action ? "border-cyan-400 shadow-[0_0_8px_rgba(0,255,255,0.4)] scale-105" : ""}`}
+                >
+                  <Icon
+                    size={18}
+                    className={`${
+                      selectedTool === action
+                        ? "text-cyan-400"
+                        : "text-cyan-400"
+                    } transition-transform`}
+                  />
+                </button>
+              ))}
             </div>
           </div>
 

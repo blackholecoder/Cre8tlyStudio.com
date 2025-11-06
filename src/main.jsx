@@ -6,6 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import Konva from "konva";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
 import { MagnetProvider } from "./admin/MagnetContext.jsx";
@@ -248,6 +249,24 @@ const RootApp = () => {
       </AuthProviderWithRouter>
     </Router>
   );
+};
+
+const originalFire = Konva.Stage.prototype._fire;
+
+Konva.Stage.prototype._fire = function (...args) {
+  try {
+    return originalFire.apply(this, args);
+  } catch (err) {
+    if (
+      err &&
+      (err.message?.includes("ot is not a function") ||
+        err.stack?.includes("Stage$1._pointerup"))
+    ) {
+      console.warn("⚠️ Ignored Konva internal pointerup error:", err);
+      return;
+    }
+    throw err;
+  }
 };
 
 // 🔹 Create root only once

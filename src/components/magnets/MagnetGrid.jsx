@@ -14,6 +14,8 @@ export default function MagnetGrid({
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
+  
+
   const magnetList = Array.isArray(magnets) ? magnets : magnets?.magnets || [];
   if (!Array.isArray(magnetList) || magnetList.length === 0) return null;
 

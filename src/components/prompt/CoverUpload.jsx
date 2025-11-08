@@ -14,23 +14,34 @@ export default function CoverUpload({ setCover }) {
   const isLocked = !user?.pro_covers;
 
   // ✅ Handle local upload
-  const handleCoverUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ const handleCoverUpload = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    if (file.size > 1000 * 1024 * 1024) {
-      toast.error("File too large. Maximum 1GB allowed.");
-      return;
-    }
+  // 🔒 Limit file size (example: 10 MB max — 1 GB is way too large for base64)
+  const maxSizeMB = 10;
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    toast.error(`File too large. Maximum ${maxSizeMB} MB allowed.`);
+    return;
+  }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setCover(reader.result);
-      setPreview(reader.result);
-      setCredit(null); // remove Unsplash credit if user uploads manually
-    };
-    reader.readAsDataURL(file);
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    const base64 = reader.result;
+
+    // ✅ Set base64 string (data:image/...;base64,...)
+    setCover(base64);
+    setPreview(base64);
+
+    // Clear Unsplash credit if the user uploads manually
+    setCredit(null);
   };
+
+  // Trigger file reading
+  reader.readAsDataURL(file);
+};
+
 
   const handleUnlock = () => navigate("/plans");
 

@@ -250,7 +250,7 @@ export default function PromptModal({
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-900 p-8 shadow-2xl border border-gray-700">
             <DialogTitle className="text-2xl font-bold text-white mb-6 text-center">
-              ✨ Create Your Lead Magnet
+              ✨ Create Your Digital Asset
             </DialogTitle>
 
             {/* ---------- Form Wrapper ---------- */}

@@ -30,6 +30,8 @@ export default function BookPromptModal({
   const [bookType, setBookType] = useState(
     initialBookData?.bookType || "fiction"
   );
+  const [fontName, setFontName] = useState("Classic AdobeArabic");
+  const [fontFile, setFontFile] = useState("/fonts/AdobeArabic-Regular.ttf");
 
   useEffect(() => {
     if (initialBookData) {
@@ -191,6 +193,7 @@ useEffect(() => {
         },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
+          timeout: 0, 
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
         }
@@ -213,6 +216,10 @@ useEffect(() => {
       clearInterval(interval);
       setProgress(0);
       setShowGenerating(false);
+      if (err.code === "ECONNABORTED") {
+    toast.info("⏳ Your book is still generating — please wait");
+    return; // ✅ don’t mark as failed
+  }
       toast.error(
         err.response?.data?.message || "Book generation failed. Try again."
       );
@@ -273,6 +280,10 @@ useEffect(() => {
           partNumber={partNumber} 
           onClose={onClose}
           setProgress={setProgress}
+          fontName={fontName}
+          setFontName={setFontName}
+          fontFile={fontFile}
+          setFontFile={setFontFile}
         />
       </div>
     </div>

@@ -79,7 +79,7 @@ export default function NewBookModal({ onCreate, onClose }) {
           <button
             onClick={handleAddInfo}
             disabled={loading}
-            className="bg-gradient-to-r from-green to-royalPurple px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
+            className="bg-royalPurple px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
           >
             {loading ? "Saving..." : "Continue"}
           </button>

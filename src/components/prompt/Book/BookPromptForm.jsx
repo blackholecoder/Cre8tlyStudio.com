@@ -167,6 +167,7 @@ export default function BookPromptForm({
         title,
         font_name: fontName, 
         font_file: fontFile,
+        partNumber,
       };
 
       const res = await axiosInstance.post(
@@ -183,9 +184,15 @@ export default function BookPromptForm({
 
       localStorage.removeItem("bookDraftLocal");
       console.log("Book generated:", res.data);
+
     } catch (err) {
+      if (err.code === "ECONNABORTED") {
+    console.warn("backend still processing...please wait");
+    toast.info("⏳ Your book is still generating — please wait");
+    return; // ✅ don’t mark as failed
+  }
       console.error("Book generation failed:", err);
-      toast.error("Failed to generate book");
+      // toast.error("Failed to generate book");
       setShowGenerating(false);
     }
   }

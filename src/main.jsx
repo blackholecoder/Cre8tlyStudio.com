@@ -68,7 +68,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/settings"
           element={
-            <PrivateRoute role={["customer", "admin"]}>
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -86,7 +86,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/prompts"
           element={
-            <PrivateRoute role={["customer", "admin"]}>
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -103,7 +103,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/notifications"
           element={
-            <PrivateRoute role={["customer", "admin"]}>
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -139,7 +139,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/plans"
           element={
-            <PrivateRoute role={["customer", "admin"]}>
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -154,7 +154,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute role={["customer", "admin"]}>
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

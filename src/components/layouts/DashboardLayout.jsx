@@ -13,6 +13,7 @@ import {
   Package,
   DollarSign,
   Inbox,
+  Globe,
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 
@@ -85,7 +86,11 @@ export default function DashboardLayout({ children }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex flex-col items-center justify-center mt-6 mb-4">
-                <img src={headerLogo} alt="Cre8tly" className="w-16 h-16 mb-2" />
+                <img
+                  src={headerLogo}
+                  alt="Cre8tly"
+                  className="w-16 h-16 mb-2"
+                />
                 <h1 className="text-sm font-semibold text-white text-center tracking-wide">
                   Cre8tly Studio
                 </h1>
@@ -138,17 +143,33 @@ export default function DashboardLayout({ children }) {
                         </>
                       )}
                     </div>
-
-                    {/* <span
-          className={`text-xs font-medium ${
-            active ? "text-green" : "text-gray-400"
-          }`}
-        >
-          {item.label}
-        </span> */}
                   </button>
                 );
               })}
+
+              {user?.pro_status === "active" && (
+                <button
+                  onClick={() => {
+                    navigate("/landing-page-builder");
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                  }}
+                  className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
+                >
+                  <div
+                    className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+        ${
+          location.pathname === "/landing-page-builder"
+            ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
+            : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
+        }`}
+                  >
+                    <Globe size={22} />
+                    <span className="absolute -bottom-5 text-[10px] text-gray-400 whitespace-nowrap">
+                      Builder
+                    </span>
+                  </div>
+                </button>
+              )}
             </nav>
           </div>
 

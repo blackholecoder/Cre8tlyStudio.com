@@ -99,6 +99,18 @@ select.dropdown-scroll:focus option {
   overflow-y: auto;
 }
 
+.react-colorful,
+input[type="color"] {
+  position: relative;
+  z-index: 9999 !important;
+}
+
+.color-picker-popover {
+  position: absolute;
+  z-index: 9999 !important;
+  top: 40px; /* pushes below the input */
+}
+
 
 
 @layer utilities {

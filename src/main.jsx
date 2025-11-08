@@ -40,6 +40,8 @@ import Inbox from "./sections/Inbox.jsx";
 import useMaintenance from "./settings/UseMaintenance.jsx";
 import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
 import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
+import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
+
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -151,6 +153,25 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+
+        <Route
+  path="/landing-page-builder"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <LandingPageBuilder />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
         <Route
           path="/dashboard"
           element={

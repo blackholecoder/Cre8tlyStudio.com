@@ -35,7 +35,22 @@ A full creative suite that lets you write, design, and publish with complete con
 The Prompt Memory Plan gives you a persistent AI memory across your entire Cre8tly Studio experience.
 It learns your tone, writing style, and preferences, letting you generate faster, more accurate, and
 on-brand results every time. Cancel anytime, no contracts.`,
-  }
+  },
+  business_builder_pack: {
+  title: "Pro Business Builder Pack",
+  content: `
+The Pro Business Builder Pack is the ultimate growth suite for creators, entrepreneurs, and marketers.
+It gives you unlimited access to build landing pages, capture leads automatically, and send high-converting emails using Cre8tly Studio’s advanced automation tools.
+
+Features include:
+• Unlimited landing pages and lead forms  
+• Custom domains and analytics tracking  
+• AI-powered email content generator  
+• Premium conversion templates  
+• Priority support and one-year updates
+
+This plan helps you automate your lead generation and sales process from start to finish—everything you need to scale your digital business.`,
+},
 }
 
   const { title, content } = descriptions[plan] || {};

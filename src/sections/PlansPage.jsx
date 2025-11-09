@@ -12,33 +12,48 @@ export default function PlansPage() {
   const { user } = useAuth();
 
   const handleSelectPlan = async (planType) => {
-    if (!user || !user.id) {
-      toast.error("Please sign in before selecting a plan");
-      return;
+  if (!user || !user.id) {
+    toast.error("Please sign in before selecting a plan");
+    return;
+  }
+
+  try {
+    setLoadingPlan(planType);
+    const token = localStorage.getItem("accessToken");
+
+    // ✅ Default values
+    let productType = planType;
+    let billingCycle = null;
+
+    // ✅ Normalize the new Business Builder variants to your backend format
+    if (planType === "business_builder_pack_annual") {
+      productType = "business_builder_pack";
+      billingCycle = "annual";
+    } else if (planType === "business_builder_pack_monthly") {
+      productType = "business_builder_pack";
+      billingCycle = "monthly";
     }
 
-    try {
-      setLoadingPlan(planType);
-      const token = localStorage.getItem("accessToken");
+    const res = await api.post(
+      "/checkout",
+      {
+        userId: user.id,
+        productType,
+        billingCycle, // only send when relevant
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-      const res = await api.post(
-        "/checkout",
-        {
-          userId: user.id,
-          productType: planType,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    window.location.href = res.data.url;
+  } catch (err) {
+    console.error("Checkout error:", err);
+    toast.error("Failed to start checkout session");
+    setLoadingPlan(null);
+  }
+};
 
-      window.location.href = res.data.url;
-    } catch (err) {
-      console.error("Checkout error:", err);
-      toast.error("Failed to start checkout session");
-      setLoadingPlan(null);
-    }
-  };
 
   return (
     
@@ -213,6 +228,64 @@ export default function PlansPage() {
     </button>
   </div>
 </div>
+{/* ---------- Pro Business Builder Pack ---------- */}
+<div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-blue-500 via-sky-400 to-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.3)] hover:shadow-[0_0_45px_rgba(59,130,246,0.6)] transition-all duration-500">
+  <div className="rounded-3xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 flex flex-col justify-between min-h-[460px] text-center">
+    <div>
+      <h2 className="text-3xl font-semibold mb-3 text-sky-400 design-text">
+        Pro Business Builder Pack
+      </h2>
+      <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+        Grow your business with <span className="text-white font-medium">professional landing pages, automated email capture, analytics, and AI-powered content tools</span> designed to turn leads into paying customers.
+        Includes custom domains, premium templates, and one-year access to all future updates plus <span className="text-white font-medium">5 digital asset slots</span>.
+      </p>
+      <button
+        onClick={() => setSelectedPlan("business_builder_pack")}
+        className="text-sky-400 text-sm hover:underline mb-3"
+      >
+        Learn More
+      </button>
+      <p className="text-4xl font-extrabold mb-6 text-sky-400 design-text">
+        $129.99<span className="text-lg font-normal text-gray-400"> / year</span>
+      </p>
+    </div>
+
+    <div className="flex flex-col sm:flex-row justify-center gap-3">
+      <button
+        onClick={() =>
+          handleSelectPlan("business_builder_pack_annual")
+        }
+        disabled={loadingPlan === "business_builder_pack_annual"}
+        className={`w-full sm:w-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+          loadingPlan === "business_builder_pack_annual"
+            ? "opacity-50 cursor-not-allowed bg-gray-700"
+            : "bg-blue hover:bg-blue/90 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] text-white design-text"
+        }`}
+      >
+        {loadingPlan === "business_builder_pack_annual"
+          ? "Redirecting..."
+          : "Annual Plan"}
+      </button>
+
+      <button
+        onClick={() =>
+          handleSelectPlan("business_builder_pack_monthly")
+        }
+        disabled={loadingPlan === "business_builder_pack_monthly"}
+        className={`w-full sm:w-auto py-3 px-6 text-2xl font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+          loadingPlan === "business_builder_pack_monthly"
+            ? "opacity-50 cursor-not-allowed bg-gray-700"
+            : "bg-sky-500 hover:bg-sky-600 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] text-black design-text"
+        }`}
+      >
+        {loadingPlan === "business_builder_pack_monthly"
+          ? "Redirecting..."
+          : "$199 / month"}
+      </button>
+    </div>
+  </div>
+</div>
+
 
       </div>
 

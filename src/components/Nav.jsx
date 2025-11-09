@@ -5,6 +5,7 @@ import { navLinks } from "../constants";
 import { headerLogo } from "../assets/images";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
+
 import {
   Cog,
   Home,
@@ -36,7 +37,7 @@ const Nav = () => {
   }, [isOpen]);
 
   if (
-    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder"].includes(
+    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads"].includes(
       location.pathname
     )
   ) {

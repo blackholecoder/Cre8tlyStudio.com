@@ -43,6 +43,7 @@
     "lowlight": "^2.9.0",
     "lucide-react": "^0.544.0",
     "moment": "^2.30.1",
+    "papaparse": "^5.5.3",
     "paper": "^0.12.18",
     "pdf-lib": "^1.17.1",
     "react": "^18.2.0",

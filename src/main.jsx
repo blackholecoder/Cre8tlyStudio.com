@@ -41,6 +41,7 @@ import useMaintenance from "./settings/UseMaintenance.jsx";
 import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
 import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
 import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
+import Leads from "./sections/Leads.jsx";
 
 
 const AnimatedRoutes = () => {
@@ -167,6 +168,24 @@ const AnimatedRoutes = () => {
       >
         <DashboardLayout>
           <LandingPageBuilder />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/leads"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <Leads />
         </DashboardLayout>
       </motion.div>
     </PrivateRoute>

@@ -12,6 +12,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { MemoizedSortableBlock } from "./SortableBlock";
+import { Wand2 } from "lucide-react";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -21,6 +22,8 @@ export default function LandingPageBuilder() {
   const [fontFile, setFontFile] = useState("");
   const [bgTheme, setBgTheme] = useState("default");
   const [pdfList, setPdfList] = useState([]);
+  const [coverPreview, setCoverPreview] = useState("");
+  const [coverLoading, setCoverLoading] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -37,7 +40,14 @@ export default function LandingPageBuilder() {
 
   const addBlock = (type) => {
     if (!type) return; // prevent invalid type
-    const newBlock = { id: crypto.randomUUID(), type, text: "", padding: 20 };
+    const newBlock = {
+      id: crypto.randomUUID(),
+      type,
+      text: "",
+      padding: 20,
+      alignment: "left", // ✅ default alignment
+      bulleted: false,
+    };
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -53,53 +63,48 @@ export default function LandingPageBuilder() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const fetchLanding = async () => {
+    const loadData = async () => {
       try {
-        const res = await axiosInstance.get(
-          `https://cre8tlystudio.com/api/landing/builder/${user.id}`
-        );
-        if (res.data.success) {
-          let blocks = [];
-          try {
-            blocks =
-              typeof lp.content_blocks === "string"
-                ? JSON.parse(lp.content_blocks)
-                : lp.content_blocks || [];
-          } catch {
-            blocks = [];
-          }
+        const [landingRes, pdfRes] = await Promise.all([
+          axiosInstance.get(
+            `https://cre8tlystudio.com/api/landing/builder/${user.id}`
+          ),
+          axiosInstance.get("https://cre8tlystudio.com/api/lead-magnets"),
+        ]);
 
-          const lp = res.data.landingPage;
-          setLanding(lp);
-          setFontName(lp.font || "Montserrat");
-          setFontFile(lp.font_file || "");
-          setBgTheme(lp.bg_theme || "default");
-        } else toast.error(res.data.message);
+        const lp = landingRes.data.landingPage;
+        const magnets = pdfRes.data.magnets || [];
+
+        // parse blocks
+        let blocks = [];
+        try {
+          blocks =
+            typeof lp.content_blocks === "string"
+              ? JSON.parse(lp.content_blocks)
+              : lp.content_blocks || [];
+        } catch {
+          blocks = [];
+        }
+
+        setLanding({ ...lp, content_blocks: blocks });
+        setPdfList(magnets);
+        setFontName(lp.font || "Montserrat");
+        setFontFile(lp.font_file || "");
+
+        // ✅ restore cover and theme
+        if (lp.cover_image_url) setCoverPreview(lp.cover_image_url);
+        setBgTheme(
+          lp.bg_theme || "linear-gradient(to bottom, #ffffff, #F285C3)"
+        );
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load landing page");
+        toast.error("Failed to load landing data");
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchPDFs = async () => {
-  try {
-    const res = await axiosInstance.get("https://cre8tlystudio.com/api/lead-magnets");
-
-    console.log("🧩 Full response:", res);
-    console.log("✅ res.data:", res.data);
-    // No need for user.id in URL — the token handles it
-    setPdfList(res.data.magnets || []); 
-  } catch (err) {
-    console.error("Error loading PDFs:", err.response?.data || err.message);
-  }
-};
-
-    fetchLanding();
-    fetchPDFs();
-
-    
+    loadData();
   }, [user]);
 
   useEffect(() => {
@@ -113,7 +118,25 @@ export default function LandingPageBuilder() {
   }, []);
 
   if (loading)
-    return <p className="text-center mt-10 text-gray-400">Loading...</p>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="relative">
+          {/* Glowing pulse ring */}
+          <div className="absolute inset-0 rounded-full bg-blue/30 blur-2xl animate-ping"></div>
+
+          {/* Center spinner */}
+          <div className="w-16 h-16 border-4 border-t-transparent border-blue rounded-full animate-spin"></div>
+        </div>
+
+        {/* Loading text */}
+        <p className="mt-6 text-lg font-semibold tracking-wide text-silver animate-pulse">
+          Building your page...
+        </p>
+        <p className="text-sm text-gray-400 mt-2">
+          Cre8tly Studio is fetching your latest content blocks.
+        </p>
+      </div>
+    );
 
   if (!loading && user?.pro_status !== "active") {
     return (
@@ -161,7 +184,9 @@ export default function LandingPageBuilder() {
         {
           ...landing,
           content_blocks: blocks,
-          pdf_url: landing.pdf_url, 
+          pdf_url: landing.pdf_url,
+          cover_image_url: landing.cover_image_url,
+          logo_url: landing.logo_url,
         }
       );
 
@@ -174,13 +199,16 @@ export default function LandingPageBuilder() {
 
   // 🎨 Determine the selected background theme
   const selectedTheme =
-    [...colorThemes, ...gradientThemes].find((t) => t.name === bgTheme)
-      ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
+    bgTheme?.includes("gradient") || bgTheme?.startsWith("#")
+      ? bgTheme
+      : [...colorThemes, ...gradientThemes].find((t) => t.name === bgTheme)
+          ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-10 overflow-y-auto">
       <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-extrabold text-center mb-8 text-silver">
+        <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
+          <Wand2 className="w-6 h-6 text-green" />
           Landing Page Builder
         </h1>
 
@@ -201,7 +229,7 @@ export default function LandingPageBuilder() {
                   if (landing.username?.trim()?.length >= 3) {
                     try {
                       const res = await axiosInstance.get(
-                        `/check-username/${landing.username.trim()}`
+                        `https://cre8tlystudio.com/api/landing/check-username/${landing.username.trim()}`
                       );
                       toast[res.data.available ? "success" : "error"](
                         res.data.message
@@ -214,15 +242,19 @@ export default function LandingPageBuilder() {
                 placeholder="e.g. cre8tlydesigns"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
               />
-              <p className="text-xs text-gray-200 mt-1">
+              <p className="text-xs text-gray-200 mt-1 mb-10">
                 This will be used for your page URL:{" "}
-                <span className="text-blue">
+                <span className="text-yellow">
                   {landing.username
                     ? `https://${landing.username}.cre8tlystudio.com`
                     : "https://yourname.cre8tlystudio.com"}
                 </span>
               </p>
             </div>
+
+            <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
+              Content
+            </h1>
             {/* DndContext */}
             <div className="space-y-4">
               <DndContext
@@ -266,21 +298,23 @@ export default function LandingPageBuilder() {
               </DndContext>
             </div>
 
-            <div className="relative inline-block add-section-dropdown mt-10 mb-10">
+            <div className="mt-12 mb-10 w-full">
               <button
                 type="button"
                 onClick={() => setShowDropdown((prev) => !prev)}
-                className="bg-blue text-white py-2 px-4 rounded-lg shadow transition relative"
+                className="w-full bg-blue text-white py-4 rounded-xl shadow-lg text-lg font-semibold 
+               hover:bg-[#7bed9f] hover:text-black transition-all duration-300 tracking-wide"
               >
                 + Add Section
               </button>
 
               {showDropdown && (
-                <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div className="mt-2 w-full bg-[#0F172A] border border-gray-700 rounded-lg shadow-xl overflow-hidden">
                   {[
                     { label: "Heading (H1)", value: "heading" },
                     { label: "Subheading (H2)", value: "subheading" },
                     { label: "Sub-Subheading (H3)", value: "subsubheading" },
+                    { label: "List Heading", value: "list_heading" },
                     { label: "Paragraph", value: "paragraph" },
                     { label: "Button", value: "button" },
                   ].map((opt) => (
@@ -288,7 +322,7 @@ export default function LandingPageBuilder() {
                       key={opt.value}
                       type="button"
                       onClick={() => addBlock(opt.value)}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue/10 hover:text-black transition"
+                      className="block w-full text-left px-6 py-3 text-gray-200 hover:bg-blue/20 transition-all duration-200"
                     >
                       {opt.label}
                     </button>
@@ -299,48 +333,229 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* 🧾 PDF Attachment */}
-<div className="mt-8">
-  <label className="block font-semibold mb-2 text-silver">
-    Choose PDF to Offer
-  </label>
+          <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+            <div className="flex items-center justify-between mb-5">
+              <label className="text-lg font-semibold text-silver tracking-wide">
+                Choose PDF to Offer
+              </label>
+              <span className="text-xs text-gray-400 italic">
+                Only completed PDFs will appear
+              </span>
+            </div>
 
-  <select
-    value={landing.pdf_url || ""}
-    onChange={(e) =>
-      setLanding({
-        ...landing,
-        pdf_url: e.target.value,
-      })
-    }
-    className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
-  >
-    <option value="">-- Select a Completed PDF --</option>
+            {/* PDF Dropdown */}
+            <div className="relative">
+              <select
+                value={landing.pdf_url || ""}
+                onChange={async (e) => {
+                  const selectedUrl = e.target.value;
+                  setLanding((prev) => ({ ...prev, pdf_url: selectedUrl }));
+                  setCoverPreview("");
+                  setCoverLoading(true); // 🆕 start spinner
 
-    {pdfList
-      .filter((lm) => lm.status === "completed" && lm.pdf_url)
-      .map((lm) => (
-        <option key={lm.id} value={lm.pdf_url}>
-          {lm.title || "Untitled PDF"} — (Ready)
-        </option>
-      ))}
-  </select>
+                  if (!selectedUrl) {
+                    setCoverLoading(false);
+                    return;
+                  }
 
-  {landing.pdf_url && (
-    <p className="text-xs text-gray-400 mt-2">
-      Selected file:{" "}
-      <a
-        href={landing.pdf_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue underline"
-      >
-        Preview PDF
-      </a>
-    </p>
-  )}
-</div>
+                  try {
+                    const res = await axiosInstance.get(
+                      `https://cre8tlystudio.com/api/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
+                    );
 
+                    if (res.data.success && res.data.cover_image) {
+                      setCoverPreview(res.data.cover_image);
+                      setLanding((prev) => ({
+                        ...prev,
+                        cover_image_url: res.data.cover_image,
+                      }));
+                    }
+                  } catch (err) {
+                    console.error("Error loading cover image:", err);
+                  } finally {
+                    setCoverLoading(false); // 🆕 stop spinner
+                  }
+                }}
+                className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer focus:ring-2 focus:ring-silver focus:outline-none"
+              >
+                <option value="">-- Select a Completed PDF --</option>
+                {pdfList
+                  .filter((lm) => lm.status === "completed" && lm.pdf_url)
+                  .map((lm) => (
+                    <option key={lm.id} value={lm.pdf_url}>
+                      {lm.title || "Untitled PDF"} — (Ready)
+                    </option>
+                  ))}
+              </select>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M8.25 9.75L12 13.5l3.75-3.75"
+                />
+              </svg>
+            </div>
 
+            {/* PDF Info */}
+            {landing.pdf_url && (
+              <div className="mt-4 flex flex-col items-center text-center">
+                <p className="text-xs text-gray-400 mb-2">
+                  Selected File:
+                  <a
+                    href={landing.pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green font-medium ml-1 underline hover:text-green transition"
+                  >
+                    Preview PDF
+                  </a>
+                </p>
+              </div>
+            )}
+
+            {/* 📘 Cover Preview */}
+            <div
+              className="mt-6 text-center bg-[#1f2937]/60 border border-gray-700 rounded-xl p-5 shadow-inner relative flex flex-col items-center justify-center overflow-hidden transition-all duration-300"
+              style={{ height: "340px" }} // 👈 fixed height (adjust as needed)
+            >
+              {coverLoading ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#111827]/70 backdrop-blur-sm transition-opacity duration-500">
+                  {/* Spinner */}
+                  <div className="w-12 h-12 border-4 border-gray-500 border-t-green rounded-full animate-spin"></div>
+                  <p className="text-gray-400 text-sm mt-3">
+                    Loading cover preview...
+                  </p>
+                </div>
+              ) : coverPreview ? (
+                <div className="flex flex-col items-center justify-center w-full h-full transition-opacity duration-700 ease-in-out">
+                  <p className="text-sm text-gray-300 mb-3 font-semibold tracking-wide">
+                    PDF Cover Preview
+                  </p>
+                  <img
+                    src={coverPreview}
+                    alt="PDF Cover"
+                    className="h-48 object-contain rounded-lg shadow-md border border-gray-600 mx-auto transition-transform duration-700 ease-in-out"
+                    style={{
+                      opacity: 1,
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-3">
+                    This cover will appear on your landing page automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  <p className="text-gray-500 text-sm italic">
+                    No PDF cover selected yet.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+            <div className="flex items-center justify-between mb-5">
+              <label className="text-lg font-semibold text-silver tracking-wide">
+                Brand Logo
+              </label>
+              <span className="text-xs text-gray-400 italic">
+                Recommended: PNG or SVG · 200×200px+
+              </span>
+            </div>
+
+            {/* Upload UI */}
+            {!landing.logo_url ? (
+              <label
+                htmlFor="logoUpload"
+                className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 hover:border-green rounded-xl py-10 px-6 cursor-pointer transition-all duration-300 group"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-gray-500 group-hover:text-green transition"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-6-9l-3-3m0 0l-3 3m3-3V15"
+                  />
+                </svg>
+                <p className="mt-3 text-sm text-gray-400">
+                  <span className="text-green font-medium">
+                    Click to upload
+                  </span>{" "}
+                  or drag your logo
+                </p>
+
+                <input
+                  id="logoUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const previewUrl = URL.createObjectURL(file);
+                    setLanding({ ...landing, logo_url: previewUrl });
+
+                    const formData = new FormData();
+                    formData.append("logo", file);
+                    formData.append("landingId", landing.id);
+
+                    try {
+                      const res = await axiosInstance.post(
+                        "https://cre8tlystudio.com/api/landing/upload-logo",
+                        formData,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                      );
+
+                      if (res.data.success) {
+                        setLanding({ ...landing, logo_url: res.data.logo_url });
+                        toast.success("Logo uploaded successfully!");
+                        URL.revokeObjectURL(previewUrl);
+                      } else {
+                        toast.error(res.data.message || "Upload failed");
+                        setLanding({ ...landing, logo_url: "" });
+                      }
+                    } catch (err) {
+                      console.error("❌ Upload error:", err);
+                      toast.error("Error uploading logo");
+                      setLanding({ ...landing, logo_url: "" });
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-sm text-gray-400 mb-3">Current Logo:</p>
+                <div className="relative bg-white rounded-lg shadow-md border border-gray-300 p-3 w-fit mx-auto">
+                  <img
+                    src={landing.logo_url}
+                    alt="Uploaded Logo"
+                    className="h-24 object-contain rounded-md mx-auto"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="text-red-400 text-xs mt-4 hover:underline"
+                  onClick={() => setLanding({ ...landing, logo_url: "" })}
+                >
+                  Remove Logo
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Theme & Font Choosers */}
           <ColorThemeChooser
@@ -354,9 +569,11 @@ export default function LandingPageBuilder() {
               );
 
               // 💾 store the actual CSS value (gradient or hex)
+              const actualBg = selected?.preview || themeName;
+              setBgTheme(actualBg);
               setLanding({
                 ...landing,
-                bg_theme: selected?.preview || themeName,
+                bg_theme: actualBg,
               });
             }}
             colorThemes={pageBuilderThemes}
@@ -426,10 +643,31 @@ export default function LandingPageBuilder() {
               fontFamily: fontName,
             }}
           >
+            {landing.cover_image_url && (
+              <img
+                src={landing.cover_image_url}
+                alt="PDF Cover"
+                className="mx-auto mb-8 rounded-xl shadow-lg"
+                style={{
+                  width: "100%",
+                  maxWidth: "480px",
+                  aspectRatio: "3 / 4",
+                  objectFit: "cover",
+                  border: "2px solid rgba(255, 255, 255, 0.06)",
+                  background: "#000",
+                  boxShadow:
+                    "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
+                  borderRadius: "12px",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+              />
+            )}
             {landing.content_blocks?.length ? (
               landing.content_blocks.map((block, index) => {
-                const paddingStyle = {
-                  marginBottom: `${block.padding || 20}px`,
+                const baseStyle = {
+                  margin: "0 auto 24px", // unified spacing for all blocks
+                  maxWidth: "700px", // consistent text width
+                  textAlign: "center",
                 };
 
                 switch (block.type) {
@@ -437,9 +675,9 @@ export default function LandingPageBuilder() {
                     return (
                       <h1
                         key={index}
-                        className="text-4xl font-bold"
+                        className="text-4xl font-bold leading-snug"
                         style={{
-                          ...paddingStyle,
+                          ...baseStyle,
                           color: landing.font_color_h1 || "#FFFFFF",
                         }}
                       >
@@ -451,9 +689,9 @@ export default function LandingPageBuilder() {
                     return (
                       <h2
                         key={index}
-                        className="text-2xl font-semibold"
+                        className="text-2xl font-semibold leading-snug"
                         style={{
-                          ...paddingStyle,
+                          ...baseStyle,
                           color: landing.font_color_h2 || "#E5E5E5",
                         }}
                       >
@@ -465,9 +703,9 @@ export default function LandingPageBuilder() {
                     return (
                       <h3
                         key={index}
-                        className="text-xl font-medium"
+                        className="text-xl font-medium leading-snug"
                         style={{
-                          ...paddingStyle,
+                          ...baseStyle,
                           color: landing.font_color_h3 || "#CCCCCC",
                         }}
                       >
@@ -475,14 +713,59 @@ export default function LandingPageBuilder() {
                       </h3>
                     );
 
-                  case "paragraph":
+                  case "list_heading":
                     return (
                       <p
                         key={index}
-                        className="text-lg max-w-2xl mx-auto"
                         style={{
-                          ...paddingStyle,
+                          margin: "0 auto 10px",
+                          maxWidth: "700px",
+                          fontWeight: 700,
+                          fontSize: "1.15rem",
+                          textAlign: block.alignment || "left",
+                          color: landing.font_color_p || "#FFFFFF",
+                        }}
+                      >
+                        {block.text || "💎 List Heading Example"}
+                      </p>
+                    );
+
+                  case "paragraph":
+                    if (block.bulleted) {
+                      // ✅ Render as bullet list
+                      const lines = (block.text || "")
+                        .split(/\n/)
+                        .filter(Boolean);
+                      return (
+                        <ul
+                          key={index}
+                          style={{
+                            margin: "0 auto 24px",
+                            maxWidth: "700px",
+                            color: landing.font_color_p || "#DDDDDD",
+                            textAlign: block.alignment || "left",
+                            lineHeight: "1.8",
+                            listStyle: "disc",
+                            paddingLeft: "1.5rem",
+                          }}
+                        >
+                          {lines.map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                        </ul>
+                      );
+                    }
+
+                    // 🧩 Normal paragraph fallback
+                    return (
+                      <p
+                        key={index}
+                        className="text-lg leading-relaxed"
+                        style={{
+                          margin: "0 auto 24px",
+                          maxWidth: "700px",
                           color: landing.font_color_p || "#DDDDDD",
+                          textAlign: block.alignment || "left",
                         }}
                       >
                         {block.text || "Your paragraph will appear here."}
@@ -491,10 +774,17 @@ export default function LandingPageBuilder() {
 
                   case "button":
                     return (
-                      <div key={index} style={paddingStyle}>
+                      <div
+                        key={index}
+                        style={{ textAlign: "center", marginTop: "12px" }}
+                      >
                         <a
                           href={block.url || "#"}
-                          className="inline-block bg-black text-white px-6 py-3 rounded-lg shadow hover:bg-[#F285C3] transition"
+                          target={block.new_tab ? "_blank" : "_self"}
+                          rel={
+                            block.new_tab ? "noopener noreferrer" : undefined
+                          }
+                          className="inline-block bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green hover:text-black transition"
                         >
                           {block.text || "Click Here"}
                         </a>
@@ -511,9 +801,8 @@ export default function LandingPageBuilder() {
               </p>
             )}
           </div>
-
           {/* Save + View */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-16 pt-8 border-t border-gray-700">
             <button
               type="submit"
               className="bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green transition mx-auto sm:mx-0"
@@ -532,7 +821,7 @@ export default function LandingPageBuilder() {
                 rel="noopener noreferrer"
                 className={`${
                   landing.username
-                    ? "text-white font-semibold underline hover:text-blue"
+                    ? "text-green font-semibold underline hover:text-white"
                     : "text-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -542,7 +831,7 @@ export default function LandingPageBuilder() {
               </a>
               <p className="text-xs text-gray-500 mt-1">
                 Live URL:{" "}
-                <span className="text-blue font-medium">
+                <span className="text-silver font-medium">
                   {landing.username
                     ? `https://${landing.username}.cre8tlystudio.com`
                     : "Not set"}

@@ -112,6 +112,74 @@ input[type="color"] {
 }
 
 
+/* 🖤 True Black Input Styling — Cre8tly Studio Builder */
+input[type="text"],
+input[type="url"],
+input[type="email"],
+textarea,
+select {
+  @apply bg-black text-white border border-gray-500 rounded-lg px-4 py-2 w-full
+         focus:ring-2 focus:ring-[#7bed9f] focus:border-gray-400 focus:outline-none
+         placeholder-gray-400 transition-all duration-200;
+}
+
+/* 🩶 Placeholder text (soft gray) */
+input::placeholder,
+textarea::placeholder {
+  color: #9CA3AF; /* Tailwind gray-400 */
+}
+
+/* 🚫 Remove inner white autofill background (Chrome/Safari) */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px black inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white !important;
+}
+
+/* 🖤 Dropdown consistency (Select elements) */
+select {
+  background-color: black !important;
+  color: white !important;
+  border-color: #6B7280; /* gray-500 */
+  appearance: none; /* removes OS-specific arrows */
+  background-image: none !important; /* removes default dropdown arrow */
+}
+
+/* 👇 Optional: Add a custom arrow with Tailwind color scheme */
+select::-ms-expand {
+  display: none;
+}
+
+/* 🧭 Custom white dropdown arrow for Cre8tly Studio builder */
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 🔄 Optional hover effect (adds subtle motion) */
+.select-wrapper:hover::after {
+  opacity: 1;
+}
+
+/* 🩷 Optional focus glow on open state */
+select:focus + .select-wrapper::after {
+  border-color: #7bed9f;
+}
+
+
+
 
 @layer utilities {
   .padding {

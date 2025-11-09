@@ -1,10 +1,7 @@
-import {
-  useSortable,
-} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
-
-
+import { Trash2 } from "lucide-react";
 
 function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -19,7 +16,8 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg relative"
+      className="mb-6 bg-black/70 border border-gray-600 hover:border-gray-400 
+                 rounded-xl p-5 relative shadow-inner text-white transition-all duration-300"
     >
       <div
         {...attributes}
@@ -32,62 +30,184 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
 
       {/* Editable fields */}
       {["heading", "subheading", "subsubheading"].includes(block.type) && (
-  <>
-    <label className="font-semibold text-sm mb-1">
-      {block.type === "heading"
-        ? "Heading (H1)"
-        : block.type === "subheading"
-        ? "Subheading (H2)"
-        : "Sub-Subheading (H3)"}
-    </label>
-    <input
-      type="text"
-      placeholder={
-        block.type === "heading"
-          ? "Enter your main headline"
-          : block.type === "subheading"
-          ? "Enter your subheading"
-          : "Enter your supporting header"
-      }
-      value={block.text}
-      onChange={(e) => updateBlock(index, "text", e.target.value)}
-      onFocus={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.stopPropagation()}
-      className="w-full mt-1 p-2 border rounded"
-    />
-  </>
-)}
+        <>
+          <label className="font-semibold text-sm mb-1">
+            {block.type === "heading"
+              ? "Heading (H1)"
+              : block.type === "subheading"
+                ? "Subheading (H2)"
+                : "Sub-Subheading (H3)"}
+          </label>
 
+          <textarea
+            rows={2}
+            placeholder={
+              block.type === "heading"
+                ? "Enter your main headline"
+                : block.type === "subheading"
+                  ? "Enter your subheading"
+                  : "Enter your supporting header"
+            }
+            value={block.text}
+            onChange={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
+              updateBlock(index, "text", e.target.value);
+            }}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mt-1 p-2 border border-gray-600 rounded-lg bg-black text-white 
+                 focus:ring-2 focus:ring-green focus:border-gray-400 
+                 placeholder-gray-400 leading-snug resize-none transition-all duration-200"
+            style={{ minHeight: "3.5rem", lineHeight: "1.4" }}
+          />
+        </>
+      )}
+
+      {block.type === "list_heading" && (
+        <>
+          <label className="font-semibold text-sm mb-1">
+            List Heading (bold line above bullet list)
+          </label>
+          <textarea
+            rows={2}
+            placeholder="e.g. LABEL FOR YOUR BULLETED LISTS"
+            value={block.text}
+            onChange={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
+              updateBlock(index, "text", e.target.value);
+            }}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mt-1 p-2 border border-gray-600 rounded-lg bg-black text-white 
+             focus:ring-2 focus:ring-green focus:border-gray-400 
+             placeholder-gray-400 leading-snug resize-none transition-all duration-200"
+            style={{ minHeight: "3.5rem", lineHeight: "1.4" }}
+          />
+        </>
+      )}
 
       {block.type === "paragraph" && (
-        <textarea
-          value={block.text}
-          onChange={(e) => updateBlock(index, "text", e.target.value)}
-          onFocus={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
-          className="w-full mt-1 p-2 border rounded h-24"
-        />
+        <>
+          <textarea
+            value={block.text}
+            onChange={(e) => updateBlock(index, "text", e.target.value)}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mt-1 p-2 border rounded h-24"
+            placeholder={
+              block.bulleted
+                ? "Enter list items, one per line"
+                : "Enter your paragraph text"
+            }
+          />
+
+          {/* 🧭 Alignment selector */}
+          <div className="mt-3 flex items-center gap-4">
+            <div className="relative select-wrapper w-fit">
+              <select
+                value={block.alignment || "left"}
+                onChange={(e) =>
+                  updateBlock(index, "alignment", e.target.value)
+                }
+                onFocus={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="appearance-none bg-black text-white border border-gray-600 rounded-md px-3 py-2 pr-8 
+               text-sm focus:ring-2 focus:ring-silver focus:outline-none cursor-pointer w-full transition-all duration-200"
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+
+            {/* ✅ Bullet toggle */}
+            <div className="flex items-center mt-5">
+              <input
+                id={`bulleted-${id}`}
+                type="checkbox"
+                checked={block.bulleted || false}
+                onChange={(e) =>
+                  updateBlock(index, "bulleted", e.target.checked)
+                }
+                onFocus={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="w-4 h-4 mr-2 accent-blue-500"
+              />
+              <label
+                htmlFor={`bulleted-${id}`}
+                className="text-sm font-semibold text-gray-600"
+              >
+                Bullet List
+              </label>
+            </div>
+          </div>
+        </>
       )}
 
       {block.type === "button" && (
-        <input
-          type="text"
-          value={block.text}
-          onChange={(e) => updateBlock(index, "text", e.target.value)}
-          onFocus={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
-          className="w-full mt-1 p-2 border rounded"
-        />
+        <>
+          {/* 🏷️ Button Text */}
+          <label className="font-semibold text-sm mb-1">Button Text</label>
+          <input
+            type="text"
+            placeholder="Enter button label (e.g. Download Now)"
+            value={block.text || ""}
+            onChange={(e) => updateBlock(index, "text", e.target.value)}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mt-1 p-2 border rounded"
+          />
+
+          {/* 🔗 Button Link */}
+          <label className="font-semibold text-sm mt-3 mb-1">
+            Button Link URL
+          </label>
+          <input
+            type="url"
+            placeholder="https://example.com or /your-path"
+            value={block.url || ""}
+            onChange={(e) => updateBlock(index, "url", e.target.value)}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mt-1 p-2 border rounded"
+          />
+
+          {/* 🪟 Open in new tab toggle */}
+          <div className="flex items-center mt-3">
+            <input
+              id={`new-tab-${id}`}
+              type="checkbox"
+              checked={block.new_tab || false}
+              onChange={(e) => updateBlock(index, "new_tab", e.target.checked)}
+              onFocus={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-4 h-4 mr-2 accent-blue-500"
+            />
+            <label
+              htmlFor={`new-tab-${id}`}
+              className="text-sm font-semibold text-gray-600"
+            >
+              Open in new tab
+            </label>
+          </div>
+        </>
       )}
 
       <button
-        className="mt-3 text-red-500 text-sm hover:underline"
+        type="button"
         onClick={() => removeBlock(index)}
+        className="mt-4 flex items-center gap-2 text-red-400 hover:text-red-300 text-sm font-semibold transition-all"
       >
-        Remove
+        <Trash2 size={16} className="opacity-80" />
+        <span>Remove</span>
       </button>
     </div>
   );

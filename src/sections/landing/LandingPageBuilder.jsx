@@ -27,6 +27,7 @@ export default function LandingPageBuilder() {
   const [coverPreview, setCoverPreview] = useState("");
   const [coverLoading, setCoverLoading] = useState(false);
   const [showPdfSection, setShowPdfSection] = useState(false);
+  const [showPreviewSection, setShowPreviewSection] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -276,7 +277,7 @@ export default function LandingPageBuilder() {
         <form onSubmit={handleSave} className="space-y-4">
           {/* Headline */}
           <div>
-            <div>
+            <div className="max-w-[40%]">
               <label className="block font-semibold mb-1 text-silver ">
                 Page Url Username
               </label>
@@ -301,7 +302,7 @@ export default function LandingPageBuilder() {
                   }
                 }}
                 placeholder="e.g. cre8tlydesigns"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                className="w-[40%] border border-gray-300 rounded-lg px-4 py-2"
               />
               <p className="text-xs text-gray-200 mt-1 mb-10">
                 This will be used for your page URL:{" "}
@@ -689,238 +690,264 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* ✅ Live Preview */}
-          <h1 className="text-3xl font-extrabold text-center mb-8 text-silver">
-            Landing Page Preview
-          </h1>
-          <div
-            className="mt-16 p-10 rounded-xl text-center shadow-lg transition-all duration-500"
-            style={{
-              background: selectedTheme,
-              fontFamily: fontName,
-            }}
-          >
-            {landing.cover_image_url && (
-              <img
-                src={landing.cover_image_url}
-                alt="PDF Cover"
-                className="mx-auto mb-8 rounded-xl shadow-lg"
+          {/* 🧪 Landing Page Preview (Collapsible) */}
+          <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+            {/* Header toggle */}
+            <div
+              onClick={() => setShowPreviewSection(!showPreviewSection)}
+              className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
+            >
+              <h3 className="text-lg font-semibold text-silver tracking-wide">
+                Landing Page Preview
+              </h3>
+              <span
+                className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+                  showPreviewSection ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                ▼
+              </span>
+            </div>
+
+            {/* Animated Content */}
+            <div
+              className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                showPreviewSection
+                  ? "max-h-[4000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              <div
+                className="mt-8 p-10 rounded-xl text-center shadow-lg transition-all duration-500"
                 style={{
-                  width: "100%",
-                  maxWidth: "480px",
-                  aspectRatio: "3 / 4",
-                  objectFit: "cover",
-                  border: "2px solid rgba(255, 255, 255, 0.06)",
-                  background: "#000",
-                  boxShadow:
-                    "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
-                  borderRadius: "12px",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  background: selectedTheme,
+                  fontFamily: fontName,
                 }}
-              />
-            )}
-            {landing.content_blocks?.length ? (
-              landing.content_blocks.map((block, index) => {
-                const baseStyle = {
-                  margin: "0 auto 24px", // unified spacing for all blocks
-                  maxWidth: "700px", // consistent text width
-                  textAlign: "center",
-                };
+              >
+                {landing.cover_image_url && (
+                  <img
+                    src={landing.cover_image_url}
+                    alt="PDF Cover"
+                    className="mx-auto mb-8 rounded-xl shadow-lg"
+                    style={{
+                      width: "100%",
+                      maxWidth: "480px",
+                      aspectRatio: "3 / 4",
+                      objectFit: "cover",
+                      border: "2px solid rgba(255, 255, 255, 0.06)",
+                      background: "#000",
+                      boxShadow:
+                        "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
+                      borderRadius: "12px",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    }}
+                  />
+                )}
 
-                switch (block.type) {
-                  case "heading":
-                    return (
-                      <h1
-                        key={index}
-                        className="text-4xl font-bold leading-snug"
-                        style={{
-                          ...baseStyle,
-                          color: landing.font_color_h1 || "#FFFFFF",
-                        }}
-                      >
-                        {block.text || "Heading Example"}
-                      </h1>
-                    );
+                {landing.content_blocks?.length ? (
+                  landing.content_blocks.map((block, index) => {
+                    const baseStyle = {
+                      margin: "0 auto 24px",
+                      maxWidth: "700px",
+                      textAlign: "center",
+                    };
 
-                  case "subheading":
-                    return (
-                      <h2
-                        key={index}
-                        className="text-2xl font-semibold leading-snug"
-                        style={{
-                          ...baseStyle,
-                          color: landing.font_color_h2 || "#E5E5E5",
-                        }}
-                      >
-                        {block.text || "Subheading Example"}
-                      </h2>
-                    );
-
-                  case "subsubheading":
-                    return (
-                      <h3
-                        key={index}
-                        className="text-xl font-medium leading-snug"
-                        style={{
-                          ...baseStyle,
-                          color: landing.font_color_h3 || "#CCCCCC",
-                        }}
-                      >
-                        {block.text || "Supporting Header"}
-                      </h3>
-                    );
-
-                  case "list_heading":
-                    return (
-                      <p
-                        key={index}
-                        style={{
-                          margin: "0 auto 10px",
-                          maxWidth: "700px",
-                          fontWeight: 700,
-                          fontSize: "1.15rem",
-                          textAlign: block.alignment || "left",
-                          color: landing.font_color_p || "#FFFFFF",
-                        }}
-                      >
-                        {block.text || "💎 List Heading Example"}
-                      </p>
-                    );
-
-                  case "paragraph":
-                    if (block.bulleted) {
-                      // ✅ Render as bullet list
-                      const lines = (block.text || "")
-                        .split(/\n/)
-                        .filter(Boolean);
-                      return (
-                        <ul
-                          key={index}
-                          style={{
-                            margin: "0 auto 24px",
-                            maxWidth: "700px",
-                            color: landing.font_color_p || "#DDDDDD",
-                            textAlign: block.alignment || "left",
-                            lineHeight: "1.8",
-                            listStyle: "disc",
-                            paddingLeft: "1.5rem",
-                          }}
-                        >
-                          {lines.map((line, i) => (
-                            <li key={i}>{line}</li>
-                          ))}
-                        </ul>
-                      );
-                    }
-
-                    // 🧩 Normal paragraph fallback
-                    return (
-                      <p
-                        key={index}
-                        className="text-lg leading-relaxed"
-                        style={{
-                          margin: "0 auto 24px",
-                          maxWidth: "700px",
-                          color: landing.font_color_p || "#DDDDDD",
-                          textAlign: block.alignment || "left",
-                        }}
-                      >
-                        {block.text || "Your paragraph will appear here."}
-                      </p>
-                    );
-
-                  case "button":
-                    return (
-                      <div
-                        key={index}
-                        style={{ textAlign: "center", marginTop: "12px" }}
-                      >
-                        <a
-                          href={block.url || "#"}
-                          target={block.new_tab ? "_blank" : "_self"}
-                          rel={
-                            block.new_tab ? "noopener noreferrer" : undefined
-                          }
-                          className="inline-block bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green hover:text-black transition"
-                        >
-                          {block.text || "Click Here"}
-                        </a>
-                      </div>
-                    );
-
-                  case "video":
-                    if (!block.url) return null;
-
-                    let embedUrl = block.url.trim();
-
-                    // 🧠 Normalize YouTube links
-                    if (embedUrl.includes("watch?v=")) {
-                      embedUrl = embedUrl.replace("watch?v=", "embed/");
-                    } else if (embedUrl.includes("youtu.be/")) {
-                      const id = embedUrl
-                        .split("youtu.be/")[1]
-                        .split(/[?&]/)[0];
-                      embedUrl = `https://www.youtube.com/embed/${id}`;
-                    }
-
-                    // 🎬 Normalize Vimeo links
-                    if (
-                      embedUrl.includes("vimeo.com") &&
-                      !embedUrl.includes("player.vimeo.com")
-                    ) {
-                      const id = embedUrl
-                        .split("vimeo.com/")[1]
-                        .split(/[?&]/)[0];
-                      embedUrl = `https://player.vimeo.com/video/${id}`;
-                    }
-
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          margin: "40px auto",
-                          maxWidth: "800px",
-                          textAlign: "center",
-                        }}
-                      >
-                        <iframe
-                          src={embedUrl}
-                          title="Embedded Video"
-                          style={{
-                            width: "100%",
-                            aspectRatio: "16 / 9",
-                            border: "none",
-                            borderRadius: "12px",
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-                          }}
-                          allow="autoplay; fullscreen"
-                          allowFullScreen
-                        ></iframe>
-
-                        {block.caption && (
-                          <p
+                    switch (block.type) {
+                      case "heading":
+                        return (
+                          <h1
+                            key={index}
+                            className="text-4xl font-bold leading-snug"
                             style={{
-                              marginTop: "12px",
-                              fontSize: "0.95rem",
-                              color: landing.font_color_p || "#DDD",
-                              fontStyle: "italic",
+                              ...baseStyle,
+                              color: landing.font_color_h1 || "#FFFFFF",
                             }}
                           >
-                            {block.caption}
-                          </p>
-                        )}
-                      </div>
-                    );
+                            {block.text || "Heading Example"}
+                          </h1>
+                        );
 
-                  default:
-                    return null;
-                }
-              })
-            ) : (
-              <p className="text-gray-400 italic">
-                Start adding sections to preview your landing page...
-              </p>
-            )}
+                      case "subheading":
+                        return (
+                          <h2
+                            key={index}
+                            className="text-2xl font-semibold leading-snug"
+                            style={{
+                              ...baseStyle,
+                              color: landing.font_color_h2 || "#E5E5E5",
+                            }}
+                          >
+                            {block.text || "Subheading Example"}
+                          </h2>
+                        );
+
+                      case "subsubheading":
+                        return (
+                          <h3
+                            key={index}
+                            className="text-xl font-medium leading-snug"
+                            style={{
+                              ...baseStyle,
+                              color: landing.font_color_h3 || "#CCCCCC",
+                            }}
+                          >
+                            {block.text || "Supporting Header"}
+                          </h3>
+                        );
+
+                      case "list_heading":
+                        return (
+                          <p
+                            key={index}
+                            style={{
+                              margin: "0 auto 10px",
+                              maxWidth: "700px",
+                              fontWeight: 700,
+                              fontSize: "1.15rem",
+                              textAlign: block.alignment || "left",
+                              color: landing.font_color_p || "#FFFFFF",
+                            }}
+                          >
+                            {block.text || "💎 List Heading Example"}
+                          </p>
+                        );
+
+                      case "paragraph":
+                        if (block.bulleted) {
+                          const lines = (block.text || "")
+                            .split(/\n/)
+                            .filter(Boolean);
+                          return (
+                            <ul
+                              key={index}
+                              style={{
+                                margin: "0 auto 24px",
+                                maxWidth: "700px",
+                                color: landing.font_color_p || "#DDDDDD",
+                                textAlign: block.alignment || "left",
+                                lineHeight: "1.8",
+                                listStyle: "disc",
+                                paddingLeft: "1.5rem",
+                              }}
+                            >
+                              {lines.map((line, i) => (
+                                <li key={i}>{line}</li>
+                              ))}
+                            </ul>
+                          );
+                        }
+
+                        return (
+                          <p
+                            key={index}
+                            className="text-lg leading-relaxed"
+                            style={{
+                              margin: "0 auto 24px",
+                              maxWidth: "700px",
+                              color: landing.font_color_p || "#DDDDDD",
+                              textAlign: block.alignment || "left",
+                            }}
+                          >
+                            {block.text || "Your paragraph will appear here."}
+                          </p>
+                        );
+
+                      case "button":
+                        return (
+                          <div
+                            key={index}
+                            style={{ textAlign: "center", marginTop: "12px" }}
+                          >
+                            <a
+                              href={block.url || "#"}
+                              target={block.new_tab ? "_blank" : "_self"}
+                              rel={
+                                block.new_tab
+                                  ? "noopener noreferrer"
+                                  : undefined
+                              }
+                              className="inline-block bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green hover:text-black transition"
+                            >
+                              {block.text || "Click Here"}
+                            </a>
+                          </div>
+                        );
+
+                      case "video":
+                        if (!block.url) return null;
+
+                        let embedUrl = block.url.trim();
+
+                        if (embedUrl.includes("watch?v=")) {
+                          embedUrl = embedUrl.replace("watch?v=", "embed/");
+                        } else if (embedUrl.includes("youtu.be/")) {
+                          const id = embedUrl
+                            .split("youtu.be/")[1]
+                            .split(/[?&]/)[0];
+                          embedUrl = `https://www.youtube.com/embed/${id}`;
+                        }
+
+                        if (
+                          embedUrl.includes("vimeo.com") &&
+                          !embedUrl.includes("player.vimeo.com")
+                        ) {
+                          const id = embedUrl
+                            .split("vimeo.com/")[1]
+                            .split(/[?&]/)[0];
+                          embedUrl = `https://player.vimeo.com/video/${id}`;
+                        }
+
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              margin: "40px auto",
+                              maxWidth: "800px",
+                              textAlign: "center",
+                            }}
+                          >
+                            <iframe
+                              src={embedUrl}
+                              title="Embedded Video"
+                              style={{
+                                width: "100%",
+                                aspectRatio: "16 / 9",
+                                border: "none",
+                                borderRadius: "12px",
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+                              }}
+                              allow="autoplay; fullscreen"
+                              allowFullScreen
+                            ></iframe>
+
+                            {block.caption && (
+                              <p
+                                style={{
+                                  marginTop: "12px",
+                                  fontSize: "0.95rem",
+                                  color: landing.font_color_p || "#DDD",
+                                  fontStyle: "italic",
+                                }}
+                              >
+                                {block.caption}
+                              </p>
+                            )}
+                          </div>
+                        );
+
+                      default:
+                        return null;
+                    }
+                  })
+                ) : (
+                  <p className="text-gray-400 italic">
+                    Start adding sections to preview your landing page...
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
+
           {/* Save + View */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-16 pt-8 border-t border-gray-700">
             <button

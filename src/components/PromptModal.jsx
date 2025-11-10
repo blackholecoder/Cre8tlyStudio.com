@@ -52,7 +52,9 @@ export default function PromptModal({
       setCover(null);
       setProgress(0);
       setShowPreview(false);
-      setPhase("questions"); // 👈 reset to Smart Builder every time modal closes
+      setPhase("questions"); 
+      setFontName(null);
+      setFontFile(null);
     } else {
       // 👇 optional: always start at questions when it opens too
       setPhase("questions");

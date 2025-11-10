@@ -2,6 +2,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 import { Trash2 } from "lucide-react";
+import { normalizeVideoUrl } from "./NormalizeVideoUrl";
+
+
 
 function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -11,6 +14,8 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  // 🔧 Normalize any YouTube or Vimeo link into an embeddable URL
 
   return (
     <div
@@ -173,7 +178,11 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
             type="url"
             placeholder="https://example.com or /your-path"
             value={block.url || ""}
-            onChange={(e) => updateBlock(index, "url", e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              const normalized = normalizeVideoUrl(value);
+              updateBlock(index, "url", normalized);
+            }}
             onFocus={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
@@ -198,6 +207,52 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
               Open in new tab
             </label>
           </div>
+        </>
+      )}
+
+      {block.type === "video" && (
+        <>
+          <label className="block text-sm font-semibold text-gray-300 mb-1">
+            Video URL (YouTube or Vimeo)
+          </label>
+          <input
+            type="url"
+            placeholder="https://www.youtube.com/watch?v=xxxx or https://vimeo.com/xxxx"
+            value={block.url || ""}
+            onChange={(e) => updateBlock(index, "url", e.target.value)}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mb-3 p-2 rounded-md bg-[#0F172A] border border-gray-700 text-gray-100 
+                 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+          />
+
+          <label className="block text-sm font-semibold text-gray-300 mb-1">
+            Caption (optional)
+          </label>
+          <input
+            type="text"
+            placeholder="Enter caption text"
+            value={block.caption || ""}
+            onChange={(e) => updateBlock(index, "caption", e.target.value)}
+            onFocus={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="w-full mb-4 p-2 rounded-md bg-[#0F172A] border border-gray-700 text-gray-100 
+                 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+          />
+
+          {/* ✅ Live Video Preview */}
+          {block.url && (
+            <div className="mt-4">
+              <iframe
+                src={normalizeVideoUrl(block.url)}
+                title="Video Preview"
+                className="w-full aspect-video rounded-lg border border-gray-700 shadow-md"
+                allow="autoplay; fullscreen"
+              ></iframe>
+            </div>
+          )}
         </>
       )}
 

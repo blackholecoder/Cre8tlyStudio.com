@@ -13,6 +13,9 @@ import {
 } from "@dnd-kit/sortable";
 import { MemoizedSortableBlock } from "./SortableBlock";
 import { Wand2 } from "lucide-react";
+import { normalizeVideoUrl } from "./NormalizeVideoUrl";
+
+
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -38,22 +41,44 @@ export default function LandingPageBuilder() {
     });
   }, []);
 
+
   const addBlock = (type) => {
-    if (!type) return; // prevent invalid type
-    const newBlock = {
-      id: crypto.randomUUID(),
-      type,
-      text: "",
-      padding: 20,
-      alignment: "left", // ✅ default alignment
-      bulleted: false,
-    };
-    setLanding((prev) => ({
-      ...prev,
-      content_blocks: [...(prev.content_blocks || []), newBlock],
-    }));
-    setShowDropdown(false);
+  if (!type) return; // prevent invalid type
+
+  let newBlock = {
+    id: crypto.randomUUID(),
+    type,
+    padding: 20,
+    alignment: "left",
+    bulleted: false,
   };
+
+  // 🧩 Custom defaults for specific block types
+  if (["heading", "subheading", "subsubheading", "paragraph", "list_heading"].includes(type)) {
+    newBlock.text = "";
+  }
+
+  if (type === "button") {
+    newBlock.text = "";
+    newBlock.url = "";
+    newBlock.new_tab = false;
+  }
+
+  if (type === "video") {
+    newBlock.url = "";
+    newBlock.caption = "";
+    newBlock.autoplay = false;
+    newBlock.loop = false;
+    newBlock.muted = false;
+  }
+
+  setLanding((prev) => ({
+    ...prev,
+    content_blocks: [...(prev.content_blocks || []), newBlock],
+  }));
+
+  setShowDropdown(false);
+};
 
   const removeBlock = (index) => {
     const updated = landing.content_blocks.filter((_, i) => i !== index);
@@ -164,6 +189,19 @@ export default function LandingPageBuilder() {
     );
   }
 
+  // 🔍 Validate YouTube or Vimeo URLs
+const isValidVideoUrl = (url) => {
+  if (!url) return true; // allow empty (unfilled video block)
+  const ytPattern =
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}($|[?&])/;
+  const vimeoPattern =
+    /^(https?:\/\/)?(www\.)?vimeo\.com\/\d{6,12}($|[?&])/;
+  return ytPattern.test(url) || vimeoPattern.test(url);
+};
+
+
+
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -178,6 +216,21 @@ export default function LandingPageBuilder() {
           blocks = [];
         }
       }
+
+       // 🧠 Validate all video URLs before saving
+    const invalidVideos = blocks
+      .filter((b) => b.type === "video" && b.url && !isValidVideoUrl(b.url))
+      .map((b, i) => `Video Block ${i + 1}`);
+
+    if (invalidVideos.length > 0) {
+      toast.error(
+        `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`
+      );
+      return; // ❌ stop saving
+    }
+    blocks = blocks.map((b) =>
+  b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
+);
 
       await axiosInstance.put(
         `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
@@ -298,38 +351,46 @@ export default function LandingPageBuilder() {
               </DndContext>
             </div>
 
-            <div className="mt-12 mb-10 w-full">
-              <button
-                type="button"
-                onClick={() => setShowDropdown((prev) => !prev)}
-                className="w-full bg-blue text-white py-4 rounded-xl shadow-lg text-lg font-semibold 
+            <div className="add-section-dropdown mt-12 mb-10 w-full relative">
+  <button
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation(); // Prevent global listener
+      setShowDropdown((prev) => !prev);
+    }}
+    className="w-full bg-blue text-white py-4 rounded-xl shadow-lg text-lg font-semibold 
                hover:bg-[#7bed9f] hover:text-black transition-all duration-300 tracking-wide"
-              >
-                + Add Section
-              </button>
+  >
+    + Add Section
+  </button>
 
-              {showDropdown && (
-                <div className="mt-2 w-full bg-[#0F172A] border border-gray-700 rounded-lg shadow-xl overflow-hidden">
-                  {[
-                    { label: "Heading (H1)", value: "heading" },
-                    { label: "Subheading (H2)", value: "subheading" },
-                    { label: "Sub-Subheading (H3)", value: "subsubheading" },
-                    { label: "List Heading", value: "list_heading" },
-                    { label: "Paragraph", value: "paragraph" },
-                    { label: "Button", value: "button" },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => addBlock(opt.value)}
-                      className="block w-full text-left px-6 py-3 text-gray-200 hover:bg-blue/20 transition-all duration-200"
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+  {showDropdown && (
+    <div className="mt-2 w-full bg-[#0F172A] border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+      {[
+        { label: "Heading (H1)", value: "heading" },
+        { label: "Subheading (H2)", value: "subheading" },
+        { label: "Sub-Subheading (H3)", value: "subsubheading" },
+        { label: "List Heading", value: "list_heading" },
+        { label: "Paragraph", value: "paragraph" },
+        { label: "Button", value: "button" },
+        { label: "Video", value: "video" },
+      ].map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            addBlock(opt.value);
+          }}
+          className="block w-full text-left px-6 py-3 text-gray-200 hover:bg-blue/20 transition-all duration-200"
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
+
           </div>
 
           {/* 🧾 PDF Attachment */}
@@ -577,6 +638,7 @@ export default function LandingPageBuilder() {
               });
             }}
             colorThemes={pageBuilderThemes}
+            includeGradients={true} 
           />
           <div className="relative z-[60]">
             <FontSelector
@@ -790,6 +852,65 @@ export default function LandingPageBuilder() {
                         </a>
                       </div>
                     );
+
+                    case "video":
+  if (!block.url) return null;
+
+  let embedUrl = block.url.trim();
+
+  // 🧠 Normalize YouTube links
+  if (embedUrl.includes("watch?v=")) {
+    embedUrl = embedUrl.replace("watch?v=", "embed/");
+  } else if (embedUrl.includes("youtu.be/")) {
+    const id = embedUrl.split("youtu.be/")[1].split(/[?&]/)[0];
+    embedUrl = `https://www.youtube.com/embed/${id}`;
+  }
+
+  // 🎬 Normalize Vimeo links
+  if (embedUrl.includes("vimeo.com") && !embedUrl.includes("player.vimeo.com")) {
+    const id = embedUrl.split("vimeo.com/")[1].split(/[?&]/)[0];
+    embedUrl = `https://player.vimeo.com/video/${id}`;
+  }
+
+  return (
+    <div
+      key={index}
+      style={{
+        margin: "40px auto",
+        maxWidth: "800px",
+        textAlign: "center",
+      }}
+    >
+      <iframe
+        src={embedUrl}
+        title="Embedded Video"
+        style={{
+          width: "100%",
+          aspectRatio: "16 / 9",
+          border: "none",
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+        }}
+        allow="autoplay; fullscreen"
+        allowFullScreen
+      ></iframe>
+
+      {block.caption && (
+        <p
+          style={{
+            marginTop: "12px",
+            fontSize: "0.95rem",
+            color: landing.font_color_p || "#DDD",
+            fontStyle: "italic",
+          }}
+        >
+          {block.caption}
+        </p>
+      )}
+    </div>
+  );
+
+
 
                   default:
                     return null;

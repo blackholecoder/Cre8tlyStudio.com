@@ -209,7 +209,7 @@ export default function PromptForm({
         setLogoPreview={setLogoPreview}
       />
 
-      <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} />
+      <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} includeGradients={false}/>
 
       {/* Theme Selector */}
       <FontSelector

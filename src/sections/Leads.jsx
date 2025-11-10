@@ -30,9 +30,15 @@ export default function Leads() {
     fetchLeads();
   }, [page]);
 
+  useEffect(() => {
+    console.log("Fetched leads:", leads);
+  }, [leads]);
+
   // ✅ Get unique landing pages for filter dropdown
   const landingOptions = [
-    ...new Map(leads.map((l) => [l.landing_page_id, l.landing_title])).entries(),
+    ...new Map(
+      leads.map((l) => [l.landing_page_id, l.landing_title])
+    ).entries(),
   ].map(([id, title]) => ({ id, title }));
 
   // ✅ Filter by email search and selected landing
@@ -46,44 +52,43 @@ export default function Leads() {
   const totalPages = Math.ceil(total / limit);
 
   const downloadCSV = () => {
-  if (!leads.length) {
-    alert("No leads available to download");
-    return;
-  }
+    if (!leads.length) {
+      alert("No leads available to download");
+      return;
+    }
 
-  const csvData = leads.map((lead) => ({
-    Email: lead.email,
-    "Created At": new Date(lead.created_at).toLocaleString(),
-    "Landing Title": lead.landing_title,
-    "PDF Title": lead.title || "Untitled PDF",
-  }));
+    const csvData = leads.map((lead) => ({
+      Email: lead.email,
+      "Created At": new Date(lead.created_at).toLocaleString(),
+      "Landing Title": lead.landing_title,
+      "PDF Title": lead.title || "Untitled PDF",
+    }));
 
-  const csv = Papa.unparse(csvData);
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", "leads_export.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "leads_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-10 text-white">
       <div className="max-w-5xl mx-auto bg-black/70 rounded-2xl shadow-lg p-8">
-      
         <div className="flex justify-between items-center mb-6">
-  <h1 className="text-3xl font-bold text-silver flex items-center gap-3">
-    <Mail className="text-green" /> Leads
-  </h1>
-  <button
-    onClick={downloadCSV}
-    className="bg-green text-black font-semibold px-4 py-2 rounded-lg shadow hover:bg-lime-400 transition"
-  >
-    Download CSV
-  </button>
-</div>
+          <h1 className="text-3xl font-bold text-silver flex items-center gap-3">
+            <Mail className="text-green" /> Leads
+          </h1>
+          <button
+            onClick={downloadCSV}
+            className="bg-green text-black font-semibold px-4 py-2 rounded-lg shadow hover:bg-lime-400 transition"
+          >
+            Download CSV
+          </button>
+        </div>
 
         {/* 🔍 Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
@@ -136,7 +141,11 @@ export default function Leads() {
                     </p>
                     {lead.pdf_url && (
                       <a
-                        href={lead.pdf_url}
+                        href={
+                          lead.pdf_url.startsWith("http")
+                            ? lead.pdf_url
+                            : `https://${lead.pdf_url}`
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-green underline text-xs mt-1 block"

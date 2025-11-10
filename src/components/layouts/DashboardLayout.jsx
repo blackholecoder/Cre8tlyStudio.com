@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }) {
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
     const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth >= 1024);
+      setIsSidebarOpen(window.innerWidth >= 1280);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -72,7 +72,7 @@ export default function DashboardLayout({ children }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#030712] text-white relative">
+    <div className="flex bg-[#030712] text-white relative min-h-full">
       <CustomCursor />
 
       {/* Sidebar */}

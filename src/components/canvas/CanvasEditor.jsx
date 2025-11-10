@@ -247,6 +247,7 @@ export default function CanvasEditor() {
   const [loading, setLoading] = useState(true);
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const handleClearSelectedTool = () => setSelectedTool(null);
@@ -508,54 +509,52 @@ export default function CanvasEditor() {
     );
   }
 
- 
-
   return (
     <div className="flex h-screen bg-[#111] text-white">
-       <input
-    id="hiddenImageUpload"
-    type="file"
-    accept="image/*"
-    style={{ display: "none" }}
-    onChange={(e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+      <input
+        id="hiddenImageUpload"
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
 
-      // ✅ use blob URL instead of base64 (much lighter for React)
-      const objectUrl = URL.createObjectURL(file);
+          // ✅ use blob URL instead of base64 (much lighter for React)
+          const objectUrl = URL.createObjectURL(file);
 
-      // ✅ get current canvas size for auto-centering
-      const canvasWidth =
-        document.querySelector(".konva-overlay")?.clientWidth || 600;
-      const canvasHeight =
-        document.querySelector(".konva-overlay")?.clientHeight || 800;
+          // ✅ get current canvas size for auto-centering
+          const canvasWidth =
+            document.querySelector(".konva-overlay")?.clientWidth || 600;
+          const canvasHeight =
+            document.querySelector(".konva-overlay")?.clientHeight || 800;
 
-      const newShape = {
-        id: `image-${Date.now()}`,
-        type: "image",
-        src: objectUrl,
-        // ✅ auto-center
-        x: canvasWidth / 2 - 100,
-        y: canvasHeight / 2 - 100,
-        width: 200,
-        height: 200,
-        draggable: true,
-      };
+          const newShape = {
+            id: `image-${Date.now()}`,
+            type: "image",
+            src: objectUrl,
+            // ✅ auto-center
+            x: canvasWidth / 2 - 100,
+            y: canvasHeight / 2 - 100,
+            width: 200,
+            height: 200,
+            draggable: true,
+          };
 
-      console.log("✅ Added image shape:", newShape);
+          console.log("✅ Added image shape:", newShape);
 
-      // ✅ add to current page (preserving undo)
-      setShapesByPage((prev) => {
-        const current = prev[selectedPage] || [];
-        const next = [...current, newShape];
-        pushPast(selectedPage, current);
-        return { ...prev, [selectedPage]: next };
-      });
+          // ✅ add to current page (preserving undo)
+          setShapesByPage((prev) => {
+            const current = prev[selectedPage] || [];
+            const next = [...current, newShape];
+            pushPast(selectedPage, current);
+            return { ...prev, [selectedPage]: next };
+          });
 
-      toast.success("🖼 Image added to canvas!");
-      e.target.value = ""; // reset file input
-    }}
-  />
+          toast.success("🖼 Image added to canvas!");
+          e.target.value = ""; // reset file input
+        }}
+      />
       {/* ✅ Left sidebar thumbnails */}
       <div className="w-28 flex-shrink-0 overflow-y-auto p-3 border-r border-gray-800">
         <h1 className="text-sm font-semibold mb-3 text-gray-300">Pages</h1>
@@ -591,11 +590,15 @@ export default function CanvasEditor() {
             <h1 className="text-lg font-semibold">Canvas Editor</h1>
           </div>
           <button
-            onClick={handleSaveFinalPDF}
+            onClick={async () => {
+              setSaving(true);
+              await handleSaveFinalPDF();
+              setSaving(false);
+            }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-green hover:bg-green border border-grey-700 transition text-black text-sm font-medium"
           >
             <Package size={18} />
-            Save Final PDF
+            {saving ? "Saving…" : "Save Final PDF"}
           </button>
         </div>
 
@@ -758,7 +761,6 @@ export default function CanvasEditor() {
             Clear
           </button>
 
-          {/* 🔹 Canvas Display */}
           {pages.length > 0 && (
             <>
               {(() => {

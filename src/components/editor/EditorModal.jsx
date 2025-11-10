@@ -466,7 +466,7 @@ pre code {
   
 
   return (
-    <Dialog open={open} onClose={onClose} className="fixed inset-0 z-50">
+    <Dialog open={open} onClose={onClose} className="fixed inset-0 z-[9999]">
       {/* Background overlay */}
       <div className="fixed inset-0 bg-black/60" />
       

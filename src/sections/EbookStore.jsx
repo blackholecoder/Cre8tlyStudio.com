@@ -16,7 +16,7 @@ export default function EbooksStore() {
   useEffect(() => {
     const fetchEbooks = async () => {
       try {
-        const res = await api.get("/ebooks");
+        const res = await api.get("/ebooks/public");
         setEbooks(res.data);
       } catch (err) {
         console.error("Failed to fetch ebooks:", err);

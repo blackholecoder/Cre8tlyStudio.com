@@ -225,26 +225,33 @@ export default function PromptForm({
           Add a Closing Message or Call-to-Action
         </label>
 
-        {/* Dropdown for saved CTA */}
-        {user?.cta && (
-          <div className="flex items-center justify-between mb-2">
-            <select
-              onChange={(e) => {
-                const selected = e.target.value;
-                if (selected === "saved") setCta(user.cta);
-                else if (selected === "custom") setCta("");
-              }}
-              className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
-            >
-              <option value="">Choose CTA</option>
-              <option value="saved">Use My Saved CTA</option>
-              <option value="custom">Write New CTA</option>
-            </select>
-            <span className="text-xs text-gray-500 italic ml-2">
-              {cta === user.cta ? "Using saved CTA" : ""}
-            </span>
-          </div>
-        )}
+        <div className="relative w-[30%] mb-2">
+  <select
+    onChange={(e) => {
+      const selected = e.target.value;
+      if (selected === "saved") setCta(user.cta);
+      else if (selected === "custom") setCta("");
+    }}
+    className="w-full appearance-none px-4 py-2 bg-[#1E293B] border border-gray-600 rounded-lg text-silver text-sm focus:ring-2 focus:ring-green focus:outline-none hover:border-silver transition"
+  >
+    <option value="">Choose CTA</option>
+    <option value="saved">Use My Saved CTA</option>
+    <option value="custom">Write New CTA</option>
+  </select>
+
+  {/* 👇 Custom chevron icon */}
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-silver pointer-events-none"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+  </svg>
+</div>
+
 
         {/* Editable text area */}
         <textarea

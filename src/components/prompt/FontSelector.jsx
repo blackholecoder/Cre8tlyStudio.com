@@ -41,7 +41,7 @@ export default function FontSelector({ fontName, setFontName, fontFile, setFontF
 
       {/* 🔹 Live Preview (always visible on top) */}
       <div
-        className="mb-4 p-4 rounded-xl border border-gray-700 bg-[#1a1a1a] text-center"
+        className="mb-4 p-4 rounded-xl border border-gray-700 bg-[#111827]/80 text-center"
         style={{
           fontFamily: loaded ? previewFont : "sans-serif",
           transition: "all 0.3s ease",
@@ -62,7 +62,7 @@ export default function FontSelector({ fontName, setFontName, fontFile, setFontF
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-[#111] border border-gray-700 text-gray-300 text-base rounded-lg p-2.5 focus:ring-green focus:border-green"
+        className="w-full flex items-center justify-between bg-[#111827]/80 border border-gray-700 text-gray-300 text-base rounded-lg p-2.5 focus:ring-green focus:border-green"
         style={{ fontFamily: loaded ? selectedFont : "sans-serif" }}
       >
         <span>

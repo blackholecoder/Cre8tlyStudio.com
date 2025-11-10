@@ -16,8 +16,6 @@ import { Wand2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
 import AddSectionButton from "../../components/landing/AddSectionButton";
 
-
-
 export default function LandingPageBuilder() {
   const { user } = useAuth();
   const [landing, setLanding] = useState(null);
@@ -43,45 +41,52 @@ export default function LandingPageBuilder() {
     });
   }, []);
 
-
   const addBlock = (type) => {
-  if (!type) return; // prevent invalid type
+    if (!type) return; // prevent invalid type
 
-  let newBlock = {
-    id: crypto.randomUUID(),
-    type,
-    padding: 20,
-    alignment: "left",
-    bulleted: false,
-    collapsed: true,
+    let newBlock = {
+      id: crypto.randomUUID(),
+      type,
+      padding: 20,
+      alignment: "left",
+      bulleted: false,
+      collapsed: true,
+    };
+
+    // 🧩 Custom defaults for specific block types
+    if (
+      [
+        "heading",
+        "subheading",
+        "subsubheading",
+        "paragraph",
+        "list_heading",
+      ].includes(type)
+    ) {
+      newBlock.text = "";
+    }
+
+    if (type === "button") {
+      newBlock.text = "";
+      newBlock.url = "";
+      newBlock.new_tab = false;
+    }
+
+    if (type === "video") {
+      newBlock.url = "";
+      newBlock.caption = "";
+      newBlock.autoplay = false;
+      newBlock.loop = false;
+      newBlock.muted = false;
+    }
+
+    setLanding((prev) => ({
+      ...prev,
+      content_blocks: [...(prev.content_blocks || []), newBlock],
+    }));
+
+    setShowDropdown(false);
   };
-
-  // 🧩 Custom defaults for specific block types
-  if (["heading", "subheading", "subsubheading", "paragraph", "list_heading"].includes(type)) {
-    newBlock.text = "";
-  }
-
-  if (type === "button") {
-    newBlock.text = "";
-    newBlock.url = "";
-    newBlock.new_tab = false;
-  }
-
-  if (type === "video") {
-    newBlock.url = "";
-    newBlock.caption = "";
-    newBlock.autoplay = false;
-    newBlock.loop = false;
-    newBlock.muted = false;
-  }
-
-  setLanding((prev) => ({
-    ...prev,
-    content_blocks: [...(prev.content_blocks || []), newBlock],
-  }));
-
-  setShowDropdown(false);
-};
 
   const removeBlock = (index) => {
     const updated = landing.content_blocks.filter((_, i) => i !== index);
@@ -192,18 +197,18 @@ export default function LandingPageBuilder() {
     );
   }
 
-// 🔍 Validate YouTube or Vimeo URLs (normal + embed)
-const isValidVideoUrl = (url) => {
-  if (!url) return true; // allow empty
+  // 🔍 Validate YouTube or Vimeo URLs (normal + embed)
+  const isValidVideoUrl = (url) => {
+    if (!url) return true; // allow empty
 
-  const ytPattern =
-    /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]{11}($|[?&])/;
+    const ytPattern =
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]{11}($|[?&])/;
 
-  const vimeoPattern =
-    /^(https?:\/\/)?(www\.)?(vimeo\.com\/(\d{6,12}|video\/\d{6,12}))($|[?&])/;
+    const vimeoPattern =
+      /^(https?:\/\/)?(www\.)?(vimeo\.com\/(\d{6,12}|video\/\d{6,12}))($|[?&])/;
 
-  return ytPattern.test(url) || vimeoPattern.test(url);
-};
+    return ytPattern.test(url) || vimeoPattern.test(url);
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -220,20 +225,20 @@ const isValidVideoUrl = (url) => {
         }
       }
 
-       // 🧠 Validate all video URLs before saving
-    const invalidVideos = blocks
-      .filter((b) => b.type === "video" && b.url && !isValidVideoUrl(b.url))
-      .map((b, i) => `Video Block ${i + 1}`);
+      // 🧠 Validate all video URLs before saving
+      const invalidVideos = blocks
+        .filter((b) => b.type === "video" && b.url && !isValidVideoUrl(b.url))
+        .map((b, i) => `Video Block ${i + 1}`);
 
-    if (invalidVideos.length > 0) {
-      toast.error(
-        `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`
+      if (invalidVideos.length > 0) {
+        toast.error(
+          `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`
+        );
+        return; // ❌ stop saving
+      }
+      blocks = blocks.map((b) =>
+        b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
       );
-      return; // ❌ stop saving
-    }
-    blocks = blocks.map((b) =>
-  b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
-);
 
       await axiosInstance.put(
         `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
@@ -312,10 +317,10 @@ const isValidVideoUrl = (url) => {
               Content
             </h1>
             <div className="flex justify-end mb-6">
-  <AddSectionButton addBlock={addBlock} />
-</div>
+              <AddSectionButton addBlock={addBlock} />
+            </div>
             {/* DndContext */}
-            <div className="space-y-4">
+            <div className="space-y-4 mb-28">
               <DndContext
                 collisionDetection={closestCenter}
                 onDragEnd={({ active, over }) => {
@@ -356,162 +361,158 @@ const isValidVideoUrl = (url) => {
                 </SortableContext>
               </DndContext>
             </div>
-
-            
-
           </div>
 
           {/* 🧾 PDF Attachment */}
           <div className="mt-1 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
-            
-  {/* Header toggle */}
-  <div
-    onClick={() => setShowPdfSection(!showPdfSection)}
-    className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
-  >
-    <h3 className="text-lg font-semibold text-silver tracking-wide">
-      Choose PDF to Offer
-    </h3>
-    <span
-      className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-        showPdfSection ? "rotate-180" : "rotate-0"
-      }`}
-    >
-      ▼
-    </span>
-  </div>
-
-  {/* Animated content */}
-  <div
-    className={`transition-all duration-500 ease-in-out overflow-hidden ${
-      showPdfSection ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
-    }`}
-  >
-    <div className="px-6 pb-6">
-      <span className="text-xs text-gray-400 italic block mb-5">
-        Only completed PDFs will appear
-      </span>
-
-      {/* PDF Dropdown */}
-      <div className="relative">
-        <select
-          value={landing.pdf_url || ""}
-          onChange={async (e) => {
-            const selectedUrl = e.target.value;
-            setLanding((prev) => ({ ...prev, pdf_url: selectedUrl }));
-            setCoverPreview("");
-            setCoverLoading(true);
-
-            if (!selectedUrl) {
-              setCoverLoading(false);
-              return;
-            }
-
-            try {
-              const res = await axiosInstance.get(
-                `https://cre8tlystudio.com/api/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
-              );
-
-              if (res.data.success && res.data.cover_image) {
-                setCoverPreview(res.data.cover_image);
-                setLanding((prev) => ({
-                  ...prev,
-                  cover_image_url: res.data.cover_image,
-                }));
-              }
-            } catch (err) {
-              console.error("Error loading cover image:", err);
-            } finally {
-              setCoverLoading(false);
-            }
-          }}
-          className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer focus:ring-2 focus:ring-silver focus:outline-none"
-        >
-          <option value="">-- Select a Completed PDF --</option>
-          {pdfList
-            .filter((lm) => lm.status === "completed" && lm.pdf_url)
-            .map((lm) => (
-              <option key={lm.id} value={lm.pdf_url}>
-                {lm.title || "Untitled PDF"} — (Ready)
-              </option>
-            ))}
-        </select>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M8.25 9.75L12 13.5l3.75-3.75"
-          />
-        </svg>
-      </div>
-
-      {/* PDF Info */}
-      {landing.pdf_url && (
-        <div className="mt-4 flex flex-col items-center text-center">
-          <p className="text-xs text-gray-400 mb-2">
-            Selected File:
-            <a
-              href={landing.pdf_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-green font-medium ml-1 underline hover:text-green transition"
+            {/* Header toggle */}
+            <div
+              onClick={() => setShowPdfSection(!showPdfSection)}
+              className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
             >
-              Preview PDF
-            </a>
-          </p>
-        </div>
-      )}
-      <div
-              className="mt-6 text-center bg-[#1f2937]/60 border border-gray-700 rounded-xl p-5 shadow-inner relative flex flex-col items-center justify-center overflow-hidden transition-all duration-300"
-              style={{ height: "340px" }} // 👈 fixed height (adjust as needed)
-            >
-              {coverLoading ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#111827]/70 backdrop-blur-sm transition-opacity duration-500">
-                  {/* Spinner */}
-                  <div className="w-12 h-12 border-4 border-gray-500 border-t-green rounded-full animate-spin"></div>
-                  <p className="text-gray-400 text-sm mt-3">
-                    Loading cover preview...
-                  </p>
-                </div>
-              ) : coverPreview ? (
-                <div className="flex flex-col items-center justify-center w-full h-full transition-opacity duration-700 ease-in-out">
-                  <p className="text-sm text-gray-300 mb-3 font-semibold tracking-wide">
-                    PDF Cover Preview
-                  </p>
-                  <img
-                    src={coverPreview}
-                    alt="PDF Cover"
-                    className="h-48 object-contain rounded-lg shadow-md border border-gray-600 mx-auto transition-transform duration-700 ease-in-out"
-                    style={{
-                      opacity: 1,
-                    }}
-                  />
-                  <p className="text-xs text-gray-500 mt-3">
-                    This cover will appear on your landing page automatically.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center w-full h-full">
-                  <p className="text-gray-500 text-sm italic">
-                    No PDF cover selected yet.
-                  </p>
-                </div>
-              )}
+              <h3 className="text-lg font-semibold text-silver tracking-wide">
+                Choose PDF to Offer
+              </h3>
+              <span
+                className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+                  showPdfSection ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                ▼
+              </span>
             </div>
-    </div>
-  </div>
 
+            {/* Animated content */}
+            <div
+              className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                showPdfSection
+                  ? "max-h-[2000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="px-6 pb-6">
+                <span className="text-xs text-gray-400 italic block mb-5">
+                  Only completed PDFs will appear
+                </span>
 
+                {/* PDF Dropdown */}
+                <div className="relative">
+                  <select
+                    value={landing.pdf_url || ""}
+                    onChange={async (e) => {
+                      const selectedUrl = e.target.value;
+                      setLanding((prev) => ({ ...prev, pdf_url: selectedUrl }));
+                      setCoverPreview("");
+                      setCoverLoading(true);
+
+                      if (!selectedUrl) {
+                        setCoverLoading(false);
+                        return;
+                      }
+
+                      try {
+                        const res = await axiosInstance.get(
+                          `https://cre8tlystudio.com/api/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
+                        );
+
+                        if (res.data.success && res.data.cover_image) {
+                          setCoverPreview(res.data.cover_image);
+                          setLanding((prev) => ({
+                            ...prev,
+                            cover_image_url: res.data.cover_image,
+                          }));
+                        }
+                      } catch (err) {
+                        console.error("Error loading cover image:", err);
+                      } finally {
+                        setCoverLoading(false);
+                      }
+                    }}
+                    className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer focus:ring-2 focus:ring-silver focus:outline-none"
+                  >
+                    <option value="">-- Select a Completed PDF --</option>
+                    {pdfList
+                      .filter((lm) => lm.status === "completed" && lm.pdf_url)
+                      .map((lm) => (
+                        <option key={lm.id} value={lm.pdf_url}>
+                          {lm.title || "Untitled PDF"} — (Ready)
+                        </option>
+                      ))}
+                  </select>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8.25 9.75L12 13.5l3.75-3.75"
+                    />
+                  </svg>
+                </div>
+
+                {/* PDF Info */}
+                {landing.pdf_url && (
+                  <div className="mt-4 flex flex-col items-center text-center">
+                    <p className="text-xs text-gray-400 mb-2">
+                      Selected File:
+                      <a
+                        href={landing.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green font-medium ml-1 underline hover:text-green transition"
+                      >
+                        Preview PDF
+                      </a>
+                    </p>
+                  </div>
+                )}
+                <div
+                  className="mt-6 text-center bg-[#1f2937]/60 border border-gray-700 rounded-xl p-5 shadow-inner relative flex flex-col items-center justify-center overflow-hidden transition-all duration-300"
+                  style={{ height: "340px" }} // 👈 fixed height (adjust as needed)
+                >
+                  {coverLoading ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#111827]/70 backdrop-blur-sm transition-opacity duration-500">
+                      {/* Spinner */}
+                      <div className="w-12 h-12 border-4 border-gray-500 border-t-green rounded-full animate-spin"></div>
+                      <p className="text-gray-400 text-sm mt-3">
+                        Loading cover preview...
+                      </p>
+                    </div>
+                  ) : coverPreview ? (
+                    <div className="flex flex-col items-center justify-center w-full h-full transition-opacity duration-700 ease-in-out">
+                      <p className="text-sm text-gray-300 mb-3 font-semibold tracking-wide">
+                        PDF Cover Preview
+                      </p>
+                      <img
+                        src={coverPreview}
+                        alt="PDF Cover"
+                        className="h-48 object-contain rounded-lg shadow-md border border-gray-600 mx-auto transition-transform duration-700 ease-in-out"
+                        style={{
+                          opacity: 1,
+                        }}
+                      />
+                      <p className="text-xs text-gray-500 mt-3">
+                        This cover will appear on your landing page
+                        automatically.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center w-full h-full">
+                      <p className="text-gray-500 text-sm italic">
+                        No PDF cover selected yet.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* 📘 Cover Preview */}
-            
           </div>
 
           <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
@@ -631,7 +632,7 @@ const isValidVideoUrl = (url) => {
               });
             }}
             colorThemes={pageBuilderThemes}
-            includeGradients={true} 
+            includeGradients={true}
           />
           <div className="relative z-[60]">
             <FontSelector
@@ -846,64 +847,69 @@ const isValidVideoUrl = (url) => {
                       </div>
                     );
 
-                    case "video":
-  if (!block.url) return null;
+                  case "video":
+                    if (!block.url) return null;
 
-  let embedUrl = block.url.trim();
+                    let embedUrl = block.url.trim();
 
-  // 🧠 Normalize YouTube links
-  if (embedUrl.includes("watch?v=")) {
-    embedUrl = embedUrl.replace("watch?v=", "embed/");
-  } else if (embedUrl.includes("youtu.be/")) {
-    const id = embedUrl.split("youtu.be/")[1].split(/[?&]/)[0];
-    embedUrl = `https://www.youtube.com/embed/${id}`;
-  }
+                    // 🧠 Normalize YouTube links
+                    if (embedUrl.includes("watch?v=")) {
+                      embedUrl = embedUrl.replace("watch?v=", "embed/");
+                    } else if (embedUrl.includes("youtu.be/")) {
+                      const id = embedUrl
+                        .split("youtu.be/")[1]
+                        .split(/[?&]/)[0];
+                      embedUrl = `https://www.youtube.com/embed/${id}`;
+                    }
 
-  // 🎬 Normalize Vimeo links
-  if (embedUrl.includes("vimeo.com") && !embedUrl.includes("player.vimeo.com")) {
-    const id = embedUrl.split("vimeo.com/")[1].split(/[?&]/)[0];
-    embedUrl = `https://player.vimeo.com/video/${id}`;
-  }
+                    // 🎬 Normalize Vimeo links
+                    if (
+                      embedUrl.includes("vimeo.com") &&
+                      !embedUrl.includes("player.vimeo.com")
+                    ) {
+                      const id = embedUrl
+                        .split("vimeo.com/")[1]
+                        .split(/[?&]/)[0];
+                      embedUrl = `https://player.vimeo.com/video/${id}`;
+                    }
 
-  return (
-    <div
-      key={index}
-      style={{
-        margin: "40px auto",
-        maxWidth: "800px",
-        textAlign: "center",
-      }}
-    >
-      <iframe
-        src={embedUrl}
-        title="Embedded Video"
-        style={{
-          width: "100%",
-          aspectRatio: "16 / 9",
-          border: "none",
-          borderRadius: "12px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-        }}
-        allow="autoplay; fullscreen"
-        allowFullScreen
-      ></iframe>
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          margin: "40px auto",
+                          maxWidth: "800px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <iframe
+                          src={embedUrl}
+                          title="Embedded Video"
+                          style={{
+                            width: "100%",
+                            aspectRatio: "16 / 9",
+                            border: "none",
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+                          }}
+                          allow="autoplay; fullscreen"
+                          allowFullScreen
+                        ></iframe>
 
-      {block.caption && (
-        <p
-          style={{
-            marginTop: "12px",
-            fontSize: "0.95rem",
-            color: landing.font_color_p || "#DDD",
-            fontStyle: "italic",
-          }}
-        >
-          {block.caption}
-        </p>
-      )}
-    </div>
-  );
-
-
+                        {block.caption && (
+                          <p
+                            style={{
+                              marginTop: "12px",
+                              fontSize: "0.95rem",
+                              color: landing.font_color_p || "#DDD",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {block.caption}
+                          </p>
+                        )}
+                      </div>
+                    );
 
                   default:
                     return null;

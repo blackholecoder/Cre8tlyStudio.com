@@ -14,6 +14,7 @@ import {
 import { MemoizedSortableBlock } from "./SortableBlock";
 import { Wand2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
+import AddSectionButton from "../../components/landing/AddSectionButton";
 
 
 
@@ -27,6 +28,7 @@ export default function LandingPageBuilder() {
   const [pdfList, setPdfList] = useState([]);
   const [coverPreview, setCoverPreview] = useState("");
   const [coverLoading, setCoverLoading] = useState(false);
+  const [showPdfSection, setShowPdfSection] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -203,9 +205,6 @@ const isValidVideoUrl = (url) => {
   return ytPattern.test(url) || vimeoPattern.test(url);
 };
 
-
-
-
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -312,6 +311,9 @@ const isValidVideoUrl = (url) => {
             <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
               Content
             </h1>
+            <div className="flex justify-end mb-6">
+  <AddSectionButton addBlock={addBlock} />
+</div>
             {/* DndContext */}
             <div className="space-y-4">
               <DndContext
@@ -355,138 +357,118 @@ const isValidVideoUrl = (url) => {
               </DndContext>
             </div>
 
-            <div className="add-section-dropdown mt-12 mb-10 w-full relative">
-  <button
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation(); // Prevent global listener
-      setShowDropdown((prev) => !prev);
-    }}
-    className="w-full bg-blue text-white py-4 rounded-xl shadow-lg text-lg font-semibold 
-               hover:bg-[#7bed9f] hover:text-black transition-all duration-300 tracking-wide"
-  >
-    + Add Section
-  </button>
-
-  {showDropdown && (
-    <div className="mt-2 w-full bg-[#0F172A] border border-gray-700 rounded-lg shadow-xl overflow-hidden">
-      {[
-        { label: "Heading (H1)", value: "heading" },
-        { label: "Subheading (H2)", value: "subheading" },
-        { label: "Sub-Subheading (H3)", value: "subsubheading" },
-        { label: "List Heading", value: "list_heading" },
-        { label: "Paragraph", value: "paragraph" },
-        { label: "Button", value: "button" },
-        { label: "Video", value: "video" },
-      ].map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            addBlock(opt.value);
-          }}
-          className="block w-full text-left px-6 py-3 text-gray-200 hover:bg-blue/20 transition-all duration-200"
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  )}
-</div>
+            
 
           </div>
 
           {/* 🧾 PDF Attachment */}
-          <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
-            <div className="flex items-center justify-between mb-5">
-              <label className="text-lg font-semibold text-silver tracking-wide">
-                Choose PDF to Offer
-              </label>
-              <span className="text-xs text-gray-400 italic">
-                Only completed PDFs will appear
-              </span>
-            </div>
+          <div className="mt-1 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+            
+  {/* Header toggle */}
+  <div
+    onClick={() => setShowPdfSection(!showPdfSection)}
+    className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
+  >
+    <h3 className="text-lg font-semibold text-silver tracking-wide">
+      Choose PDF to Offer
+    </h3>
+    <span
+      className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+        showPdfSection ? "rotate-180" : "rotate-0"
+      }`}
+    >
+      ▼
+    </span>
+  </div>
 
-            {/* PDF Dropdown */}
-            <div className="relative">
-              <select
-                value={landing.pdf_url || ""}
-                onChange={async (e) => {
-                  const selectedUrl = e.target.value;
-                  setLanding((prev) => ({ ...prev, pdf_url: selectedUrl }));
-                  setCoverPreview("");
-                  setCoverLoading(true); // 🆕 start spinner
+  {/* Animated content */}
+  <div
+    className={`transition-all duration-500 ease-in-out overflow-hidden ${
+      showPdfSection ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+    }`}
+  >
+    <div className="px-6 pb-6">
+      <span className="text-xs text-gray-400 italic block mb-5">
+        Only completed PDFs will appear
+      </span>
 
-                  if (!selectedUrl) {
-                    setCoverLoading(false);
-                    return;
-                  }
+      {/* PDF Dropdown */}
+      <div className="relative">
+        <select
+          value={landing.pdf_url || ""}
+          onChange={async (e) => {
+            const selectedUrl = e.target.value;
+            setLanding((prev) => ({ ...prev, pdf_url: selectedUrl }));
+            setCoverPreview("");
+            setCoverLoading(true);
 
-                  try {
-                    const res = await axiosInstance.get(
-                      `https://cre8tlystudio.com/api/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
-                    );
+            if (!selectedUrl) {
+              setCoverLoading(false);
+              return;
+            }
 
-                    if (res.data.success && res.data.cover_image) {
-                      setCoverPreview(res.data.cover_image);
-                      setLanding((prev) => ({
-                        ...prev,
-                        cover_image_url: res.data.cover_image,
-                      }));
-                    }
-                  } catch (err) {
-                    console.error("Error loading cover image:", err);
-                  } finally {
-                    setCoverLoading(false); // 🆕 stop spinner
-                  }
-                }}
-                className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer focus:ring-2 focus:ring-silver focus:outline-none"
-              >
-                <option value="">-- Select a Completed PDF --</option>
-                {pdfList
-                  .filter((lm) => lm.status === "completed" && lm.pdf_url)
-                  .map((lm) => (
-                    <option key={lm.id} value={lm.pdf_url}>
-                      {lm.title || "Untitled PDF"} — (Ready)
-                    </option>
-                  ))}
-              </select>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M8.25 9.75L12 13.5l3.75-3.75"
-                />
-              </svg>
-            </div>
+            try {
+              const res = await axiosInstance.get(
+                `https://cre8tlystudio.com/api/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
+              );
 
-            {/* PDF Info */}
-            {landing.pdf_url && (
-              <div className="mt-4 flex flex-col items-center text-center">
-                <p className="text-xs text-gray-400 mb-2">
-                  Selected File:
-                  <a
-                    href={landing.pdf_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-green font-medium ml-1 underline hover:text-green transition"
-                  >
-                    Preview PDF
-                  </a>
-                </p>
-              </div>
-            )}
+              if (res.data.success && res.data.cover_image) {
+                setCoverPreview(res.data.cover_image);
+                setLanding((prev) => ({
+                  ...prev,
+                  cover_image_url: res.data.cover_image,
+                }));
+              }
+            } catch (err) {
+              console.error("Error loading cover image:", err);
+            } finally {
+              setCoverLoading(false);
+            }
+          }}
+          className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer focus:ring-2 focus:ring-silver focus:outline-none"
+        >
+          <option value="">-- Select a Completed PDF --</option>
+          {pdfList
+            .filter((lm) => lm.status === "completed" && lm.pdf_url)
+            .map((lm) => (
+              <option key={lm.id} value={lm.pdf_url}>
+                {lm.title || "Untitled PDF"} — (Ready)
+              </option>
+            ))}
+        </select>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M8.25 9.75L12 13.5l3.75-3.75"
+          />
+        </svg>
+      </div>
 
-            {/* 📘 Cover Preview */}
-            <div
+      {/* PDF Info */}
+      {landing.pdf_url && (
+        <div className="mt-4 flex flex-col items-center text-center">
+          <p className="text-xs text-gray-400 mb-2">
+            Selected File:
+            <a
+              href={landing.pdf_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green font-medium ml-1 underline hover:text-green transition"
+            >
+              Preview PDF
+            </a>
+          </p>
+        </div>
+      )}
+      <div
               className="mt-6 text-center bg-[#1f2937]/60 border border-gray-700 rounded-xl p-5 shadow-inner relative flex flex-col items-center justify-center overflow-hidden transition-all duration-300"
               style={{ height: "340px" }} // 👈 fixed height (adjust as needed)
             >
@@ -523,6 +505,13 @@ const isValidVideoUrl = (url) => {
                 </div>
               )}
             </div>
+    </div>
+  </div>
+
+
+
+            {/* 📘 Cover Preview */}
+            
           </div>
 
           <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">

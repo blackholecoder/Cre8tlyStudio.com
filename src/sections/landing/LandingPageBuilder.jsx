@@ -51,6 +51,7 @@ export default function LandingPageBuilder() {
     padding: 20,
     alignment: "left",
     bulleted: false,
+    collapsed: true,
   };
 
   // 🧩 Custom defaults for specific block types
@@ -189,13 +190,16 @@ export default function LandingPageBuilder() {
     );
   }
 
-  // 🔍 Validate YouTube or Vimeo URLs
+// 🔍 Validate YouTube or Vimeo URLs (normal + embed)
 const isValidVideoUrl = (url) => {
-  if (!url) return true; // allow empty (unfilled video block)
+  if (!url) return true; // allow empty
+
   const ytPattern =
-    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}($|[?&])/;
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]{11}($|[?&])/;
+
   const vimeoPattern =
-    /^(https?:\/\/)?(www\.)?vimeo\.com\/\d{6,12}($|[?&])/;
+    /^(https?:\/\/)?(www\.)?(vimeo\.com\/(\d{6,12}|video\/\d{6,12}))($|[?&])/;
+
   return ytPattern.test(url) || vimeoPattern.test(url);
 };
 

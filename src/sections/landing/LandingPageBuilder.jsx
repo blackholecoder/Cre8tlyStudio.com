@@ -28,6 +28,7 @@ export default function LandingPageBuilder() {
   const [coverLoading, setCoverLoading] = useState(false);
   const [showPdfSection, setShowPdfSection] = useState(false);
   const [showPreviewSection, setShowPreviewSection] = useState(false);
+  const [showDownloadButton, setShowDownloadButton] = useState(true);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -124,6 +125,8 @@ export default function LandingPageBuilder() {
         setPdfList(magnets);
         setFontName(lp.font || "Montserrat");
         setFontFile(lp.font_file || "");
+        setShowDownloadButton(lp.show_download_button !== false);
+
 
         // ✅ restore cover and theme
         if (lp.cover_image_url) setCoverPreview(lp.cover_image_url);
@@ -249,6 +252,7 @@ export default function LandingPageBuilder() {
           pdf_url: landing.pdf_url,
           cover_image_url: landing.cover_image_url,
           logo_url: landing.logo_url,
+          show_download_button: showDownloadButton,
         }
       );
 
@@ -947,6 +951,36 @@ export default function LandingPageBuilder() {
               </div>
             </div>
           </div>
+
+          {/* Toggle Download Button */}
+<div className="mt-10 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
+  <div className="flex items-center justify-between">
+    <label className="text-lg font-semibold text-silver tracking-wide">
+      Show “Download Now” Button
+    </label>
+    <label className="relative inline-flex items-center cursor-pointer select-none">
+  <input
+    type="checkbox"
+    checked={showDownloadButton}
+    onChange={(e) => setShowDownloadButton(e.target.checked)}
+    className="sr-only"
+  />
+  <span
+    className={`block w-11 h-6 rounded-full transition-all duration-300 ${
+      showDownloadButton ? "bg-green" : "bg-gray-600"
+    }`}
+  ></span>
+  <span
+    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
+      showDownloadButton ? "translate-x-5" : ""
+    }`}
+  ></span>
+</label>
+  </div>
+  <p className="text-xs text-gray-400 mt-2">
+    Turn this off if you want to hide the email download form on your public page.
+  </p>
+</div>
 
           {/* Save + View */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-16 pt-8 border-t border-gray-700">

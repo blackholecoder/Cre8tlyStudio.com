@@ -261,7 +261,7 @@ const isValidVideoUrl = (url) => {
           ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-10 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-10 overflow-y-scroll">
       <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-8">
         <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
           <Wand2 className="w-6 h-6 text-green" />

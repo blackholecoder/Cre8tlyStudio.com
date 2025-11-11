@@ -3,6 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
+import { adjustForLandingOverlay } from "./adjustForLandingOverlay";
 
 function SortableBlock({
   id,
@@ -293,23 +294,29 @@ function SortableBlock({
             <div
               className="rounded-xl p-6 mt-3 shadow-inner transition-all relative"
               style={{
-                background: `linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.25)), ${
-                  bgTheme || "linear-gradient(to bottom, #1e1e1e, #111)"
-                }`,
+                background: block.match_main_bg
+                  ? adjustForLandingOverlay(bgTheme) // ✅ true live-page color tone
+                  : bgTheme || "linear-gradient(to bottom, #1e1e1e, #111)",
                 border: "1px solid rgba(255,255,255,0.1)",
-                backdropFilter: "blur(4px)",
+                boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                transition: "background 0.4s ease",
               }}
             >
               {/* Inner Offer Banner Preview */}
               <div
                 className="rounded-xl p-6 shadow-lg transition-all duration-300"
                 style={{
-                  background: block.use_gradient
-                    ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                        block.gradient_start || "#F285C3"
-                      }, ${block.gradient_end || "#7bed9f"})`
-                    : block.bg_color || "#F285C3",
-                  color: block.text_color || "#000",
+                  background: block.match_main_bg
+                    ? adjustForLandingOverlay(bgTheme) // ✅ use brightened content background
+                    : block.use_gradient
+                      ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                          block.gradient_start || "#F285C3"
+                        }, ${block.gradient_end || "#7bed9f"})`
+                      : block.bg_color || "#F285C3",
+                  color: block.text_color || "#fff",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.35)",
+                  transition: "background 0.4s ease, box-shadow 0.3s ease",
                 }}
               >
                 {/* 📝 Banner Message */}
@@ -351,6 +358,18 @@ function SortableBlock({
                     checked={block.use_gradient || false}
                     onChange={(e) =>
                       updateBlock(index, "use_gradient", e.target.checked)
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Match Content Background
+                  </label>
+                  <input
+                    type="checkbox"
+                    checked={block.match_main_bg || false}
+                    onChange={(e) =>
+                      updateBlock(index, "match_main_bg", e.target.checked)
                     }
                   />
                 </div>

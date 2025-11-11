@@ -15,6 +15,8 @@ import { MemoizedSortableBlock } from "./SortableBlock";
 import { Wand2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
 import AddSectionButton from "../../components/landing/AddSectionButton";
+import { blendColors } from "./BlendColors";
+import { adjustForLandingOverlay } from "./adjustForLandingOverlay";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -714,7 +716,7 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* ✅ Live Preview */}
-          {/* 🧪 Landing Page Preview (Collapsible) */}
+
           <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
             {/* Header toggle */}
             <div
@@ -744,10 +746,95 @@ export default function LandingPageBuilder() {
               <div
                 className="mt-8 p-10 rounded-xl text-center shadow-lg transition-all duration-500"
                 style={{
-                  background: selectedTheme,
+                  background: adjustForLandingOverlay(selectedTheme),
                   fontFamily: fontName,
                 }}
               >
+                {landing.content_blocks
+                  ?.filter((b) => b.type === "offer_banner")
+                  .map((block, index) => {
+                    const isGradient =
+                      selectedTheme?.includes("linear-gradient");
+                    const mainOverlayColor = isGradient
+                      ? "rgba(255,255,255,0.04)" // fallback overlay tone
+                      : blendColors(selectedTheme || "#1e0033");
+
+                    const bannerBg = block.match_main_bg
+                      ? mainOverlayColor
+                      : block.use_gradient
+                        ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                            block.gradient_start || "#F285C3"
+                          }, ${block.gradient_end || "#7bed9f"})`
+                        : block.bg_color || "#F285C3";
+
+                    return (
+                      <div
+                        key={index}
+                        className="relative shadow-lg"
+                        style={{
+                          background: bannerBg,
+                          color: block.text_color || "#fff",
+                          textAlign: "center",
+                          padding: `${block.padding || 40}px 20px`,
+                          fontWeight: 600,
+                          fontSize: "1.2rem",
+                          lineHeight: "1.5",
+                          position: "relative",
+                          top: "-40px",
+                          margin: "0 -30px 20px",
+                          borderRadius: "24px 24px 0 0",
+                          overflow: "hidden",
+
+                          // ✅ Match main background layer
+                          backdropFilter: "blur(6px)",
+                          backgroundBlendMode: "overlay",
+                          border: "1px solid rgba(255,255,255,0.06)",
+                          boxShadow: "0 4px 25px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: 700,
+                            margin: "0 0 22px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {block.text ||
+                            "🔥 Limited Time Offer! Get your free eBook today!"}
+                        </p>
+
+                        {block.link_text && block.link_url && (
+                          <a
+                            href={block.link_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-block",
+                              background: bannerBg,
+                              color: "#fff",
+                              padding: "14px 32px",
+                              borderRadius: "10px",
+                              fontWeight: 700,
+                              fontSize: "1rem",
+                              textDecoration: "none",
+                              boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                              transition: "transform 0.25s ease",
+                            }}
+                            onMouseOver={(e) =>
+                              (e.currentTarget.style.transform = "scale(1.05)")
+                            }
+                            onMouseOut={(e) =>
+                              (e.currentTarget.style.transform = "scale(1)")
+                            }
+                          >
+                            {block.link_text}
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
+
                 {landing.cover_image_url && (
                   <img
                     src={landing.cover_image_url}
@@ -982,51 +1069,6 @@ export default function LandingPageBuilder() {
                               opacity: 0.7,
                             }}
                           />
-                        );
-
-                      case "offer_banner":
-                        const bannerBg = block.use_gradient
-                          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                              block.gradient_start || "#F285C3"
-                            }, ${block.gradient_end || "#7bed9f"})`
-                          : block.bg_color || "#F285C3";
-
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              background: bannerBg,
-                              color: block.text_color || "#000000",
-                              textAlign: block.alignment || "center",
-                              padding: `${block.padding || 20}px`,
-                              borderRadius: "12px",
-                              maxWidth: "850px",
-                              margin: "40px auto",
-                              fontWeight: 600,
-                              fontSize: "1.2rem",
-                              lineHeight: "1.5",
-                              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                            }}
-                          >
-                            <span>
-                              {block.text || "🔥 Limited Time Offer!"}
-                            </span>
-                            {block.link_text && block.link_url && (
-                              <a
-                                href={block.link_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  marginLeft: "12px",
-                                  textDecoration: "underline",
-                                  fontWeight: "bold",
-                                  color: block.text_color || "#000000",
-                                }}
-                              >
-                                {block.link_text}
-                              </a>
-                            )}
-                          </div>
                         );
 
                       default:

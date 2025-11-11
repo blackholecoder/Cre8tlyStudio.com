@@ -178,6 +178,37 @@ select:focus + .select-wrapper::after {
   border-color: #7bed9f;
 }
 
+/* make all color inputs perfectly round */
+input[type="color"] {
+  border-radius: 9999px; /* fully round */
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 9999px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 9999px;
+}
+
+/* optional: white ring when focused */
+input[type="color"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px white, 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+
 
 
 

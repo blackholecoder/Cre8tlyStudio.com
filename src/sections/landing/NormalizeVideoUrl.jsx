@@ -9,6 +9,12 @@ export function normalizeVideoUrl(url) {
     return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
   }
 
+   // ✅ Handle YouTube "shorts" links
+  if (clean.includes("youtube.com/shorts/")) {
+    const id = clean.split("shorts/")[1].split(/[?&]/)[0];
+    return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+  }
+
   // ✅ Handle YouTube short links
   if (clean.includes("youtu.be/")) {
     const id = clean.split("youtu.be/")[1].split(/[?&]/)[0];

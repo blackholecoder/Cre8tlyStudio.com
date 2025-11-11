@@ -23,6 +23,9 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Paragraph", value: "paragraph" },
     { label: "Button", value: "button" },
     { label: "Video", value: "video" },
+    { label: "Divider", value: "divider" },
+    { label: "Offer Banner", value: "offer_banner" },
+
   ];
 
   return (

@@ -4,7 +4,14 @@ import React from "react";
 import { Trash2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
 
-function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
+function SortableBlock({
+  id,
+  block,
+  index,
+  updateBlock,
+  removeBlock,
+  bgTheme,
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -251,6 +258,231 @@ function SortableBlock({ id, block, index, updateBlock, removeBlock }) {
                 </div>
               )}
             </>
+          )}
+
+          {block.type === "divider" && (
+            <div className="flex flex-col gap-2 mt-3">
+              <label>Height (px)</label>
+              <input
+                type="number"
+                value={block.height || 40}
+                onChange={(e) =>
+                  updateBlock(index, "height", parseInt(e.target.value))
+                }
+                className="w-24 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white"
+              />
+              <label>Line Color</label>
+              <input
+                type="color"
+                value={block.color || "#FFFFFF"}
+                onChange={(e) => updateBlock(index, "color", e.target.value)}
+              />
+              <label>Style</label>
+              <select
+                value={block.style || "line"}
+                onChange={(e) => updateBlock(index, "style", e.target.value)}
+                className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white"
+              >
+                <option value="line">Line Divider</option>
+                <option value="space">Spacer Only</option>
+              </select>
+            </div>
+          )}
+
+          {block.type === "offer_banner" && (
+            <div
+              className="rounded-xl p-6 mt-3 shadow-inner transition-all relative"
+              style={{
+                background: `linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.25)), ${
+                  bgTheme || "linear-gradient(to bottom, #1e1e1e, #111)"
+                }`,
+                border: "1px solid rgba(255,255,255,0.1)",
+                backdropFilter: "blur(4px)",
+              }}
+            >
+              {/* Inner Offer Banner Preview */}
+              <div
+                className="rounded-xl p-6 shadow-lg transition-all duration-300"
+                style={{
+                  background: block.use_gradient
+                    ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                        block.gradient_start || "#F285C3"
+                      }, ${block.gradient_end || "#7bed9f"})`
+                    : block.bg_color || "#F285C3",
+                  color: block.text_color || "#000",
+                }}
+              >
+                {/* 📝 Banner Message */}
+                <label className="text-sm font-semibold text-gray-300">
+                  Banner Message
+                </label>
+                <textarea
+                  placeholder="🔥 Limited Time Offer! Get your free eBook today!"
+                  value={block.text || ""}
+                  onChange={(e) => updateBlock(index, "text", e.target.value)}
+                  className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1 resize-none h-20"
+                />
+
+                {/* 🎨 Text Color Picker */}
+                <div className="flex items-center gap-4 mt-4">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Text Color
+                  </label>
+                  <input
+                    type="color"
+                    value={block.text_color || "#000000"}
+                    onChange={(e) =>
+                      updateBlock(index, "text_color", e.target.value)
+                    }
+                    className="w-10 h-10 rounded cursor-pointer color-circle"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.text_color}
+                  </span>
+                </div>
+
+                {/* 🎨 Gradient or Solid Background */}
+                <div className="flex items-center gap-3 mt-4">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Use Gradient Background
+                  </label>
+                  <input
+                    type="checkbox"
+                    checked={block.use_gradient || false}
+                    onChange={(e) =>
+                      updateBlock(index, "use_gradient", e.target.checked)
+                    }
+                  />
+                </div>
+
+                {/* 🎛 Gradient Builder */}
+                {block.use_gradient ? (
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div className="flex flex-col">
+                      <label className="text-sm text-gray-400">
+                        Start Color
+                      </label>
+                      <input
+                        type="color"
+                        value={block.gradient_start || "#F285C3"}
+                        onChange={(e) =>
+                          updateBlock(index, "gradient_start", e.target.value)
+                        }
+                        className="w-full h-10 rounded cursor-pointer color-circle"
+                      />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label className="text-sm text-gray-400">End Color</label>
+                      <input
+                        type="color"
+                        value={block.gradient_end || "#7bed9f"}
+                        onChange={(e) =>
+                          updateBlock(index, "gradient_end", e.target.value)
+                        }
+                        className="w-full h-10 rounded cursor-pointer color-circle"
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="text-sm text-gray-400">Direction</label>
+                      <select
+                        value={block.gradient_direction || "90deg"}
+                        onChange={(e) =>
+                          updateBlock(
+                            index,
+                            "gradient_direction",
+                            e.target.value
+                          )
+                        }
+                        className="w-full p-2 border border-gray-600 rounded bg-black text-white"
+                      >
+                        <option value="90deg">Left → Right</option>
+                        <option value="180deg">Top → Bottom</option>
+                        <option value="45deg">Diagonal ↘</option>
+                        <option value="135deg">Diagonal ↙</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <label className="text-sm font-semibold text-gray-300 mt-3">
+                      Solid Background Color
+                    </label>
+                    <div className="flex items-center gap-3 mt-2">
+                      <input
+                        type="color"
+                        value={block.bg_color || "#F285C3"}
+                        onChange={(e) =>
+                          updateBlock(index, "bg_color", e.target.value)
+                        }
+                        className="color-circle"
+                      />
+                      <span className="text-xs text-gray-400">
+                        {block.bg_color}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* 🔗 Button Fields */}
+                <label className="text-sm font-semibold text-gray-300 mt-4">
+                  Button Text
+                </label>
+                <input
+                  type="text"
+                  placeholder="Claim Offer"
+                  value={block.link_text || ""}
+                  onChange={(e) =>
+                    updateBlock(index, "link_text", e.target.value)
+                  }
+                  className="w-full p-2 border border-gray-600 rounded bg-black text-white"
+                />
+
+                <label className="text-sm font-semibold text-gray-300">
+                  Button Link URL
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://example.com"
+                  value={block.link_url || ""}
+                  onChange={(e) =>
+                    updateBlock(index, "link_url", e.target.value)
+                  }
+                  className="w-full p-2 border border-gray-600 rounded bg-black text-white"
+                />
+
+                {/* 🧩 Live Preview */}
+                <div className="mt-6 text-center">
+                  <p
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: block.text_color || "#000000" }}
+                  >
+                    {block.text ||
+                      "🔥 Limited Time Offer! Get your free eBook today!"}
+                  </p>
+
+                  {block.link_text && block.link_url && (
+                    <a
+                      href={block.link_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition-transform transform hover:scale-105"
+                      style={{
+                        background: block.use_gradient
+                          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                              block.gradient_start || "#F285C3"
+                            }, ${block.gradient_end || "#7bed9f"})`
+                          : block.bg_color || "#F285C3",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                      }}
+                    >
+                      {block.link_text}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

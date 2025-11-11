@@ -82,6 +82,27 @@ export default function LandingPageBuilder() {
       newBlock.muted = false;
     }
 
+    if (type === "divider" || type === "spacer") {
+      newBlock.height = 40; // default space in pixels
+      newBlock.style = "line"; // can be "line" or "space"
+      newBlock.color = "rgba(255,255,255,0.2)";
+      newBlock.width = "60%";
+    }
+
+    if (type === "offer_banner") {
+      newBlock.text = "🔥 Limited Time Offer!";
+      newBlock.text_color = "#000000";
+      newBlock.link_text = "";
+      newBlock.link_url = "";
+      newBlock.alignment = "center";
+      newBlock.padding = 20;
+      newBlock.use_gradient = true;
+      newBlock.gradient_start = "#F285C3";
+      newBlock.gradient_end = "#7bed9f";
+      newBlock.gradient_direction = "90deg";
+      newBlock.bg_color = "#F285C3";
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -126,7 +147,6 @@ export default function LandingPageBuilder() {
         setFontName(lp.font || "Montserrat");
         setFontFile(lp.font_file || "");
         setShowDownloadButton(lp.show_download_button !== false);
-
 
         // ✅ restore cover and theme
         if (lp.cover_image_url) setCoverPreview(lp.cover_image_url);
@@ -206,8 +226,7 @@ export default function LandingPageBuilder() {
     if (!url) return true; // allow empty
 
     const ytPattern =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]{11}($|[?&])/;
-
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]{11}($|[?&])/;
     const vimeoPattern =
       /^(https?:\/\/)?(www\.)?(vimeo\.com\/(\d{6,12}|video\/\d{6,12}))($|[?&])/;
 
@@ -361,6 +380,7 @@ export default function LandingPageBuilder() {
                         index={index}
                         updateBlock={updateBlock}
                         removeBlock={removeBlock}
+                        bgTheme={bgTheme}
                       />
                     ))}
                 </SortableContext>
@@ -939,6 +959,76 @@ export default function LandingPageBuilder() {
                           </div>
                         );
 
+                      case "divider":
+                      case "spacer":
+                        if (block.style === "space") {
+                          return (
+                            <div
+                              key={index}
+                              style={{
+                                height: `${block.height || 40}px`,
+                              }}
+                            ></div>
+                          );
+                        }
+                        return (
+                          <hr
+                            key={index}
+                            style={{
+                              border: "none",
+                              borderTop: `1px solid ${block.color || "rgba(255,255,255,0.2)"}`,
+                              width: block.width || "60%",
+                              margin: `${(block.height || 40) / 2}px auto`,
+                              opacity: 0.7,
+                            }}
+                          />
+                        );
+
+                      case "offer_banner":
+                        const bannerBg = block.use_gradient
+                          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                              block.gradient_start || "#F285C3"
+                            }, ${block.gradient_end || "#7bed9f"})`
+                          : block.bg_color || "#F285C3";
+
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              background: bannerBg,
+                              color: block.text_color || "#000000",
+                              textAlign: block.alignment || "center",
+                              padding: `${block.padding || 20}px`,
+                              borderRadius: "12px",
+                              maxWidth: "850px",
+                              margin: "40px auto",
+                              fontWeight: 600,
+                              fontSize: "1.2rem",
+                              lineHeight: "1.5",
+                              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                            }}
+                          >
+                            <span>
+                              {block.text || "🔥 Limited Time Offer!"}
+                            </span>
+                            {block.link_text && block.link_url && (
+                              <a
+                                href={block.link_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  marginLeft: "12px",
+                                  textDecoration: "underline",
+                                  fontWeight: "bold",
+                                  color: block.text_color || "#000000",
+                                }}
+                              >
+                                {block.link_text}
+                              </a>
+                            )}
+                          </div>
+                        );
+
                       default:
                         return null;
                     }
@@ -953,34 +1043,35 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* Toggle Download Button */}
-<div className="mt-10 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
-  <div className="flex items-center justify-between">
-    <label className="text-lg font-semibold text-silver tracking-wide">
-      Show “Download Now” Button
-    </label>
-    <label className="relative inline-flex items-center cursor-pointer select-none">
-  <input
-    type="checkbox"
-    checked={showDownloadButton}
-    onChange={(e) => setShowDownloadButton(e.target.checked)}
-    className="sr-only"
-  />
-  <span
-    className={`block w-11 h-6 rounded-full transition-all duration-300 ${
-      showDownloadButton ? "bg-green" : "bg-gray-600"
-    }`}
-  ></span>
-  <span
-    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-      showDownloadButton ? "translate-x-5" : ""
-    }`}
-  ></span>
-</label>
-  </div>
-  <p className="text-xs text-gray-400 mt-2">
-    Turn this off if you want to hide the email download form on your public page.
-  </p>
-</div>
+          <div className="mt-10 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
+            <div className="flex items-center justify-between">
+              <label className="text-lg font-semibold text-silver tracking-wide">
+                Show “Download Now” Button
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={showDownloadButton}
+                  onChange={(e) => setShowDownloadButton(e.target.checked)}
+                  className="sr-only"
+                />
+                <span
+                  className={`block w-11 h-6 rounded-full transition-all duration-300 ${
+                    showDownloadButton ? "bg-green" : "bg-gray-600"
+                  }`}
+                ></span>
+                <span
+                  className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
+                    showDownloadButton ? "translate-x-5" : ""
+                  }`}
+                ></span>
+              </label>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">
+              Turn this off if you want to hide the email download form on your
+              public page.
+            </p>
+          </div>
 
           {/* Save + View */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-16 pt-8 border-t border-gray-700">

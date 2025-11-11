@@ -25,6 +25,7 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Video", value: "video" },
     { label: "Divider", value: "divider" },
     { label: "Offer Banner", value: "offer_banner" },
+    { label: "Calendly", value: "calendly" },
 
   ];
 

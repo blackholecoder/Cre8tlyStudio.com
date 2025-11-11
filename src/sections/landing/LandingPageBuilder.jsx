@@ -105,6 +105,11 @@ export default function LandingPageBuilder() {
       newBlock.bg_color = "#F285C3";
     }
 
+    if (type === "calendly") {
+      newBlock.calendly_url = "";
+      newBlock.height = 650; // default iframe height
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -1069,6 +1074,31 @@ export default function LandingPageBuilder() {
                               opacity: 0.7,
                             }}
                           />
+                        );
+                      case "calendly":
+                        if (!block.calendly_url) return null;
+                        
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              margin: "40px auto",
+                              maxWidth: "900px",
+                              textAlign: "center",
+                            }}
+                          >
+                            <iframe
+                              src={block.calendly_url}
+                              style={{
+                                width: "100%",
+                                height: `${block.height || 650}px`,
+                                border: "none",
+                                borderRadius: "12px",
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+                              }}
+                              title="Calendly Scheduler"
+                            ></iframe>
+                          </div>
                         );
 
                       default:

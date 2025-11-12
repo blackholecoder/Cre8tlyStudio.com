@@ -26,6 +26,7 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Divider", value: "divider" },
     { label: "Offer Banner", value: "offer_banner" },
     { label: "Calendly", value: "calendly" },
+    { label: "Countdown Timer", value: "countdown" },
     { label: "Social Links Row", value: "social_links" }, 
 
   ];

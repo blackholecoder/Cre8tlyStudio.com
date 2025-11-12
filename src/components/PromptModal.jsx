@@ -35,7 +35,10 @@ export default function PromptModal({
   const [loading, setLoading] = useState(false);
 
   const { user, refreshUser } = useAuth();
+  console.log("isFreePlan =", Number(user?.has_free_magnet) === 1);
   const navigate = useNavigate();
+
+  const isFreePlan = Number(user?.has_free_magnet) === 1;
 
   const [cover, setCover] = useState(null);
   const [cta, setCta] = useState("");
@@ -323,6 +326,7 @@ export default function PromptModal({
                     showPreview={showPreview}
                     setShowPreview={setShowPreview}
                     disabled={user?.isFreeTier && user?.trialExpired}
+                    isFreePlan={isFreePlan}
                     onSubmit={handleSubmit}
                     loading={loading}
                     contentType={contentType}

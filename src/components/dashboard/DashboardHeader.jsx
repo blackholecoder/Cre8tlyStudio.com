@@ -49,7 +49,7 @@ export default function DashboardHeader({ items = [], onCheckout, type = "magnet
 
         {isFreeTier && !trialExpired && (
           <p className="text-yellow-400 text-sm mt-2">
-            🆓 You’re on a Free Trial — 1 slot, up to 5 pages, expires in 7 days.
+            🆓 You’re on a Free Trial, 1 slot, up to 5 pages, expires in 7 days.
           </p>
         )}
 

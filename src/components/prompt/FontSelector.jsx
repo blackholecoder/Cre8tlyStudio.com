@@ -2,15 +2,28 @@ import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { fontThemes as availableFonts } from "../../constants/index";
 
-export default function FontSelector({ fontName, setFontName, fontFile, setFontFile }) {
-  const [selectedFont, setSelectedFont] = useState(fontName || availableFonts?.[0]?.name || "");
+export default function FontSelector({
+  fontName,
+  setFontName,
+  fontFile,
+  setFontFile,
+  isFreePlan = false,
+}) {
+  const visibleFonts = availableFonts.map((f) => ({
+    ...f,
+    locked: isFreePlan && !["Montserrat", "AdobeArabic", "Bebas Neue"].includes(f.name),
+  }));
+
+  const [selectedFont, setSelectedFont] = useState(
+    fontName || visibleFonts?.[0]?.name || ""
+  );
   const [previewFont, setPreviewFont] = useState(selectedFont);
   const [isOpen, setIsOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   // ✅ Load font dynamically when preview changes
   useEffect(() => {
-    const font = availableFonts.find((f) => f.name === previewFont);
+    const font = visibleFonts.find((f) => f.name === previewFont);
     if (!font?.file) return;
 
     const fontUrl = font.file.startsWith("http")
@@ -66,30 +79,37 @@ export default function FontSelector({ fontName, setFontName, fontFile, setFontF
         style={{ fontFamily: loaded ? selectedFont : "sans-serif" }}
       >
         <span>
-          {availableFonts.find((f) => f.name === selectedFont)?.label || selectedFont}
+          {visibleFonts.find((f) => f.name === selectedFont)?.label ||
+            selectedFont}
         </span>
         {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
 
       {/* 🔹 Dropdown List */}
       {isOpen && (
-        <div
-          className="absolute z-20 mt-2 w-full max-h-[260px] overflow-y-auto bg-[#111] border border-gray-700 rounded-lg shadow-lg scroll-smooth scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
-        >
-          {availableFonts.map((f) => (
+        <div className="absolute z-20 mt-2 w-full max-h-[260px] overflow-y-auto bg-[#111] border border-gray-700 rounded-lg shadow-lg scroll-smooth scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+          {visibleFonts.map((f) => (
             <div
               key={f.name}
-              onMouseEnter={() => setPreviewFont(f.name)} // hover preview live
-              onClick={() => handleFontSelect(f)} // click to select + close
-              className={`px-4 py-2 cursor-pointer text-gray-300 hover:bg-[#1f1f1f] transition-all duration-150 ${
-                selectedFont === f.name ? "bg-[#1f1f1f]" : ""
-              }`}
+              onMouseEnter={() => !f.locked && setPreviewFont(f.name)}
+              onClick={() => !f.locked && handleFontSelect(f)}
+              className={`px-4 py-2 transition-all duration-150 cursor-pointer ${
+                f.locked
+                  ? "text-gray-500 cursor-not-allowed"
+                  : "text-gray-300 hover:bg-[#1f1f1f]"
+              } ${selectedFont === f.name ? "bg-[#1f1f1f]" : ""}`}
               style={{ fontFamily: f.name }}
             >
               {f.label}
+              {f.locked && <span className="ml-2 text-yellow-500">🔒</span>}
             </div>
           ))}
         </div>
+      )}
+      {isFreePlan && (
+        <p className="text-xs text-yellow-400 mt-2 text-center">
+          Upgrade to unlock all fonts.
+        </p>
       )}
 
       <p className="text-xs text-gray-400 mt-3 text-center">

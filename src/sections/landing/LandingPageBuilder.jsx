@@ -17,6 +17,7 @@ import { normalizeVideoUrl } from "./NormalizeVideoUrl";
 import AddSectionButton from "../../components/landing/AddSectionButton";
 import { blendColors } from "./BlendColors";
 import { adjustForLandingOverlay } from "./adjustForLandingOverlay";
+import CountdownTimerPreview from "./Timer";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -121,6 +122,16 @@ export default function LandingPageBuilder() {
         facebook: "",
         tiktok: "",
       };
+    }
+
+    if (type === "countdown") {
+      newBlock.text = "Offer Ends In:";
+      newBlock.text_color = "#FFFFFF";
+      newBlock.target_date = new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ).toISOString();
+      newBlock.alignment = "center";
+      newBlock.style_variant = "minimal"; // default style
     }
 
     setLanding((prev) => ({
@@ -1121,7 +1132,6 @@ export default function LandingPageBuilder() {
 
                       case "social_links":
                         const align = block.alignment || "center";
-                        const iconStyle = block.icon_style || "color";
                         const iconColor = block.icon_color || "#ffffff";
                         const links = block.links || {};
 
@@ -1187,25 +1197,45 @@ export default function LandingPageBuilder() {
                                     e.currentTarget.style.opacity = "1";
                                   }}
                                 >
-                                  <img
-                                    src={iconSet[platform]}
-                                    alt={platform}
+                                  <div
                                     style={{
                                       width: "100%",
                                       height: "100%",
-                                      objectFit: "contain",
-                                      filter:
-                                        iconStyle === "mono"
-                                          ? "invert(1)"
-                                          : `brightness(0) saturate(100%) invert(1) sepia(1) saturate(5000%) hue-rotate(0deg) drop-shadow(0 0 0 ${iconColor})`,
-                                      WebkitFilter:
-                                        iconStyle === "mono"
-                                          ? "invert(1)"
-                                          : `brightness(0) saturate(100%) invert(1) sepia(1) saturate(5000%) hue-rotate(0deg) drop-shadow(0 0 0 ${iconColor})`,
+                                      WebkitMask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                                      mask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                                      backgroundColor: iconColor, // ✅ exact chosen color
+                                      transition: "background-color 0.3s ease",
                                     }}
                                   />
                                 </a>
                               ))}
+                          </div>
+                        );
+
+                      case "countdown":
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              margin: "40px auto",
+                              textAlign: block.alignment || "center",
+                              color: block.text_color || "#FFFFFF",
+                            }}
+                          >
+                            <p
+                              style={{
+                                fontWeight: "bold",
+                                fontSize: "1.5rem",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              {block.text || "Offer Ends In:"}
+                            </p>
+                            <CountdownTimerPreview
+                              targetDate={block.target_date}
+                              variant={block.style_variant}
+                              bgTheme={bgTheme}
+                            />
                           </div>
                         );
 

@@ -83,12 +83,33 @@ export default function PlansPage() {
             <li>⚡ 7-Day Trial Access</li>
           </ul>
 
-          <button
-            onClick={() => (window.location.href = "/sign-up")}
-            className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
-          >
-            Start Free
-          </button>
+          {/* 🔹 Dynamic Free-Trial Button */}
+{!user ? (
+  // Not logged in — show sign-up CTA
+  <button
+    onClick={() => (window.location.href = "/sign-up")}
+    className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
+  >
+    Start Free
+  </button>
+) : user?.has_free_magnet === 1 ? (
+  // Logged in and already has free tier
+  <button
+    disabled
+    className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gray-700 text-gray-300 cursor-not-allowed"
+  >
+    Trial Active
+  </button>
+) : (
+  // Logged in but somehow no free tier (edge case)
+  <button
+    onClick={() => (window.location.href = "/dashboard")}
+    className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
+  >
+    Go to Dashboard
+  </button>
+)}
+
         </div>
 
         {/* ---------- Basic Creator ---------- */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
+import QRCode from "react-qr-code";
 
 export default function DashboardSettings() {
   const { user, setUser } = useAuth();
@@ -10,7 +11,58 @@ export default function DashboardSettings() {
   const [uploading, setUploading] = useState(false);
   const [ctaSaved, setCtaSaved] = useState(false);
 
+  const [twofaEnabled, setTwofaEnabled] = useState(user?.twofa_enabled === 1);
+  const [qr, setQr] = useState(null);
+  const [secret, setSecret] = useState(null);
+  const [twofaCode, setTwofaCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
   const fileInputRef = useRef(null);
+
+  // Enable 2FA (get QR + secret)
+  const handleEnable2FA = async () => {
+    try {
+      const res = await api.post(
+        "https://cre8tlystudio.com/api/auth/user/enable-2fa"
+      );
+      setQr(res.data.qr);
+      setSecret(res.data.secret);
+      toast.info("Scan the QR code with Google Authenticator or Authy.");
+    } catch (err) {
+      console.error("2FA setup error:", err);
+      toast.error("Failed to start 2FA setup.");
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (!twofaCode.trim()) return toast.warning("Enter the 6-digit code");
+    setVerifying(true);
+    try {
+      const res = await api.post(
+        "https://cre8tlystudio.com/api/auth/user/verify-login-2fa",
+        { token: twofaCode }
+      );
+      if (res.data.success || res.data.verified) {
+        setTwofaEnabled(true);
+        setQr(null);
+        setSecret(null);
+        setTwofaCode("");
+        setUser({ ...user, twofa_enabled: 1 });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, twofa_enabled: 1 })
+        );
+        toast.success("✅ Two-Factor Authentication enabled!");
+      } else {
+        toast.error("Invalid 2FA code. Try again.");
+      }
+    } catch (err) {
+      console.error("2FA verify error:", err);
+      toast.error("Invalid or expired code.");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -301,8 +353,73 @@ export default function DashboardSettings() {
           )}
         </div>
 
+        {/* 🔐 Two-Factor Authentication Section */}
+              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
+                <h2 className="text-lg font-semibold text-gray-200">
+                  Two-Factor Authentication
+                </h2>
+                <p className="text-sm text-gray-400">
+                  Add an extra layer of security to your Cre8tly Studio account.
+                </p>
+
+                {!twofaEnabled ? (
+                  <>
+                    {!qr ? (
+                      <button
+                        onClick={handleEnable2FA}
+                        className="mt-2 px-6 py-2.5 bg-green text-black font-semibold rounded-lg hover:opacity-90 transition"
+                      >
+                        Enable 2FA
+                      </button>
+                    ) : (
+                      <div className="flex flex-col items-center space-y-4">
+                        <QRCode
+                          value={qr}
+                          size={160}
+                          bgColor="#0B0F19"
+                          fgColor="#00ffae"
+                        />
+                        <p className="text-xs text-gray-400 text-center">
+                          Scan this code with your Authenticator app, then enter
+                          the 6-digit code below.
+                        </p>
+
+                        <input
+                          type="text"
+                          placeholder="Enter 6-digit code"
+                          value={twofaCode}
+                          onChange={(e) => setTwofaCode(e.target.value)}
+                          className="w-40 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none"
+                        />
+
+                        <button
+                          onClick={handleVerify2FA}
+                          disabled={verifying}
+                          className={`px-5 py-2 rounded-lg font-semibold transition-all ${
+                            verifying
+                              ? "opacity-60 cursor-not-allowed bg-green-700"
+                              : "bg-green text-black hover:opacity-90"
+                          }`}
+                        >
+                          {verifying ? "Verifying..." : "Verify 2FA Code"}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="text-green font-semibold">
+                      ✅ 2FA is enabled
+                    </span>
+                    <p className="text-xs text-gray-500">
+                      Your account is protected with two-factor authentication.
+                    </p>
+                  </div>
+                )}
+              </div>
+
         {/* Active File */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-3 shadow-lg mb-8">
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8">
           {settings?.brand_identity_file ? (
             <>
               <div className="flex items-center justify-between">
@@ -503,6 +620,7 @@ export default function DashboardSettings() {
                   ISBN requests inside the dashboard.
                 </p>
               </div>
+              
             </>
           ) : null}
         </div>

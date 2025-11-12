@@ -14,10 +14,10 @@ export default function PromptForm({
   setText,
   title,
   setTitle,
-  fontName,          
-  setFontName,      
-  fontFile,         
-  setFontFile, 
+  fontName,
+  setFontName,
+  fontFile,
+  setFontFile,
   bgTheme,
   setBgTheme,
   pages,
@@ -35,13 +35,13 @@ export default function PromptForm({
   loading,
   contentType,
   disabled,
+  isFreePlan,
 }) {
   const { user } = useAuth();
   const [warning, setWarning] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [tooLong, setTooLong] = useState(false);
   const [error, setError] = useState("");
-
 
   useEffect(() => {
     if (user?.cta && (!cta || cta.trim() === "")) {
@@ -116,6 +116,7 @@ export default function PromptForm({
               }}
               className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
             />
+            
 
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">
               <button
@@ -127,11 +128,24 @@ export default function PromptForm({
               >
                 ◀
               </button>
+
               <button
                 type="button"
-                onClick={() =>
-                  setPages((prev) => Math.min(25, Number(prev || 1) + 1))
-                }
+                onClick={() => {
+                  const limit = isFreePlan ? 5 : 25;
+                  setPages((prev) => {
+                    const next = Number(prev || 1) + 1;
+                    if (next > limit) {
+                      if (isFreePlan) {
+                        toast.info(
+                          "🚀 Upgrade your plan to unlock more than 5 pages."
+                        );
+                      }
+                      return limit;
+                    }
+                    return next;
+                  });
+                }}
                 className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
               >
                 ▶
@@ -154,7 +168,23 @@ export default function PromptForm({
         </p>
       </div>
       {/* Pre-Made Prompt */}
-      <PromptSelect setText={setText} />
+      {/* Pre-Made Prompts (only for paid users) */}
+      {!isFreePlan ? (
+        <PromptSelect setText={setText} />
+      ) : (
+        <div className="p-4 rounded-xl border border-gray-700 bg-[#111827]/80 text-center">
+          <p className="text-gray-400 text-sm">
+            🔒 Pre-Made Prompts are available on paid plans.
+          </p>
+          <button
+            type="button"
+            onClick={() => (window.location.href = "/plans")}
+            className="mt-2 text-green font-semibold text-sm hover:underline"
+          >
+            Upgrade to Unlock
+          </button>
+        </div>
+      )}
 
       {/* Prompt Editor */}
       <div>
@@ -204,13 +234,33 @@ export default function PromptForm({
       <CoverUpload cover={cover} setCover={setCover} />
 
       {/* Logo Upload */}
-      <LogoUploader
-        logoPreview={logoPreview}
-        setLogo={setLogo}
-        setLogoPreview={setLogoPreview}
-      />
+      {/* Logo Upload (only for paid users) */}
+      {!isFreePlan ? (
+        <LogoUploader
+          logoPreview={logoPreview}
+          setLogo={setLogo}
+          setLogoPreview={setLogoPreview}
+        />
+      ) : (
+        <div className="p-4 rounded-xl border border-gray-700 bg-[#111827]/80 text-center mt-6">
+          <p className="text-gray-400 text-sm">
+            🔒 Logo upload is available on paid plans.
+          </p>
+          <button
+            type="button"
+            onClick={() => (window.location.href = "/plans")}
+            className="mt-2 text-green font-semibold text-sm hover:underline"
+          >
+            Upgrade to Unlock
+          </button>
+        </div>
+      )}
 
-      <ColorThemeChooser bgTheme={bgTheme} setBgTheme={setBgTheme} includeGradients={false}/>
+      <ColorThemeChooser
+        bgTheme={bgTheme}
+        setBgTheme={setBgTheme}
+        includeGradients={false}
+      />
 
       {/* Theme Selector */}
       <FontSelector
@@ -218,6 +268,7 @@ export default function PromptForm({
         setFontName={setFontName}
         fontFile={fontFile}
         setFontFile={setFontFile}
+        isFreePlan={isFreePlan}
       />
 
       {/* Author Call-to-Action */}
@@ -227,32 +278,35 @@ export default function PromptForm({
         </label>
 
         <div className="relative w-[30%] mb-2">
-  <select
-    onChange={(e) => {
-      const selected = e.target.value;
-      if (selected === "saved") setCta(user.cta);
-      else if (selected === "custom") setCta("");
-    }}
-    className="w-full appearance-none px-4 py-2 bg-[#1E293B] border border-gray-600 rounded-lg text-silver text-sm focus:ring-2 focus:ring-green focus:outline-none hover:border-silver transition"
-  >
-    <option value="">Choose CTA</option>
-    <option value="saved">Use My Saved CTA</option>
-    <option value="custom">Write New CTA</option>
-  </select>
+          <select
+            onChange={(e) => {
+              const selected = e.target.value;
+              if (selected === "saved") setCta(user.cta);
+              else if (selected === "custom") setCta("");
+            }}
+            className="w-full appearance-none px-4 py-2 bg-[#1E293B] border border-gray-600 rounded-lg text-silver text-sm focus:ring-2 focus:ring-green focus:outline-none hover:border-silver transition"
+          >
+            <option value="">Choose CTA</option>
+            <option value="saved">Use My Saved CTA</option>
+            <option value="custom">Write New CTA</option>
+          </select>
 
-  {/* 👇 Custom chevron icon */}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-silver pointer-events-none"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-  </svg>
-</div>
-
+          {/* 👇 Custom chevron icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-silver pointer-events-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 9l6 6 6-6"
+            />
+          </svg>
+        </div>
 
         {/* Editable text area */}
         <textarea
@@ -286,33 +340,35 @@ export default function PromptForm({
       </div>
 
       {disabled && (
-  <p className="text-center text-red-600 text-sm mb-3">
-    Your trial has expired — please upgrade to continue generating.
-  </p>
-)}
+        <p className="text-center text-red-600 text-sm mb-3">
+          Your trial has expired — please upgrade to continue generating.
+        </p>
+      )}
 
       {!loading && (
-  <button
-    type={disabled ? "button" : "submit"}
-    disabled={
-      disabled || !text.trim() || text === "<p><br></p>" || tooLong
-    }
-    onClick={() => {
-      if (disabled) {
-        toast.error("Trial expired — please upgrade to continue.");
-      }
-    }}
-    className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
-      disabled
-        ? "bg-gray-600 cursor-not-allowed text-gray-300"
-        : !text.trim() || text === "<p><br></p>" || tooLong
-        ? "bg-gray-600 cursor-not-allowed text-gray-300"
-        : "bg-green font-semibold text-black hover:opacity-90"
-    }`}
-  >
-    {disabled ? "Trial Expired — Upgrade to Continue" : "🚀 Submit Prompt"}
-  </button>
-)}
+        <button
+          type={disabled ? "button" : "submit"}
+          disabled={
+            disabled || !text.trim() || text === "<p><br></p>" || tooLong
+          }
+          onClick={() => {
+            if (disabled) {
+              toast.error("Trial expired — please upgrade to continue.");
+            }
+          }}
+          className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+            disabled
+              ? "bg-gray-600 cursor-not-allowed text-gray-300"
+              : !text.trim() || text === "<p><br></p>" || tooLong
+                ? "bg-gray-600 cursor-not-allowed text-gray-300"
+                : "bg-green font-semibold text-black hover:opacity-90"
+          }`}
+        >
+          {disabled
+            ? "Trial Expired — Upgrade to Continue"
+            : "🚀 Submit Prompt"}
+        </button>
+      )}
     </form>
   );
 }

@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [twofaToken, setTwofaToken] = useState("");
   const [verifying, setVerifying] = useState(false);
 
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -55,6 +56,67 @@ export default function LoginPage() {
     }
   };
 
+  function encodeBase64URL(buffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+  const handlePasskeyLogin = async () => {
+  try {
+    const { email } = form;
+    if (!email) {
+      setError("Enter your email first to use Passkey login.");
+      return;
+    }
+
+    // 1️⃣ Get challenge + credential request options
+    const { data: options } = await axiosInstance.post("/auth/webauthn/login-options", { email });
+
+    // 2️⃣ Ask browser for credential
+    const credential = await navigator.credentials.get({
+      publicKey: {
+        ...options,
+        challenge: Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+        allowCredentials: options.allowCredentials.map(c => ({
+          ...c,
+          id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+        })),
+      },
+    });
+
+    // 3️⃣ Send response back to server
+   const { data } = await axiosInstance.post("/auth/webauthn/login-verify", {
+  email,
+  assertionResp: {
+    id: credential.id,
+    rawId: encodeBase64URL(credential.rawId),
+    type: credential.type,
+    response: {
+      authenticatorData: encodeBase64URL(credential.response.authenticatorData),
+      clientDataJSON: encodeBase64URL(credential.response.clientDataJSON),
+      signature: encodeBase64URL(credential.response.signature),
+      userHandle: credential.response.userHandle
+        ? encodeBase64URL(credential.response.userHandle)
+        : null,
+    },
+  },
+});
+
+    if (data.success) {
+      saveAuth(data.user, data.accessToken, data.refreshToken);
+      navigate("/dashboard");
+    } else {
+      setError("Passkey login failed. Try again.");
+    }
+  } catch (err) {
+    console.error("Passkey login error:", err);
+    setError("Passkey login failed.");
+  }
+};
+
+
   const handleVerify2FA = async () => {
     if (!twofaCode.trim()) {
       setError("Enter the 6-digit code first.");
@@ -65,10 +127,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await axiosInstance.post("https://cre8tlystudio.com/api/auth/user/verify-login-2fa", {
-        token: twofaCode,
-        twofaToken,
-      });
+      const res = await axiosInstance.post(
+        "https://cre8tlystudio.com/api/auth/user/verify-login-2fa",
+        {
+          token: twofaCode,
+          twofaToken,
+        }
+      );
 
       if (res.data.success) {
         // ✅ Use AuthContext's saveAuth so everything syncs
@@ -166,6 +231,13 @@ export default function LoginPage() {
               >
                 {loading ? "Logging In..." : "Log In"}
               </button>
+              <button
+                type="button"
+                onClick={handlePasskeyLogin}
+                className="w-full mt-2 bg-blue text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+              >
+                Sign in with Passkey
+              </button>
             </form>
           ) : (
             // 🔹 2FA verification screen
@@ -199,7 +271,10 @@ export default function LoginPage() {
           {!show2FA && (
             <>
               <p className="text-sm text-gray-400 text-center mt-4">
-                <a href="/forgot-password" className="text-green hover:underline">
+                <a
+                  href="/forgot-password"
+                  className="text-green hover:underline"
+                >
                   Forgot Password?
                 </a>
               </p>

@@ -20,6 +20,7 @@
     "@mui/material": "^5.14.7",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
+    "@simplewebauthn/browser": "^13.2.2",
     "@studio-freight/lenis": "^1.0.42",
     "@tiptap/extension-blockquote": "^3.6.6",
     "@tiptap/extension-bubble-menu": "^3.6.6",

@@ -19,6 +19,26 @@ export default function DashboardSettings() {
 
   const fileInputRef = useRef(null);
 
+  function bufferToBase64URL(buffer) {
+    let bytes;
+    if (buffer instanceof ArrayBuffer) {
+      bytes = new Uint8Array(buffer);
+    } else if (ArrayBuffer.isView(buffer)) {
+      bytes = new Uint8Array(buffer.buffer);
+    } else {
+      throw new Error("Invalid buffer type passed to bufferToBase64URL");
+    }
+
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary)
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  }
+
   // Enable 2FA (get QR + secret)
   const handleEnable2FA = async () => {
     try {
@@ -61,6 +81,134 @@ export default function DashboardSettings() {
       toast.error("Invalid or expired code.");
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleRegisterPasskey = async () => {
+    try {
+      // 1️⃣ Request registration options from backend
+      const { data: options } = await api.post(
+        "/auth/webauthn/register-options",
+        {
+          email: user.email,
+        }
+      );
+
+      // 2️⃣ Handle both possible formats for challenge
+      const challengeBase64 = options.challenge || options.publicKey?.challenge;
+      if (!challengeBase64)
+        throw new Error("Missing challenge from server response");
+
+      // 🔐 Decode challenge (Base64URL → Uint8Array)
+      const challenge = Uint8Array.from(
+        atob(challengeBase64.replace(/-/g, "+").replace(/_/g, "/")),
+        (c) => c.charCodeAt(0)
+      );
+
+      // 🔐 Decode user ID safely
+      const userIdStr = options.user?.id || options.publicKey?.user?.id || "";
+      const userId = Uint8Array.from(userIdStr, (c) => c.charCodeAt(0));
+
+      // 3️⃣ Create credential in browser
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          ...options,
+          challenge,
+          user: {
+            ...options.user,
+            id: userId,
+          },
+        },
+      });
+
+      // ✅ Extract the *real underlying buffer* (fixes truncation issues)
+      // ✅ Log everything about rawId
+      console.log(
+        "🔍 rawId instanceof ArrayBuffer:",
+        credential.rawId instanceof ArrayBuffer
+      );
+      console.log("🔍 rawId byteLength:", credential.rawId.byteLength);
+      console.log("🔍 credential.id (browser's Base64URL):", credential.id);
+
+      // ✅ Always encode the true ArrayBuffer
+      function toBase64Url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary)
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/, "");
+      }
+
+      const rawIdBase64URL = toBase64Url(credential.rawId);
+
+      console.log(
+        "🧩 Final rawIdBase64URL:",
+        rawIdBase64URL,
+        "length:",
+        rawIdBase64URL.length
+      );
+
+      const attResp = {
+        id: rawIdBase64URL,
+        rawId: rawIdBase64URL,
+        type: credential.type,
+        response: {
+          attestationObject: bufferToBase64URL(
+            credential.response.attestationObject
+          ),
+          clientDataJSON: bufferToBase64URL(credential.response.clientDataJSON),
+        },
+      };
+
+      console.log(
+        "🧩 Using credential.id:",
+        rawIdBase64URL,
+        "length:",
+        rawIdBase64URL.length
+      );
+      // 5️⃣ Send credential to backend for verification
+      const { data } = await api.post("/auth/webauthn/register-verify", {
+        email: user.email,
+        attResp,
+      });
+
+      // ✅ Success handling
+      if (data.success) {
+        toast.success("✅ Passkey registered successfully!");
+        setUser({ ...user, has_passkey: 1 });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, has_passkey: 1 })
+        );
+      } else {
+        toast.error("Passkey registration failed.");
+      }
+    } catch (err) {
+      console.error("❌ Passkey registration error:", err);
+      toast.error("Passkey registration failed. Try again.");
+    }
+  };
+
+  const handleRemovePasskey = async () => {
+    try {
+      const res = await api.post("/auth/webauthn/remove-passkey");
+      if (res.data.success) {
+        toast.info("🗑️ Passkey removed successfully.");
+        setUser({ ...user, has_passkey: 0 });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, has_passkey: 0 })
+        );
+      } else {
+        toast.warning("Failed to remove passkey. Try again.");
+      }
+    } catch (err) {
+      console.error("❌ Passkey removal error:", err);
+      toast.error("Error removing passkey.");
     }
   };
 
@@ -354,69 +502,105 @@ export default function DashboardSettings() {
         </div>
 
         {/* 🔐 Two-Factor Authentication Section */}
-              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
-                <h2 className="text-lg font-semibold text-gray-200">
-                  Two-Factor Authentication
-                </h2>
-                <p className="text-sm text-gray-400">
-                  Add an extra layer of security to your Cre8tly Studio account.
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Two-Factor Authentication
+          </h2>
+          <p className="text-sm text-gray-400">
+            Add an extra layer of security to your Cre8tly Studio account.
+          </p>
+
+          {!twofaEnabled ? (
+            <>
+              {!qr ? (
+                <button
+                  onClick={handleEnable2FA}
+                  className="mt-2 px-6 py-2.5 bg-green text-black font-semibold rounded-lg hover:opacity-90 transition"
+                >
+                  Enable 2FA
+                </button>
+              ) : (
+                <div className="flex flex-col items-center space-y-4">
+                  <QRCode
+                    value={qr}
+                    size={160}
+                    bgColor="#0B0F19"
+                    fgColor="#00ffae"
+                  />
+                  <p className="text-xs text-gray-400 text-center">
+                    Scan this code with your Authenticator app, then enter the
+                    6-digit code below.
+                  </p>
+
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={twofaCode}
+                    onChange={(e) => setTwofaCode(e.target.value)}
+                    className="w-40 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none"
+                  />
+
+                  <button
+                    onClick={handleVerify2FA}
+                    disabled={verifying}
+                    className={`px-5 py-2 rounded-lg font-semibold transition-all ${
+                      verifying
+                        ? "opacity-60 cursor-not-allowed bg-green-700"
+                        : "bg-green text-black hover:opacity-90"
+                    }`}
+                  >
+                    {verifying ? "Verifying..." : "Verify 2FA Code"}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-green font-semibold">
+                ✅ 2FA is enabled
+              </span>
+              <p className="text-xs text-gray-500">
+                Your account is protected with two-factor authentication.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Passkey Authentication
+          </h2>
+          <p className="text-sm text-gray-400">
+            Securely sign in using Face ID, Touch ID, or your device’s security
+            key.
+          </p>
+
+          {user?.has_passkey ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-green font-semibold">
+                  ✅ Passkey Registered
+                </span>
+                <p className="text-xs text-gray-500">
+                  You can now use “Sign in with Passkey” on the login screen.
                 </p>
-
-                {!twofaEnabled ? (
-                  <>
-                    {!qr ? (
-                      <button
-                        onClick={handleEnable2FA}
-                        className="mt-2 px-6 py-2.5 bg-green text-black font-semibold rounded-lg hover:opacity-90 transition"
-                      >
-                        Enable 2FA
-                      </button>
-                    ) : (
-                      <div className="flex flex-col items-center space-y-4">
-                        <QRCode
-                          value={qr}
-                          size={160}
-                          bgColor="#0B0F19"
-                          fgColor="#00ffae"
-                        />
-                        <p className="text-xs text-gray-400 text-center">
-                          Scan this code with your Authenticator app, then enter
-                          the 6-digit code below.
-                        </p>
-
-                        <input
-                          type="text"
-                          placeholder="Enter 6-digit code"
-                          value={twofaCode}
-                          onChange={(e) => setTwofaCode(e.target.value)}
-                          className="w-40 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none"
-                        />
-
-                        <button
-                          onClick={handleVerify2FA}
-                          disabled={verifying}
-                          className={`px-5 py-2 rounded-lg font-semibold transition-all ${
-                            verifying
-                              ? "opacity-60 cursor-not-allowed bg-green-700"
-                              : "bg-green text-black hover:opacity-90"
-                          }`}
-                        >
-                          {verifying ? "Verifying..." : "Verify 2FA Code"}
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <span className="text-green font-semibold">
-                      ✅ 2FA is enabled
-                    </span>
-                    <p className="text-xs text-gray-500">
-                      Your account is protected with two-factor authentication.
-                    </p>
-                  </div>
-                )}
               </div>
+              <button
+                onClick={handleRemovePasskey}
+                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+              >
+                Remove Passkey
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleRegisterPasskey}
+              className="px-6 py-2.5 bg-blue text-white font-semibold rounded-lg hover:opacity-90 transition"
+            >
+              Register Passkey
+            </button>
+          )}
+        </div>
 
         {/* Active File */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8">
@@ -620,7 +804,6 @@ export default function DashboardSettings() {
                   ISBN requests inside the dashboard.
                 </p>
               </div>
-              
             </>
           ) : null}
         </div>

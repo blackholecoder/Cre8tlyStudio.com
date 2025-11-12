@@ -74,32 +74,33 @@ export default function DashboardSettings() {
     reader.readAsDataURL(file);
   };
 
-const handleRemove = async () => {
-  try {
-    const res = await api.delete(`upload-data/user/settings/remove/${user.id}`);
-
-    if (res.data.success) {
-      // 🔥 Clear everything in sync: state, user, localStorage, and selected file
-      setSettings((prev) => ({ ...prev, brand_identity_file: null }));
-      setUser((prev) => ({ ...prev, brand_identity_file: null }));
-      setFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...user, brand_identity_file: null })
+  const handleRemove = async () => {
+    try {
+      const res = await api.delete(
+        `upload-data/user/settings/remove/${user.id}`
       );
 
-      toast.info("Brand identity file removed. Defaults restored.");
-    } else {
-      toast.warning("Failed to remove brand file. Try again.");
-    }
-  } catch (err) {
-    console.error("Error removing brand file:", err);
-    toast.error("Error removing file.");
-  }
-};
+      if (res.data.success) {
+        // 🔥 Clear everything in sync: state, user, localStorage, and selected file
+        setSettings((prev) => ({ ...prev, brand_identity_file: null }));
+        setUser((prev) => ({ ...prev, brand_identity_file: null }));
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
 
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, brand_identity_file: null })
+        );
+
+        toast.info("Brand identity file removed. Defaults restored.");
+      } else {
+        toast.warning("Failed to remove brand file. Try again.");
+      }
+    } catch (err) {
+      console.error("Error removing brand file:", err);
+      toast.error("Error removing file.");
+    }
+  };
 
   const handleSaveCTA = async () => {
     try {
@@ -139,7 +140,9 @@ const handleRemove = async () => {
       <div className="w-full max-w-[900px] p-5">
         {/* Header */}
         <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-3xl font-bold text-white design-text">Brand Settings</h1>
+          <h1 className="text-3xl font-bold text-white design-text">
+            Brand Settings
+          </h1>
           <p className="text-gray-400 mt-2">
             Manage your brand tone and upload a reference file for AI
             generation.
@@ -327,54 +330,75 @@ const handleRemove = async () => {
         </div>
 
         {/* Upload Section */}
+        {/* Upload Section */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
           <h2 className="text-lg font-semibold text-gray-200">
             Upload New Brand File
           </h2>
-          <p className="text-sm text-gray-400">
-            Accepted formats:{" "}
-            <span className="text-gray-300">.pdf, .docx, .doc, .txt</span> (max
-            5 MB)
-          </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
-            <div className="flex-1 w-full">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.docx,.doc,.txt"
-                onChange={(e) => setFile(e.target.files[0])}
-                className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-green-500 file:to-purple-600 hover:file:opacity-90"
-              />
-              {file && (
-                <p className="text-xs text-gray-400 italic mt-1">
-                  Selected: <span className="text-gray-200">{file.name}</span>
-                </p>
-              )}
+          {user?.has_free_magnet === 1 && user?.magnet_slots === 1 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <p className="text-gray-400 text-sm mb-4 max-w-[400px]">
+                🧩 Uploading a custom brand identity file is a{" "}
+                <span className="text-green font-semibold">Pro feature</span>.
+                Upgrade to personalize your tone, voice, and branding for all
+                generated products.
+              </p>
+              <button
+                onClick={() => (window.location.href = "/plans")}
+                className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold shadow-md hover:opacity-90 transition"
+              >
+                Upgrade Now
+              </button>
             </div>
+          ) : (
+            <>
+              <p className="text-sm text-gray-400">
+                Accepted formats:{" "}
+                <span className="text-gray-300">.pdf, .docx, .doc, .txt</span>{" "}
+                (max 5 MB)
+              </p>
 
-            <button
-              onClick={handleUpload}
-              disabled={uploading}
-              className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
-    ${
-      uploading
-        ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green-700 to-green-600"
-        : "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-    }
-    text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
-            >
-              <span className="relative z-10">
-                {uploading ? "Uploading..." : "Save Brand"}
-              </span>
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+                <div className="flex-1 w-full">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.docx,.doc,.txt"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-green-500 file:to-purple-600 hover:file:opacity-90"
+                  />
+                  {file && (
+                    <p className="text-xs text-gray-400 italic mt-1">
+                      Selected:{" "}
+                      <span className="text-gray-200">{file.name}</span>
+                    </p>
+                  )}
+                </div>
 
-              {/* soft animated shine */}
-              {!uploading && (
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
-              )}
-            </button>
-          </div>
+                <button
+                  onClick={handleUpload}
+                  disabled={uploading}
+                  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
+            ${
+              uploading
+                ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green-700 to-green-600"
+                : "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+            }
+            text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
+                >
+                  <span className="relative z-10">
+                    {uploading ? "Uploading..." : "Save Brand"}
+                  </span>
+                  {!uploading && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
         </div>
+
         {/* CTA Settings */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
           <h2 className="text-lg font-semibold text-gray-200">
@@ -405,84 +429,82 @@ const handleRemove = async () => {
           </div>
           {user?.has_book ? (
             <>
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">
-              <h2 className="text-lg font-semibold text-gray-200 mb-2">
-                Guided Tour
-              </h2>
-              <p className="text-sm text-gray-400 mb-4">
-                Replay the Book Builder onboarding walkthrough to revisit all
-                key features.
-              </p>
+              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">
+                <h2 className="text-lg font-semibold text-gray-200 mb-2">
+                  Guided Tour
+                </h2>
+                <p className="text-sm text-gray-400 mb-4">
+                  Replay the Book Builder onboarding walkthrough to revisit all
+                  key features.
+                </p>
 
-              <button
-                onClick={async () => {
-                  try {
-                    await api.post(
-                      "https://cre8tlystudio.com/api/books/onboarding/replay",
-                      {},
-                      {
-                        headers: {
-                          Authorization: `Bearer ${user?.accessToken}`,
-                        },
-                      }
-                    );
+                <button
+                  onClick={async () => {
+                    try {
+                      await api.post(
+                        "https://cre8tlystudio.com/api/books/onboarding/replay",
+                        {},
+                        {
+                          headers: {
+                            Authorization: `Bearer ${user?.accessToken}`,
+                          },
+                        }
+                      );
 
-                    toast.success(
-                      "✅ Tour reset! It will replay next time you open Book Builder."
-                    );
-                  } catch (err) {
-                    console.error("❌ Failed to reset onboarding:", err);
-                    toast.error("Could not reset tour. Please try again.");
-                  }
-                }}
-                className="px-5 py-2.5 rounded-lg bg-[#6a5acd] text-black font-semibold hover:opacity-90 transition"
-              >
-                Replay Book Tour
-              </button>
-            </div>
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-    <h2 className="text-lg font-semibold text-gray-200 mb-2">
-      ISBN Assistance
-    </h2>
-    <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-      Need an ISBN for your book? Cre8tly Studio can guide you through the
-      process. An ISBN (International Standard Book Number) identifies your
-      book worldwide and is required for publishing on major retailers like
-      Amazon, Apple Books, and Barnes & Noble.
-    </p>
+                      toast.success(
+                        "✅ Tour reset! It will replay next time you open Book Builder."
+                      );
+                    } catch (err) {
+                      console.error("❌ Failed to reset onboarding:", err);
+                      toast.error("Could not reset tour. Please try again.");
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-lg bg-[#6a5acd] text-black font-semibold hover:opacity-90 transition"
+                >
+                  Replay Book Tour
+                </button>
+              </div>
+              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+                <h2 className="text-lg font-semibold text-gray-200 mb-2">
+                  ISBN Assistance
+                </h2>
+                <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                  Need an ISBN for your book? Cre8tly Studio can guide you
+                  through the process. An ISBN (International Standard Book
+                  Number) identifies your book worldwide and is required for
+                  publishing on major retailers like Amazon, Apple Books, and
+                  Barnes & Noble.
+                </p>
 
-    <div className="flex flex-col sm:flex-row items-center gap-3">
-      <button
-        onClick={() =>
-          window.open("https://www.myidentifiers.com/", "_blank")
-        }
-        className="flex-1 bg-green text-black font-semibold py-2.5 rounded-lg shadow-md hover:opacity-90 transition text-center"
-      >
-        Get ISBN from Bowker
-      </button>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    onClick={() =>
+                      window.open("https://www.myidentifiers.com/", "_blank")
+                    }
+                    className="flex-1 bg-green text-black font-semibold py-2.5 rounded-lg shadow-md hover:opacity-90 transition text-center"
+                  >
+                    Get ISBN from Bowker
+                  </button>
 
-      <button
-        onClick={() =>
-          toast.info(
-            "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!"
-          )
-        }
-        className="flex-1 bg-gray-800 text-gray-300 font-semibold py-2.5 rounded-lg border border-gray-700 hover:border-green hover:text-green transition"
-      >
-        Coming Soon: ISBN Concierge
-      </button>
-    </div>
+                  <button
+                    onClick={() =>
+                      toast.info(
+                        "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!"
+                      )
+                    }
+                    className="flex-1 bg-gray-800 text-gray-300 font-semibold py-2.5 rounded-lg border border-gray-700 hover:border-green hover:text-green transition"
+                  >
+                    Coming Soon: ISBN Concierge
+                  </button>
+                </div>
 
-    <p className="text-xs text-gray-500 italic mt-3">
-      Available for Assistant Plan users. Stay tuned for automated ISBN
-      requests inside the dashboard.
-    </p>
-  </div>
+                <p className="text-xs text-gray-500 italic mt-3">
+                  Available for Assistant Plan users. Stay tuned for automated
+                  ISBN requests inside the dashboard.
+                </p>
+              </div>
             </>
           ) : null}
-          
-
-          
         </div>
       </div>
     </div>

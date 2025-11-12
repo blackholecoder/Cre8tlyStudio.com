@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../admin/AuthContext";
 import OutOfSlotsModal from "../components/dashboard/OutOfSlotModal";
@@ -8,14 +8,22 @@ const PricingSection = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleSignUpRedirect = () => {
-      window.location.href = "/sign-up"; 
+    window.location.href = "/sign-up";
   };
 
+  const handleUpgradeRedirect = () => {
+    window.location.href = "/plans";
+  };
+
+  const isFreeTier =
+    user?.has_free_magnet === 1 && user?.magnet_slots === 1 && !user?.has_magnet;
 
   return (
     <section id="pricing" className="px-6 py-24 text-center">
       <div className="max-w-3xl mx-auto">
-        <h3 className="text-4xl mb-10 design-text">Simple Pricing</h3>
+        <h3 className="text-4xl mb-10 design-text">
+          Start Free, Upgrade When You're Ready
+        </h3>
 
         <motion.div
           className="relative rounded-2xl max-w-md mx-auto overflow-hidden"
@@ -36,29 +44,57 @@ const PricingSection = () => {
 
           {/* card content */}
           <div className="relative z-10 p-10 border border-transparent rounded-2xl shadow-xl">
-            <p className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-blue to-purple-500 bg-clip-text text-white design-text">
-              $47
+            {/* --- Free Trial Section --- */}
+            {!user || isFreeTier ? (
+              <>
+                <p className="text-3xl font-extrabold mb-2 bg-gradient-to-r from-green to-royalPurple bg-clip-text text-transparent design-text">
+                  Start Free<br/>
+                </p>
+
+                <p className="text-gray-300 text-lg font-medium mb-6">
+                  Try Cre8tly Studio free for 7 days — includes 1 lead magnet slot (up
+                  to 5 pages).
+                </p>
+
+                <button
+                  onClick={handleSignUpRedirect}
+                  className="w-full bg-gradient-to-r from-green to-royalPurple
+                    text-black text-xl font-semibold py-4 rounded-xl 
+                    hover:opacity-90 hover:shadow-[0_0_25px_rgba(0,255,170,0.4)]
+                    transition shadow-lg design-text"
+                >
+                  {user ? "Go to Dashboard" : "Start Free Trial"}
+                </button>
+
+                <div className="border-t border-gray-800 my-8"></div>
+              </>
+            ) : null}
+
+            {/* --- Paid Upgrade Section --- */}
+            <p className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue to-purple-400 bg-clip-text text-transparent design-text">
+              $47 Upgrade
             </p>
-            <p className="text-gray-400 mb-8 type-text">
-              One-time payment for 5 lead magnet slots
+
+            <p className="text-gray-400 mb-8 text-sm">
+              Unlock <span className="text-white font-semibold">5 permanent slots</span>,  
+              generate up to 50-page PDFs, and access all premium features including 
+              Learning Documents and Brand Identity uploads.
             </p>
 
             <button
-              onClick={handleSignUpRedirect}
-              className="w-full bg-royalPurple 
-                text-white text-xl font-semibold py-4 rounded-xl 
-                hover:opacity-90 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]
-                transition shadow-lg design-text"
+              onClick={handleUpgradeRedirect}
+              className="w-full bg-gray-800 border border-green text-green font-semibold py-3 rounded-xl hover:bg-green hover:text-black transition"
             >
-              {user ? "Sign Up" : "Sign Up"}
+              Upgrade Now
             </button>
           </div>
         </motion.div>
 
         <p className="text-center text-sm text-silver mt-3">
-          🔒 Secure checkout
+          🔒 Secure checkout · No credit card required for free trial
         </p>
       </div>
+
       <OutOfSlotsModal
         open={showModal}
         onClose={() => setShowModal(false)}

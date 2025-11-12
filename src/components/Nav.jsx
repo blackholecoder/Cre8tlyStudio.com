@@ -15,6 +15,7 @@ import {
   Crown,
   Store,
   LayoutDashboard,
+  DollarSign
 } from "lucide-react";
 
 const Nav = () => {
@@ -154,12 +155,20 @@ const Nav = () => {
                     <Crown className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   <button
+                    onClick={() => navigate("/plans")}
+                    className="p-2 hover:bg-gray-800/60  transition"
+                    title="Pricing"
+                  >
+                    <DollarSign  className="h-5 w-5 text-gray-300 hover:text-white" />
+                  </button>
+                  <button
                     onClick={() => navigate("/shop")}
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Shop"
                   >
                     <Store className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
+                  
                   <button
                     onClick={() => navigate("/login")}
                     className="p-2 hover:bg-gray-800/60  transition"

@@ -34,6 +34,7 @@ export default function PromptForm({
   onSubmit,
   loading,
   contentType,
+  disabled,
 }) {
   const { user } = useAuth();
   const [warning, setWarning] = useState("");
@@ -284,19 +285,34 @@ export default function PromptForm({
         </p>
       </div>
 
+      {disabled && (
+  <p className="text-center text-red-600 text-sm mb-3">
+    Your trial has expired — please upgrade to continue generating.
+  </p>
+)}
+
       {!loading && (
-        <button
-          disabled={!text.trim() || text === "<p><br></p>" || tooLong}
-          type="submit"
-          className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
-            !text.trim() || text === "<p><br></p>" || tooLong
-              ? "bg-gray-600 cursor-not-allowed text-gray-300"
-              : "bg-green font-semibold text-black hover:opacity-90"
-          }`}
-        >
-          🚀 Submit Prompt
-        </button>
-      )}
+  <button
+    type={disabled ? "button" : "submit"}
+    disabled={
+      disabled || !text.trim() || text === "<p><br></p>" || tooLong
+    }
+    onClick={() => {
+      if (disabled) {
+        toast.error("Trial expired — please upgrade to continue.");
+      }
+    }}
+    className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+      disabled
+        ? "bg-gray-600 cursor-not-allowed text-gray-300"
+        : !text.trim() || text === "<p><br></p>" || tooLong
+        ? "bg-gray-600 cursor-not-allowed text-gray-300"
+        : "bg-green font-semibold text-black hover:opacity-90"
+    }`}
+  >
+    {disabled ? "Trial Expired — Upgrade to Continue" : "🚀 Submit Prompt"}
+  </button>
+)}
     </form>
   );
 }

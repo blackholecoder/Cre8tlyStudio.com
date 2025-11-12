@@ -110,6 +110,19 @@ export default function LandingPageBuilder() {
       newBlock.height = 650; // default iframe height
     }
 
+    if (type === "social_links") {
+      newBlock.alignment = "center";
+      newBlock.icon_style = "color";
+      newBlock.links = {
+        instagram: "",
+        twitter: "",
+        youtube: "",
+        linkedin: "",
+        facebook: "",
+        tiktok: "",
+      };
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -148,6 +161,11 @@ export default function LandingPageBuilder() {
         } catch {
           blocks = [];
         }
+
+        blocks = blocks.map((b) => ({
+          collapsed: b.collapsed ?? true,
+          ...b,
+        }));
 
         setLanding({ ...lp, content_blocks: blocks });
         setPdfList(magnets);
@@ -1077,7 +1095,7 @@ export default function LandingPageBuilder() {
                         );
                       case "calendly":
                         if (!block.calendly_url) return null;
-                        
+
                         return (
                           <div
                             key={index}
@@ -1098,6 +1116,96 @@ export default function LandingPageBuilder() {
                               }}
                               title="Calendly Scheduler"
                             ></iframe>
+                          </div>
+                        );
+
+                      case "social_links":
+                        const align = block.alignment || "center";
+                        const iconStyle = block.icon_style || "color";
+                        const iconColor = block.icon_color || "#ffffff";
+                        const links = block.links || {};
+
+                        const iconSet = {
+                          instagram:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg",
+                          threads:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/threads.svg",
+                          twitter:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg",
+                          youtube:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg",
+                          linkedin:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg",
+                          facebook:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
+                          tiktok:
+                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
+                        };
+
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              textAlign: align,
+                              margin: "40px 0",
+                              display: "flex",
+                              justifyContent:
+                                align === "center"
+                                  ? "center"
+                                  : align === "right"
+                                    ? "flex-end"
+                                    : "flex-start",
+                              gap: "20px",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            {Object.entries(links)
+                              .filter(
+                                ([platform, url]) => url && iconSet[platform]
+                              )
+                              .map(([platform, url]) => (
+                                <a
+                                  key={platform}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    width: "38px",
+                                    height: "38px",
+                                    display: "inline-block",
+                                    transition:
+                                      "transform 0.25s ease, opacity 0.2s ease",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform =
+                                      "scale(1.1)";
+                                    e.currentTarget.style.opacity = "0.9";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform =
+                                      "scale(1)";
+                                    e.currentTarget.style.opacity = "1";
+                                  }}
+                                >
+                                  <img
+                                    src={iconSet[platform]}
+                                    alt={platform}
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "contain",
+                                      filter:
+                                        iconStyle === "mono"
+                                          ? "invert(1)"
+                                          : `brightness(0) saturate(100%) invert(1) sepia(1) saturate(5000%) hue-rotate(0deg) drop-shadow(0 0 0 ${iconColor})`,
+                                      WebkitFilter:
+                                        iconStyle === "mono"
+                                          ? "invert(1)"
+                                          : `brightness(0) saturate(100%) invert(1) sepia(1) saturate(5000%) hue-rotate(0deg) drop-shadow(0 0 0 ${iconColor})`,
+                                    }}
+                                  />
+                                </a>
+                              ))}
                           </div>
                         );
 

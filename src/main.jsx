@@ -43,7 +43,6 @@ import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
 import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
 import Leads from "./sections/Leads.jsx";
 
-
 const AnimatedRoutes = () => {
   const location = useLocation();
 
@@ -142,55 +141,53 @@ const AnimatedRoutes = () => {
         <Route
           path="/plans"
           element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <PlansPage />
+            </motion.div>
+          }
+        />
+
+        <Route
+          path="/landing-page-builder"
+          element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
               >
-                <PlansPage />
+                <DashboardLayout>
+                  <LandingPageBuilder />
+                </DashboardLayout>
               </motion.div>
             </PrivateRoute>
           }
         />
-
         <Route
-  path="/landing-page-builder"
-  element={
-    <PrivateRoute role={["customer", "admin", "marketer"]}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="min-h-screen bg-[#030712]"
-      >
-        <DashboardLayout>
-          <LandingPageBuilder />
-        </DashboardLayout>
-      </motion.div>
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="/leads"
-  element={
-    <PrivateRoute role={["customer", "admin", "marketer"]}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="min-h-screen bg-[#030712]"
-      >
-        <DashboardLayout>
-          <Leads />
-        </DashboardLayout>
-      </motion.div>
-    </PrivateRoute>
-  }
-/>
+          path="/leads"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <Leads />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
@@ -256,7 +253,6 @@ const AnimatedRoutes = () => {
 
 // 🔹 Root wrapper with Router outside (fixes useLocation error)
 const RootApp = () => {
-
   const { maintenance, loading } = useMaintenance();
 
   if (loading) return null; // optional spinner
@@ -289,7 +285,6 @@ const RootApp = () => {
     </Router>
   );
 };
-
 
 // 🔹 Create root only once
 const container = document.getElementById("root");

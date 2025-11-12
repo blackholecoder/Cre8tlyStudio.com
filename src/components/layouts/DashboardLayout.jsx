@@ -25,6 +25,9 @@ export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+const trialExpired = user?.trialExpired;
+
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
     const handleResize = () => {
@@ -50,7 +53,7 @@ export default function DashboardLayout({ children }) {
     return () => clearInterval(interval);
   }, [user?.id]);
 
-  const menu = [
+  let menu = [
     {
       label: "Digital Products",
       path: "/dashboard",
@@ -70,6 +73,12 @@ export default function DashboardLayout({ children }) {
     },
     { label: "Plans", path: "/plans", icon: <DollarSign size={22} /> },
   ];
+
+  if (isFreeTier) {
+  menu = menu.filter(
+    (item) => item.label !== "Prompt Memory" && item.label !== "Assistant"
+  );
+}
 
   return (
     <div className="flex bg-[#030712] text-white relative min-h-full">

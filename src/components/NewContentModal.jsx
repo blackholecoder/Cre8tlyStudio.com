@@ -1,28 +1,46 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-
+import { useAuth } from "../admin/AuthContext";
 
 export default function NewContentModal({ onCreate, onClose }) {
   const [contentType, setContentType] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
   async function handleContinue() {
-  if (!contentType) {
-    toast.error("Please select a document type.", {
-      position: "top-right",
-      autoClose: 2500,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-    });
-    return;
+    if (!contentType) {
+      toast.error("Please select a document type.", {
+        position: "top-right",
+        autoClose: 2500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
+      return;
+    }
+
+    setLoading(true);
+    onCreate({ contentType });
   }
 
-  setLoading(true);
-  onCreate({ contentType });
-}
+  const docTypes = [
+    {
+      label: "Lead Magnet",
+      value: "lead_magnet",
+      description:
+        "Generate a persuasive, marketing-focused guide designed to attract and convert readers.",
+    },
+    {
+      label: "Learning Document",
+      value: "learning_doc",
+      description:
+        "Create a detailed, step-by-step educational document that teaches practical real-world skills.",
+      premium: true, // mark as premium
+    },
+  ];
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -32,45 +50,50 @@ export default function NewContentModal({ onCreate, onClose }) {
         </h2>
 
         <div className="flex flex-col gap-3">
-          {[
-            {
-              label: "Lead Magnet",
-              value: "lead_magnet",
-              description:
-                "Generate a persuasive, marketing-focused guide designed to attract and convert readers.",
-            },
-            {
-              label: "Learning Document",
-              value: "learning_doc",
-              description:
-                "Create a detailed, step-by-step educational document that teaches practical real-world skills.",
-            },
-          ].map((type) => (
-            <label
-              key={type.value}
-              className={`flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition ${
-                contentType === type.value
-                  ? "border-green bg-green/10"
-                  : "border-gray-700 hover:border-gray-500"
-              }`}
-            >
-              <input
-                type="radio"
-                name="contentType"
-                value={type.value}
-                checked={contentType === type.value}
-                onChange={(e) => setContentType(e.target.value)}
-                className="accent-green mt-1"
-              />
-              <div>
-                <span className="font-semibold text-base">
-                  {type.label}
-                </span>
-                <p className="text-sm text-gray-400">{type.description}</p>
-              </div>
-            </label>
-          ))}
+          {docTypes.map((type) => {
+            // hide premium option for free users
+            if (isFreeTier && type.premium) return null;
+
+            return (
+              <label
+                key={type.value}
+                className={`flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition ${
+                  contentType === type.value
+                    ? "border-green bg-green/10"
+                    : "border-gray-700 hover:border-gray-500"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="contentType"
+                  value={type.value}
+                  checked={contentType === type.value}
+                  onChange={(e) => setContentType(e.target.value)}
+                  className="accent-green mt-1"
+                />
+                <div>
+                  <span className="font-semibold text-base flex items-center gap-2">
+                    {type.label}
+                    {type.premium && (
+                      <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-[1px] rounded-md">
+                        PRO
+                      </span>
+                    )}
+                  </span>
+                  <p className="text-sm text-gray-400">{type.description}</p>
+                </div>
+              </label>
+            );
+          })}
         </div>
+
+        {isFreeTier && (
+          <p className="text-xs text-center text-gray-400 mt-2">
+            Upgrade your plan to unlock the{" "}
+            <span className="text-green font-semibold">Learning Document</span>{" "}
+            feature.
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <button

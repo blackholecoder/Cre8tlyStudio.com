@@ -12,6 +12,8 @@ import axios from "axios";
 import PromptForm from "./prompt/PromptForm";
 import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
 import BookPromptForm from "./prompt/Book/BookPromptForm";
+import { useAuth } from "../admin/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function PromptModal({
   isOpen,
@@ -31,6 +33,9 @@ export default function PromptModal({
   const [link, setLink] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
 
   const [cover, setCover] = useState(null);
   const [cta, setCta] = useState("");
@@ -65,6 +70,25 @@ export default function PromptModal({
 
   async function handleSubmit(e, contentType) {
     e.preventDefault();
+
+
+// 🧩 1️⃣ Refresh latest user data
+  const freshUser = await refreshUser();
+
+// 🧩 2️⃣ Block if trial expired
+  if (freshUser?.isFreeTier && freshUser?.trialExpired) {
+    toast.error("⛔ Your 7-day free trial has expired. Upgrade to continue.");
+    navigate("/plans");
+    return;
+  }
+
+   // 🧩 3️⃣ Prevent more than 5 pages for free users
+  if (freshUser?.isFreeTier && pages > 5) {
+    toast.warn("Free tier limited to 5 pages maximum. Please upgrade to unlock more.");
+    return;
+  }
+
+
     setLoading(true);
     setProgress(0);
     setShowGenerating(true);
@@ -298,6 +322,7 @@ export default function PromptModal({
                     setCta={setCta}
                     showPreview={showPreview}
                     setShowPreview={setShowPreview}
+                    disabled={user?.isFreeTier && user?.trialExpired}
                     onSubmit={handleSubmit}
                     loading={loading}
                     contentType={contentType}

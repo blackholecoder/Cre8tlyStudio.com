@@ -167,7 +167,7 @@ export default function PromptForm({
           This title will appear at the top of your generated document.
         </p>
       </div>
-      {/* Pre-Made Prompt */}
+
       {/* Pre-Made Prompts (only for paid users) */}
       {!isFreePlan ? (
         <PromptSelect setText={setText} />
@@ -187,49 +187,65 @@ export default function PromptForm({
       )}
 
       {/* Prompt Editor */}
-      <div>
-        <div
-          className="h-[250px] overflow-hidden rounded-lg border border-gray-600 bg-white"
-          style={{ color: "#111" }}
-        >
-          <ReactQuill
-            theme="snow"
-            value={text}
-            onChange={(value) => {
-              setText(value);
-              if (error) setError(""); // clear inline error as user types
-            }}
-            modules={{ toolbar: false }}
-            placeholder="Write your prompt..."
-            className="h-[250px]"
-          />
-        </div>
+<div>
+  <div
+    className={`relative h-[250px] overflow-hidden rounded-lg border border-gray-600 ${
+      isFreePlan ? "bg-gray-50" : "bg-white"
+    }`}
+    style={{ color: "#111" }}
+  >
+    <ReactQuill
+      theme="snow"
+      value={text}
+      onChange={(value) => {
+        if (!isFreePlan) {
+          setText(value);
+          if (error) setError("");
+        }
+      }}
+      readOnly={isFreePlan} // ✅ disables editing
+      modules={{ toolbar: false }}
+      placeholder="Write your prompt..."
+      className="h-[250px]"
+    />
 
-        {/* Inline Error */}
-        {error && (
-          <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>
-        )}
+    {/* Prevent highlight & copy for free users */}
+    {isFreePlan && (
+      <div
+        className="absolute inset-0 z-10 cursor-default select-none"
+        style={{
+          background: "transparent",
+          userSelect: "none",
+          pointerEvents: "auto",
+        }}
+      />
+    )}
+  </div>
 
-        {/* Warning + Counter */}
-        <div className="flex justify-between items-center mt-2">
-          <p
-            className={`text-sm font-medium ${
-              warning.includes("⚠️")
-                ? "text-red-500"
-                : warning
-                  ? "text-yellow-500"
-                  : "text-gray-400"
-            }`}
-          >
-            {warning || " "}
-          </p>
-          <p
-            className={`text-xs ${tooLong ? "text-red-500" : "text-gray-400"}`}
-          >
-            {charCount.toLocaleString()} / 100,000
-          </p>
-        </div>
-      </div>
+  {/* Inline Error */}
+  {error && <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>}
+
+  {/* Warning + Counter */}
+  <div className="flex justify-between items-center mt-2">
+    <p
+      className={`text-sm font-medium ${
+        warning.includes("⚠️")
+          ? "text-red-500"
+          : warning
+          ? "text-yellow"
+          : "text-gray-400"
+      }`}
+    >
+      {warning || " "}
+    </p>
+    <p
+      className={`text-xs ${tooLong ? "text-red-500" : "text-gray-400"}`}
+    >
+      {charCount.toLocaleString()} / 100,000
+    </p>
+  </div>
+</div>
+
 
       <CoverUpload cover={cover} setCover={setCover} />
 

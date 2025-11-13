@@ -10,7 +10,9 @@ export default function SmartPromptBuilder({ onPromptReady }) {
   const [offer, setOffer] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { user, accessToken } = useAuth(); 
+  const { user, accessToken } = useAuth();
+
+  const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
   const handleGeneratePrompt = async () => {
     if (!audience || !pain || !promise) {
@@ -52,9 +54,12 @@ export default function SmartPromptBuilder({ onPromptReady }) {
 
   return (
     <div className="bg-gray-900/60 p-6 rounded-xl border border-gray-700 space-y-4">
-      <h2 className="text-xl font-bold text-white mb-2">Smart Prompt Builder</h2>
+      <h2 className="text-xl font-bold text-white mb-2">
+        Smart Prompt Builder
+      </h2>
       <p className="text-gray-400 text-sm mb-4">
-        Answer a few quick questions so we can craft a personalized lead magnet prompt for you.
+        Answer a few quick questions so we can craft a personalized lead magnet
+        prompt for you.
       </p>
       <div>
         <label className="block text-gray-300 mb-1">Who is this for?</label>
@@ -66,7 +71,9 @@ export default function SmartPromptBuilder({ onPromptReady }) {
         />
       </div>
       <div>
-        <label className="block text-gray-300 mb-1">What problem are they facing?</label>
+        <label className="block text-gray-300 mb-1">
+          What problem are they facing?
+        </label>
         <input
           className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
           placeholder="Example: struggling to grow an email list or convert leads"
@@ -75,7 +82,9 @@ export default function SmartPromptBuilder({ onPromptReady }) {
         />
       </div>
       <div>
-        <label className="block text-gray-300 mb-1">What transformation or result do they want?</label>
+        <label className="block text-gray-300 mb-1">
+          What transformation or result do they want?
+        </label>
         <input
           className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
           placeholder="Example: consistently attract qualified leads every week"
@@ -84,7 +93,9 @@ export default function SmartPromptBuilder({ onPromptReady }) {
         />
       </div>
       <div>
-        <label className="block text-gray-300 mb-1">What’s your offer or next step? (optional)</label>
+        <label className="block text-gray-300 mb-1">
+          What’s your offer or next step? (optional)
+        </label>
         <input
           className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
           placeholder="Example: join my course, book a free strategy call"
@@ -101,13 +112,15 @@ export default function SmartPromptBuilder({ onPromptReady }) {
           {loading ? "Generating..." : "Generate"}
         </button>
 
-        <button
-          onClick={() => onPromptReady("")}
-          disabled={loading}
-          className="flex-1 px-6 py-2 border border-gray-600 text-gray-300 rounded hover:bg-gray-800 transition"
-        >
-          Skip
-        </button>
+        {!isFreePlan && (
+          <button
+            onClick={() => onPromptReady("")}
+            disabled={loading}
+            className="flex-1 px-6 py-2 border border-gray-600 text-gray-300 rounded hover:bg-gray-800 transition"
+          >
+            Skip
+          </button>
+        )}
       </div>
     </div>
   );

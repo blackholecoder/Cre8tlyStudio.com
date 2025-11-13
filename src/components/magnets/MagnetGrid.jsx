@@ -1,20 +1,28 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { themeStyles } from "../../constants/index";
-import { CheckCircle, Edit, Plus, Timer, Eye, Pencil, Package } from "lucide-react";
+import {
+  CheckCircle,
+  Edit,
+  Plus,
+  Timer,
+  Eye,
+  Pencil,
+  Package,
+} from "lucide-react";
 import NewContentModal from "../NewContentModal";
 import PDFPreviewModal from "../dashboard/PDFPreviewModal";
+import { useAuth } from "../../admin/AuthContext";
 
 export default function MagnetGrid({
   magnets = [],
   onAddPrompt,
   onOpenEditor,
 }) {
+  const { user } = useAuth();
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-
-  
 
   const magnetList = Array.isArray(magnets) ? magnets : magnets?.magnets || [];
   if (!Array.isArray(magnetList) || magnetList.length === 0) return null;
@@ -24,6 +32,10 @@ export default function MagnetGrid({
     setShowNewModal(false);
     onAddPrompt(selectedSlot, data.contentType);
   }
+
+  
+const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+
 
   return (
     <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
@@ -45,20 +57,16 @@ export default function MagnetGrid({
 
           {/* Cover / Preview */}
           <div className="aspect-[4/3] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center overflow-hidden border border-gray-700 relative">
-            {m.cover_image ? (
+            {m.cover_image && m.cover_image.trim() !== "" ? (
               <img
                 src={m.cover_image}
                 alt={m.title || "Lead Magnet Cover"}
                 className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-105"
               />
-            ) : m.pdf_url ? (
-              <img
-                src={`https://cre8tlystudio.com/api/preview/${m.id}`}
-                alt={m.title}
-                className="object-cover w-full h-full rounded-xl opacity-80"
-              />
             ) : (
-              <span className="text-gray-600 text-xs italic">No Preview</span>
+              <span className="text-gray-400 text-xs italic">
+                No Cover Selected
+              </span>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
           </div>
@@ -182,62 +190,87 @@ export default function MagnetGrid({
             )}
 
             {m.pdf_url && (
-              <>
-                <button
-                  onClick={() => setPreviewUrl(m.pdf_url)}
-                  className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
-                  title="Preview PDF"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Eye
-                      size={16}
-                      className={`${
-                        m.status === "completed" ? "text-green" : "text-white"
-                      } transition-colors`}
-                    />
-                    <span>View</span>
-                  </div>
-                </button>
+  <>
+    {/* View Button */}
+    <button
+      onClick={() => setPreviewUrl(m.pdf_url)}
+      className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
+      title="Preview PDF"
+    >
+      <div className="flex items-center justify-center gap-2">
+        <Eye
+          size={16}
+          className={`${
+            m.status === "completed" ? "text-green" : "text-white"
+          } transition-colors`}
+        />
+        <span>View</span>
+      </div>
+    </button>
 
-                <button
-                  onClick={() => {
-                    if (!m.edit_used) onOpenEditor(m.id);
-                  }}
-                  disabled={m.edit_used}
-                  className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                    m.edit_used
-                      ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-60"
-                      : "bg-gray-700 hover:bg-gray-600 text-white"
-                  }`}
-                  title="Open Editor"
-                >
-                  <Pencil
-                    size={16}
-                    className={`${
-                      m.edit_used ? "text-gray-500" : "text-white"
-                    } transition-colors`}
-                  />
-                  <span>{m.edit_used ? "Closed" : "Edit"}</span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (!m.id || !m.pdf_url) {
-                      alert("Missing lead magnet ID or PDF URL.");
-                      return;
-                    }
-                    const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
-                      m.pdf_url
-                    )}`;
-                    window.open(canvasUrl, "_blank");
-                  }}
-                  className="hidden md:flex w-full bg-hotPink text-white font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all"
-                  title="Edit in Canvas Editor"
-                >
-                  <Package size={16} />
-                  <span>Canvas Editor</span>
-                </button>
-              </>
-            )}
+    {/* Edit Button */}
+    <button
+      onClick={() => {
+        if (isFreePlan) {
+          window.location.href = "/plans";
+          return;
+        }
+        if (!m.edit_used) onOpenEditor(m.id);
+      }}
+      disabled={m.edit_used}
+      className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+        m.edit_used
+          ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-60"
+          : isFreePlan
+          ? "bg-gray-700 text-gray-300 hover:bg-gray-700 cursor-pointer"
+          : "bg-gray-700 hover:bg-gray-600 text-white"
+      }`}
+      title={isFreePlan ? "Upgrade to unlock editing" : "Open Editor"}
+    >
+      <Pencil
+        size={16}
+        className={`${
+          m.edit_used ? "text-gray-500" : "text-white"
+        } transition-colors`}
+      />
+      <span>
+        {isFreePlan
+          ? "Unlock Edit"
+          : m.edit_used
+          ? "Closed"
+          : "Edit"}
+      </span>
+    </button>
+
+    {/* Canvas Editor Button */}
+    <button
+      onClick={() => {
+        if (isFreePlan) {
+          window.location.href = "/plans";
+          return;
+        }
+        if (!m.id || !m.pdf_url) {
+          alert("Missing lead magnet ID or PDF URL.");
+          return;
+        }
+        const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
+          m.pdf_url
+        )}`;
+        window.open(canvasUrl, "_blank");
+      }}
+      className={`hidden md:flex w-full font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all ${
+        isFreePlan
+          ? "bg-hotPink/70 text-gray-200 hover:bg-hotPink/70 cursor-pointer"
+          : "bg-hotPink text-white hover:bg-hotPink/90"
+      }`}
+      title={isFreePlan ? "Upgrade to unlock Canvas Editor" : "Open in Canvas Editor"}
+    >
+      <Package size={16} />
+      <span>{isFreePlan ? "Unlock Canvas Editor" : "Canvas Editor"}</span>
+    </button>
+  </>
+)}
+
           </div>
         </motion.div>
       ))}

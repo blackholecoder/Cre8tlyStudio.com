@@ -1,6 +1,7 @@
 import { Document, Page, pdfjs } from "react-pdf";
 import { useState, useMemo, useEffect } from "react";
 import { X, Download, ZoomIn, ZoomOut } from "lucide-react";
+import { useAuth } from "../../admin/AuthContext";
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -15,11 +16,13 @@ export default function PDFPreviewModal({
   sourceType = "magnet",
   onClose,
 }) {
+  const { user } = useAuth();
   const [numPages, setNumPages] = useState(null);
   const [scale, setScale] = useState(1.2);
   const [pdfReady, setPdfReady] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
+  const [showUpgradeNotice, setShowUpgradeNotice] = useState(false);
 
   const memoizedFile = useMemo(() => {
     if (!fileUrl) return null;
@@ -61,6 +64,11 @@ export default function PDFPreviewModal({
   }, [fileUrl]);
 
   const handleDownload = async () => {
+    const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+    if (isFreeTier) {
+      setShowUpgradeNotice(true);
+      return;
+    }
     try {
       setDownloading(true);
       const res = await fetch(memoizedFile.url);
@@ -264,6 +272,33 @@ export default function PDFPreviewModal({
           )}
         </div>
       </div>
+      {showUpgradeNotice && (
+        <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[999] px-6 text-center">
+          <div className="bg-[#0b0f19] border border-gray-800 rounded-2xl p-8 max-w-md w-full shadow-lg">
+            <h2 className="text-xl font-semibold text-white mb-3">
+              🔒 Upgrade Required
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+              Downloads are available for Pro users only. Upgrade your plan to
+              unlock high-quality PDF exports, full lead magnet access, and more.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => (window.location.href = "/plans")}
+                className="bg-green text-black px-5 py-2.5 rounded-lg font-semibold hover:opacity-90 transition"
+              >
+                Upgrade Now
+              </button>
+              <button
+                onClick={() => setShowUpgradeNotice(false)}
+                className="bg-gray-800 border border-gray-700 text-gray-300 px-5 py-2.5 rounded-lg hover:bg-gray-700 transition"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

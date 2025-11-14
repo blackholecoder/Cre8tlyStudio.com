@@ -38,7 +38,7 @@ const Nav = () => {
   }, [isOpen]);
 
   if (
-    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads"].includes(
+    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads", "/landing-analytics"].includes(
       location.pathname
     )
   ) {
@@ -281,6 +281,18 @@ const Nav = () => {
                 </a>
               );
             })}
+
+            {/* ✅ Add Plans link here */}
+      {!user && (
+        <Link
+          to="/plans"
+          onClick={() => setIsOpen(false)}
+          className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+        >
+          Plans
+        </Link>
+      )}
+
             
 
             {user && (

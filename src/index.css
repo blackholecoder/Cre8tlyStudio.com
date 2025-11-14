@@ -209,6 +209,13 @@ input[type="color"]:focus {
 }
 
 
+.nivo-bar rect {
+  transition: all 0.3s ease;
+}
+.nivo-bar rect:hover {
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.15));
+  transform: scaleY(1.05);
+}
 
 
 

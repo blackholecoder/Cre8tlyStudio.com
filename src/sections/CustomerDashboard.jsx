@@ -112,6 +112,20 @@ export default function CustomerDashboard() {
     }
   }, [user]);
 
+  useEffect(() => {
+  // Always restore scrolling when this page mounts
+  document.body.style.overflow = "auto";
+  document.body.style.position = "";
+  document.body.style.width = "";
+
+  return () => {
+    // Ensure scroll is restored if you navigate away and come back
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  };
+}, []);
+
   return (
     <DashboardLayout>
       <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">

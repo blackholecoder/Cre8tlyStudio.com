@@ -90,7 +90,7 @@ const Landing = () => {
 
 
       <HowItWorks />
-      <PremiumEbooksCTA />
+      {/* <PremiumEbooksCTA /> */}
     </div>
   );
 };

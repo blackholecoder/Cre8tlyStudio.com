@@ -43,6 +43,7 @@ import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
 import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
 import Leads from "./sections/Leads.jsx";
 import LandingAnalytics from "./sections/analytics/Analytics.jsx";
+import SellerDashboard from "./sections/seller/SellerDashboard.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -86,6 +87,24 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route
+  path="/seller-dashboard"
+  element={
+    <PrivateRoute role={["marketer", "admin", "customer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <SellerDashboard />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
         <Route
           path="/prompts"
           element={

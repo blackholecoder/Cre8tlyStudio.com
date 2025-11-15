@@ -13,7 +13,6 @@ import {
   LogOut,
   MessageCircleQuestionMarkIcon,
   Crown,
-  Store,
   LayoutDashboard,
   DollarSign
 } from "lucide-react";
@@ -38,7 +37,7 @@ const Nav = () => {
   }, [isOpen]);
 
   if (
-    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads", "/landing-analytics"].includes(
+    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads", "/landing-analytics", "/seller-dashboard"].includes(
       location.pathname
     )
   ) {
@@ -160,13 +159,6 @@ const Nav = () => {
                     title="Pricing"
                   >
                     <DollarSign  className="h-5 w-5 text-gray-300 hover:text-white" />
-                  </button>
-                  <button
-                    onClick={() => navigate("/shop")}
-                    className="p-2 hover:bg-gray-800/60  transition"
-                    title="Shop"
-                  >
-                    <Store className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   
                   <button

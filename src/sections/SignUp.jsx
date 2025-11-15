@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../admin/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Footer from "../sections/Footer.jsx";
 import CustomCursor from "../components/CustomCursor.jsx";
@@ -18,6 +18,10 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [searchParams] = useSearchParams();
+const refEmployee = searchParams.get("ref_employee");
+
+
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(""), 5000);
@@ -28,15 +32,21 @@ export default function SignupPage() {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      // ✅ Send refEmployee only if present
+      const payload = refEmployee
+        ? { ...formData, refEmployee }
+        : formData;
+
       const res = await axios.post(
         "https://cre8tlystudio.com/api/auth/signup",
-        formData
+        payload
       );
+
       if (res.status === 201) {
         await login(formData.email, formData.password);
         navigate("/dashboard");

@@ -16,7 +16,9 @@ const PricingSection = () => {
   };
 
   const isFreeTier =
-    user?.has_free_magnet === 1 && user?.magnet_slots === 1 && !user?.has_magnet;
+    user?.has_free_magnet === 1 &&
+    user?.magnet_slots === 1 &&
+    !user?.has_magnet;
 
   return (
     <section id="pricing" className="px-6 py-24 text-center">
@@ -48,12 +50,13 @@ const PricingSection = () => {
             {!user || isFreeTier ? (
               <>
                 <p className="text-3xl font-extrabold mb-2 bg-gradient-to-r from-green to-royalPurple bg-clip-text text-transparent design-text">
-                  Start Free<br/>
+                  Start Free
+                  <br />
                 </p>
 
                 <p className="text-gray-300 text-lg font-medium mb-6">
-                  Try Cre8tly Studio free for 7 days — includes 1 lead magnet slot (up
-                  to 5 pages).
+                  Try Cre8tly Studio free for 7 days — includes 1 lead magnet
+                  slot (up to 5 pages).
                 </p>
 
                 <button
@@ -72,20 +75,20 @@ const PricingSection = () => {
 
             {/* --- Paid Upgrade Section --- */}
             <p className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue to-purple-400 bg-clip-text text-transparent design-text">
-              $47 Upgrade
+              Unlock Full Access
             </p>
 
-            <p className="text-gray-400 mb-8 text-sm">
-              Unlock <span className="text-white font-semibold">5 permanent slots</span>,  
-              generate up to 50-page PDFs, and access all premium features including 
-              Learning Documents and Brand Identity uploads.
+            <p className="text-gray-400 mb-8 text-sm leading-relaxed">
+              Unlock every tool inside Cre8tly Studio, advanced design,
+              automation, selling features, and complete creative freedom for
+              your brand.
             </p>
 
             <button
               onClick={handleUpgradeRedirect}
               className="w-full bg-gray-800 border border-green text-green font-semibold py-3 rounded-xl hover:bg-green hover:text-black transition"
             >
-              Upgrade Now
+              See Pricing
             </button>
           </div>
         </motion.div>

@@ -1,9 +1,11 @@
 // src/components/AddSectionButton.jsx
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { useAuth } from "../../admin/AuthContext"; 
 
 export default function AddSectionButton({ addBlock }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -21,15 +23,20 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Sub-Subheading (H3)", value: "subsubheading" },
     { label: "List Heading", value: "list_heading" },
     { label: "Paragraph", value: "paragraph" },
-    { label: "Button", value: "button" },
     { label: "Video", value: "video" },
     { label: "Divider", value: "divider" },
     { label: "Offer Banner", value: "offer_banner" },
     { label: "Calendly", value: "calendly" },
     { label: "Countdown Timer", value: "countdown" },
     { label: "Social Links Row", value: "social_links" }, 
+    { label: "Stripe Checkout", value: "stripe_checkout" }, 
 
   ];
+
+  if (user?.is_admin_employee === 1) {
+    options.push({ label: "Referral Button", value: "referral_button" });
+  }
+
 
   return (
     <div className="add-section-dropdown relative inline-block text-left">

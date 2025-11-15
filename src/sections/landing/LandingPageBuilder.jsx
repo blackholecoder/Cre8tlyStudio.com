@@ -71,12 +71,6 @@ export default function LandingPageBuilder() {
       newBlock.text = "";
     }
 
-    if (type === "button") {
-      newBlock.text = "";
-      newBlock.url = "";
-      newBlock.new_tab = false;
-    }
-
     if (type === "video") {
       newBlock.url = "";
       newBlock.caption = "";
@@ -95,15 +89,19 @@ export default function LandingPageBuilder() {
     if (type === "offer_banner") {
       newBlock.text = "🔥 Limited Time Offer!";
       newBlock.text_color = "#000000";
-      newBlock.link_text = "";
-      newBlock.link_url = "";
       newBlock.alignment = "center";
       newBlock.padding = 20;
+
+      // 🎨 Background
       newBlock.use_gradient = true;
       newBlock.gradient_start = "#F285C3";
       newBlock.gradient_end = "#7bed9f";
       newBlock.gradient_direction = "90deg";
       newBlock.bg_color = "#F285C3";
+
+      // 🧩 New logic for button control
+      newBlock.offer_type = "free"; // "free" or "paid"
+      newBlock.button_text = "Claim Offer"; // Default text for the button
     }
 
     if (type === "calendly") {
@@ -134,6 +132,22 @@ export default function LandingPageBuilder() {
       newBlock.style_variant = "minimal"; // default style
     }
 
+    if (type === "stripe_checkout") {
+      newBlock.price = 10; // default price in USD
+      newBlock.button_text = "Buy & Download PDF";
+      newBlock.button_color = "#7bed9f";
+      newBlock.alignment = "center";
+      newBlock.collapsed = false;
+    }
+
+    if (type === "referral_button") {
+      newBlock.text = "Join Cre8tly Studio";
+      newBlock.button_color = "#7bed9f";
+      newBlock.text_color = "#000000";
+      newBlock.alignment = "center";
+      newBlock.collapsed = false;
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -146,6 +160,19 @@ export default function LandingPageBuilder() {
     const updated = landing.content_blocks.filter((_, i) => i !== index);
     setLanding({ ...landing, content_blocks: updated });
   };
+
+  useEffect(() => {
+    // Always restore scroll when this page mounts
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    return () => {
+      // Clean up on unmount
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -417,6 +444,7 @@ export default function LandingPageBuilder() {
                         updateBlock={updateBlock}
                         removeBlock={removeBlock}
                         bgTheme={bgTheme}
+                        pdfList={pdfList}
                       />
                     ))}
                 </SortableContext>
@@ -790,9 +818,11 @@ export default function LandingPageBuilder() {
                     const isGradient =
                       selectedTheme?.includes("linear-gradient");
                     const mainOverlayColor = isGradient
-                      ? "rgba(255,255,255,0.04)" // fallback overlay tone
-                      : blendColors(selectedTheme || "#1e0033");
-
+                      ? selectedTheme // keep gradient as-is
+                      : blendColors(
+                          selectedTheme || "#1e0033",
+                          "rgba(255,255,255,0.04)"
+                        );
                     const bannerBg = block.match_main_bg
                       ? mainOverlayColor
                       : block.use_gradient
@@ -997,27 +1027,6 @@ export default function LandingPageBuilder() {
                           </p>
                         );
 
-                      case "button":
-                        return (
-                          <div
-                            key={index}
-                            style={{ textAlign: "center", marginTop: "12px" }}
-                          >
-                            <a
-                              href={block.url || "#"}
-                              target={block.new_tab ? "_blank" : "_self"}
-                              rel={
-                                block.new_tab
-                                  ? "noopener noreferrer"
-                                  : undefined
-                              }
-                              className="inline-block bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green hover:text-black transition"
-                            >
-                              {block.text || "Click Here"}
-                            </a>
-                          </div>
-                        );
-
                       case "video":
                         if (!block.url) return null;
 
@@ -1080,7 +1089,6 @@ export default function LandingPageBuilder() {
                           </div>
                         );
 
-                      case "divider":
                       case "spacer":
                         if (block.style === "space") {
                           return (
@@ -1104,6 +1112,7 @@ export default function LandingPageBuilder() {
                             }}
                           />
                         );
+
                       case "calendly":
                         if (!block.calendly_url) return null;
 
@@ -1236,6 +1245,149 @@ export default function LandingPageBuilder() {
                               variant={block.style_variant}
                               bgTheme={bgTheme}
                             />
+                          </div>
+                        );
+
+                      case "stripe_checkout":
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              textAlign: block.alignment || "center",
+                              margin: "40px auto",
+                            }}
+                          >
+                            <button
+                              onClick={async () => {
+                                if (!block.pdf_url) {
+                                  toast.warn(
+                                    "Please select a PDF to sell first."
+                                  );
+                                  return;
+                                }
+
+                                try {
+                                  const res = await axiosInstance.post(
+                                    "https://cre8tlystudio.com/api/seller-checkout/create-checkout-session",
+                                    {
+                                      landingPageId: landing.id,
+                                      sellerId: user?.id,
+                                      pdfUrl: block.pdf_url,
+                                      price_in_cents: Math.round(
+                                        (block.price || 10) * 100
+                                      ),
+                                    }
+                                  );
+
+                                  if (res.data?.url)
+                                    window.location.href = res.data.url;
+                                  else
+                                    toast.error(
+                                      "Unable to start checkout. Please try again."
+                                    );
+                                } catch (err) {
+                                  console.error("Stripe Checkout Error:", err);
+                                  toast.error(
+                                    "Error connecting to Stripe. Try again later."
+                                  );
+                                }
+                              }}
+                              className="transition-transform hover:scale-105"
+                              style={{
+                                background: block.button_color || "#7bed9f",
+                                color: block.text_color || "#000", // ✅ new text color
+                                padding: "14px 36px",
+                                borderRadius: "8px",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                              }}
+                            >
+                              {block.button_text || "Buy & Download PDF"}
+                            </button>
+
+                            <p style={{ marginTop: "8px", color: "#aaa" }}>
+                              ${block.price?.toFixed(2) || "10.00"} USD
+                            </p>
+
+                            {block.pdf_url && (
+                              <p className="text-xs text-gray-400 mt-2">
+                                Selling:
+                                <a
+                                  href={block.pdf_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-green font-medium ml-1 underline hover:text-green transition"
+                                >
+                                  Preview PDF
+                                </a>
+                              </p>
+                            )}
+                          </div>
+                        );
+
+                      case "referral_button":
+                        // only allow employees to have active referral links
+                        if (user?.is_admin_employee !== 1) {
+                          return (
+                            <p
+                              key={index}
+                              style={{
+                                color: "#999",
+                                fontSize: "0.9rem",
+                                textAlign: "center",
+                                marginTop: "20px",
+                              }}
+                            >
+                              (Referral buttons are available to admin employees
+                              only)
+                            </p>
+                          );
+                        }
+
+                        const referralUrl = `https://cre8tlystudio.com/signup?ref_employee=${user?.id}`;
+
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              textAlign: block.alignment || "center",
+                              margin: "40px auto",
+                            }}
+                          >
+                            <a
+                              href={referralUrl}
+                              style={{
+                                display: "inline-block",
+                                background: block.button_color || "#7bed9f",
+                                color: block.text_color || "#000000",
+                                padding: "14px 36px",
+                                borderRadius: "10px",
+                                fontWeight: 700,
+                                textDecoration: "none",
+                                boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                                transition: "transform 0.25s ease",
+                              }}
+                              onMouseOver={(e) =>
+                                (e.currentTarget.style.transform =
+                                  "scale(1.05)")
+                              }
+                              onMouseOut={(e) =>
+                                (e.currentTarget.style.transform = "scale(1)")
+                              }
+                            >
+                              {block.text || "Sign Up with My Referral"}
+                            </a>
+
+                            <p
+                              style={{
+                                color: "#aaa",
+                                fontSize: "0.8rem",
+                                marginTop: "10px",
+                              }}
+                            >
+                              {`Referral link: ${referralUrl}`}
+                            </p>
                           </div>
                         );
 

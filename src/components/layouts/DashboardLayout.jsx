@@ -15,7 +15,8 @@ import {
   Inbox,
   Globe,
   Users,
-  BarChart2
+  BarChart2,
+  Banknote
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 
@@ -221,6 +222,28 @@ const trialExpired = user?.trialExpired;
     </div>
   </button>
 )}
+
+{user?.stripe_connect_account_id && (
+  <button
+    onClick={() => {
+      navigate("/seller-dashboard");
+      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+    }}
+    className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
+  >
+    <div
+      className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+        ${
+          location.pathname === "/seller-dashboard"
+            ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
+            : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
+        }`}
+    >
+      <Banknote size={22} />
+    </div>
+  </button>
+)}
+
 
             </nav>
           </div>

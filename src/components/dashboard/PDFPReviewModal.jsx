@@ -28,7 +28,7 @@ export default function PDFPreviewModal({
     if (!fileUrl) return null;
 
     return {
-      url: `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}`,
+      url: `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}&preview=1`,
     };
   }, [fileUrl]);
 
@@ -63,54 +63,51 @@ export default function PDFPreviewModal({
     return () => clearTimeout(timeout);
   }, [fileUrl]);
 
-  const handleDownload = async () => {
-    const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
-    if (isFreeTier) {
-      setShowUpgradeNotice(true);
-      return;
-    }
-    try {
-      setDownloading(true);
-      const res = await fetch(memoizedFile.url);
-      if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-
-      // ✅ Use title and part number if available
-      if (sourceType === "book") {
-        const safeTitle = (fileTitle || "Book")
-          .replace(/[^\w\s-]/g, "")
-          .trim()
-          .replace(/\s+/g, "_");
-        const safePart = partNumber ? `_Part_${partNumber}` : "";
-        a.download = `${safeTitle}${safePart}.pdf`;
-      }
-      // ✅ Update for Lead Magnets only
-      else if (sourceType === "magnet") {
-        const safeTitle = (fileTitle || "Lead_Magnet")
-          .replace(/[^\w\s-]/g, "")
-          .trim()
-          .replace(/\s+/g, "_");
-        a.download = `${safeTitle}.pdf`;
-      } else {
-        a.download = "document.pdf";
-      }
-
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      await new Promise((r) => setTimeout(r, 2000));
-    } catch (err) {
-      console.error("Download error:", err);
-      alert("❌ Download failed. Please try again.");
-    } finally {
-      setDownloading(false);
-    }
-  };
   
+  const handleDownload = async () => {
+  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+  if (isFreeTier) {
+    setShowUpgradeNotice(true);
+    return;
+  }
+
+  try {
+    setDownloading(true);
+
+    // ✅ Create safe title for filename
+    const safeTitle = (fileTitle || "Cre8tly_Download")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "_");
+
+    // ✅ Build proxy download URL with title param (forces download)
+    const proxyDownloadUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(
+      fileUrl
+    )}&title=${encodeURIComponent(safeTitle)}`;
+
+    const res = await fetch(proxyDownloadUrl);
+    if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeTitle}.pdf`; // backend already sets filename, but this ensures consistency
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    await new Promise((r) => setTimeout(r, 2000));
+  } catch (err) {
+    console.error("Download error:", err);
+    alert("❌ Download failed. Please try again.");
+  } finally {
+    setDownloading(false);
+  }
+};
+
 
   useEffect(() => {
     if (!fileUrl) {

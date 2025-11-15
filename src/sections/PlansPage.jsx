@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
@@ -46,6 +46,20 @@ export default function PlansPage() {
     }
   };
 
+    useEffect(() => {
+    // Always restore scrolling when this page mounts
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  
+    return () => {
+      // Ensure scroll is restored if you navigate away and come back
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0b0b0b] text-white flex flex-col items-center px-6 py-20">
       <CustomCursor />
@@ -67,7 +81,8 @@ export default function PlansPage() {
       </div>
 
       {/* ===== Main Plans Grid ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 w-full max-w-7xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-6xl mx-auto place-items-stretch">
+
         {/* ---------- Free Tier ---------- */}
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-green/50 transition">
           <h2 className="text-2xl font-bold mb-2 text-white design-text">
@@ -112,43 +127,8 @@ export default function PlansPage() {
 
         </div>
 
-        {/* ---------- Basic Creator ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-purple-500 transition">
-          <h2 className="text-2xl font-bold mb-2 text-purple-400 design-text">
-            Basic Creator
-          </h2>
-          <p className="text-4xl font-extrabold mb-2">$47</p>
-          <p className="text-gray-400 mb-4 text-sm">One-time payment</p>
-
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 5 Digital Product Slots</li>
-            <li>✅ AI Templates & Content Blocks</li>
-            <li>✅ Instant PDF Generation</li>
-            <li>✅ Custom Branding</li>
-          </ul>
-
-          <button
-            onClick={() => handleSelectPlan("basic")}
-            disabled={loadingPlan === "basic"}
-            className={`w-full mt-auto py-3 text-lg font-semibold rounded-lg transition-all ${
-              loadingPlan === "basic"
-                ? "opacity-50 cursor-not-allowed bg-gray-700"
-                : "bg-gradient-to-r from-purple-600 to-purple-500 hover:opacity-90"
-            }`}
-          >
-            {loadingPlan === "basic" ? "Redirecting..." : "Get Started"}
-          </button>
-
-          <button
-            onClick={() => setSelectedPlan("basic")}
-            className="mt-3 text-sm text-purple-400 hover:underline"
-          >
-            Learn More
-          </button>
-        </div>
-
         {/* ---------- Pro Business Builder ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-blue-500 transition">
+        {/* <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-blue-500 transition">
           <h2 className="text-2xl font-bold mb-2 text-blue-400 design-text">
             Pro Business
           </h2>
@@ -156,9 +136,13 @@ export default function PlansPage() {
           <p className="text-gray-400 mb-4 text-sm">Annual or Monthly</p>
 
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 5 Digital Asset Slots</li>
-            <li>✅ Landing Pages & Lead Forms</li>
+            <li>✅ 15 Digital Asset Slots /monthly</li>
+            <li>✅ Custom Landing Page</li>
+            <li>✅ Custom Subdomain</li>
+            <li>✅ Sellers Dashboard - keep 90% of sales</li>
             <li>✅ Email Capture Automation</li>
+            <li>✅ Pro Covers</li>
+            <li>✅ Prompt Memory</li>
             <li>✅ Analytics Dashboard</li>
             <li>✅ Custom Domains</li>
             <li>✅ Priority Support</li>
@@ -200,127 +184,89 @@ export default function PlansPage() {
           >
             Learn More
           </button>
-        </div>
+        </div> */}
+        {/* ---------- Business Builder (Annual) ---------- */}
+<div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-blue-500/50 transition">
+  <h2 className="text-2xl font-bold mb-2 text-blue-400 design-text">
+    Business Builder (Annual)
+  </h2>
+  <p className="text-4xl font-extrabold mb-2 text-blue-400">$129.99</p>
+  <p className="text-gray-400 mb-4 text-sm">Billed annually ($1,560/year)</p>
 
-        {/* ---------- All-In-One Bundle ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-yellow-400 transition">
-          <h2 className="text-2xl font-bold mb-2 text-yellow-300 design-text">
-            All-In-One Bundle
-          </h2>
-          <p className="text-4xl font-extrabold mb-2">$999</p>
-          <p className="text-gray-400 mb-4 text-sm">Lifetime Access</p>
+  <ul className="text-sm text-gray-300 space-y-2 mb-8">
+    <li>✅ 15 Lead Magnet Slots /month</li>
+    <li>✅ Sell on Your Landing Page</li>
+    <li>✅ Keep 90% of Every Sale</li>
+    <li>✅ Pro Covers & Prompt Memory</li>
+    <li>✅ Custom Subdomain + Email Capture</li>
+    <li>✅ Analytics Dashboard</li>
+    <li>✅ Priority Support</li>
+  </ul>
 
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ Everything in Basic & Pro Covers</li>
-            <li>✅ Author’s Assistant (750 pages)</li>
-            <li>✅ Pro Covers + Templates</li>
-            <li>✅ Priority Support</li>
-            <li>✅ Lifetime Updates</li>
-          </ul>
+  <button
+    onClick={() => handleSelectPlan("business_builder_pack_annual")}
+    disabled={loadingPlan === "business_builder_pack_annual"}
+    className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
+      loadingPlan === "business_builder_pack_annual"
+        ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
+        : "bg-gradient-to-r from-blue-500 to-indigo-400 text-white border-blue-400 hover:opacity-90 shadow-lg shadow-blue-400/30"
+    }`}
+  >
+    {loadingPlan === "business_builder_pack_annual"
+      ? "Redirecting..."
+      : "Get Annual Plan"}
+  </button>
 
-          <button
-            onClick={() => handleSelectPlan("bundle")}
-            disabled={loadingPlan === "bundle"}
-            className={`w-full mt-auto py-3 text-lg font-semibold rounded-lg transition-all ${
-              loadingPlan === "bundle"
-                ? "opacity-50 cursor-not-allowed bg-gray-700"
-                : "bg-gradient-to-r from-yellow to-yellow/80 text-black hover:opacity-90"
-            }`}
-          >
-            {loadingPlan === "bundle" ? "Redirecting..." : "Get the Bundle"}
-          </button>
+  <button
+    onClick={() => setSelectedPlan("business_builder_pack")}
+    className="mt-4 text-sm text-blue-400 hover:underline text-center"
+  >
+    Learn More
+  </button>
+</div>
 
-          <button
-            onClick={() => setSelectedPlan("bundle")}
-            className="mt-3 text-sm text-yellow-300 hover:underline"
-          >
-            Learn More
-          </button>
-        </div>
-      </div>
+{/* ---------- Business Builder (Monthly) ---------- */}
+<div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-sky-400/50 transition">
+  <h2 className="text-2xl font-bold mb-2 text-sky-400 design-text">
+    Business Builder (Monthly)
+  </h2>
+  <p className="text-4xl font-extrabold mb-2 text-sky-400">$199.99</p>
+  <p className="text-gray-400 mb-4 text-sm">Billed monthly (12-month term)</p>
 
-      {/* ===== Add-Ons Section ===== */}
-      {/* ===== Add-Ons Section ===== */}
-      <div className="w-full max-w-6xl mt-20">
-        <h3 className="text-3xl font-bold text-center mb-8 design-text">
-          Add-Ons
-        </h3>
+  <ul className="text-sm text-gray-300 space-y-2 mb-8">
+    <li>✅ 15 Lead Magnet Slots /month</li>
+    <li>✅ Sell on Your Landing Page</li>
+    <li>✅ Keep 90% of Every Sale</li>
+    <li>✅ Pro Covers & Prompt Memory</li>
+    <li>✅ Custom Subdomain + Email Capture</li>
+    <li>✅ Analytics Dashboard</li>
+    <li>✅ Priority Support</li>
+  </ul>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* ---------- Prompt Memory ---------- */}
-          <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-emerald-400 transition">
-            <h2 className="text-2xl font-bold mb-2 text-green-400 design-text">
-              Prompt Memory Subscription
-            </h2>
-            <p className="text-4xl font-extrabold mb-2 text-green-400">
-              $14.99
-              <span className="text-lg font-normal text-gray-400">
-                {" "}
-                / month
-              </span>
-            </p>
-            <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-              Your AI’s memory for tone, style, and brand voice — so every
-              project you create feels authentically yours. Stay consistent and
-              save hours on rewriting.
-            </p>
+  <button
+    onClick={() => handleSelectPlan("business_builder_pack_monthly")}
+    disabled={loadingPlan === "business_builder_pack_monthly"}
+    className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
+      loadingPlan === "business_builder_pack_monthly"
+        ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
+        : "bg-gradient-to-r from-sky-400 to-sky-300 border-sky-400 text-black hover:opacity-90 shadow-lg shadow-sky-400/30"
+    }`}
+  >
+    {loadingPlan === "business_builder_pack_monthly"
+      ? "Redirecting..."
+      : "Get Monthly Plan"}
+  </button>
 
-            <button
-              onClick={() => setSelectedPlan("prompt_memory")}
-              className="text-green-400 text-sm hover:underline mb-3"
-            >
-              Learn More
-            </button>
+  <button
+    onClick={() => setSelectedPlan("business_builder_pack")}
+    className="mt-4 text-sm text-sky-400 hover:underline text-center"
+  >
+    Learn More
+  </button>
+</div>
 
-            <button
-              onClick={() => handleSelectPlan("prompt_memory")}
-              disabled={loadingPlan === "prompt_memory"}
-              className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg transition-all ${
-                loadingPlan === "prompt_memory"
-                  ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-gradient-to-r from-green to-green/90 text-black hover:opacity-90"
-              }`}
-            >
-              {loadingPlan === "prompt_memory" ? "Redirecting..." : "Subscribe"}
-            </button>
-          </div>
 
-          {/* ---------- Pro Covers ---------- */}
-          <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-green-500 transition">
-            <h2 className="text-2xl font-bold mb-2 text-green-400 design-text">
-              Pro Covers
-            </h2>
-            <p className="text-4xl font-extrabold mb-2 text-green-400">$150</p>
-            <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-              Unlimited{" "}
-              <span className="text-white font-medium">
-                custom and Unsplash cover uploads
-              </span>
-              . Single purchase unlocks Pro Covers for lifetime.
-            </p>
-
-            <button
-              onClick={() => setSelectedPlan("pro")}
-              className="text-green-400 text-sm hover:underline mb-3"
-            >
-              Learn More
-            </button>
-
-            <button
-              onClick={() => handleSelectPlan("pro")}
-              disabled={loadingPlan === "pro"}
-              className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg transition-all ${
-                loadingPlan === "pro"
-                  ? "opacity-50 cursor-not-allowed bg-gray-700"
-                  : "bg-green text-black hover:opacity-90"
-              }`}
-            >
-              {loadingPlan === "pro" ? "Redirecting..." : "Unlock Pro Covers"}
-            </button>
-          </div>
-
-          {/* ---------- Author’s Assistant ---------- */}
-          <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
+        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
             <h2 className="text-2xl font-bold mb-2 text-pink-400 design-text">
               Author’s Assistant
             </h2>
@@ -351,7 +297,8 @@ export default function PlansPage() {
                 : "Unlock Author’s Assistant"}
             </button>
           </div>
-        </div>
+
+
       </div>
 
       {selectedPlan && (

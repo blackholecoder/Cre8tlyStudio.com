@@ -601,6 +601,52 @@ export default function DashboardSettings() {
             </button>
           )}
         </div>
+        {/* 💳 Stripe Seller Connection */}
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Seller Payouts (Stripe Connect)
+          </h2>
+          <p className="text-sm text-gray-400 mb-4">
+            Connect your Stripe Express account to receive payouts for sales you
+            make through Cre8tly Studio.
+          </p>
+
+          {user?.stripe_connect_account_id ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-green font-semibold">✅ Connected</span>
+                <p className="text-xs text-gray-500">
+                  Your Stripe account is linked for payouts.
+                </p>
+              </div>
+              <button
+                onClick={() =>
+                  window.open("https://dashboard.stripe.com/express", "_blank")
+                }
+                className="px-5 py-2 bg-blue hover:bg-blue/80 text-white rounded-lg font-semibold transition"
+              >
+                Open Stripe Dashboard
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={async () => {
+                try {
+                  const { data } = await api.post(
+                    "https://cre8tlystudio.com/api/seller/create-account-link"
+                  );
+                  if (data.url) window.location.href = data.url;
+                } catch (err) {
+                  console.error("Stripe connect error:", err);
+                  toast.error("Failed to start Stripe onboarding. Try again.");
+                }
+              }}
+              className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+            >
+              Connect with Stripe
+            </button>
+          )}
+        </div>
 
         {/* Active File */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8">

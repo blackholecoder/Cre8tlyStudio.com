@@ -13,6 +13,7 @@ function SortableBlock({
   updateBlock,
   removeBlock,
   bgTheme,
+  pdfList,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -179,52 +180,6 @@ function SortableBlock({
             </>
           )}
 
-          {block.type === "button" && (
-            <>
-              <label className="font-semibold text-sm mb-1">Button Text</label>
-              <input
-                type="text"
-                placeholder="Enter button label"
-                value={block.text || ""}
-                onChange={(e) => updateBlock(index, "text", e.target.value)}
-                className="w-full mt-1 p-2 border rounded bg-black text-white"
-              />
-
-              <label className="font-semibold text-sm mt-3 mb-1">
-                Button Link URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://example.com"
-                value={block.url || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const normalized = normalizeVideoUrl(value);
-                  updateBlock(index, "url", normalized);
-                }}
-                className="w-full mt-1 p-2 border rounded bg-black text-white"
-              />
-
-              <div className="flex items-center mt-3">
-                <input
-                  id={`new-tab-${id}`}
-                  type="checkbox"
-                  checked={block.new_tab || false}
-                  onChange={(e) =>
-                    updateBlock(index, "new_tab", e.target.checked)
-                  }
-                  className="w-4 h-4 mr-2 accent-green-500"
-                />
-                <label
-                  htmlFor={`new-tab-${id}`}
-                  className="text-sm font-semibold text-gray-400"
-                >
-                  Open in new tab
-                </label>
-              </div>
-            </>
-          )}
-
           {block.type === "video" && (
             <>
               <label className="block text-sm font-semibold text-gray-300 mb-1">
@@ -296,7 +251,7 @@ function SortableBlock({
               className="rounded-xl p-6 mt-3 shadow-inner transition-all relative"
               style={{
                 background: block.match_main_bg
-                  ? adjustForLandingOverlay(bgTheme) // ✅ true live-page color tone
+                  ? adjustForLandingOverlay(bgTheme) // ✅ keep main tone
                   : bgTheme || "linear-gradient(to bottom, #1e1e1e, #111)",
                 border: "1px solid rgba(255,255,255,0.1)",
                 boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
@@ -308,7 +263,7 @@ function SortableBlock({
                 className="rounded-xl p-6 shadow-lg transition-all duration-300"
                 style={{
                   background: block.match_main_bg
-                    ? adjustForLandingOverlay(bgTheme) // ✅ use brightened content background
+                    ? adjustForLandingOverlay(bgTheme)
                     : block.use_gradient
                       ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
                           block.gradient_start || "#F285C3"
@@ -445,29 +400,33 @@ function SortableBlock({
                   </>
                 )}
 
-                {/* 🔗 Button Fields */}
+                {/* 💰 Offer Type Dropdown (replaces unsafe external link) */}
+                <div className="mt-5">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Offer Type
+                  </label>
+                  <select
+                    value={block.offer_type || "free"}
+                    onChange={(e) =>
+                      updateBlock(index, "offer_type", e.target.value)
+                    }
+                    className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+                  >
+                    <option value="free">Email Download</option>
+                    <option value="paid">Stripe Checkout</option>
+                  </select>
+                </div>
+
+                {/* 🏷 Button Text */}
                 <label className="text-sm font-semibold text-gray-300 mt-4">
                   Button Text
                 </label>
                 <input
                   type="text"
                   placeholder="Claim Offer"
-                  value={block.link_text || ""}
+                  value={block.button_text || ""}
                   onChange={(e) =>
-                    updateBlock(index, "link_text", e.target.value)
-                  }
-                  className="w-full p-2 border border-gray-600 rounded bg-black text-white"
-                />
-
-                <label className="text-sm font-semibold text-gray-300">
-                  Button Link URL
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://example.com"
-                  value={block.link_url || ""}
-                  onChange={(e) =>
-                    updateBlock(index, "link_url", e.target.value)
+                    updateBlock(index, "button_text", e.target.value)
                   }
                   className="w-full p-2 border border-gray-600 rounded bg-black text-white"
                 />
@@ -482,11 +441,8 @@ function SortableBlock({
                       "🔥 Limited Time Offer! Get your free eBook today!"}
                   </p>
 
-                  {block.link_text && block.link_url && (
-                    <a
-                      href={block.link_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  {block.button_text && (
+                    <button
                       className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition-transform transform hover:scale-105"
                       style={{
                         background: block.use_gradient
@@ -497,8 +453,8 @@ function SortableBlock({
                         boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
                       }}
                     >
-                      {block.link_text}
-                    </a>
+                      {block.button_text}
+                    </button>
                   )}
                 </div>
               </div>
@@ -797,6 +753,249 @@ function SortableBlock({
               >
                 <p className="font-semibold mb-2">{block.text}</p>
                 <CountdownTimerPreview targetDate={block.target_date} />
+              </div>
+            </div>
+          )}
+          {block.type === "stripe_checkout" && (
+            <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
+              <h3 className="text-lg font-semibold text-silver mb-4">
+                Stripe Checkout Button
+              </h3>
+
+              {/* 🧾 PDF Selector */}
+              <label className="text-sm font-semibold text-gray-300">
+                Select PDF to Sell
+              </label>
+              <select
+                value={block.pdf_url || ""}
+                onChange={(e) => updateBlock(index, "pdf_url", e.target.value)}
+                className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+              >
+                <option value="">-- Select a Completed PDF --</option>
+                {pdfList
+                  .filter((lm) => lm.status === "completed" && lm.pdf_url)
+                  .map((lm) => (
+                    <option key={lm.id} value={lm.pdf_url}>
+                      {lm.title || "Untitled PDF"} — (Ready)
+                    </option>
+                  ))}
+              </select>
+
+              {/* ✅ Preview link if PDF is chosen */}
+              {block.pdf_url && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Selected File:
+                  <a
+                    href={block.pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green font-medium ml-1 underline hover:text-green transition"
+                  >
+                    Preview PDF
+                  </a>
+                </p>
+              )}
+
+              {/* 🏷 Button Label */}
+              <label className="text-sm font-semibold text-gray-300 mt-4 block">
+                Button Label
+              </label>
+              <input
+                type="text"
+                placeholder="Buy & Download PDF"
+                value={block.button_text || ""}
+                onChange={(e) =>
+                  updateBlock(index, "button_text", e.target.value)
+                }
+                className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+              />
+
+              {/* 💲 Price Input */}
+              <label className="text-sm font-semibold text-gray-300 mt-4 block">
+                Price (USD)
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={block.price || 10}
+                onChange={(e) =>
+                  updateBlock(index, "price", parseFloat(e.target.value))
+                }
+                className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+              />
+
+              {/* 🎨 Button Colors */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-4">
+                {/* Background Color */}
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Button Background
+                  </label>
+                  <input
+                    type="color"
+                    value={block.button_color || "#10b981"}
+                    onChange={(e) =>
+                      updateBlock(index, "button_color", e.target.value)
+                    }
+                    className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.button_color || "#10b981"}
+                  </span>
+                </div>
+
+                {/* Text Color */}
+                <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Text Color
+                  </label>
+                  <input
+                    type="color"
+                    value={block.text_color || "#000000"}
+                    onChange={(e) =>
+                      updateBlock(index, "text_color", e.target.value)
+                    }
+                    className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.text_color || "#000000"}
+                  </span>
+                </div>
+              </div>
+
+              {/* 📐 Alignment */}
+              <div className="flex items-center justify-between mt-4">
+                <label className="text-sm font-semibold text-gray-300">
+                  Alignment
+                </label>
+                <select
+                  value={block.alignment || "center"}
+                  onChange={(e) =>
+                    updateBlock(index, "alignment", e.target.value)
+                  }
+                  className="p-2 bg-black border border-gray-700 rounded text-white text-sm"
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+
+              {/* 💳 Live Preview */}
+              <div
+                className="mt-6 p-6 text-center border border-gray-700 rounded-lg"
+                style={{ textAlign: block.alignment }}
+              >
+                <button
+                  className="px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                  style={{
+                    background: block.button_color || "#10b981",
+                    color: block.text_color || "#000000",
+                  }}
+                >
+                  {block.button_text || "Buy & Download PDF"}
+                </button>
+                <p className="text-xs text-gray-400 mt-2">
+                  ${block.price?.toFixed(2) || "10.00"} USD
+                </p>
+              </div>
+            </div>
+          )}
+          {block.type === "referral_button" && (
+            <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
+              <h3 className="text-lg font-semibold text-silver mb-4">
+                Referral Signup Button
+              </h3>
+
+              {/* 🏷 Label */}
+              <label className="text-sm font-semibold text-gray-300">
+                Button Label
+              </label>
+              <input
+                type="text"
+                placeholder="Sign Up Now"
+                value={block.button_text || ""}
+                onChange={(e) =>
+                  updateBlock(index, "button_text", e.target.value)
+                }
+                className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+              />
+
+              {/* 🎨 Button Colors */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-4">
+                {/* Background Color */}
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Button Background
+                  </label>
+                  <input
+                    type="color"
+                    value={block.button_color || "#10b981"}
+                    onChange={(e) =>
+                      updateBlock(index, "button_color", e.target.value)
+                    }
+                    className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.button_color || "#10b981"}
+                  </span>
+                </div>
+
+                {/* Text Color */}
+                <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                  <label className="text-sm font-semibold text-gray-300">
+                    Text Color
+                  </label>
+                  <input
+                    type="color"
+                    value={block.text_color || "#000000"}
+                    onChange={(e) =>
+                      updateBlock(index, "text_color", e.target.value)
+                    }
+                    className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.text_color || "#000000"}
+                  </span>
+                </div>
+              </div>
+
+              {/* 📐 Alignment */}
+              <div className="flex items-center justify-between mt-4">
+                <label className="text-sm font-semibold text-gray-300">
+                  Alignment
+                </label>
+                <select
+                  value={block.alignment || "center"}
+                  onChange={(e) =>
+                    updateBlock(index, "alignment", e.target.value)
+                  }
+                  className="p-2 bg-black border border-gray-700 rounded text-white text-sm"
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+
+              {/* 💻 Live Preview */}
+              <div
+                className="mt-6 p-6 text-center border border-gray-700 rounded-lg"
+                style={{ textAlign: block.alignment }}
+              >
+                <button
+                  className="px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                  style={{
+                    background: block.button_color || "#10b981",
+                    color: block.text_color || "#000000",
+                  }}
+                >
+                  {block.button_text || "Sign Up Now"}
+                </button>
+                <p className="text-xs text-gray-400 mt-3 italic">
+                  This button will automatically track new signups under your
+                  referral.
+                </p>
               </div>
             </div>
           )}

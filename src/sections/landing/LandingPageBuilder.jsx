@@ -148,6 +148,15 @@ export default function LandingPageBuilder() {
       newBlock.collapsed = false;
     }
 
+    // ⭐ Verified Reviews Block
+    if (type === "verified_reviews") {
+      newBlock.title = "Verified Buyer Reviews";
+      newBlock.text_color = "#FFFFFF";
+      newBlock.bg_color = "rgba(0,0,0,0.3)";
+      newBlock.alignment = "center";
+      newBlock.collapsed = false;
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -1388,6 +1397,53 @@ export default function LandingPageBuilder() {
                             >
                               {`Referral link: ${referralUrl}`}
                             </p>
+                          </div>
+                        );
+
+                      case "verified_reviews":
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              background: block.bg_color || "rgba(0,0,0,0.3)",
+                              color: block.text_color || "#FFFFFF",
+                              textAlign: block.alignment || "center",
+                              padding: "40px",
+                              borderRadius: "20px",
+                              marginTop: "40px",
+                            }}
+                          >
+                            <h2
+                              style={{
+                                fontSize: "1.8rem",
+                                fontWeight: 700,
+                                marginBottom: "10px",
+                              }}
+                            >
+                              {block.title || "Verified Buyer Reviews"}
+                            </h2>
+                            <p style={{ color: "#AAA", fontSize: "0.95rem" }}>
+                              (Buyers who purchased will be able to leave
+                              reviews here)
+                            </p>
+                            <div
+                              style={{
+                                marginTop: "20px",
+                                background: "rgba(255,255,255,0.08)",
+                                padding: "20px",
+                                borderRadius: "10px",
+                                color: "#CCC",
+                                fontStyle: "italic",
+                              }}
+                            >
+                              ★★★★★ “Love this product!”
+                              <br />
+                              <span
+                                style={{ fontSize: "0.8rem", color: "#999" }}
+                              >
+                                — Verified Buyer, sample preview
+                              </span>
+                            </div>
                           </div>
                         );
 

@@ -16,9 +16,10 @@ import {
   Globe,
   Users,
   BarChart2,
-  Banknote
+  Banknote,
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
+import AnimatedLogo from "../animation/AnimatedLogo";
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -28,7 +29,6 @@ export default function DashboardLayout({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
-const trialExpired = user?.trialExpired;
 
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
@@ -77,10 +77,10 @@ const trialExpired = user?.trialExpired;
   ];
 
   if (isFreeTier) {
-  menu = menu.filter(
-    (item) => item.label !== "Prompt Memory" && item.label !== "Assistant"
-  );
-}
+    menu = menu.filter(
+      (item) => item.label !== "Prompt Memory" && item.label !== "Assistant"
+    );
+  }
 
   return (
     <div className="flex bg-[#030712] text-white relative min-h-full">
@@ -97,14 +97,19 @@ const trialExpired = user?.trialExpired;
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-              <div className="flex flex-col items-center justify-center mt-6 mb-4">
-                <img
-                  src={headerLogo}
-                  alt="Cre8tly"
-                  className="w-16 h-16 mb-2"
-                />
-                <h1 className="text-sm font-semibold text-white text-center tracking-wide">
-                  Cre8tly Studio
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="relative flex items-center justify-center w-16 h-16 mb-3 overflow-visible">
+                  {/* Soft outer glow (contained, doesn’t push text) */}
+                  <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse"></div>
+
+                  {/* Logo itself */}
+                  <AnimatedLogo className="relative z-10 w-16 h-16 animate-glow" />
+                </div>
+
+                <h1 className="text-[13px] font-semibold text-white text-center leading-snug mt-1">
+                  Cre8tly
+                  <br />
+                  Studio
                 </h1>
               </div>
               <button
@@ -176,75 +181,72 @@ const trialExpired = user?.trialExpired;
         }`}
                   >
                     <Globe size={22} />
-                    
                   </div>
                 </button>
               )}
               {user?.pro_status === "active" && (
-  <button
-    onClick={() => {
-      navigate("/leads");
-      if (window.innerWidth < 1024) setIsSidebarOpen(false);
-    }}
-    className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-  >
-    <div
-      className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+                <button
+                  onClick={() => {
+                    navigate("/leads");
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                  }}
+                  className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
+                >
+                  <div
+                    className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
       ${
         location.pathname === "/leads"
-           ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-          : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-blue-400 hover:text-blue-400"
+          ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
+          : "bg-gray-800/50 border-gray-700 text-gray-300  hover:border-green hover:text-green"
       }`}
-    >
-      <Users size={22} />
-      
-    </div>
-  </button>
-)}
+                  >
+                    <Users size={22} />
+                  </div>
+                </button>
+              )}
 
-{user?.pro_status === "active" && (
-  <button
-    onClick={() => {
-      navigate("/landing-analytics");
-      if (window.innerWidth < 1024) setIsSidebarOpen(false);
-    }}
-    className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-  >
-    <div
-      className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+              {user?.pro_status === "active" && (
+                <button
+                  onClick={() => {
+                    navigate("/landing-analytics");
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                  }}
+                  className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
+                >
+                  <div
+                    className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
         ${
           location.pathname === "/landing-analytics"
             ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
             : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
         }`}
-    >
-      <BarChart2 size={22} /> {/* import this from lucide-react */}
-    </div>
-  </button>
-)}
+                  >
+                    <BarChart2 size={22} />{" "}
+                    {/* import this from lucide-react */}
+                  </div>
+                </button>
+              )}
 
-{user?.stripe_connect_account_id && (
-  <button
-    onClick={() => {
-      navigate("/seller-dashboard");
-      if (window.innerWidth < 1024) setIsSidebarOpen(false);
-    }}
-    className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-  >
-    <div
-      className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
+              {user?.stripe_connect_account_id && (
+                <button
+                  onClick={() => {
+                    navigate("/seller-dashboard");
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                  }}
+                  className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
+                >
+                  <div
+                    className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
         ${
           location.pathname === "/seller-dashboard"
             ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
             : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
         }`}
-    >
-      <Banknote size={22} />
-    </div>
-  </button>
-)}
-
-
+                  >
+                    <Banknote size={22} />
+                  </div>
+                </button>
+              )}
             </nav>
           </div>
 

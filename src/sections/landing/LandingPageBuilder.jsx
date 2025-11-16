@@ -254,7 +254,7 @@ export default function LandingPageBuilder() {
           <div className="absolute inset-0 rounded-full bg-blue/30 blur-2xl animate-ping"></div>
 
           {/* Center spinner */}
-          <div className="w-16 h-16 border-4 border-t-transparent border-blue rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
         </div>
 
         {/* Loading text */}

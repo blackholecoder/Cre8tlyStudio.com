@@ -101,7 +101,7 @@ export default function LandingAnalytics() {
   })();
 
   return (
-    <div className="w-full min-h-screen bg-black text-white px-4 py-8 pt-24">
+    <div className="w-full min-h-screen text-white px-4 py-8 pt-24">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -114,7 +114,7 @@ export default function LandingAnalytics() {
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                   range === r
                     ? "bg-gray-700 text-white"
-                    : "bg-[#111111] text-gray-400 border border-[#222]"
+                    : "bg-[#111111] text-gray-400 border border-[#2A2F3A]"
                 }`}
               >
                 {r} days
@@ -129,7 +129,7 @@ export default function LandingAnalytics() {
     {metrics.map((m) => (
       <div
         key={m.key}
-        className="flex flex-col items-center justify-center bg-[#0a0a0a] rounded-xl p-3 sm:p-4 shadow-md border border-[#1a1a1a]"
+        className="flex flex-col items-center justify-center bg-[#0a0a0a] rounded-xl p-3 sm:p-4 shadow-md border border-[#2A2F3A]"
       >
         <p className="text-sm text-gray-400">{m.label}</p>
         <p className="text-2xl font-semibold" style={{ color: m.color }}>
@@ -143,7 +143,7 @@ export default function LandingAnalytics() {
 
         {/* Total Views */}
         {data && (
-          <div className="bg-[#0a0a0a] rounded-2xl py-8 text-center mb-6 border border-[#1a1a1a]">
+          <div className="bg-[#0a0a0a] rounded-2xl py-8 text-center mb-6 border border-[#2A2F3A]">
             <p className="text-gray-400 text-sm uppercase tracking-wide mb-1">
               Total Views
             </p>
@@ -173,7 +173,7 @@ export default function LandingAnalytics() {
         )}
 
         {/* Chart */}
-        <div className="bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] p-4 h-[400px] shadow-inner mb-8">
+        <div className="bg-[#0a0a0a] rounded-2xl border border-[#2A2F3A] p-4 h-[400px] shadow-inner mb-8">
           {loading ? (
             <p className="text-center text-gray-500 mt-20">
               Loading analytics...

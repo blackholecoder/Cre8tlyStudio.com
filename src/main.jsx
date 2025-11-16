@@ -96,7 +96,7 @@ const AnimatedRoutes = () => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
-        className="min-h-screen bg-[#030712]"
+        className="min-h-screen"
       >
         <DashboardLayout>
           <SellerDashboard />

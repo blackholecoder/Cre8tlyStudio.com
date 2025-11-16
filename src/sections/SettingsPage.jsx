@@ -394,7 +394,6 @@ export default function DashboardSettings() {
 
   const plans = getUserPlan();
 
-
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
       <div className="w-full max-w-[900px] p-5">
@@ -530,7 +529,44 @@ export default function DashboardSettings() {
             Add an extra layer of security to your Cre8tly Studio account.
           </p>
 
-          {!twofaEnabled ? (
+          {twofaEnabled ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-green font-semibold">
+                  ✅ 2FA is enabled
+                </span>
+                <p className="text-xs text-gray-500">
+                  Your account is protected with two-factor authentication.
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await api.post(
+                      "https://cre8tlystudio.com/api/auth/user/disable-2fa"
+                    );
+                    if (res.data.success) {
+                      setTwofaEnabled(false);
+                      setUser({ ...user, twofa_enabled: 0 });
+                      localStorage.setItem(
+                        "user",
+                        JSON.stringify({ ...user, twofa_enabled: 0 })
+                      );
+                      toast.info("2FA has been disabled.");
+                    } else {
+                      toast.error("Failed to disable 2FA. Try again.");
+                    }
+                  } catch (err) {
+                    console.error("Disable 2FA error:", err);
+                    toast.error("Server error disabling 2FA.");
+                  }
+                }}
+                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+              >
+                Disable 2FA
+              </button>
+            </div>
+          ) : (
             <>
               {!qr ? (
                 <button
@@ -551,7 +587,6 @@ export default function DashboardSettings() {
                     Scan this code with your Authenticator app, then enter the
                     6-digit code below.
                   </p>
-
                   <input
                     type="text"
                     placeholder="Enter 6-digit code"
@@ -559,7 +594,6 @@ export default function DashboardSettings() {
                     onChange={(e) => setTwofaCode(e.target.value)}
                     className="w-40 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none"
                   />
-
                   <button
                     onClick={handleVerify2FA}
                     disabled={verifying}
@@ -574,15 +608,6 @@ export default function DashboardSettings() {
                 </div>
               )}
             </>
-          ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-green font-semibold">
-                ✅ 2FA is enabled
-              </span>
-              <p className="text-xs text-gray-500">
-                Your account is protected with two-factor authentication.
-              </p>
-            </div>
           )}
         </div>
 
@@ -726,7 +751,7 @@ export default function DashboardSettings() {
         </div>
 
         {/* Upload Section */}
-        {/* Upload Section */}
+
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
           <h2 className="text-lg font-semibold text-gray-200">
             Upload New Brand File
@@ -762,7 +787,7 @@ export default function DashboardSettings() {
                     type="file"
                     accept=".pdf,.docx,.doc,.txt"
                     onChange={(e) => setFile(e.target.files[0])}
-                    className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-green-500 file:to-purple-600 hover:file:opacity-90"
+                    className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white hover:file:opacity-90"
                   />
                   {file && (
                     <p className="text-xs text-gray-400 italic mt-1">
@@ -778,12 +803,12 @@ export default function DashboardSettings() {
                   className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
             ${
               uploading
-                ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green-700 to-green-600"
-                : "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green/80 to-green/60"
+                : "bg-green hover:from-green-400 hover:green/70 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
             }
             text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
                 >
-                  <span className="relative z-10">
+                  <span className="relative z-10 text-black">
                     {uploading ? "Uploading..." : "Save Brand"}
                   </span>
                   {!uploading && (
@@ -797,32 +822,45 @@ export default function DashboardSettings() {
 
         {/* CTA Settings */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
-          <h2 className="text-lg font-semibold text-gray-200">
-            Default Closing Message / CTA
-          </h2>
-          <p className="text-sm text-gray-400">
-            This message will appear at the end of your lead magnets or books.
-            You can change it anytime.
-          </p>
+          
+          {/* CTA Settings */}
+<div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+  <h2 className="text-lg font-semibold text-gray-200">
+    Default Closing Message / CTA
+  </h2>
+  <p className="text-sm text-gray-400 mb-4">
+    This message will appear at the end of your lead magnets or books.
+    You can change it anytime.
+  </p>
 
-          <textarea
-            placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
-            value={settings?.cta || ""}
-            onChange={(e) =>
-              setSettings((prev) => ({ ...prev, cta: e.target.value }))
-            }
-            rows={5}
-            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
-          />
+  {/* Inner card for textarea + button */}
+  <div className="rounded-lg p-5 space-y-4">
+    <textarea
+      placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
+      value={settings?.cta || ""}
+      onChange={(e) =>
+        setSettings((prev) => ({ ...prev, cta: e.target.value }))
+      }
+      rows={6}
+      className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+    />
 
-          <div className="flex justify-end">
-            <button
-              onClick={handleSaveCTA}
-              className="mt-3 px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
-            >
-              Save CTA
-            </button>
-          </div>
+    <div className="flex justify-end">
+      <button
+        onClick={handleSaveCTA}
+        className="px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
+      >
+        Save CTA
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+          
           {user?.has_book ? (
             <>
               <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">

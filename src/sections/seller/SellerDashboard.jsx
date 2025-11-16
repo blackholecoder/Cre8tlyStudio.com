@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
+import DashboardLayout from "../../components/layouts/DashboardLayout";
 
 export default function SellerDashboard() {
   const { user } = useAuth();
@@ -55,14 +56,17 @@ export default function SellerDashboard() {
 
   if (loading) {
     return (
+      <DashboardLayout>
       <div className="flex items-center justify-center min-h-screen text-gray-400">
         Loading seller data...
       </div>
+      </DashboardLayout>
     );
   }
 
   if (!user?.stripe_connect_account_id) {
     return (
+      <DashboardLayout>
       <div className="flex flex-col items-center justify-center min-h-screen text-gray-300">
         <h1 className="text-2xl font-bold mb-3">No Stripe Account Connected</h1>
         <p className="text-gray-400 text-center mb-6 max-w-md">
@@ -77,6 +81,7 @@ export default function SellerDashboard() {
           Go to Settings
         </button>
       </div>
+      </DashboardLayout>
     );
   }
 

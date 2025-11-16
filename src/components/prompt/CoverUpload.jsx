@@ -67,7 +67,7 @@ export default function CoverUpload({ setCover }) {
              text-black font-semibold hover:opacity-90 transition shadow-lg flex items-center gap-2 justify-center"
           >
             <Lock size={15} className="text-black" />
-            <span>Unlock Pro Covers</span>
+            <span>Upgrade to Unlock</span>
           </button>
         </div>
       )}

@@ -152,32 +152,49 @@ export default function CustomerDashboard() {
         />
 
         {/* Content */}
-        {loading ? (
-          <LoadingState />
-        ) : (magnets.magnets?.length || 0) === 0 ? (
-          <EmptyState onCheckout={handleCheckout} type="magnet" />
-        ) : (
-          <>
-            <MagnetGrid
-              magnets={paginatedMagnets}
-              onAddPrompt={openPromptModal}
-              onOpenEditor={openEditor}
-              onDelete={handleDeleteMagnet}
-            />
-            <MagnetCardList
-              magnets={paginatedMagnets}
-              onAddPrompt={openPromptModal}
-              onOpenEditor={openEditor}
-              onDelete={handleDeleteMagnet}
-            />
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-            <SupportTab />
-          </>
-        )}
+       {loading ? (
+  <div className="flex flex-col items-center justify-center min-h-screen text-white">
+    <div className="relative">
+      {/* Glowing pulse ring */}
+      <div className="absolute inset-0 rounded-full bg-blue-500/30 blur-2xl animate-ping"></div>
+
+      {/* Center spinner */}
+      <div className="w-16 h-16 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
+    </div>
+
+    {/* Loading text */}
+    <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
+      Fetching your lead magnets...
+    </p>
+    <p className="text-sm text-gray-400 mt-2">
+      Please wait while we load your content from Cre8tly Studio.
+    </p>
+  </div>
+) : magnets.magnets?.length > 0 ? (
+  <>
+    <MagnetGrid
+      magnets={paginatedMagnets}
+      onAddPrompt={openPromptModal}
+      onOpenEditor={openEditor}
+      onDelete={handleDeleteMagnet}
+    />
+    <MagnetCardList
+      magnets={paginatedMagnets}
+      onAddPrompt={openPromptModal}
+      onOpenEditor={openEditor}
+      onDelete={handleDeleteMagnet}
+    />
+    <PaginationControls
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+    />
+    <SupportTab />
+  </>
+) : (
+  <EmptyState onCheckout={handleCheckout} type="magnet" />
+)}
+
 
         {/* Modals */}
         {activeMagnet && (

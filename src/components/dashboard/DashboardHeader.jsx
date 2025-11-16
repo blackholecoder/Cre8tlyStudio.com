@@ -7,6 +7,16 @@ export default function DashboardHeader({
   type = "magnet",
 }) {
   const { user } = useAuth();
+
+  const isDataLoading =
+  !user ||
+  user.magnet_slots === undefined ||
+  user.magnet_slots === null ||
+  summary === undefined ||
+  summary.total_slots === undefined;
+
+if (isDataLoading) return null;
+  
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
   const trialExpired = user?.trialExpired;
 
@@ -44,6 +54,8 @@ export default function DashboardHeader({
   const freeUsedAll = isFreeTier && (availableSlots <= 0 || trialExpired);
 
   const title = type === "book" ? "My Books" : "My Digital Products";
+
+  
 
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">

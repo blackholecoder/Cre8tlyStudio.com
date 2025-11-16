@@ -1,27 +1,44 @@
 import { useAuth } from "../../admin/AuthContext";
 
-export default function DashboardHeader({ items = [], onCheckout, type = "magnet" }) {
+export default function DashboardHeader({
+  items = [],
+  summary = {},
+  onCheckout,
+  type = "magnet",
+}) {
   const { user } = useAuth();
-
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
   const trialExpired = user?.trialExpired;
 
-  // ✅ Handle if backend returns { magnets, summary }
-  const magnetsArray = Array.isArray(items.magnets) ? items.magnets : items;
-  const summary = items.summary || {};
+  let totalSlots;
+  let usedSlots;
+  let availableSlots;
 
-  const totalSlots =
-    type === "book"
-      ? user?.book_slots ?? 0
-      : summary.total_slots ?? user?.magnet_slots ?? 0;
+  // BOOK LOGIC (unchanged)
+  if (type === "book") {
+    const bookArray = Array.isArray(items) ? items : [];
 
-  const usedSlots =
-    type === "book"
-      ? magnetsArray.filter((i) => i.pages >= 750).length
-      : summary.used_slots ?? magnetsArray.filter((i) => i.status === "completed").length;
+    totalSlots = user?.book_slots ?? 0;
+    usedSlots = bookArray.filter((b) => b.pages >= 750).length;
+    availableSlots = Math.max(totalSlots - usedSlots, 0);
+  }
 
-  const availableSlots =
-    summary.available_slots ?? Math.max(totalSlots - usedSlots, 0);
+  // MAGNET LOGIC (your rules)
+  else {
+    const magnetsArray = Array.isArray(items) ? items : [];
+
+    totalSlots = summary.total_slots ?? user?.magnet_slots ?? 0;
+
+    const completed = magnetsArray.filter(
+      (m) => m.status === "completed"
+    ).length;
+    const awaiting = magnetsArray.filter(
+      (m) => m.status === "awaiting_prompt"
+    ).length;
+
+    usedSlots = completed;
+    availableSlots = awaiting;
+  }
 
   // 🧩 Determine if the free user has used their only slot
   const freeUsedAll = isFreeTier && (availableSlots <= 0 || trialExpired);
@@ -44,7 +61,7 @@ export default function DashboardHeader({ items = [], onCheckout, type = "magnet
         )}
 
         <p className="text-silver mt-1">
-          You currently have {availableSlots} of {totalSlots} slots remaining.
+          You currently have {availableSlots} slots remaining.
         </p>
 
         {isFreeTier && !trialExpired && (

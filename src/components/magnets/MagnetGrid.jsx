@@ -9,6 +9,7 @@ import {
   Eye,
   Pencil,
   Package,
+  Trash2
 } from "lucide-react";
 import NewContentModal from "../NewContentModal";
 import PDFPreviewModal from "../dashboard/PDFPreviewModal";
@@ -18,6 +19,7 @@ export default function MagnetGrid({
   magnets = [],
   onAddPrompt,
   onOpenEditor,
+  onDelete,
 }) {
   const { user } = useAuth();
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -268,6 +270,19 @@ const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
       <Package size={16} />
       <span>{isFreePlan ? "Unlock Canvas Editor" : "Canvas Editor"}</span>
     </button>
+    {/* Delete Button */}
+<button
+  onClick={() => {
+    if (window.confirm("Are you sure you want to delete this lead magnet?")) {
+      onDelete(m.id);
+    }
+  }}
+  className="w-full bg-red-700/60 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+>
+  <Trash2 size={16} className="text-white" />
+  <span>Delete</span>
+</button>
+
   </>
 )}
 

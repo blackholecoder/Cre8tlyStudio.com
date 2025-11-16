@@ -1504,7 +1504,7 @@ export default function LandingPageBuilder() {
               <a
                 href={
                   landing.username
-                    ? `https://${landing.username}.cre8tlystudio.com`
+                    ? `https://${landing.username}.cre8tlystudio.com?owner_preview=${encodeURIComponent(user?.id || "")}`
                     : "#"
                 }
                 target="_blank"

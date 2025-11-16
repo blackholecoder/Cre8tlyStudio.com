@@ -14,6 +14,7 @@ import GenerationOverlay from "../components/dashboard/GenerationOverlay.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import EditorModal from "../components/editor/EditorModal.jsx";
 import MagnetGrid from "../components/magnets/MagnetGrid.jsx";
+import axiosInstance from "../api/axios.jsx";
 
 export default function CustomerDashboard() {
   const { user, accessToken, refreshUser } = useAuth();
@@ -113,18 +114,31 @@ export default function CustomerDashboard() {
   }, [user]);
 
   useEffect(() => {
-  // Always restore scrolling when this page mounts
-  document.body.style.overflow = "auto";
-  document.body.style.position = "";
-  document.body.style.width = "";
-
-  return () => {
-    // Ensure scroll is restored if you navigate away and come back
+    // Always restore scrolling when this page mounts
     document.body.style.overflow = "auto";
     document.body.style.position = "";
     document.body.style.width = "";
-  };
-}, []);
+
+    return () => {
+      // Ensure scroll is restored if you navigate away and come back
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
+  async function handleDeleteMagnet(id) {
+    try {
+      await axiosInstance.delete(
+        `https://cre8tlystudio.com/api/lead-magnets/magnets/${id}`,
+        {}
+      );
+      // Refresh magnets after deletion
+      fetchMagnets();
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -140,7 +154,7 @@ export default function CustomerDashboard() {
         {/* Content */}
         {loading ? (
           <LoadingState />
-        ) : magnets.length === 0 ? (
+        ) : (magnets.magnets?.length || 0) === 0 ? (
           <EmptyState onCheckout={handleCheckout} type="magnet" />
         ) : (
           <>
@@ -148,6 +162,7 @@ export default function CustomerDashboard() {
               magnets={paginatedMagnets}
               onAddPrompt={openPromptModal}
               onOpenEditor={openEditor}
+              onDelete={handleDeleteMagnet}
             />
             <MagnetCardList
               magnets={paginatedMagnets}

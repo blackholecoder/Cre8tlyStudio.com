@@ -3,9 +3,12 @@ import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
+import { useLocation } from "react-router-dom";
 
 export default function DashboardSettings() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, refreshUser } = useAuth();
+  const location = useLocation();
+
   const [settings, setSettings] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -213,6 +216,17 @@ export default function DashboardSettings() {
   };
 
   useEffect(() => {
+    if (location.search.includes("connected=true")) {
+      refreshUser(); // Refreshes /auth/me data from backend
+      toast.success("✅ Stripe account connected successfully!");
+      // Optionally clean up URL so it doesn’t re-trigger on reload
+      const url = new URL(window.location);
+      url.searchParams.delete("connected");
+      window.history.replaceState({}, "", url);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     if (!user?.id) return;
     const fetchSettings = async () => {
       try {
@@ -325,15 +339,61 @@ export default function DashboardSettings() {
   };
 
   const getUserPlan = () => {
-    if (!user) return [];
     const plans = [];
-    if (user.has_book) plans.push("Assistant");
-    if (user.has_magnet) plans.push("Magnets");
-    if (user.pro_covers) plans.push("Pro Covers");
+
+    // Business Builder Monthly
+    if (user.plan === "monthly") {
+      plans.push({
+        title: "Business Builder",
+        planKey: "business_monthly",
+        billing: "monthly",
+        description:
+          "15 monthly lead magnet slots, analytics, templates, and sales tools.",
+        remainingSlots: user.magnet_slots,
+      });
+    }
+
+    // Business Builder Annual
+    if (user.plan === "annual") {
+      plans.push({
+        title: "Business Builder",
+        planKey: "business_annual",
+        billing: "annual",
+        description:
+          "Annual plan with 15 monthly lead magnet slots and all premium tools.",
+        remainingSlots: user.magnet_slots,
+      });
+    }
+
+    // Free Trial
+    if (!user.plan && user.has_free_magnet == 1) {
+      plans.push({
+        title: "Free Trial",
+        planKey: "free",
+        billing: "trial",
+        description:
+          "Your Free Trial includes 1 lead magnet slot and 7-day access.",
+        expires: user.free_trial_expires_at,
+        remainingSlots: user.magnet_slots,
+      });
+    }
+
+    // Author’s Assistant ADD-ON
+    if (user.has_book == 1) {
+      plans.push({
+        title: "Author’s Assistant",
+        planKey: "assistant",
+        billing: "one_time",
+        description: "Create up to 750 pages with the AI Book Builder.",
+        remainingPages: user.book_slots,
+      });
+    }
+
     return plans;
   };
 
   const plans = getUserPlan();
+
 
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
@@ -362,48 +422,37 @@ export default function DashboardSettings() {
           </div>
 
           {plans.length > 0 ? (
-            <div className="grid sm:grid-cols-3 gap-6">
-              {plans.map((plan) => {
-                let planStatus = "active"; // active | expired | lifetime
-                let remainingSlots = null;
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {plans.map((plan, idx) => {
+                // Determine status badge
+                let statusBadge = "Active";
+                let statusColor = "text-green bg-green-400/10";
 
-                if (plan.includes("Assistant")) {
-                  remainingSlots = user?.book_slots ?? 0;
-                  if (remainingSlots <= 0) planStatus = "expired";
-                } else if (plan.includes("Magnets")) {
-                  remainingSlots = user?.magnet_slots ?? 0;
-                  if (remainingSlots <= 0) planStatus = "expired";
-                } else if (plan.includes("Pro")) {
-                  planStatus = user?.pro_covers ? "lifetime" : "expired";
+                // Trial expiration
+                if (plan.billing === "trial" && plan.expires) {
+                  if (new Date(plan.expires) < new Date()) {
+                    statusBadge = "Expired";
+                    statusColor = "text-red-400 bg-red-400/10";
+                  }
                 }
 
                 return (
                   <div
-                    key={plan}
-                    className={`relative flex flex-col justify-between transition-all rounded-xl p-5 border shadow-inner
-              ${
-                planStatus === "expired"
-                  ? "bg-[#0c0f18]/80 border-gray-800 opacity-70"
-                  : "bg-[#111827]/80 hover:bg-[#1f2937]/80 border-gray-700 hover:border-gray-600 hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
-              }`}
+                    key={idx}
+                    className="relative flex flex-col justify-between transition-all rounded-xl p-5 border shadow-inner
+          bg-[#111827]/80 hover:bg-[#1f2937]/80 border-gray-700 hover:border-gray-600 hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
                   >
+                    {/* Status Badge */}
                     <span
-                      className={`text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded-md mb-2 self-start ${
-                        planStatus === "expired"
-                          ? "text-red-400 bg-red-400/10"
-                          : "text-green bg-green-400/10"
-                      }`}
+                      className={`text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded-md mb-2 self-start ${statusColor}`}
                     >
-                      {plan.includes("Pro")
-                        ? "Active"
-                        : planStatus === "active"
-                          ? "Active"
-                          : "Expired"}
+                      {statusBadge}
                     </span>
 
-                    {/* Icon and Title */}
+                    {/* Icon + Title */}
                     <div className="flex items-center gap-3 mb-3">
-                      {plan.includes("Assistant") && (
+                      {/* Author’s Assistant icon */}
+                      {plan.planKey === "assistant" && (
                         <svg
                           className="w-6 h-6 text-hotPink"
                           fill="none"
@@ -423,7 +472,10 @@ export default function DashboardSettings() {
                           />
                         </svg>
                       )}
-                      {plan.includes("Magnets") && (
+
+                      {/* Business Builder icons */}
+                      {(plan.planKey === "business_monthly" ||
+                        plan.planKey === "business_annual") && (
                         <svg
                           className="w-6 h-6 text-blue"
                           fill="none"
@@ -438,57 +490,25 @@ export default function DashboardSettings() {
                           />
                         </svg>
                       )}
-                      {plan.includes("Pro") && (
-                        <svg
-                          className="w-6 h-6 text-royalPurple"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 3v18m9-9H3"
-                          />
-                        </svg>
-                      )}
 
                       <h3 className="text-lg font-semibold text-white">
-                        {plan}
+                        {plan.title}
                       </h3>
                     </div>
 
                     {/* Description */}
                     <p className="text-sm text-gray-400 leading-relaxed">
-                      {plan.includes("Assistant")
-                        ? "Access advanced book creation and AI writing tools."
-                        : plan.includes("Magnets")
-                          ? "Generate digital products and marketing assets."
-                          : "Unlock pro cover uploads and customization tools."}
+                      {plan.description}
                     </p>
 
-                    {/* ✅ Footer: Slots or Lifetime (aligned perfectly) */}
-                    <div className="mt-3">
-                      {planStatus === "lifetime" ? (
-                        <p className="text-xs font-semibold text-gray-500 tracking-wide">
-                          Lifetime
-                        </p>
-                      ) : (
-                        <p className="text-xs text-gray-500">
-                          Slots remaining:{" "}
-                          <span
-                            className={`font-semibold ${
-                              remainingSlots > 0
-                                ? "text-gray-300"
-                                : "text-red-400"
-                            }`}
-                          >
-                            {remainingSlots}
-                          </span>
-                        </p>
-                      )}
-                    </div>
+                    {/* Billing Label */}
+                    <p className="text-xs mt-2 text-gray-500">
+                      {plan.billing === "monthly" && "Billed Monthly"}
+                      {plan.billing === "annual" && "Billed Annually"}
+                      {plan.billing === "trial" &&
+                        `Trial Ends: ${new Date(plan.expires).toLocaleDateString()}`}
+                      {plan.billing === "one_time" && "One-Time Purchase"}
+                    </p>
                   </div>
                 );
               })}
@@ -611,12 +631,12 @@ export default function DashboardSettings() {
             make through Cre8tly Studio.
           </p>
 
-          {user?.stripe_connect_account_id ? (
+          {user?.stripe_connected ? (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-green font-semibold">✅ Connected</span>
                 <p className="text-xs text-gray-500">
-                  Your Stripe account is linked for payouts.
+                  Your Stripe account is active and ready for payouts.
                 </p>
               </div>
               <button
@@ -626,6 +646,35 @@ export default function DashboardSettings() {
                 className="px-5 py-2 bg-blue hover:bg-blue/80 text-white rounded-lg font-semibold transition"
               >
                 Open Stripe Dashboard
+              </button>
+            </div>
+          ) : user?.stripe_connect_account_id ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-yellow-400 font-semibold">
+                  ⚠️ Pending Setup
+                </span>
+                <p className="text-xs text-gray-500">
+                  Your Stripe account was created but not completed.
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const { data } = await api.post(
+                      "https://cre8tlystudio.com/api/seller/create-account-link"
+                    );
+                    if (data.url) window.location.href = data.url;
+                  } catch (err) {
+                    console.error("Stripe connect error:", err);
+                    toast.error(
+                      "Failed to resume Stripe onboarding. Try again."
+                    );
+                  }
+                }}
+                className="px-6 py-2.5 bg-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition"
+              >
+                Complete Setup
               </button>
             </div>
           ) : (

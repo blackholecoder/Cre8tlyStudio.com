@@ -19,8 +19,12 @@ export default function SellerDashboard() {
     const fetchSellerData = async () => {
       try {
         const [balanceRes, payoutsRes] = await Promise.all([
-          axiosInstance.get(`https://cre8tlystudio.com/api/seller/balance/${user.stripe_connect_account_id}`),
-          axiosInstance.get(`https://cre8tlystudio.com/api/seller/payouts/${user.stripe_connect_account_id}`),
+          axiosInstance.get(
+            `https://cre8tlystudio.com/api/seller/balance/${user.stripe_connect_account_id}`
+          ),
+          axiosInstance.get(
+            `https://cre8tlystudio.com/api/seller/payouts/${user.stripe_connect_account_id}`
+          ),
         ]);
 
         setBalance(balanceRes.data.balance);
@@ -63,7 +67,8 @@ export default function SellerDashboard() {
         <h1 className="text-2xl font-bold mb-3">No Stripe Account Connected</h1>
         <p className="text-gray-400 text-center mb-6 max-w-md">
           You need to connect your Stripe account in{" "}
-          <span className="text-green font-semibold">Settings</span> to view your seller dashboard and payouts.
+          <span className="text-green font-semibold">Settings</span> to view
+          your seller dashboard and payouts.
         </p>
         <button
           onClick={() => (window.location.href = "/settings")}
@@ -89,13 +94,13 @@ export default function SellerDashboard() {
           <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-gray-400 text-sm mb-1">Available Balance</h3>
             <p className="text-2xl font-bold text-green">
-              ${((balance.available / 100) || 0).toFixed(2)}
+              ${(balance.available / 100 || 0).toFixed(2)}
             </p>
           </div>
           <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-gray-400 text-sm mb-1">Pending Balance</h3>
             <p className="text-2xl font-bold text-yellow-400">
-              ${((balance.pending / 100) || 0).toFixed(2)}
+              ${(balance.pending / 100 || 0).toFixed(2)}
             </p>
           </div>
           <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg flex items-center justify-center">
@@ -115,7 +120,9 @@ export default function SellerDashboard() {
 
       {/* 📅 Payout History */}
       <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
-        <h2 className="text-xl font-semibold text-white mb-4">Recent Payouts</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Recent Payouts
+        </h2>
         {payouts.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-left text-gray-300">

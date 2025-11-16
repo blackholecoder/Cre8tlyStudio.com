@@ -37,41 +37,6 @@ export function AuthProvider({ children, navigate }) {
 
 
  // 🔹 Login
-// async function login(email, password) {
-//   try {
-//     const res = await axiosInstance.post("/auth/login", { email, password });
-//     const data = res.data;
-
-//     // 🧩 1. If the backend requires 2FA, don't store tokens yet
-//     if (data.requires2FA && data.twofaToken) {
-//       return {
-//         requires2FA: true,
-//         twofaToken: data.twofaToken, // temporary token for verification step
-//         message: data.message,
-//       };
-//     }
-
-//     // 🧩 2. Otherwise, normal login flow
-//     saveAuth(data.user, data.accessToken, data.refreshToken);
-
-//     // 🔥 Immediately refresh user data to include latest fields (like pro_covers)
-//     try {
-//       const meRes = await axiosInstance.get("/auth/me", {
-//         headers: { Authorization: `Bearer ${data.accessToken}` },
-//       });
-//       const enriched = enrichUser(meRes.data);
-//       setUser(enriched);
-//       localStorage.setItem("user", JSON.stringify(enriched));
-//     } catch (fetchErr) {
-//       console.error("Failed to fetch fresh user data after login:", fetchErr);
-//     }
-
-//     return { requires2FA: false };
-//   } catch (err) {
-//     console.error("Login failed:", err);
-//     throw err;
-//   }
-// }
 async function login(email, password) {
   try {
     const res = await axiosInstance.post("/auth/login", { email, password });

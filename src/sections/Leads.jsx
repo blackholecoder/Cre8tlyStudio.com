@@ -35,17 +35,16 @@ export default function Leads() {
   }, [leads]);
 
   // ✅ Get unique landing pages for filter dropdown
-  const landingOptions = [
-    ...new Map(
-      leads.map((l) => [l.landing_page_id, l.landing_title])
-    ).entries(),
-  ].map(([id, title]) => ({ id, title }));
+  const pdfOptions = [
+    ...new Map(leads.map((l) => [l.title, l.title])).entries(),
+  ].map(([title]) => ({ title }));
 
   // ✅ Filter by email search and selected landing
   const filtered = leads.filter((l) => {
     const matchesEmail = l.email.toLowerCase().includes(search.toLowerCase());
     const matchesLanding =
-      selectedLanding === "all" || l.landing_page_id === selectedLanding;
+      selectedLanding === "all" || l.title === selectedLanding;
+
     return matchesEmail && matchesLanding;
   });
 
@@ -92,23 +91,15 @@ export default function Leads() {
 
         {/* 🔍 Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Search by email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-[#0F172A] text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green outline-none"
-          />
-
           <select
             value={selectedLanding}
             onChange={(e) => setSelectedLanding(e.target.value)}
             className="bg-[#0F172A] text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green outline-none"
           >
             <option value="all">All PDFs</option>
-            {landingOptions.map((opt) => (
-              <option key={opt.id} value={opt.id}>
-                {opt.title || "Untitled Landing"}
+            {pdfOptions.map((opt, i) => (
+              <option key={i} value={opt.title}>
+                {opt.title || "Untitled PDF"}
               </option>
             ))}
           </select>

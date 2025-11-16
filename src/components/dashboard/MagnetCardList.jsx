@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { themeStyles } from "../../constants/index";
-import { CheckCircle, Timer, Eye, Edit, Plus, Pencil } from "lucide-react";
+import { CheckCircle, Timer, Eye, Plus, Pencil, Trash2 } from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import NewContentModal from "../NewContentModal";
+import { useAuth } from "../../admin/AuthContext";
 
 export default function MagnetCardList({
   magnets = [],
   onAddPrompt,
   onOpenEditor,
+  onDelete,
 }) {
+  const { user } = useAuth();
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -21,6 +24,8 @@ export default function MagnetCardList({
     setShowNewModal(false);
     onAddPrompt(selectedSlot, data.contentType);
   }
+
+  const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
   return (
     <div className="md:hidden flex flex-col gap-4 p-4">
@@ -131,25 +136,53 @@ export default function MagnetCardList({
                   </div>
                 </button>
 
+                {/* EDIT BUTTON (from MagnetGrid) */}
                 <button
                   onClick={() => {
+                    if (isFreePlan) {
+                      window.location.href = "/plans";
+                      return;
+                    }
                     if (!m.edit_used) onOpenEditor(m.id);
                   }}
                   disabled={m.edit_used}
                   className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
                     m.edit_used
                       ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-60"
-                      : "bg-gray-700 hover:bg-gray-600 text-white"
+                      : isFreePlan
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-700 cursor-pointer"
+                        : "bg-gray-700 hover:bg-gray-600 text-white"
                   }`}
-                  title="Open Editor"
+                  title={
+                    isFreePlan ? "Upgrade to unlock editing" : "Open Editor"
+                  }
                 >
                   <Pencil
                     size={16}
-                    className={`${
-                      m.edit_used ? "text-gray-500" : "text-white"
-                    } transition-colors`}
+                    className={`${m.edit_used ? "text-gray-500" : "text-white"} transition-colors`}
                   />
-                  <span>{m.edit_used ? "Closed" : "Edit"}</span>
+                  <span>
+                    {isFreePlan
+                      ? "Unlock Edit"
+                      : m.edit_used
+                        ? "Closed"
+                        : "Edit"}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this lead magnet?"
+                      )
+                    ) {
+                      onDelete(m.id);
+                    }
+                  }}
+                  className="w-full bg-red-600/70 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={16} className="text-white" />
+                  <span>Delete</span>
                 </button>
               </>
             )}

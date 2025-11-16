@@ -142,7 +142,7 @@ export default function CustomerDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
+      <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen">
         {/* Header */}
         <DashboardHeader
           type="magnet"
@@ -168,6 +168,7 @@ export default function CustomerDashboard() {
               magnets={paginatedMagnets}
               onAddPrompt={openPromptModal}
               onOpenEditor={openEditor}
+              onDelete={handleDeleteMagnet}
             />
             <PaginationControls
               currentPage={currentPage}

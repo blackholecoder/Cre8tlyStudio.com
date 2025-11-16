@@ -277,7 +277,7 @@ const trialExpired = user?.trialExpired;
       </button>
 
       {/* Main content (scrolls independently) */}
-      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-[120px]">
+      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-[120px]  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         {children}
       </main>
     </div>

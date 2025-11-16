@@ -9,7 +9,7 @@ import {
   Eye,
   Pencil,
   Package,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import NewContentModal from "../NewContentModal";
 import PDFPreviewModal from "../dashboard/PDFPreviewModal";
@@ -35,9 +35,7 @@ export default function MagnetGrid({
     onAddPrompt(selectedSlot, data.contentType);
   }
 
-  
-const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
-
+  const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
   return (
     <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
@@ -192,100 +190,110 @@ const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
             )}
 
             {m.pdf_url && (
-  <>
-    {/* View Button */}
-    <button
-      onClick={() => setPreviewUrl(m.pdf_url)}
-      className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
-      title="Preview PDF"
-    >
-      <div className="flex items-center justify-center gap-2">
-        <Eye
-          size={16}
-          className={`${
-            m.status === "completed" ? "text-green" : "text-white"
-          } transition-colors`}
-        />
-        <span>View</span>
-      </div>
-    </button>
+              <>
+                {/* View Button */}
+                <button
+                  onClick={() => setPreviewUrl(m.pdf_url)}
+                  className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
+                  title="Preview PDF"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Eye
+                      size={16}
+                      className={`${
+                        m.status === "completed" ? "text-green" : "text-white"
+                      } transition-colors`}
+                    />
+                    <span>View</span>
+                  </div>
+                </button>
 
-    {/* Edit Button */}
-    <button
-      onClick={() => {
-        if (isFreePlan) {
-          window.location.href = "/plans";
-          return;
-        }
-        if (!m.edit_used) onOpenEditor(m.id);
-      }}
-      disabled={m.edit_used}
-      className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-        m.edit_used
-          ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-60"
-          : isFreePlan
-          ? "bg-gray-700 text-gray-300 hover:bg-gray-700 cursor-pointer"
-          : "bg-gray-700 hover:bg-gray-600 text-white"
-      }`}
-      title={isFreePlan ? "Upgrade to unlock editing" : "Open Editor"}
-    >
-      <Pencil
-        size={16}
-        className={`${
-          m.edit_used ? "text-gray-500" : "text-white"
-        } transition-colors`}
-      />
-      <span>
-        {isFreePlan
-          ? "Unlock Edit"
-          : m.edit_used
-          ? "Closed"
-          : "Edit"}
-      </span>
-    </button>
+                {/* Edit Button */}
+                <button
+                  onClick={() => {
+                    if (isFreePlan) {
+                      window.location.href = "/plans";
+                      return;
+                    }
+                    if (!m.edit_used) onOpenEditor(m.id);
+                  }}
+                  disabled={m.edit_used}
+                  className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                    m.edit_used
+                      ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-60"
+                      : isFreePlan
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-700 cursor-pointer"
+                        : "bg-gray-700 hover:bg-gray-600 text-white"
+                  }`}
+                  title={
+                    isFreePlan ? "Upgrade to unlock editing" : "Open Editor"
+                  }
+                >
+                  <Pencil
+                    size={16}
+                    className={`${
+                      m.edit_used ? "text-gray-500" : "text-white"
+                    } transition-colors`}
+                  />
+                  <span>
+                    {isFreePlan
+                      ? "Unlock Edit"
+                      : m.edit_used
+                        ? "Closed"
+                        : "Edit"}
+                  </span>
+                </button>
 
-    {/* Canvas Editor Button */}
-    <button
-      onClick={() => {
-        if (isFreePlan) {
-          window.location.href = "/plans";
-          return;
-        }
-        if (!m.id || !m.pdf_url) {
-          alert("Missing lead magnet ID or PDF URL.");
-          return;
-        }
-        const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
-          m.pdf_url
-        )}`;
-        window.open(canvasUrl, "_blank");
-      }}
-      className={`hidden md:flex w-full font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all ${
-        isFreePlan
-          ? "bg-hotPink/70 text-gray-200 hover:bg-hotPink/70 cursor-pointer"
-          : "bg-hotPink text-white hover:bg-hotPink/90"
-      }`}
-      title={isFreePlan ? "Upgrade to unlock Canvas Editor" : "Open in Canvas Editor"}
-    >
-      <Package size={16} />
-      <span>{isFreePlan ? "Unlock Canvas Editor" : "Canvas Editor"}</span>
-    </button>
-    {/* Delete Button */}
-<button
-  onClick={() => {
-    if (window.confirm("Are you sure you want to delete this lead magnet?")) {
-      onDelete(m.id);
-    }
-  }}
-  className="w-full bg-red-700/60 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
->
-  <Trash2 size={16} className="text-white" />
-  <span>Delete</span>
-</button>
-
-  </>
-)}
-
+                {/* Canvas Editor Button */}
+                <button
+                  onClick={() => {
+                    if (isFreePlan) {
+                      window.location.href = "/plans";
+                      return;
+                    }
+                    if (!m.id || !m.pdf_url) {
+                      alert("Missing lead magnet ID or PDF URL.");
+                      return;
+                    }
+                    const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
+                      m.pdf_url
+                    )}`;
+                    window.open(canvasUrl, "_blank");
+                  }}
+                  className={`hidden md:flex w-full font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all ${
+                    isFreePlan
+                      ? "bg-hotPink/70 text-gray-200 hover:bg-hotPink/70 cursor-pointer"
+                      : "bg-hotPink text-white hover:bg-hotPink/90"
+                  }`}
+                  title={
+                    isFreePlan
+                      ? "Upgrade to unlock Canvas Editor"
+                      : "Open in Canvas Editor"
+                  }
+                >
+                  <Package size={16} />
+                  <span>
+                    {isFreePlan ? "Unlock Canvas Editor" : "Canvas Editor"}
+                  </span>
+                </button>
+                {/* Delete Button */}
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this lead magnet?"
+                      )
+                    ) {
+                      onDelete(m.id);
+                    }
+                  }}
+                  className="w-full bg-red-600/70 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={16} className="text-white" />
+                  <span>Delete</span>
+                </button>
+              </>
+            )}
           </div>
         </motion.div>
       ))}

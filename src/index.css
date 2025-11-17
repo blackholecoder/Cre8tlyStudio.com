@@ -395,6 +395,32 @@ input[type="color"]:focus {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.animate-pingOnce {
+  animation: pop 0.25s ease-out forwards;
+}
+
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out;
+}
+
 .konvajs-content canvas:focus {
   outline: none !important;
 }

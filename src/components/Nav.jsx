@@ -36,13 +36,26 @@ const Nav = () => {
     }
   }, [isOpen]);
 
-  if (
-    ["/dashboard", "/books", "/settings", "/prompts", "/notifications", "/canvas-editor", "/landing-page-builder", "/leads", "/landing-analytics", "/seller-dashboard"].includes(
-      location.pathname
-    )
-  ) {
-    return null;
-  }
+  const noNavRoutes = [
+  "/dashboard",
+  "/books",
+  "/settings",
+  "/prompts",
+  "/notifications",
+  "/canvas-editor",
+  "/landing-page-builder",
+  "/leads",
+  "/landing-analytics",
+  "/seller-dashboard",
+];
+
+if (
+  noNavRoutes.includes(location.pathname) ||
+  location.pathname.startsWith("/community")
+) {
+  return null;
+}
+
 
   const filteredNavLinks = navLinks.filter((link) => {
     // Hide "How It Works" on /signup

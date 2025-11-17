@@ -44,6 +44,9 @@ import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
 import Leads from "./sections/Leads.jsx";
 import LandingAnalytics from "./sections/analytics/Analytics.jsx";
 import SellerDashboard from "./sections/seller/SellerDashboard.jsx";
+import CommunityPost from "./sections/community/CommunityPost.jsx";
+import CommunityTopic from "./sections/community/CommunityTopic.jsx";
+import CommunityHome from "./sections/community/CommunityHome.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -87,6 +90,61 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route
+  path="/community"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <CommunityHome />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/community/topic/:topicId"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <CommunityTopic />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/community/post/:postId"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <CommunityPost />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+
         <Route
   path="/seller-dashboard"
   element={

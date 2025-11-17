@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
-import { headerLogo } from "../../assets/images";
 import api from "../../api/axios";
 import {
   Menu,
@@ -17,6 +16,7 @@ import {
   Users,
   BarChart2,
   Banknote,
+  MessageSquare
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 import AnimatedLogo from "../animation/AnimatedLogo";
@@ -64,6 +64,11 @@ export default function DashboardLayout({ children }) {
     { label: "Assistant", path: "/books", icon: <BookOpen size={22} /> },
     { label: "Settings", path: "/settings", icon: <Settings size={22} /> },
     {
+      label: "Community",
+      path: "/community",
+      icon: <MessageSquare size={22} />,
+    },
+    {
       label: "Prompt Memory",
       path: "/prompts",
       icon: <SquareTerminal size={22} />,
@@ -74,6 +79,7 @@ export default function DashboardLayout({ children }) {
       icon: <Inbox size={22} />,
     },
     { label: "Plans", path: "/plans", icon: <DollarSign size={22} /> },
+    
   ];
 
   if (isFreeTier) {

@@ -4,7 +4,6 @@ import { useAuth } from "../admin/AuthContext.jsx";
 import { useMagnets } from "../admin/MagnetContext.jsx";
 import PromptModal from "../components/PromptModal.jsx";
 import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
-import LoadingState from "../components/dashboard/LoadingState.jsx";
 import EmptyState from "../components/dashboard/EmptyState.jsx";
 import MagnetCardList from "../components/dashboard/MagnetCardList.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";

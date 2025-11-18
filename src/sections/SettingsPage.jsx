@@ -4,6 +4,7 @@ import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 import { useLocation } from "react-router-dom";
+import axiosInstance from "../api/axios";
 
 export default function DashboardSettings() {
   const { user, setUser, refreshUser } = useAuth();
@@ -338,6 +339,44 @@ export default function DashboardSettings() {
     }
   };
 
+  const handleUploadAvatar = async () => {
+    if (!file) return toast.warning("Select an image first");
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
+        setUploading(true);
+
+        const res = await axiosInstance.post("/upload-data/upload-avatar", {
+          userId: user.id,
+          profileImage: reader.result,
+        });
+
+        if (res.data.profileImage) {
+          const updated = {
+            ...user,
+            profile_image_url: res.data.profileImage,
+            profile_image: res.data.profileImage,
+          };
+
+          localStorage.setItem("user", JSON.stringify(updated));
+          // update UI + local storage
+          setUser(updated);
+
+          toast.success("Profile image updated!");
+          setFile(null);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Upload failed");
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   const getUserPlan = () => {
     const plans = [];
 
@@ -518,6 +557,40 @@ export default function DashboardSettings() {
               incorrect.
             </p>
           )}
+        </div>
+        {/* Avatar Upload */}
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Profile Avatar
+          </h2>
+
+          <div className="flex items-center gap-6 mt-4">
+            <img
+              src={user?.profile_image_url || "/default-avatar.png"}
+              className="w-20 h-20 rounded-full object-cover border border-gray-700"
+              alt="avatar"
+            />
+
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 
+                   file:rounded-lg file:border-0 file:text-sm file:bg-white 
+                   file:font-semibold hover:file:opacity-90"
+              />
+
+              <button
+                onClick={handleUploadAvatar}
+                disabled={uploading}
+                className="mt-3 px-5 py-2 rounded-lg bg-green text-black font-semibold 
+                   hover:opacity-90 disabled:opacity-50 transition"
+              >
+                {uploading ? "Uploading..." : "Upload Avatar"}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 🔐 Two-Factor Authentication Section */}
@@ -822,45 +895,39 @@ export default function DashboardSettings() {
 
         {/* CTA Settings */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
-          
           {/* CTA Settings */}
-<div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-  <h2 className="text-lg font-semibold text-gray-200">
-    Default Closing Message / CTA
-  </h2>
-  <p className="text-sm text-gray-400 mb-4">
-    This message will appear at the end of your lead magnets or books.
-    You can change it anytime.
-  </p>
+          <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
+            <h2 className="text-lg font-semibold text-gray-200">
+              Default Closing Message / CTA
+            </h2>
+            <p className="text-sm text-gray-400 mb-4">
+              This message will appear at the end of your lead magnets or books.
+              You can change it anytime.
+            </p>
 
-  {/* Inner card for textarea + button */}
-  <div className="rounded-lg p-5 space-y-4">
-    <textarea
-      placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
-      value={settings?.cta || ""}
-      onChange={(e) =>
-        setSettings((prev) => ({ ...prev, cta: e.target.value }))
-      }
-      rows={6}
-      className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
-    />
+            {/* Inner card for textarea + button */}
+            <div className="rounded-lg p-5 space-y-4">
+              <textarea
+                placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
+                value={settings?.cta || ""}
+                onChange={(e) =>
+                  setSettings((prev) => ({ ...prev, cta: e.target.value }))
+                }
+                rows={6}
+                className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+              />
 
-    <div className="flex justify-end">
-      <button
-        onClick={handleSaveCTA}
-        className="px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
-      >
-        Save CTA
-      </button>
-    </div>
-  </div>
-</div>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveCTA}
+                  className="px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
+                >
+                  Save CTA
+                </button>
+              </div>
+            </div>
+          </div>
 
-
-
-
-
-          
           {user?.has_book ? (
             <>
               <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">

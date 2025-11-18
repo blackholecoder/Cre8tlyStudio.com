@@ -49,8 +49,8 @@ export default function BookPromptForm({
   const [isAiGenerated, setIsAiGenerated] = useState(false);
 
   const [showFindReplace, setShowFindReplace] = useState(false);
-const [findText, setFindText] = useState("");
-const [replaceText, setReplaceText] = useState("");
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
 
   async function handleFileUpload(e) {
     const file = e.target.files[0];
@@ -282,19 +282,18 @@ const [replaceText, setReplaceText] = useState("");
   }
 
   function handleFindReplace() {
-  if (!findText.trim()) {
-    toast.warn("Enter text to find");
-    return;
+    if (!findText.trim()) {
+      toast.warn("Enter text to find");
+      return;
+    }
+
+    const regex = new RegExp(findText, "gi");
+    const updated = text.replace(regex, replaceText);
+
+    setText(updated);
+    toast.success("Replaced!");
+    setShowFindReplace(false);
   }
-
-  const regex = new RegExp(findText, "gi");
-  const updated = text.replace(regex, replaceText);
-
-  setText(updated);
-  toast.success("Replaced!");
-  setShowFindReplace(false);
-}
-
 
   return (
     <>
@@ -382,15 +381,15 @@ const [replaceText, setReplaceText] = useState("");
 
           {uploading && <span className="text-gray-400">Processing...</span>}
           <button
-    type="button"
-    onClick={() => setShowFindReplace(true)}
-    className="px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver flex items-center gap-2"
-  >
-    <Replace size={18} />
-    Find & Replace
-  </button>
+            type="button"
+            onClick={() => setShowFindReplace(true)}
+            className="px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver flex items-center gap-2"
+          >
+            <Replace size={18} />
+            Find & Replace
+          </button>
         </div>
-        
+
         <div className="border border-gray-700 rounded-xl">
           {!partLocked || canEdit ? (
             <BookEditor content={text} setContent={setText} />
@@ -478,45 +477,46 @@ const [replaceText, setReplaceText] = useState("");
             </button>
           )}
           {showFindReplace && (
-  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-    <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-md">
-      <h2 className="text-xl text-white mb-4 font-semibold">Find & Replace</h2>
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-md">
+                <h2 className="text-xl text-white mb-4 font-semibold">
+                  Find & Replace
+                </h2>
 
-      <label className="text-silver text-sm">Find</label>
-      <input
-        type="text"
-        value={findText}
-        onChange={(e) => setFindText(e.target.value)}
-        className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
-      />
+                <label className="text-silver text-sm">Find</label>
+                <input
+                  type="text"
+                  value={findText}
+                  onChange={(e) => setFindText(e.target.value)}
+                  className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+                />
 
-      <label className="text-silver text-sm">Replace With</label>
-      <input
-        type="text"
-        value={replaceText}
-        onChange={(e) => setReplaceText(e.target.value)}
-        className="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600"
-      />
+                <label className="text-silver text-sm">Replace With</label>
+                <input
+                  type="text"
+                  value={replaceText}
+                  onChange={(e) => setReplaceText(e.target.value)}
+                  className="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600"
+                />
 
-      <div className="flex justify-end gap-3">
-        <button
-          onClick={() => setShowFindReplace(false)}
-          className="px-4 py-2 bg-gray-700 rounded-lg text-sm"
-        >
-          Cancel
-        </button>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowFindReplace(false)}
+                    className="px-4 py-2 bg-gray-700 rounded-lg text-sm"
+                  >
+                    Cancel
+                  </button>
 
-        <button
-          onClick={handleFindReplace}
-          className="px-4 py-2 bg-green text-black font-semibold rounded-lg text-sm"
-        >
-          Replace
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+                  <button
+                    onClick={handleFindReplace}
+                    className="px-4 py-2 bg-green text-black font-semibold rounded-lg text-sm"
+                  >
+                    Replace
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </form>
     </>

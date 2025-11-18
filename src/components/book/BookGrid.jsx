@@ -1,6 +1,14 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { CheckCircle, Timer, Eye, Plus, Layers, Rocket, Pencil } from "lucide-react";
+import {
+  CheckCircle,
+  Timer,
+  Eye,
+  Plus,
+  Layers,
+  Rocket,
+  Pencil,
+} from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import OnboardingGuide from "../onboarding/OnboardingGuide";
@@ -194,7 +202,6 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
 
               {b.pdf_url && (
                 <>
-
                   <button
                     onClick={() => openPartsModal(b.id)}
                     className="w-full bg-gray-700 hover:bg-gray-600 text-white rounded-lg py-2 text-sm flex items-center justify-center gap-2 transition"

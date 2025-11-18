@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, Timer, Eye, Plus, Layers, Rocket } from "lucide-react";
+import {
+  CheckCircle,
+  Timer,
+  Eye,
+  Plus,
+  Layers,
+  Rocket,
+  Pencil,
+} from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
 
-export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }) {
+export default function BookCardList({
+  books = [],
+  onAddPrompt,
+  onGenerateNext,
+}) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [activeBookId, setActiveBookId] = useState(null);
@@ -51,7 +63,9 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
                 style={{ width: `${Math.min((b.pages / 750) * 100, 100)}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">{b.pages || 0}/750 pages</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {b.pages || 0}/750 pages
+            </p>
           </div>
 
           {/* ✅ Book Status Pills */}
@@ -143,24 +157,23 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
             )}
 
             {/* Preview */}
-            {b.pdf_url && (
+            {b.has_part_1 === 0 && (b.is_draft === 1 || b.draft_text) && (
               <button
-                onClick={() =>
-                  setPreviewUrl({
-                    url: b.pdf_url,
-                    title: b.book_name || "Untitled",
-                    partNumber: b.part_number || 1,
-                  })
-                }
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
+                onClick={() => onAddPrompt(b.id, b.part_number || 1)}
+                className="w-full bg-blue hover:bg-blue text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all"
               >
-                <div className="flex items-center justify-center gap-2">
-                  <Eye
-                    size={16}
-                    className={`${b.pages >= 750 ? "text-green" : "text-white"}`}
-                  />
-                  <span>{b.pages >= 750 ? "Download Book" : "Preview"}</span>
-                </div>
+                <Rocket size={16} />
+                <span>Continue Draft</span>
+              </button>
+            )}
+
+            {b.can_edit === 1 && (
+              <button
+                onClick={() => onAddPrompt(b.id, b.part_number)}
+                className="w-full bg-gray-900 hover:bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all border border-gray-700"
+              >
+                <Pencil size={16} className="text-green" />
+                <span>Edit Chapter</span>
               </button>
             )}
 
@@ -179,13 +192,13 @@ export default function BookCardList({ books = [], onAddPrompt, onGenerateNext }
             {b.prompt && b.pages < 750 && (
               <button
                 onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
-                className="w-full bg-gradient-to-r from-green to-royalPurple text-black rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-royalPurple text-white rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
               >
                 <Rocket size={16} />
                 <span>
                   {b.pages >= 740
                     ? "Finish Book"
-                    : `Continue (Part ${(b.part_number || 1) + 1})`}
+                    : `Continue Story (Part ${(b.part_number || 1) + 1})`}
                 </span>
               </button>
             )}

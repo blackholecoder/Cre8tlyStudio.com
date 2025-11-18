@@ -479,6 +479,7 @@ export default function CommunityPost() {
                                 [c.id]: [...(prev[c.id] || []), newReply],
                               }));
                               await loadReplies(c.id);
+                              setActiveReplyBox(null)
                             }}
                             onCancel={() => setActiveReplyBox(null)}
                           />

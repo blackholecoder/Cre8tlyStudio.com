@@ -5,6 +5,7 @@ import CoverUpload from "../CoverUpload";
 import BookEditor from "../../book/BookEditor";
 import { useAuth } from "../../../admin/AuthContext";
 import FontSelector from "../FontSelector";
+import { BookOpenCheck, Rocket, Replace } from "lucide-react";
 
 export default function BookPromptForm({
   text,
@@ -30,44 +31,97 @@ export default function BookPromptForm({
   onClose,
   setShowGenerating,
   setProgress,
-  fontName,          
-  setFontName,      
-  fontFile,         
-  setFontFile, 
+  fontName,
+  setFontName,
+  fontFile,
+  setFontFile,
 }) {
   const [saving, setSaving] = useState(false);
   const [restored, setRestored] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [canEdit, setCanEdit] = useState(false);
   const { accessToken } = useAuth();
   const [hasShownBanner, setHasShownBanner] = useState(
     sessionStorage.getItem("shownDraftBanner") === "true"
   );
   const [draftAuthor, setDraftAuthor] = useState(authorName || "");
+  const [uploading, setUploading] = useState(false);
+  const [isAiGenerated, setIsAiGenerated] = useState(false);
+
+  const [showFindReplace, setShowFindReplace] = useState(false);
+const [findText, setFindText] = useState("");
+const [replaceText, setReplaceText] = useState("");
+
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+
+    try {
+      const ext = file.name.split(".").pop().toLowerCase();
+
+      // ---- TXT FILE ----
+      if (ext === "txt") {
+        const textContent = await file.text();
+        setText(textContent);
+        toast.success("Text imported!");
+      }
+
+      // ---- DOCX FILE ----
+      else if (ext === "docx") {
+        const mammoth = await import("mammoth");
+
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+
+        setText(result.value || "");
+        toast.success("DOCX imported!");
+      }
+
+      // ---- UNSUPPORTED ----
+      else {
+        toast.error("Unsupported file. Please upload .txt or .docx");
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast.error("Failed to import file.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   useEffect(() => {
     async function loadDraft() {
       if (!bookId) return;
 
       try {
-        // ✅ Decide which endpoint to hit based on part number
+        // Decide which endpoint to hit
         const endpoint =
           partNumber > 1
-            ? `https://cre8tlystudio.com/api/books/${bookId}/part/${partNumber}/draft`
-            : `https://cre8tlystudio.com/api/books/draft/${bookId}`;
+            ? `/books/${bookId}/part/${partNumber}/draft`
+            : `/books/draft/${bookId}`;
 
-        const res = await axiosInstance.get(endpoint, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const res = await axiosInstance.get(endpoint);
 
+        console.log("🔥 Draft/GPT response:", res.data);
+
+        setCanEdit(Boolean(Number(res.data.can_edit)));
+
+        // -----------------------------
+        // 🔥 1. Load DRAFT if available
+        // -----------------------------
         if (res.data?.draft_text) {
           setText(res.data.draft_text);
-          if (res.data.title) setBookName(res.data.title);
+          setIsAiGenerated(false);
+
+          if (res.data.book_name) setBookName(res.data.book_name);
           if (res.data.link) setLink(res.data.link);
           if (res.data.last_saved_at) setLastSavedAt(res.data.last_saved_at);
           if (res.data.author_name) setDraftAuthor(res.data.author_name);
           if (res.data.book_type) setBookType(res.data.book_type);
 
-          // ✅ Only show banner once per session
+          // Banner only for drafts
           if (!hasShownBanner) {
             setRestored(true);
             toast.info("Loaded saved draft ✍️");
@@ -75,9 +129,28 @@ export default function BookPromptForm({
             sessionStorage.setItem("shownDraftBanner", "true");
             setHasShownBanner(true);
           }
-        } else {
-          console.log("No saved draft found for this book or part.");
+
+          return; // stop here — drafts override GPT
         }
+
+        // ----------------------------------------
+        // 🔥 2. Otherwise load GPT-generated text
+        // ----------------------------------------
+        if (res.data?.gpt_output) {
+          setText(res.data.gpt_output);
+          setIsAiGenerated(true);
+
+          if (res.data.book_name) setBookName(res.data.book_name);
+          if (res.data.link) setLink(res.data.link);
+          if (res.data.author_name) setDraftAuthor(res.data.author_name);
+          if (res.data.book_type) setBookType(res.data.book_type);
+
+          console.log("Loaded GPT-generated text");
+          return;
+        }
+
+        // Otherwise nothing found
+        console.log("No draft or GPT text found for this chapter.");
       } catch (err) {
         if (err.response?.status !== 404) {
           console.error("Failed to load draft:", err);
@@ -108,12 +181,12 @@ export default function BookPromptForm({
         {
           bookId,
           draftText: text,
-          book_name: bookName,
+          bookName,
           link,
           author_name: draftAuthor || authorName,
           book_type: bookType,
-          font_name: fontName,   // ✅ added
-          font_file: fontFile, 
+          font_name: fontName, // ✅ added
+          font_file: fontFile,
         },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
@@ -156,7 +229,6 @@ export default function BookPromptForm({
 
       const payload = {
         bookId,
-        book_name: bookName,
         prompt: text,
         pages,
         link,
@@ -165,15 +237,15 @@ export default function BookPromptForm({
         authorName,
         bookType,
         title,
-        font_name: fontName, 
+        font_name: fontName,
         font_file: fontFile,
         partNumber,
+        isEditing: canEdit ? true : false,
       };
 
-      const res = await axiosInstance.post(
-        "https://cre8tlystudio.com/api/books/prompt",
-        payload
-      );
+      const res = await axiosInstance.post("/books/prompt", payload);
+
+      console.log("PAYLOAD", payload);
 
       clearInterval(interval);
       setProgress(100);
@@ -184,13 +256,12 @@ export default function BookPromptForm({
 
       localStorage.removeItem("bookDraftLocal");
       console.log("Book generated:", res.data);
-
     } catch (err) {
       if (err.code === "ECONNABORTED") {
-    console.warn("backend still processing...please wait");
-    toast.info("⏳ Your book is still generating — please wait");
-    return; // ✅ don’t mark as failed
-  }
+        console.warn("backend still processing...please wait");
+        toast.info("⏳ Your book is still generating — please wait");
+        return; // ✅ don’t mark as failed
+      }
       console.error("Book generation failed:", err);
       // toast.error("Failed to generate book");
       setShowGenerating(false);
@@ -209,6 +280,21 @@ export default function BookPromptForm({
     const days = Math.floor(hours / 24);
     return `${days} day${days !== 1 ? "s" : ""} ago`;
   }
+
+  function handleFindReplace() {
+  if (!findText.trim()) {
+    toast.warn("Enter text to find");
+    return;
+  }
+
+  const regex = new RegExp(findText, "gi");
+  const updated = text.replace(regex, replaceText);
+
+  setText(updated);
+  toast.success("Replaced!");
+  setShowFindReplace(false);
+}
+
 
   return (
     <>
@@ -231,9 +317,9 @@ export default function BookPromptForm({
           </label>
           <input
             type="text"
-            placeholder="e.g. The Clockmaker’s Secret"
+            placeholder="e.g. The Shining"
             value={bookName}
-            readOnly
+            onChange={(e) => setBookName(e.target.value)}
             className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
           />
           <p className="text-xs text-gray-400 mt-1">
@@ -271,7 +357,7 @@ export default function BookPromptForm({
           </label>
           <input
             type="text"
-            placeholder="e.g. The Midnight Promise"
+            placeholder="e.g. The Black Widow"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green focus:outline-none"
@@ -279,8 +365,40 @@ export default function BookPromptForm({
         </div>
 
         {/* ---------- Editor ---------- */}
+        <div className="mb-4 flex items-center gap-4">
+          <input
+            type="file"
+            accept=".txt,.doc,.docx"
+            id="bookUpload"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <label
+            htmlFor="bookUpload"
+            className="cursor-pointer px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver"
+          >
+            📤 Upload Text or DOCX
+          </label>
+
+          {uploading && <span className="text-gray-400">Processing...</span>}
+          <button
+    type="button"
+    onClick={() => setShowFindReplace(true)}
+    className="px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver flex items-center gap-2"
+  >
+    <Replace size={18} />
+    Find & Replace
+  </button>
+        </div>
+        
         <div className="border border-gray-700 rounded-xl">
-          <BookEditor content={text} setContent={setText} />
+          {!partLocked || canEdit ? (
+            <BookEditor content={text} setContent={setText} />
+          ) : (
+            <div className="p-4 bg-gray-800 text-gray-400 rounded-lg border border-gray-700">
+              Chapter is locked.
+            </div>
+          )}
         </div>
         <FontSelector
           fontName={fontName}
@@ -292,21 +410,23 @@ export default function BookPromptForm({
         <CoverUpload cover={cover} setCover={setCover} />
 
         {/* ---------- Other Fields ---------- */}
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Number of Pages
-          </label>
-          <div className="relative w-full max-w-xs">
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={pages ?? ""}
-              onChange={(e) => setPages(Number(e.target.value))}
-              className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
-            />
+        {bookType !== "non-fiction" && (
+          <div>
+            <label className="block text-silver mb-2 font-medium">
+              Number of Pages
+            </label>
+            <div className="relative w-full max-w-xs">
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={pages ?? ""}
+                onChange={(e) => setPages(Number(e.target.value))}
+                className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <label className="block text-silver mb-2 font-medium">
@@ -341,11 +461,62 @@ export default function BookPromptForm({
           {!loading && (
             <button
               type="submit"
-              className="flex-1 px-6 py-3 rounded-xl bg-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition"
+              disabled={partLocked && !canEdit}
+              className="flex-1 px-6 py-3 rounded-xl bg-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2"
             >
-              🚀 Generate Book PDF
+              {isAiGenerated ? (
+                <>
+                  <BookOpenCheck size={18} className="text-white" />
+                  Commit Final Chapter
+                </>
+              ) : (
+                <>
+                  <Rocket size={18} className="text-white" />
+                  Generate Book PDF
+                </>
+              )}
             </button>
           )}
+          {showFindReplace && (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-md">
+      <h2 className="text-xl text-white mb-4 font-semibold">Find & Replace</h2>
+
+      <label className="text-silver text-sm">Find</label>
+      <input
+        type="text"
+        value={findText}
+        onChange={(e) => setFindText(e.target.value)}
+        className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+      />
+
+      <label className="text-silver text-sm">Replace With</label>
+      <input
+        type="text"
+        value={replaceText}
+        onChange={(e) => setReplaceText(e.target.value)}
+        className="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600"
+      />
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setShowFindReplace(false)}
+          className="px-4 py-2 bg-gray-700 rounded-lg text-sm"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleFindReplace}
+          className="px-4 py-2 bg-green text-black font-semibold rounded-lg text-sm"
+        >
+          Replace
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
         </div>
       </form>
     </>

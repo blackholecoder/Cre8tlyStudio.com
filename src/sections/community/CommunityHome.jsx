@@ -21,6 +21,20 @@ export default function CommunityHome() {
     fetchTopics();
   }, []);
 
+      useEffect(() => {
+    // Always restore scrolling when this page mounts
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+
+    return () => {
+      // Ensure scroll is restored if you navigate away and come back
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
 return (
   <div className="w-full flex justify-center items-start min-h-screen px-6 py-20">
     <div className="bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">

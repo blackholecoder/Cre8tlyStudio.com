@@ -13,8 +13,8 @@ import BookPromptModal from "../components/prompt/Book/BookPromptModal.jsx";
 import BookCardList from "../components/book/BookCardList.jsx";
 import NewBookModal from "../components/book/NewBookModal.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
-import axios from "axios";
 import BookGrid from "../components/book/BookGrid.jsx";
+import axiosInstance from "../api/axios.jsx";
 
 export default function BooksDashboard() {
   const { accessToken } = useAuth();
@@ -44,20 +44,12 @@ export default function BooksDashboard() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  async function openBookModal(bookId, partNumber = 1) {
-  const apiUrl = `https://cre8tlystudio.com/api/books/${bookId}`;
-
+async function openBookModal(bookId, partNumber = 1) {
   let selectedBook = books.find((b) => b.id === bookId);
 
   try {
-    // ✅ Always fetch the most recent data from backend
-    const res = await axios.get(
-      `https://cre8tlystudio.com/api/books/${bookId}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
-      }
-    );
+    // Always fetch the most recent data from backend
+    const res = await axiosInstance.get(`/books/${bookId}`);
 
     if (res.data) {
       console.log("📘 Fresh data from backend:", res.data);
@@ -70,28 +62,36 @@ export default function BooksDashboard() {
 
   if (!selectedBook) return;
 
+  // ✔ Use book_name instead of title
+  const bookName =
+    selectedBook.book_name || selectedBook.title || ""; // fallback for old data
+
   const missingAuthor =
     !selectedBook.author_name || selectedBook.author_name.trim() === "";
-  const missingTitle =
-    !selectedBook.title ||
-    selectedBook.title.trim() === "" ||
-    selectedBook.title === "Untitled" ||
-    selectedBook.title === "Untitled Book";
 
-  // ✅ If missing core info, open the "New Book" setup modal
-  if (missingAuthor || missingTitle) {
+  const missingBookName =
+    !bookName ||
+    bookName.trim() === "" ||
+    bookName === "Untitled" ||
+    bookName === "Untitled Book";
+
+  // ✔ If missing core info, open setup modal
+  if (missingAuthor || missingBookName) {
     setActiveBook({ id: bookId, part_number: partNumber });
     setShowNewBookModal(true);
     return;
   }
 
-  // ✅ Otherwise, open the writing modal with latest info
+  // ✔ Populate the book modal with correct naming
   setActiveBook({
     id: selectedBook.id,
     part_number: partNumber,
-    title: selectedBook.title || selectedBook.book_name || "",
+    book_name: bookName,
     author_name: selectedBook.author_name || "",
-    book_type: selectedBook.bookType || selectedBook.book_type || "fiction",
+    book_type:
+      selectedBook.bookType ||
+      selectedBook.book_type ||
+      "fiction",
   });
 
   setOpenPrompt(true);
@@ -109,8 +109,8 @@ export default function BooksDashboard() {
     setTimeout(fetchBooks, 3000);
   }
 
-function handleAddBookInfo({ title, authorName, bookType }) {
-  setNewBookData({ title, authorName, bookType });
+function handleAddBookInfo({ bookName, authorName, bookType }) {
+  setNewBookData({ bookName, authorName, bookType });
   setShowNewBookModal(false);
   setOpenPrompt(true);
 }
@@ -118,18 +118,16 @@ function handleAddBookInfo({ title, authorName, bookType }) {
 
 
   async function refreshUserSlots() {
-    try {
-      const res = await fetch("https://cre8tlystudio.com/api/auth/me", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data) fetchBooks();
-    } catch (err) {
-      console.error("Failed to refresh slots:", err);
-    }
-  }
+  try {
+    const res = await axiosInstance.get("/auth/me");
 
+    if (res.data) {
+      fetchBooks(); // refresh dashboard books
+    }
+  } catch (err) {
+    console.error("Failed to refresh slots:", err);
+  }
+}
 
   // ✅ Render
 return (
@@ -190,7 +188,7 @@ return (
           setProgress={setProgress}
           onSubmitted={handlePromptSubmitted}
           initialBookData={{
-      title: newBookData?.title || activeBook.title || "",
+      bookName: newBookData?.bookName || activeBook.book_name || activeBook.title || "",
       authorName: newBookData?.authorName || activeBook.author_name || "",
       bookType: newBookData?.bookType || activeBook.book_type || "fiction",
     }}

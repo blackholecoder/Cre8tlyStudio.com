@@ -69,7 +69,11 @@ export default function BookEditor({ content, setContent }) {
 
   if (!editor) return null;
 
-
+useEffect(() => {
+  if (editor && content !== editor.getHTML()) {
+    editor.commands.setContent(content || "", false);
+  }
+}, [content, editor]);
 
 
   return (

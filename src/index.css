@@ -611,7 +611,14 @@ input[type="color"]:focus {
 
  html, body, #root {
   min-height: 100%;
-  background: linear-gradient(to bottom, #000000, #111827, #000000);
+  background: linear-gradient(
+  180deg,
+  #000000 0%,
+  #06080f 25%,
+  #111827 55%,
+  #06080f 80%,
+  #000000 120%
+);
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-color: #000 !important;
@@ -621,17 +628,7 @@ input[type="color"]:focus {
 }
 
 /* ✅ Extend the dark gradient far beyond the viewport to prevent white bounce */
-body::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -50vh;  /* push far below view */
-  height: 100vh;   /* covers bounce + scroll areas */
-  background: linear-gradient(to bottom, #000000, #111827, #000000);
-  z-index: -1;
-  pointer-events: none;
-}
+
 
 /* Safari background stability */
 @supports (-webkit-touch-callout: none) {

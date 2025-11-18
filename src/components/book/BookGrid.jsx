@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { CheckCircle, Timer, Eye, Plus, Layers, Rocket } from "lucide-react";
+import { CheckCircle, Timer, Eye, Plus, Layers, Rocket, Pencil } from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import OnboardingGuide from "../onboarding/OnboardingGuide";
 import { useAuth } from "../../admin/AuthContext";
-import api from "../../api/axios";
+import axiosInstance from "../../api/axios";
 
 export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -181,7 +181,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                 </button>
               )}
               {/* Continue Draft button */}
-              {(b.has_part_1 === 0 && (b.is_draft === 1 || b.draft_text)) && (
+              {b.has_part_1 === 0 && (b.is_draft === 1 || b.draft_text) && (
                 <button
                   onClick={() => onAddPrompt(b.id, b.part_number || 1)}
                   className="w-full bg-blue hover:bg-blue text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all"
@@ -194,27 +194,6 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
 
               {b.pdf_url && (
                 <>
-                  <button
-                    onClick={() =>
-                      setPreviewUrl({
-                        url: b.pdf_url,
-                        title: b.book_name || "Untitled",
-                        partNumber: b.part_number || 1,
-                      })
-                    }
-                    className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
-                    title="Preview Book"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <Eye
-                        size={16}
-                        className={`${b.pages >= 750 ? "text-green" : "text-white"}`}
-                      />
-                      <span>
-                        {b.pages >= 750 ? "Download Book" : "Preview"}
-                      </span>
-                    </div>
-                  </button>
 
                   <button
                     onClick={() => openPartsModal(b.id)}
@@ -225,6 +204,17 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                     <span>View All Parts</span>
                   </button>
                 </>
+              )}
+
+              {b.can_edit === 1 && (
+                <button
+                  onClick={() => onAddPrompt(b.id, b.part_number)}
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all border border-gray-700"
+                  title="Edit Chapter"
+                >
+                  <Pencil size={16} className="text-green" />
+                  <span>Edit Chapter</span>
+                </button>
               )}
 
               {b.prompt && b.pages < 750 && (
@@ -274,13 +264,9 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
             try {
               localStorage.setItem("bookOnboardingComplete", "true");
               setShowOnboarding(false);
-              await api.post(
-                "https://cre8tlystudio.com/api/books/book-complete",
-                { userId: user?.id },
-                {
-                  headers: { Authorization: `Bearer ${accessToken}` },
-                }
-              );
+              await axiosInstance.post("/books/book-complete", {
+                userId: user?.id,
+              });
               await refreshUser();
             } catch (err) {
               console.error("❌ Failed to save onboarding status:", err);

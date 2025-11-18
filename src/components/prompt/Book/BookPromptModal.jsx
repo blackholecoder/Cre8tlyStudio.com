@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
 import BookPromptForm from "../Book/BookPromptForm";
+import axiosInstance from "../../../api/axios";
 
 export default function BookPromptModal({
   isOpen,
@@ -23,7 +23,7 @@ export default function BookPromptModal({
   const [showPreview, setShowPreview] = useState(false);
   const [partLocked, setPartLocked] = useState(false);
 
-  const [bookName, setBookName] = useState(initialBookData?.title || "");
+  const [bookName, setBookName] = useState(initialBookData?.bookName || "");
   const [authorName, setAuthorName] = useState(
     initialBookData?.authorName || ""
   );
@@ -36,7 +36,7 @@ export default function BookPromptModal({
   useEffect(() => {
     if (initialBookData) {
       console.log("🩵 Syncing initialBookData to state:", initialBookData);
-      setBookName(initialBookData.title || "");
+      setBookName(initialBookData.bookName || "");
       setAuthorName(initialBookData.authorName || "");
       setBookType(initialBookData.bookType || "fiction");
     }
@@ -55,64 +55,8 @@ export default function BookPromptModal({
     }
   }, [isOpen]);
 
+
   useEffect(() => {
-  async function fetchDraft() {
-    if (!bookId) return;
-    try {
-      const res = await axios.get(`https://cre8tlystudio.com/books/draft/${bookId}`);
-      const draft = res.data;
-
-      if (draft?.draft_text) {
-        setText(draft.draft_text);
-        if (draft.title) setBookName(draft.title); 
-        if (draft.link) setLink(draft.link);
-        if (draft.author_name) setAuthorName(draft.author_name);
-        if (draft.book_type) setBookType(draft.book_type);
-        toast.info(`Loaded last draft from ${new Date(draft.last_saved_at).toLocaleString()}`);
-      } else {
-        console.log("No draft found for this book.");
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        console.log("No saved draft yet.");
-      } else {
-        console.error("Failed to fetch draft:", err);
-        toast.error("Failed to fetch saved draft.");
-      }
-    }
-  }
-
-  fetchDraft();
-}, [bookId]);
-
-// useEffect(() => {
-//   async function checkIfPartExists() {
-//     if (!bookId) return;
-
-//     try {
-//       const res = await axios.get(
-//         `https://cre8tlystudio.com/api/books/${bookId}/parts`,
-//         { headers: { Authorization: `Bearer ${accessToken}` } }
-//       );
-
-//       const parts = res.data || [];
-//       const exists = parts.some((p) => Number(p.part_number) === Number(partNumber));
-//      console.log("Parts found:", parts);
-
-
-//       setPartLocked(exists);
-//     } catch (err) {
-//       console.error("Failed to check part existence:", err);
-//       setPartLocked(false);
-//     }
-//   }
-
-//   checkIfPartExists();
-// }, [bookId, partNumber]);
-
-
-  // ✅ Fetch book info
-useEffect(() => {
   async function fetchDraft() {
     if (!bookId) return;
 
@@ -120,11 +64,11 @@ useEffect(() => {
       // ✅ Use part-specific route after part 1
       const endpoint =
         partNumber > 1
-          ? `https://cre8tlystudio.com/api/books/${bookId}/part/${partNumber}/draft`
-          : `https://cre8tlystudio.com/api/books/draft/${bookId}`;
+          ? `/books/${bookId}/part/${partNumber}/draft`
+          : `/books/draft/${bookId}`;
 
-      const res = await axios.get(endpoint, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+      const res = await axiosInstance.get(endpoint, {
+        // headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const draft = res.data;
@@ -132,6 +76,7 @@ useEffect(() => {
       if (draft?.draft_text) {
         setText(draft.draft_text);
         if (draft.title) setTitle(draft.title);
+        if (draft.book_name) setBookName(draft.book_name);
         if (draft.link) setLink(draft.link);
         if (draft.author_name) setAuthorName(draft.author_name);
         if (draft.book_type) setBookType(draft.book_type);
@@ -177,8 +122,8 @@ useEffect(() => {
         setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
       }, 400);
 
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/books/prompt",
+      const res = await axiosInstance.post(
+        "/books/prompt",
         {
           bookId,
           prompt: text,

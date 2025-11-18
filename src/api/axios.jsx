@@ -17,7 +17,7 @@ const axiosInstance = axios.create({
   },
   withCredentials: true,
 });
-console.log("Base URL:", axiosInstance.defaults.baseURL);
+
 // 🔐 Single refresh lock so multiple 401s don't collide
 let isRefreshing = false;
 let refreshSubscribers = [];

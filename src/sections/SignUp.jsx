@@ -64,6 +64,20 @@ const refEmployee = searchParams.get("ref_employee");
     }
   };
 
+    useEffect(() => {
+    // Always restore scrolling when this page mounts
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+
+    return () => {
+      // Ensure scroll is restored if you navigate away and come back
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
   return (
     <div
       style={{

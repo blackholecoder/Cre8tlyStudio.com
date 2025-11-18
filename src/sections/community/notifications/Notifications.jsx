@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
+import { Img } from "react-image";
 
 export default function Notifications() {
   const [items, setItems] = useState([]);
@@ -27,11 +28,24 @@ export default function Notifications() {
     }
   };
 
+  useEffect(() => {
+    // Always restore scrolling when this page mounts
+    document.body.style.overflow = "auto";
+    document.body.style.position = "";
+    document.body.style.width = "";
+
+    return () => {
+      // Ensure scroll is restored if you navigate away and come back
+      document.body.style.overflow = "auto";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
   return (
     <div className="w-full flex justify-center items-center min-h-[80vh] px-6 py-12">
       {/* 🔥 Background Container */}
       <div className="w-full max-w-2xl bg-gray-900/40 border border-gray-800 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
-        
         <h1 className="text-2xl font-bold mb-6 text-center">
           Notifications 🔔
         </h1>
@@ -50,11 +64,25 @@ export default function Notifications() {
               className="w-full text-left bg-gray-900/70 border border-gray-700 p-4 rounded-lg hover:border-green transition"
             >
               <div className="flex items-center gap-3">
-                {n.actor_image && (
-                  <img
+                {n.actor_image ? (
+                  <Img
                     src={n.actor_image}
-                    className="w-10 h-10 rounded-full object-cover"
+                    loader={
+                      <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
+                    }
+                    unloader={
+                      <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                        {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
+                      </div>
+                    }
+                    decode={true}
+                    alt="User avatar"
+                    className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
                   />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                    {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
                 )}
 
                 <div>
@@ -79,7 +107,6 @@ export default function Notifications() {
             </button>
           ))}
         </div>
-        
       </div>
     </div>
   );

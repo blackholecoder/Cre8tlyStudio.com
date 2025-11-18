@@ -1,23 +1,22 @@
 import { useState } from "react";
 
+
 export default function NewBookModal({ onCreate, onClose }) {
-  const [title, setTitle] = useState("");
+  const [bookName, setBookName] = useState("");
   const [author, setAuthor] = useState("");
   const [bookType, setBookType] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  async function handleAddInfo() {
-    if (!title || !author || !bookType) {
-      alert("Please fill in all fields, including book type.");
-      return;
-    }
-
-    onCreate({
-      title,
-      authorName: author,
-      bookType,
-    });
+  function handleAddInfo() {
+  if (!bookName || !author || !bookType) {
+    toast.error("Please fill in all fields, including book type.");
+    return;
   }
+
+  setConfirmOpen(true); // open confirmation
+}
+
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -25,12 +24,12 @@ export default function NewBookModal({ onCreate, onClose }) {
         <h2 className="text-xl font-semibold text-center">Set Up Your Book</h2>
 
         <div>
-          <label className="block text-silver mb-1">Book Title</label>
+          <label className="block text-silver mb-1">Book Name</label>
           <input
             type="text"
             placeholder="e.g. The Burning City"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={bookName}
+            onChange={(e) => setBookName(e.target.value)}
             className="w-full p-2 rounded bg-gray-800"
           />
         </div>
@@ -85,6 +84,79 @@ export default function NewBookModal({ onCreate, onClose }) {
           </button>
         </div>
       </div>
+      {confirmOpen && (
+  <div className="
+      fixed inset-0 
+      backdrop-blur-md 
+      bg-black/60 
+      flex items-center justify-center 
+      z-[9999] 
+      animate-fadeIn
+    ">
+    
+    <div className="
+        bg-black/90 
+        border border-white/10 
+        shadow-[0_0_30px_rgba(0,0,0,0.6)] 
+        rounded-2xl 
+        px-6 py-5 
+        w-[90%] max-w-sm 
+        text-center 
+        animate-slideDown
+      ">
+      
+      <h3 className="text-xl font-semibold text-[#7bed9f] drop-shadow-sm">
+        Confirm Action
+      </h3>
+
+      <p className="text-gray-300 text-sm leading-relaxed mt-3">
+        You will <span className="text-white font-semibold">NOT</span> be able 
+        to change the book type or author name after continuing.
+      </p>
+
+      <div className="flex justify-center gap-4 pt-6">
+        <button
+          onClick={() => setConfirmOpen(false)}
+          className="
+            px-4 py-2 
+            rounded-lg 
+            bg-gray-700 
+            text-gray-300 
+            hover:bg-gray-600 
+            transition
+          "
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            setConfirmOpen(false);
+            onCreate({
+              bookName,
+              authorName: author,
+              bookType,
+            });
+          }}
+          className="
+            px-5 py-2 
+            rounded-lg 
+            bg-[#7bed9f] 
+            text-black 
+            font-semibold 
+            hover:bg-[#63e28b] 
+            transition 
+            shadow-[0_0_12px_rgba(123,237,159,0.6)]
+          "
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

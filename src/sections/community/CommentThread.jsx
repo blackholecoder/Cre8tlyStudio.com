@@ -1,6 +1,7 @@
 import ReplyBox from "../../components/community/ReplyBox";
 import { ShieldCheck, Heart } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
+import { Img } from "react-image";
 
 export default function CommentThread({
   comment,
@@ -77,10 +78,19 @@ export default function CommentThread({
             <div className="flex items-center gap-3 mb-2">
               {/* Avatar */}
               {comment.author_image ? (
-                <img
+                <Img
                   src={comment.author_image}
-                  className="w-8 h-8 rounded-full object-cover border border-gray-700"
+                  loader={
+                    <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                  }
+                  unloader={
+                    <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                      {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  }
+                  decode={true}
                   alt="User avatar"
+                  className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">

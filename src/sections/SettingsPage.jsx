@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "../api/axios";
+import { Img } from "react-image";
 
 export default function DashboardSettings() {
   const { user, setUser, refreshUser } = useAuth();
@@ -46,8 +46,8 @@ export default function DashboardSettings() {
   // Enable 2FA (get QR + secret)
   const handleEnable2FA = async () => {
     try {
-      const res = await api.post(
-        "https://cre8tlystudio.com/api/auth/user/enable-2fa"
+      const res = await axiosInstance.post(
+        "/auth/user/enable-2fa"
       );
       setQr(res.data.qr);
       setSecret(res.data.secret);
@@ -62,8 +62,8 @@ export default function DashboardSettings() {
     if (!twofaCode.trim()) return toast.warning("Enter the 6-digit code");
     setVerifying(true);
     try {
-      const res = await api.post(
-        "https://cre8tlystudio.com/api/auth/user/verify-login-2fa",
+      const res = await axiosInstance.post(
+        "/auth/user/verify-login-2fa",
         { token: twofaCode }
       );
       if (res.data.success || res.data.verified) {
@@ -91,7 +91,7 @@ export default function DashboardSettings() {
   const handleRegisterPasskey = async () => {
     try {
       // 1️⃣ Request registration options from backend
-      const { data: options } = await api.post(
+      const { data: options } = await axiosInstance.post(
         "/auth/webauthn/register-options",
         {
           email: user.email,
@@ -175,7 +175,7 @@ export default function DashboardSettings() {
         rawIdBase64URL.length
       );
       // 5️⃣ Send credential to backend for verification
-      const { data } = await api.post("/auth/webauthn/register-verify", {
+      const { data } = await axiosInstance.post("/auth/webauthn/register-verify", {
         email: user.email,
         attResp,
       });
@@ -199,7 +199,7 @@ export default function DashboardSettings() {
 
   const handleRemovePasskey = async () => {
     try {
-      const res = await api.post("/auth/webauthn/remove-passkey");
+      const res = await axiosInstance.post("/auth/webauthn/remove-passkey");
       if (res.data.success) {
         toast.info("🗑️ Passkey removed successfully.");
         setUser({ ...user, has_passkey: 0 });
@@ -231,7 +231,7 @@ export default function DashboardSettings() {
     if (!user?.id) return;
     const fetchSettings = async () => {
       try {
-        const res = await api.get(`upload-data/user/settings/${user.id}`);
+        const res = await axiosInstance.get(`/upload-data/user/settings/${user.id}`);
         setSettings(res.data.settings);
       } catch (err) {
         console.error("Failed to load settings:", err);
@@ -253,7 +253,7 @@ export default function DashboardSettings() {
       setUploading(true);
 
       try {
-        const res = await api.post("upload-data/user/settings/upload", {
+        const res = await axiosInstance.post("/upload-data/user/settings/upload", {
           user_id: user.id,
           file_name: file.name,
           file_data: base64Data,
@@ -291,8 +291,8 @@ export default function DashboardSettings() {
 
   const handleRemove = async () => {
     try {
-      const res = await api.delete(
-        `upload-data/user/settings/remove/${user.id}`
+      const res = await axiosInstance.delete(
+        `/upload-data/user/settings/remove/${user.id}`
       );
 
       if (res.data.success) {
@@ -319,7 +319,7 @@ export default function DashboardSettings() {
 
   const handleSaveCTA = async () => {
     try {
-      await api.put("upload-data/user/settings/update-cta", {
+      await axiosInstance.put("/upload-data/user/settings/update-cta", {
         userId: user.id,
         cta: settings?.cta || "",
       });
@@ -565,11 +565,22 @@ export default function DashboardSettings() {
           </h2>
 
           <div className="flex items-center gap-6 mt-4">
-            <img
-              src={user?.profile_image_url || "/default-avatar.png"}
-              className="w-20 h-20 rounded-full object-cover border border-gray-700"
-              alt="avatar"
-            />
+            <Img
+  src={user?.profile_image}
+  loader={
+    <div className="w-20 h-20 rounded-full bg-gray-700/40 animate-pulse border border-gray-700" />
+  }
+  unloader={
+    <img
+      src="/default-avatar.png"
+      className="w-20 h-20 rounded-full object-cover border border-gray-700"
+      alt="avatar"
+    />
+  }
+  decode={true}
+  alt="avatar"
+  className="w-20 h-20 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+/>
 
             <div className="flex-1">
               <input
@@ -615,8 +626,8 @@ export default function DashboardSettings() {
               <button
                 onClick={async () => {
                   try {
-                    const res = await api.post(
-                      "https://cre8tlystudio.com/api/auth/user/disable-2fa"
+                    const res = await axiosInstance.post(
+                      "/auth/user/disable-2fa"
                     );
                     if (res.data.success) {
                       setTwofaEnabled(false);
@@ -759,8 +770,8 @@ export default function DashboardSettings() {
               <button
                 onClick={async () => {
                   try {
-                    const { data } = await api.post(
-                      "https://cre8tlystudio.com/api/seller/create-account-link"
+                    const { data } = await axiosInstance.post(
+                      "/seller/create-account-link"
                     );
                     if (data.url) window.location.href = data.url;
                   } catch (err) {
@@ -779,8 +790,8 @@ export default function DashboardSettings() {
             <button
               onClick={async () => {
                 try {
-                  const { data } = await api.post(
-                    "https://cre8tlystudio.com/api/seller/create-account-link"
+                  const { data } = await axiosInstance.post(
+                    "/seller/create-account-link"
                   );
                   if (data.url) window.location.href = data.url;
                 } catch (err) {
@@ -942,8 +953,8 @@ export default function DashboardSettings() {
                 <button
                   onClick={async () => {
                     try {
-                      await api.post(
-                        "https://cre8tlystudio.com/api/books/onboarding/replay",
+                      await axiosInstance.post(
+                        "/books/onboarding/replay",
                         {},
                         {
                           headers: {

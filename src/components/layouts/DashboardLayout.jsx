@@ -16,7 +16,8 @@ import {
   Users,
   BarChart2,
   Banknote,
-  MessageSquare
+  MessageSquare,
+  Bell,
 } from "lucide-react";
 import CustomCursor from "../CustomCursor";
 import AnimatedLogo from "../animation/AnimatedLogo";
@@ -27,6 +28,7 @@ export default function DashboardLayout({ children }) {
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [communityCount, setCommunityCount] = useState(0);
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
@@ -55,6 +57,25 @@ export default function DashboardLayout({ children }) {
     return () => clearInterval(interval);
   }, [user?.id]);
 
+  // ⭐ Fetch unread community notifications
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchCommunityCount = async () => {
+      try {
+        const res = await api.get("/notifications/count");
+        setCommunityCount(res.data.count || 0);
+      } catch (err) {
+        console.error("Failed to fetch community notifications:", err);
+      }
+    };
+
+    fetchCommunityCount();
+
+    const interval = setInterval(fetchCommunityCount, 30000); // refresh every 30s
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
   let menu = [
     {
       label: "Digital Products",
@@ -69,6 +90,11 @@ export default function DashboardLayout({ children }) {
       icon: <MessageSquare size={22} />,
     },
     {
+  label: "Alerts",
+  path: "/community-alerts",
+  icon: <Bell size={22} />,
+},
+    {
       label: "Prompt Memory",
       path: "/prompts",
       icon: <SquareTerminal size={22} />,
@@ -79,7 +105,6 @@ export default function DashboardLayout({ children }) {
       icon: <Inbox size={22} />,
     },
     { label: "Plans", path: "/plans", icon: <DollarSign size={22} /> },
-    
   ];
 
   if (isFreeTier) {
@@ -155,6 +180,17 @@ export default function DashboardLayout({ children }) {
                       {item.path === "/notifications" && unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex items-center justify-center w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
                           {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
+
+                      {/* 🟢 Community unread badge */}
+                      {item.path === "/community" && communityCount > 0 && (
+                        <span
+                          className="absolute -top-1 -right-1 flex items-center justify-center 
+                     w-[18px] h-[18px] text-[10px] bg-green-600 text-white font-bold 
+                     rounded-full shadow-md"
+                        >
+                          {communityCount > 9 ? "9+" : communityCount}
                         </span>
                       )}
 

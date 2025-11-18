@@ -47,6 +47,7 @@ import SellerDashboard from "./sections/seller/SellerDashboard.jsx";
 import CommunityPost from "./sections/community/CommunityPost.jsx";
 import CommunityTopic from "./sections/community/CommunityTopic.jsx";
 import CommunityHome from "./sections/community/CommunityHome.jsx";
+import Notifications from "./sections/community/notifications/Notifications.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -108,6 +109,25 @@ const AnimatedRoutes = () => {
     </PrivateRoute>
   }
 />
+<Route
+  path="/community-alerts"
+  element={
+    <PrivateRoute role={["customer", "admin", "marketer"]}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="min-h-screen bg-[#030712]"
+      >
+        <DashboardLayout>
+          <Notifications />
+        </DashboardLayout>
+      </motion.div>
+    </PrivateRoute>
+  }
+/>
+
 <Route
   path="/community/topic/:topicId"
   element={

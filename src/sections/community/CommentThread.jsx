@@ -30,13 +30,10 @@ export default function CommentThread({
     comment.reply_count ??
     (replies[comment.id] ? replies[comment.id].length : 0);
 
-    
-
-
-
   return (
     <div className="mt-3" style={{ marginLeft: depth === 1 ? 30 : 0 }}>
       <div
+        id={`comment-${comment.id}`}
         className={
           depth === 0
             ? "bg-gray-900/60 border border-gray-700 p-3 rounded-lg"
@@ -77,16 +74,32 @@ export default function CommentThread({
         ) : (
           <>
             {/* Author + Meta */}
-            <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-              <span className="font-semibold text-gray-200">
-                {comment.author}
-              </span>
-              {comment.author_role === "admin" && (
-                <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">
-                  <ShieldCheck size={11} className="text-green" /> Official
-                </span>
+            <div className="flex items-center gap-3 mb-2">
+              {/* Avatar */}
+              {comment.author_image ? (
+                <img
+                  src={comment.author_image}
+                  className="w-8 h-8 rounded-full object-cover border border-gray-700"
+                  alt="User avatar"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                  {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                </div>
               )}
-              • {timeAgo(comment.created_at)}
+
+              {/* Author + Meta */}
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span className="font-semibold text-gray-200">
+                  {comment.author}
+                </span>
+                {comment.author_role === "admin" && (
+                  <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">
+                    <ShieldCheck size={11} className="text-green" /> Official
+                  </span>
+                )}
+                • {timeAgo(comment.created_at)}
+              </div>
             </div>
 
             {/* Comment Body */}
@@ -148,19 +161,17 @@ export default function CommentThread({
                   postId={postId}
                   onReply={async (newReply) => {
                     setActiveReplyBox(null);
-                    
+
                     setReplies((prev) => ({
                       ...prev,
-                      // [comment.id]: [...(prev[comment.id] || []), newReply],
-                      [(comment.parent_id || comment.id)]: [
-  ...(prev[comment.parent_id || comment.id] || []),
-  newReply,
-],
+                      [comment.parent_id || comment.id]: [
+                        ...(prev[comment.parent_id || comment.id] || []),
+                        newReply,
+                      ],
                     }));
                     // setActiveReplyBox(null); // 🔥 close immediately
-                    await loadReplies(comment.parent_id || comment.id) // fetch fresh replies AFTER closing
+                    await loadReplies(comment.parent_id || comment.id); // fetch fresh replies AFTER closing
                   }}
-                  
                   onCancel={() => setActiveReplyBox(null)}
                 />
               </div>
@@ -181,31 +192,31 @@ export default function CommentThread({
       )}
 
       {openReplies[comment.id] &&
-  children
-    .filter(child => child && child.id)           // 🔥 prevents all crashes
-    .map(child => (
-      <CommentThread
-            key={child.id}
-            comment={child}
-            depth={1}
-            loadReplies={loadReplies}
-            replies={replies}
-            replyPages={replyPages}
-            timeAgo={timeAgo}
-            postId={postId}
-            toggleLike={toggleLike}
-            activeReplyBox={activeReplyBox}
-            setActiveReplyBox={setActiveReplyBox}
-            editCommentId={editCommentId}
-            editBody={editBody}
-            setEditBody={setEditBody}
-            setEditCommentId={setEditCommentId}
-            handleDelete={handleDelete}
-            onReplySubmit={onReplySubmit}
-            openReplies={openReplies}
-            toggleReplyVisibility={toggleReplyVisibility}
-          />
-        ))}
+        children
+          .filter((child) => child && child.id) // 🔥 prevents all crashes
+          .map((child) => (
+            <CommentThread
+              key={child.id}
+              comment={child}
+              depth={1}
+              loadReplies={loadReplies}
+              replies={replies}
+              replyPages={replyPages}
+              timeAgo={timeAgo}
+              postId={postId}
+              toggleLike={toggleLike}
+              activeReplyBox={activeReplyBox}
+              setActiveReplyBox={setActiveReplyBox}
+              editCommentId={editCommentId}
+              editBody={editBody}
+              setEditBody={setEditBody}
+              setEditCommentId={setEditCommentId}
+              handleDelete={handleDelete}
+              onReplySubmit={onReplySubmit}
+              openReplies={openReplies}
+              toggleReplyVisibility={toggleReplyVisibility}
+            />
+          ))}
 
       {/* SHOW MORE */}
       {openReplies[comment.id] && replyPages[comment.id] && (

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import CreateCommentBox from "./CreateCommentBox";
 import { ArrowLeft, ShieldCheck, Heart } from "lucide-react";
@@ -25,6 +25,10 @@ export default function CommunityPost() {
   const [activeReplyBox, setActiveReplyBox] = useState(null);
 
   const [replyPages, setReplyPages] = useState({});
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const highlightedCommentId = params.get("comment");
 
   // Load post + first page of comments
   const load = async () => {
@@ -84,38 +88,36 @@ export default function CommunityPost() {
   }, []);
 
   // Load replies for a comment
-const loadReplies = async (commentId, page = 1) => {
-  const limit = 5;
+  const loadReplies = async (commentId, page = 1) => {
+    const limit = 5;
 
-  try {
-    const res = await axiosInstance.get(
-      `/community/comments/${commentId}/replies?page=${page}&limit=${limit}`
-    );
+    try {
+      const res = await axiosInstance.get(
+        `/community/comments/${commentId}/replies?page=${page}&limit=${limit}`
+      );
 
-    // CLEAN the data
-    let newReplies = res.data.replies || [];
-    newReplies = newReplies.filter(r => r && r.id);
+      // CLEAN the data
+      let newReplies = res.data.replies || [];
+      newReplies = newReplies.filter((r) => r && r.id);
 
-    const freshReplies = [...newReplies];
+      const freshReplies = [...newReplies];
 
-    setReplies(prev => ({
-      ...prev,
-      [commentId]:
-        page === 1
-          ? [...freshReplies]
-          : [...(prev[commentId] || []), ...freshReplies],
-    }));
+      setReplies((prev) => ({
+        ...prev,
+        [commentId]:
+          page === 1
+            ? [...freshReplies]
+            : [...(prev[commentId] || []), ...freshReplies],
+      }));
 
-    setReplyPages(prev => ({
-      ...prev,
-      [commentId]: res.data.nextPage,
-    }));
-  } catch (err) {
-    console.error("Failed to load replies:", err);
-  }
-};
-
-
+      setReplyPages((prev) => ({
+        ...prev,
+        [commentId]: res.data.nextPage,
+      }));
+    } catch (err) {
+      console.error("Failed to load replies:", err);
+    }
+  };
 
   // Toggle reply expansion
   const toggleReplies = (commentId) => {
@@ -148,65 +150,39 @@ const loadReplies = async (commentId, page = 1) => {
     }
   };
 
-const handleDelete = async (commentId, parentId = null) => {
-  console.log("🔥 DELETE CLICKED", { commentId, parentId });
+  const handleDelete = async (commentId, parentId = null) => {
+    if (!window.confirm("Delete this comment?")) return;
 
-  if (!window.confirm("Delete this comment?")) return;
+    try {
+      await axiosInstance.delete(`/community/comments/${commentId}`);
 
-  try {
-    console.log("📡 Sending DELETE request...");
-    await axiosInstance.delete(`/community/comments/${commentId}`);
-    console.log("✅ Delete request finished.");
+      if (parentId) {
+        setReplies((prev) => {
+          const list = prev[parentId] || [];
 
-    if (parentId) {
-      console.log("🧹 Deleting a REPLY...");
+          const filtered = list.filter((r) => r.id !== commentId);
 
-      setReplies((prev) => {
-        console.log("📦 Current replies state:", prev);
+          const updated = {
+            ...prev,
+            [parentId]: filtered,
+          };
 
-        const list = prev[parentId] || [];
+          return updated;
+        });
+        await loadReplies(parentId);
+      } else {
+        setComments((prev) => {
+          const filtered = prev.filter((c) => c.id !== commentId);
 
-        console.log("🔍 Replies under this parent BEFORE:", list);
+          return filtered;
+        });
 
-        const filtered = list.filter((r) => r.id !== commentId);
-
-        console.log("🗑 Replies AFTER filter:", filtered);
-
-        const updated = {
-          ...prev,
-          [parentId]: filtered,
-        };
-
-        console.log("📦 NEW replies state ready:", updated);
-
-        return updated;
-      });
-
-      console.log("🔄 Reloading replies from server...");
-      await loadReplies(parentId);
-      console.log("✅ Replies reloaded.");
-    } else {
-      console.log("🧹 Deleting a TOP LEVEL comment...");
-      setComments((prev) => {
-        console.log("📦 Current comments:", prev);
-
-        const filtered = prev.filter((c) => c.id !== commentId);
-        console.log("🗑 Comments AFTER filter:", filtered);
-
-        return filtered;
-      });
-
-      console.log("🔄 Reloading top-level thread...");
-      await loadReplies(null);
-      console.log("✅ Top-level reloaded.");
+        await loadReplies(null);
+      }
+    } catch (err) {
+      console.error("❌ Delete failed:", err);
     }
-  } catch (err) {
-    console.error("❌ Delete failed:", err);
-  }
-};
-
-
-
+  };
 
   const toggleLike = async (comment, parentId = null) => {
     try {
@@ -236,6 +212,23 @@ const handleDelete = async (commentId, parentId = null) => {
     }
   };
 
+  useEffect(() => {
+    if (!highlightedCommentId) return;
+
+    setTimeout(() => {
+      const el = document.getElementById(`comment-${highlightedCommentId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-green", "rounded-lg");
+
+        // remove highlight after 3 sec
+        setTimeout(() => {
+          el.classList.remove("ring-2", "ring-green");
+        }, 3000);
+      }
+    }, 500);
+  }, [comments, replies]);
+
   if (!post) return null;
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
@@ -252,26 +245,35 @@ const handleDelete = async (commentId, parentId = null) => {
 
   const isAdmin = post.author_role === "admin";
 
+  if (!post) {
+    return <div className="p-10 text-center text-gray-300">Post not found</div>;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start px-6 py-16">
+    <div className="w-full flex justify-center items-start min-h-screen px-6 py-20">
+    <div className="bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">
       {/* Breadcrumb */}
-      <div className="w-full max-w-3xl mb-6 text-gray-400">
+      <div className="w-full max-w-3xl mb-6 text-gray-400 text-sm flex items-center gap-2">
         <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition mb-2"
+          onClick={() => navigate("/community")}
+          className="flex items-center gap-1 text-green hover:text-green/80 transition"
         >
-          <ArrowLeft size={20} /> Back
+          <ArrowLeft size={16} />
+          Back
         </button>
 
-        <p className="text-sm">
-          <span
-            onClick={() => navigate("/community")}
-            className="hover:text-white cursor-pointer"
-          >
-            Community
-          </span>{" "}
-          / <span className="text-white font-medium">{post.title}</span>
-        </p>
+        <span>/</span>
+
+        <button
+          onClick={() => navigate("/community")}
+          className="hover:text-gray-200"
+        >
+          Community
+        </button>
+
+        <span>/</span>
+
+        <span className="text-white font-medium">{post.title}</span>
       </div>
 
       {/* Main content */}
@@ -279,9 +281,17 @@ const handleDelete = async (commentId, parentId = null) => {
         {/* Post Card */}
         <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-8 shadow-lg">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full bg-green-600/30 border border-green-600 flex items-center justify-center text-xl font-bold text-green-400">
-              {avatarInitial}
-            </div>
+            {post.author_image ? (
+              <img
+                src={post.author_image}
+                className="w-12 h-12 rounded-full object-cover border border-green-600"
+                alt="User avatar"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-green-600/30 border border-green-600 flex items-center justify-center text-xl font-bold text-green-400">
+                {avatarInitial}
+              </div>
+            )}
             <div>
               <p className="text-white text-lg font-semibold flex items-center gap-2">
                 {post.author}
@@ -322,9 +332,17 @@ const handleDelete = async (commentId, parentId = null) => {
                   className="bg-gray-900/60 border border-gray-700 p-6 rounded-lg shadow-inner"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
-                      {commentAvatar}
-                    </div>
+                    {c.author_image ? (
+                      <img
+                        src={c.author_image}
+                        className="w-10 h-10 rounded-full object-cover border border-gray-700"
+                        alt="Comment avatar"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                        {commentAvatar}
+                      </div>
+                    )}
 
                     <div className="flex-1">
                       {editCommentId !== c.id && (
@@ -505,6 +523,7 @@ const handleDelete = async (commentId, parentId = null) => {
           <CreateCommentBox postId={postId} onComment={load} />
         </div>
       </div>
+    </div>
     </div>
   );
 }

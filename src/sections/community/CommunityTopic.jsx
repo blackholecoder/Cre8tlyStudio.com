@@ -33,36 +33,68 @@ export default function CommunityTopic() {
 
   if (!topic) return null;
 
-  return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{topic.name}</h1>
+return (
+  <div className="pt-20 p-8 max-w-4xl mx-auto">
+    
+    {/* 🔙 Back + Breadcrumbs */}
+    <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
+      <button
+        onClick={() => navigate("/community")}
+        className="text-green hover:text-green/80 transition"
+      >
+        ← Back
+      </button>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition"
-        >
-          <Plus size={20} /> New Post
-        </button>
-      </div>
+      <span className="mx-1">/</span>
 
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <button
-            key={post.id}
-            onClick={() => navigate(`/community/post/${post.id}`)}
-            className="w-full text-left bg-gray-900/80 p-5 rounded-xl border border-gray-700
-                       hover:border-green hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] transition"
-          >
-            <h3 className="text-lg font-semibold">{post.title}</h3>
-            <p className="text-gray-400 text-sm mt-1">By {post.author}</p>
-          </button>
-        ))}
-      </div>
+      <button
+        onClick={() => navigate("/community")}
+        className="hover:text-gray-200"
+      >
+        Community
+      </button>
 
-      {showModal && (
-        <CreatePostModal topicId={topicId} onClose={() => setShowModal(false)} onPosted={load} />
-      )}
+      <span className="mx-1">/</span>
+
+      <span className="text-gray-200">{topic.name}</span>
     </div>
-  );
+
+    {/* Header + Create Button */}
+    <div className="flex items-center justify-between mb-8">
+      <h1 className="text-3xl font-bold">{topic.name}</h1>
+
+      <button
+        onClick={() => setShowModal(true)}
+        className="flex items-center gap-2 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition"
+      >
+        <Plus size={20} /> New Post
+      </button>
+    </div>
+
+    {/* Posts List */}
+    <div className="space-y-4">
+      {posts.map((post) => (
+        <button
+          key={post.id}
+          onClick={() => navigate(`/community/post/${post.id}`)}
+          className="w-full text-left bg-gray-900/80 p-5 rounded-xl border border-gray-700
+                     hover:border-green hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] transition"
+        >
+          <h3 className="text-lg font-semibold">{post.title}</h3>
+          <p className="text-gray-400 text-sm mt-1">By {post.author}</p>
+        </button>
+      ))}
+    </div>
+
+    {/* Create Post Modal */}
+    {showModal && (
+      <CreatePostModal
+        topicId={topicId}
+        onClose={() => setShowModal(false)}
+        onPosted={load}
+      />
+    )}
+  </div>
+);
+
 }

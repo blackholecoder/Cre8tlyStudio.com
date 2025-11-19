@@ -98,7 +98,7 @@ export default function NewContentModal({ onCreate, onClose }) {
         <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition"
+            className="bg-red-600 px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
           >
             Cancel
           </button>

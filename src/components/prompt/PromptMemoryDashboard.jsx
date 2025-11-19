@@ -45,7 +45,7 @@ export default function PromptMemoryDashboard() {
 
       {/* Content */}
       {loading ? (
-  <LoadingState />
+  <LoadingState label="Loading your digital products..." />
 ) : prompts.length === 0 ? (
   <div className="text-center py-20 border border-gray-700 rounded-xl bg-gray-900/40">
     <h2 className="text-2xl font-semibold text-white mb-2">

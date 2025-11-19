@@ -48,6 +48,13 @@ const Footer = () => {
             >
               Refunds
             </Link>
+            <span>|</span>
+            <Link
+              to="/careers"
+              className="hover:text-white transition-colors"
+            >
+              Careers
+            </Link>
           </div>
 
           <p className="text-xs text-white/40">

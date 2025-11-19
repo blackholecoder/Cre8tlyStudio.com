@@ -48,6 +48,7 @@ import CommunityPost from "./sections/community/CommunityPost.jsx";
 import CommunityTopic from "./sections/community/CommunityTopic.jsx";
 import CommunityHome from "./sections/community/CommunityHome.jsx";
 import Notifications from "./sections/community/notifications/Notifications.jsx";
+import Careers from "./documents/Careers.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -226,6 +227,7 @@ const AnimatedRoutes = () => {
         <Route path="/privacy-policy" element={<Privacy />} />
         <Route path="/refund-policy" element={<Refund />} />
         <Route path="/cookie-policy" element={<Cookie />} />
+        <Route path="/careers" element={<Careers />} />
         <Route path="/prompt" element={<PromptPage />} />
 
         {/* Auth */}

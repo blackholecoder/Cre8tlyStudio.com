@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import Footer from "./Footer";
 import CustomCursor from "../components/CustomCursor";
 import AnimatedLogo from "../components/animation/AnimatedLogo";
+import axiosInstance from "../api/axios";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -18,7 +18,7 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      await axios.post("https://cre8tlystudio.com/api/support/contact", form);
+      await axiosInstance.post("/support/contact", form);
       toast.success("✅ Message sent! We'll get back to you soon.", {
         position: "top-center",
       });

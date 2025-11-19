@@ -140,7 +140,7 @@ return (
       />
       {/* Content */}
       {loading ? (
-        <LoadingState />
+        <LoadingState label="Loading your books..." />
       ) : books.length === 0 ? (
         <EmptyState onCheckout={() => navigate("/plans")} type="book" />
       ) : (

@@ -46,9 +46,7 @@ export default function DashboardSettings() {
   // Enable 2FA (get QR + secret)
   const handleEnable2FA = async () => {
     try {
-      const res = await axiosInstance.post(
-        "/auth/user/enable-2fa"
-      );
+      const res = await axiosInstance.post("/auth/user/enable-2fa");
       setQr(res.data.qr);
       setSecret(res.data.secret);
       toast.info("Scan the QR code with Google Authenticator or Authy.");
@@ -62,10 +60,9 @@ export default function DashboardSettings() {
     if (!twofaCode.trim()) return toast.warning("Enter the 6-digit code");
     setVerifying(true);
     try {
-      const res = await axiosInstance.post(
-        "/auth/user/verify-login-2fa",
-        { token: twofaCode }
-      );
+      const res = await axiosInstance.post("/auth/user/verify-login-2fa", {
+        token: twofaCode,
+      });
       if (res.data.success || res.data.verified) {
         setTwofaEnabled(true);
         setQr(null);
@@ -125,15 +122,6 @@ export default function DashboardSettings() {
         },
       });
 
-      // ✅ Extract the *real underlying buffer* (fixes truncation issues)
-      // ✅ Log everything about rawId
-      console.log(
-        "🔍 rawId instanceof ArrayBuffer:",
-        credential.rawId instanceof ArrayBuffer
-      );
-      console.log("🔍 rawId byteLength:", credential.rawId.byteLength);
-      console.log("🔍 credential.id (browser's Base64URL):", credential.id);
-
       // ✅ Always encode the true ArrayBuffer
       function toBase64Url(buffer) {
         const bytes = new Uint8Array(buffer);
@@ -149,13 +137,6 @@ export default function DashboardSettings() {
 
       const rawIdBase64URL = toBase64Url(credential.rawId);
 
-      console.log(
-        "🧩 Final rawIdBase64URL:",
-        rawIdBase64URL,
-        "length:",
-        rawIdBase64URL.length
-      );
-
       const attResp = {
         id: rawIdBase64URL,
         rawId: rawIdBase64URL,
@@ -168,17 +149,14 @@ export default function DashboardSettings() {
         },
       };
 
-      console.log(
-        "🧩 Using credential.id:",
-        rawIdBase64URL,
-        "length:",
-        rawIdBase64URL.length
-      );
       // 5️⃣ Send credential to backend for verification
-      const { data } = await axiosInstance.post("/auth/webauthn/register-verify", {
-        email: user.email,
-        attResp,
-      });
+      const { data } = await axiosInstance.post(
+        "/auth/webauthn/register-verify",
+        {
+          email: user.email,
+          attResp,
+        }
+      );
 
       // ✅ Success handling
       if (data.success) {
@@ -231,7 +209,9 @@ export default function DashboardSettings() {
     if (!user?.id) return;
     const fetchSettings = async () => {
       try {
-        const res = await axiosInstance.get(`/upload-data/user/settings/${user.id}`);
+        const res = await axiosInstance.get(
+          `/upload-data/user/settings/${user.id}`
+        );
         setSettings(res.data.settings);
       } catch (err) {
         console.error("Failed to load settings:", err);
@@ -253,11 +233,14 @@ export default function DashboardSettings() {
       setUploading(true);
 
       try {
-        const res = await axiosInstance.post("/upload-data/user/settings/upload", {
-          user_id: user.id,
-          file_name: file.name,
-          file_data: base64Data,
-        });
+        const res = await axiosInstance.post(
+          "/upload-data/user/settings/upload",
+          {
+            user_id: user.id,
+            file_name: file.name,
+            file_data: base64Data,
+          }
+        );
 
         setSettings((prev) => ({
           ...prev,
@@ -433,6 +416,8 @@ export default function DashboardSettings() {
 
   const plans = getUserPlan();
 
+  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
       <div className="w-full max-w-[900px] p-5">
@@ -460,11 +445,22 @@ export default function DashboardSettings() {
           </div>
 
           {plans.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div
+              className={`grid gap-6 ${
+                plans.length === 1
+                  ? "grid-cols-1 place-items-center"
+                  : "grid-cols-1 sm:grid-cols-2"
+              }`}
+            >
               {plans.map((plan, idx) => {
                 // Determine status badge
                 let statusBadge = "Active";
                 let statusColor = "text-green bg-green-400/10";
+
+                if (plan.planKey === "free" || plan.billing === "trial") {
+                  statusBadge = "Free Trial";
+                  statusColor = "text-amber-400 bg-amber-500/10";
+                }
 
                 // Trial expiration
                 if (plan.billing === "trial" && plan.expires) {
@@ -547,6 +543,15 @@ export default function DashboardSettings() {
                         `Trial Ends: ${new Date(plan.expires).toLocaleDateString()}`}
                       {plan.billing === "one_time" && "One-Time Purchase"}
                     </p>
+                    {plan.planKey === "free" && (
+                      <button
+                        onClick={() => (window.location.href = "/plans")}
+                        className="mt-4 px-5 py-2.5 bg-royalPurple 
+               text-white font-semibold rounded-lg shadow-md hover:opacity-90 transition"
+                      >
+                        Upgrade Plan
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -558,6 +563,7 @@ export default function DashboardSettings() {
             </p>
           )}
         </div>
+
         {/* Avatar Upload */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
           <h2 className="text-lg font-semibold text-gray-200">
@@ -566,21 +572,21 @@ export default function DashboardSettings() {
 
           <div className="flex items-center gap-6 mt-4">
             <Img
-  src={user?.profile_image}
-  loader={
-    <div className="w-20 h-20 rounded-full bg-gray-700/40 animate-pulse border border-gray-700" />
-  }
-  unloader={
-    <img
-      src="/default-avatar.png"
-      className="w-20 h-20 rounded-full object-cover border border-gray-700"
-      alt="avatar"
-    />
-  }
-  decode={true}
-  alt="avatar"
-  className="w-20 h-20 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-/>
+              src={user?.profile_image}
+              loader={
+                <div className="w-20 h-20 rounded-full bg-gray-700/40 animate-pulse border border-gray-700" />
+              }
+              unloader={
+                <img
+                  src="/default-avatar.png"
+                  className="w-20 h-20 rounded-full object-cover border border-gray-700"
+                  alt="avatar"
+                />
+              }
+              decode={true}
+              alt="avatar"
+              className="w-20 h-20 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+            />
 
             <div className="flex-1">
               <input
@@ -740,69 +746,105 @@ export default function DashboardSettings() {
             make through Cre8tly Studio.
           </p>
 
-          {user?.stripe_connected ? (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="text-green font-semibold">✅ Connected</span>
-                <p className="text-xs text-gray-500">
-                  Your Stripe account is active and ready for payouts.
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  window.open("https://dashboard.stripe.com/express", "_blank")
-                }
-                className="px-5 py-2 bg-blue hover:bg-blue/80 text-white rounded-lg font-semibold transition"
-              >
-                Open Stripe Dashboard
-              </button>
-            </div>
-          ) : user?.stripe_connect_account_id ? (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="text-yellow-400 font-semibold">
-                  ⚠️ Pending Setup
+          {/* 🔍 Free trial users cannot access Stripe */}
+          {isFreeTier ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-3 text-sm max-w-[420px] mx-auto">
+                Selling products and connecting Stripe is a{" "}
+                <span className="text-green font-semibold">
+                  premium feature
                 </span>
-                <p className="text-xs text-gray-500">
-                  Your Stripe account was created but not completed.
-                </p>
-              </div>
+                . Upgrade to unlock payouts, the seller dashboard, and full
+                product sales.
+              </p>
+
               <button
-                onClick={async () => {
-                  try {
-                    const { data } = await axiosInstance.post(
-                      "/seller/create-account-link"
-                    );
-                    if (data.url) window.location.href = data.url;
-                  } catch (err) {
-                    console.error("Stripe connect error:", err);
-                    toast.error(
-                      "Failed to resume Stripe onboarding. Try again."
-                    );
-                  }
-                }}
-                className="px-6 py-2.5 bg-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition"
+                onClick={() => (window.location.href = "/plans")}
+                className="px-6 py-3 rounded-lg bg-royalPurple 
+        text-white font-semibold shadow-md hover:opacity-90 transition mx-auto"
               >
-                Complete Setup
+                Upgrade to Unlock Selling
               </button>
             </div>
           ) : (
-            <button
-              onClick={async () => {
-                try {
-                  const { data } = await axiosInstance.post(
-                    "/seller/create-account-link"
-                  );
-                  if (data.url) window.location.href = data.url;
-                } catch (err) {
-                  console.error("Stripe connect error:", err);
-                  toast.error("Failed to start Stripe onboarding. Try again.");
-                }
-              }}
-              className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
-            >
-              Connect with Stripe
-            </button>
+            <>
+              {/* Stripe Connected */}
+              {user?.stripe_connected ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-green font-semibold">
+                      ✅ Connected
+                    </span>
+                    <p className="text-xs text-gray-500">
+                      Your Stripe account is active and ready for payouts.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      window.open(
+                        "https://dashboard.stripe.com/express",
+                        "_blank"
+                      )
+                    }
+                    className="px-5 py-2 bg-blue hover:bg-blue/80 text-white rounded-lg font-semibold transition"
+                  >
+                    Open Stripe Dashboard
+                  </button>
+                </div>
+              ) : user?.stripe_connect_account_id ? (
+                // Stripe pending setup
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-yellow-400 font-semibold">
+                      ⚠️ Pending Setup
+                    </span>
+                    <p className="text-xs text-gray-500">
+                      Your Stripe account was created but not completed.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      try {
+                        const { data } = await axiosInstance.post(
+                          "/seller/create-account-link"
+                        );
+                        if (data.url) window.location.href = data.url;
+                      } catch (err) {
+                        console.error("Stripe connect error:", err);
+                        toast.error(
+                          "Failed to resume Stripe onboarding. Try again."
+                        );
+                      }
+                    }}
+                    className="px-6 py-2.5 bg-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition"
+                  >
+                    Complete Setup
+                  </button>
+                </div>
+              ) : (
+                // Stripe Start Setup
+                <button
+                  onClick={async () => {
+                    try {
+                      const { data } = await axiosInstance.post(
+                        "/seller/create-account-link"
+                      );
+                      if (data.url) window.location.href = data.url;
+                    } catch (err) {
+                      console.error("Stripe connect error:", err);
+                      toast.error(
+                        "Failed to start Stripe onboarding. Try again."
+                      );
+                    }
+                  }}
+                  className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+                >
+                  Connect with Stripe
+                </button>
+              )}
+            </>
           )}
         </div>
 
@@ -851,7 +893,7 @@ export default function DashboardSettings() {
               </p>
               <button
                 onClick={() => (window.location.href = "/plans")}
-                className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold shadow-md hover:opacity-90 transition"
+                className="px-6 py-3 rounded-lg bg-royalPurple text-white font-semibold shadow-md hover:opacity-90 transition"
               >
                 Upgrade Now
               </button>

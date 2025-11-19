@@ -9,14 +9,14 @@ export default function DashboardHeader({
   const { user } = useAuth();
 
   const isDataLoading =
-  !user ||
-  user.magnet_slots === undefined ||
-  user.magnet_slots === null ||
-  summary === undefined ||
-  summary.total_slots === undefined;
+    !user ||
+    user.magnet_slots === undefined ||
+    user.magnet_slots === null ||
+    summary === undefined ||
+    summary.total_slots === undefined;
 
-if (isDataLoading) return null;
-  
+  if (isDataLoading) return null;
+
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
   const trialExpired = user?.trialExpired;
 
@@ -55,8 +55,6 @@ if (isDataLoading) return null;
 
   const title = type === "book" ? "My Books" : "My Digital Products";
 
-  
-
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
       {/* ---------- Left Section ---------- */}
@@ -86,14 +84,15 @@ if (isDataLoading) return null;
           <div className="mt-4">
             <button
               onClick={onCheckout}
-              className="px-6 py-3 rounded-lg bg-green text-black font-semibold hover:bg-green/80 transition shadow-lg"
+              className="px-6 py-3 rounded-lg bg-royalPurple text-white font-semibold hover:bg-green/80 transition shadow-lg"
             >
-              {trialExpired ? "Upgrade Plan" : "Buy Magnets"}
+              {trialExpired ? "Upgrade Plan" : "Upgrade Your Account"}
             </button>
+
             <p className="text-xs text-gray-400 mt-2">
               {trialExpired
-                ? "Your free trial has ended. Upgrade to unlock more lead magnet slots and features."
-                : "You’ve used your free slot. Upgrade now to add more magnets."}
+                ? "Your free trial has ended. Upgrade to unlock downloads, the Live Editor, the Design Canvas, and unlimited magnet creation."
+                : "You’ve used your free trial slot. Upgrade to unlock unlimited creation, downloads, Live Editor, and Design Canvas."}
             </p>
           </div>
         ) : availableSlots === 0 ? (

@@ -138,7 +138,7 @@ export default function PlansPage() {
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
-            <li>✅ Keep 90% of Every Sale</li>
+            <li>✅ Keep 80% of Every Sale</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ Custom Subdomain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>
@@ -180,7 +180,7 @@ export default function PlansPage() {
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
-            <li>✅ Keep 90% of Every Sale</li>
+            <li>✅ Keep 80% of Every Sale</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ Custom Subdomain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>

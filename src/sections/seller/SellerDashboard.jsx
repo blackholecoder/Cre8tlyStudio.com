@@ -12,6 +12,8 @@ export default function SellerDashboard() {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sales, setSales] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
   const [thankYouMessage, setThankYouMessage] = useState("");
   const [showThankYouModal, setShowThankYouModal] = useState(false);
@@ -32,12 +34,13 @@ export default function SellerDashboard() {
           axiosInstance.get(
             `/seller/payouts/${user.stripe_connect_account_id}`
           ),
-          axiosInstance.get(`/seller/sales/${user.id}`),
+          axiosInstance.get(`/seller/sales/${user.id}?page=${page}&limit=20`),
         ]);
 
         setBalance(balanceRes.data.balance);
         setPayouts(payoutsRes.data.payouts || []);
-        setSales(salesRes.data.sales || []); // 🆕
+        setPages(salesRes.data.pages || 1);
+        setSales(salesRes.data.sales || []);
       } catch (err) {
         console.error("❌ Error fetching seller data:", err);
         toast.error("Failed to load seller info.");
@@ -47,7 +50,7 @@ export default function SellerDashboard() {
     };
 
     fetchSellerData();
-  }, [user?.stripe_connect_account_id]);
+  }, [user?.stripe_connect_account_id, page]);
 
   const handleOpenStripeDashboard = async () => {
     try {
@@ -253,6 +256,41 @@ const handleGenerateThankYou = async (sale) => {
           <p className="text-gray-500 text-sm">No sales yet.</p>
         )}
       </div>
+      {sales.length > 0 && (
+  <div className="flex justify-center items-center gap-6 mt-6">
+    {/* Prev */}
+    <button
+      onClick={() => setPage((p) => Math.max(1, p - 1))}
+      disabled={page === 1}
+      className={`px-4 py-2 rounded-lg ${
+        page === 1
+          ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
+          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+      }`}
+    >
+      Prev
+    </button>
+
+    {/* Page status */}
+    <span className="text-gray-300 text-sm">
+      Page {page} of {pages}
+    </span>
+
+    {/* Next */}
+    <button
+      onClick={() => setPage((p) => Math.min(pages, p + 1))}
+      disabled={page === pages}
+      className={`px-4 py-2 rounded-lg ${
+        page === pages
+          ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
+          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+      }`}
+    >
+      Next
+    </button>
+  </div>
+)}
+
       <ThankYouModal
         visible={showThankYouModal}
         message={thankYouMessage}

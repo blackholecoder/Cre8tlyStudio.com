@@ -3,7 +3,6 @@ import { useState } from "react";
 import { themeStyles } from "../../constants/index";
 import {
   CheckCircle,
-  Edit,
   Plus,
   Timer,
   Eye,
@@ -14,6 +13,7 @@ import {
 import NewContentModal from "../NewContentModal";
 import PDFPreviewModal from "../dashboard/PDFPreviewModal";
 import { useAuth } from "../../admin/AuthContext";
+import { toast } from "react-toastify";
 
 export default function MagnetGrid({
   magnets = [],
@@ -36,6 +36,58 @@ export default function MagnetGrid({
   }
 
   const isFreePlan = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+
+  function handleDeleteConfirm(id, onDelete) {
+    toast.dismiss();
+
+    // Create overlay for blur + dim background
+    const overlay = document.createElement("div");
+    overlay.className =
+      "fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]";
+    document.body.appendChild(overlay);
+
+    // Centered modal box
+    const toastContent = document.createElement("div");
+    toastContent.className =
+      "bg-[#0B0F19] border border-gray-700 rounded-xl p-6 text-center text-gray-100 shadow-xl";
+    toastContent.style.width = "340px";
+    toastContent.innerHTML = `
+    <p class="text-sm font-medium text-gray-100 mb-4">Are you sure you want to delete this magnet?</p>
+    <div class="flex justify-center gap-3">
+      
+      <button id="cancelDelete" class="px-4 py-2 bg-gray-700 text-gray-200 rounded-md text-xs font-semibold hover:bg-gray-600 transition">Cancel</button>
+      <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-md text-xs font-semibold hover:bg-red-700 transition">Delete</button>
+    </div>
+  `;
+    overlay.appendChild(toastContent);
+
+    // ✅ Confirm delete
+    document.getElementById("confirmDelete").onclick = async () => {
+      try {
+        onDelete(id);
+        toast.success("Magnet deleted successfully.", {
+          position: "top-right",
+        });
+      } catch (err) {
+        toast.error("Failed to delete magnet.", {
+          position: "top-right",
+          style: {
+            background: "#0B0F19",
+            color: "#E5E7EB",
+            border: "1px solid #1F2937",
+            borderRadius: "0.5rem",
+          },
+        });
+      } finally {
+        overlay.remove();
+      }
+    };
+
+    // ❌ Cancel delete
+    document.getElementById("cancelDelete").onclick = () => {
+      overlay.remove();
+    };
+  }
 
   return (
     <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
@@ -278,15 +330,7 @@ export default function MagnetGrid({
                 </button>
                 {/* Delete Button */}
                 <button
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this lead magnet?"
-                      )
-                    ) {
-                      onDelete(m.id);
-                    }
-                  }}
+                  onClick={() => handleDeleteConfirm(m.id, onDelete)}
                   className="w-full bg-red-600/70 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
                 >
                   <Trash2 size={16} className="text-white" />

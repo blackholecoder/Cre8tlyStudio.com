@@ -14,6 +14,7 @@ import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
 import BookPromptForm from "./prompt/Book/BookPromptForm";
 import { useAuth } from "../admin/AuthContext";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axios";
 
 export default function PromptModal({
   isOpen,
@@ -113,8 +114,8 @@ export default function PromptModal({
         setProgress(progressValue);
       }, 200);
 
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/lead-magnets/prompt",
+      const res = await axiosInstance.post(
+        "/lead-magnets/prompt",
         {
           magnetId,
           prompt: text,

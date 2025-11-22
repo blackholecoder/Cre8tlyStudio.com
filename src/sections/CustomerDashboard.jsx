@@ -44,7 +44,7 @@ export default function CustomerDashboard() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 12;
 
   // ✅ Handle Stripe success redirect
   if (typeof window !== "undefined") {

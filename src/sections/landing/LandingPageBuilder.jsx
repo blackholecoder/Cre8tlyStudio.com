@@ -18,6 +18,14 @@ import AddSectionButton from "../../components/landing/AddSectionButton";
 import { blendColors } from "./BlendColors";
 import { adjustForLandingOverlay } from "./adjustForLandingOverlay";
 import CountdownTimerPreview from "./Timer";
+import {
+  fetchTemplateSnapshot,
+  restoreTemplate,
+  saveTemplate,
+  loadTemplateVersions,
+  deleteTemplate,
+} from "../../api/saveTemplates";
+import SaveVersionModal from "../../components/landing/SaveVersionModal";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -32,6 +40,12 @@ export default function LandingPageBuilder() {
   const [showPdfSection, setShowPdfSection] = useState(false);
   const [showPreviewSection, setShowPreviewSection] = useState(false);
   const [showDownloadButton, setShowDownloadButton] = useState(true);
+
+  const [versions, setVersions] = useState([]);
+  const [selectedVersion, setSelectedVersion] = useState("");
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -170,6 +184,197 @@ export default function LandingPageBuilder() {
     setLanding({ ...landing, content_blocks: updated });
   };
 
+  async function loadVersions() {
+    if (!landing?.id) return;
+    const res = await loadTemplateVersions(landing.id);
+    if (res.success) setVersions(res.templates);
+  }
+
+  const handleLoadVersion = async (e) => {
+    const versionId = e.target.value;
+    setSelectedVersion(versionId);
+    if (!versionId) return;
+
+    const res = await fetchTemplateSnapshot(versionId);
+
+    if (!res.success) {
+      toast.error("Could not load version");
+      return;
+    }
+
+    // This injects the saved snapshot into the builder
+    const snapshot = structuredClone(res.snapshot);
+
+    // Ensure blocks exist
+    let blocks = [];
+    try {
+      blocks = Array.isArray(snapshot.content_blocks)
+        ? snapshot.content_blocks
+        : JSON.parse(snapshot.content_blocks || "[]");
+    } catch {
+      blocks = [];
+    }
+
+    // Add missing runtime fields
+    blocks = blocks.map((b) => ({
+      collapsed: b.collapsed ?? true,
+      ...b,
+    }));
+
+    snapshot.content_blocks = blocks;
+
+    setLanding(snapshot);
+
+    toast.success("Version loaded! (not yet applied)");
+  };
+
+  const refreshLanding = async () => {
+    try {
+      const res = await axiosInstance.get(`/landing/builder/${user.id}`);
+
+      const lp = res.data.landingPage;
+
+      let blocks = [];
+      try {
+        blocks =
+          typeof lp.content_blocks === "string"
+            ? JSON.parse(lp.content_blocks)
+            : lp.content_blocks || [];
+      } catch {
+        blocks = [];
+      }
+
+      blocks = blocks.map((b) => ({
+        collapsed: b.collapsed ?? true,
+        ...b,
+      }));
+
+      setLanding({ ...lp, content_blocks: blocks });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to refresh landing");
+    }
+  };
+
+  const handleApplyVersion = async () => {
+    if (!selectedVersion) {
+      toast.error("Select a version first.");
+      return;
+    }
+
+    const snapshotRes = await fetchTemplateSnapshot(selectedVersion);
+    if (!snapshotRes.success) {
+      toast.error("Could not fetch snapshot.");
+      return;
+    }
+
+    const applyRes = await restoreTemplate(landing.id, snapshotRes.snapshot);
+
+    if (applyRes.success) {
+      toast.success("Template restored successfully!");
+      // refresh landing page
+      refreshLanding();
+    } else {
+      toast.error("Failed to apply template");
+    }
+  };
+
+  async function handleDeleteVersion() {
+    toast.dismiss(); // clear any stacked toasts
+
+    toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col space-y-3 text-center">
+          <p className="text-sm font-medium text-gray-100">
+            Delete this saved version?
+          </p>
+
+          <div className="flex justify-center gap-3 mt-2">
+            {/* DELETE BUTTON */}
+            <button
+              onClick={async () => {
+                try {
+                  const res = await deleteTemplate(selectedVersion);
+
+                  if (res.success) {
+                    toast.success("Version deleted.", {
+                      position: "top-right",
+                      style: {
+                        background: "#0B0F19",
+                        color: "#E5E7EB",
+                        border: "1px solid #1F2937",
+                        borderRadius: "0.5rem",
+                      },
+                    });
+
+                    setSelectedVersion("");
+                    loadVersions();
+                  } else {
+                    toast.error("Failed to delete version.", {
+                      position: "top-right",
+                      style: {
+                        background: "#0B0F19",
+                        color: "#E5E7EB",
+                        border: "1px solid #1F2937",
+                        borderRadius: "0.5rem",
+                      },
+                    });
+                  }
+                } catch (err) {
+                  console.error("Delete error:", err);
+                  toast.error("Error deleting version.", {
+                    position: "top-right",
+                    style: {
+                      background: "#0B0F19",
+                      color: "#E5E7EB",
+                      border: "1px solid #1F2937",
+                      borderRadius: "0.5rem",
+                    },
+                  });
+                } finally {
+                  closeToast();
+                }
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-md text-xs font-semibold hover:bg-red-700 transition"
+            >
+              Delete
+            </button>
+
+            {/* CANCEL BUTTON */}
+            <button
+              onClick={closeToast}
+              className="px-4 py-2 bg-gray-700 text-gray-200 rounded-md text-xs font-semibold hover:bg-gray-600 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-right",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        hideProgressBar: true,
+        closeButton: false,
+        style: {
+          background: "#0B0F19",
+          border: "1px solid #1F2937",
+          color: "#E5E7EB",
+          borderRadius: "0.75rem",
+          padding: "14px 18px",
+          width: "340px",
+          textAlign: "center",
+          marginTop: "80px",
+        },
+      }
+    );
+  }
+
+  useEffect(() => {
+    loadVersions();
+  }, [landing?.id]);
+
   useEffect(() => {
     // Always restore scroll when this page mounts
     document.body.style.overflow = "auto";
@@ -189,10 +394,8 @@ export default function LandingPageBuilder() {
     const loadData = async () => {
       try {
         const [landingRes, pdfRes] = await Promise.all([
-          axiosInstance.get(
-            `https://cre8tlystudio.com/api/landing/builder/${user.id}`
-          ),
-          axiosInstance.get("https://cre8tlystudio.com/api/lead-magnets"),
+          axiosInstance.get(`/landing/builder/${user.id}`),
+          axiosInstance.get("/lead-magnets"),
         ]);
 
         const lp = landingRes.data.landingPage;
@@ -354,6 +557,28 @@ export default function LandingPageBuilder() {
     }
   };
 
+  const handleSaveTemplate = async () => {
+    setShowSaveModal(true); // open modal instead of prompt
+  };
+
+  const confirmSaveTemplate = async () => {
+    if (!templateName.trim()) {
+      toast.error("Please enter a name");
+      return;
+    }
+
+    const res = await saveTemplate(landing.id, templateName.trim(), landing);
+
+    if (res.success) {
+      toast.success("Template version saved!");
+      loadVersions();
+      setShowSaveModal(false);
+      setTemplateName("");
+    } else {
+      toast.error("Could not save version.");
+    }
+  };
+
   // 🎨 Determine the selected background theme
   const selectedTheme =
     bgTheme?.includes("gradient") || bgTheme?.startsWith("#")
@@ -368,6 +593,64 @@ export default function LandingPageBuilder() {
           <Wand2 className="w-6 h-6 text-green" />
           Landing Page Builder
         </h1>
+
+        {/* Version Controls */}
+        {/* Version Controls */}
+        <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner">
+          {/* Dropdown (Top) */}
+          <div className="relative w-full mb-6">
+            <select
+              className="w-full bg-gray-800 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 
+                 focus:ring-2 focus:ring-green appearance-none"
+              value={selectedVersion}
+              onChange={handleLoadVersion}
+            >
+              <option value="">Load saved version…</option>
+              {versions.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name} ({new Date(v.created_at).toLocaleString()})
+                </option>
+              ))}
+            </select>
+
+            {/* Chevron */}
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+          </div>
+
+          {/* Buttons (Bottom Row) */}
+          <div className="flex items-center justify-end gap-4">
+            <button
+              className="bg-green text-black font-semibold px-6 py-2 rounded-lg shadow hover:bg-green/90 transition text-sm"
+              onClick={handleApplyVersion}
+            >
+              Apply
+            </button>
+
+            {selectedVersion && (
+              <button
+                onClick={handleDeleteVersion}
+                className="px-6 py-2 rounded-lg bg-red-600/20 border border-red-500 text-red-300 
+               hover:bg-red-600/30 hover:text-red-200 transition text-sm font-semibold"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
 
         <form onSubmit={handleSave} className="space-y-4">
           {/* Headline */}
@@ -1492,19 +1775,33 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* Save + View */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left mt-16 pt-8 border-t border-gray-700">
-            <button
-              type="submit"
-              className="bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green transition mx-auto sm:mx-0"
-            >
-              Save Changes
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-16 pt-8 border-t border-gray-700">
+            {/* Left: Save buttons grouped together */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
+              <button
+                type="submit"
+                className="bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green transition"
+              >
+                Save Changes
+              </button>
 
-            <div className="flex flex-col items-center sm:items-end mt-4 sm:mt-0">
+              <button
+                type="button"
+                onClick={handleSaveTemplate}
+                className="bg-blue text-white px-6 py-3 rounded-lg shadow hover:bg-green transition"
+              >
+                Save Version
+              </button>
+            </div>
+
+            {/* Right: View Live Page */}
+            <div className="flex flex-col items-center sm:items-end mt-6 sm:mt-0">
               <a
                 href={
                   landing.username
-                    ? `https://${landing.username}.cre8tlystudio.com?owner_preview=${encodeURIComponent(user?.id || "")}`
+                    ? `https://${landing.username}.cre8tlystudio.com?owner_preview=${encodeURIComponent(
+                        user?.id || ""
+                      )}`
                     : "#"
                 }
                 target="_blank"
@@ -1519,6 +1816,7 @@ export default function LandingPageBuilder() {
                   ? "View Live Page"
                   : "Set Username to View Page"}
               </a>
+
               <p className="text-xs text-gray-500 mt-1">
                 Live URL:{" "}
                 <span className="text-silver font-medium">
@@ -1531,6 +1829,16 @@ export default function LandingPageBuilder() {
           </div>
         </form>
       </div>
+      <SaveVersionModal
+        isOpen={showSaveModal}
+        name={templateName}
+        setName={setTemplateName}
+        onCancel={() => {
+          setShowSaveModal(false);
+          setTemplateName("");
+        }}
+        onConfirm={confirmSaveTemplate}
+      />
     </div>
   );
 }

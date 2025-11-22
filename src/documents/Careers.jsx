@@ -70,27 +70,30 @@ export default function Careers() {
   }, []);
 
   return (
-    <>
-      <section className="min-h-screen text-white flex items-center justify-center px-6 py-10">
-        <CustomCursor />
+  <>
+  <div className="min-h-screen flex flex-col">
+    
+    {/* Centered Content */}
+    <div className="flex-grow flex items-center justify-center px-6 py-10">
+      <CustomCursor />
 
-        {/* Center wrapper */}
-        <div className="flex justify-center w-full">
-          <div className="max-w-2xl w-full bg-metalBlack p-8 rounded-2xl border border-gray-700 shadow-2xl">
-            <div className="flex items-center justify-center text-center mb-4">
-              <AnimatedLogo />
-            </div>
+      <div className="max-h-[90vh] overflow-y-auto w-full flex justify-center">
+        <div className="max-w-2xl w-full bg-metalBlack p-8 rounded-2xl border border-gray-700 shadow-2xl">
+          <div className="flex items-center justify-center text-center mb-4">
+            <AnimatedLogo />
+          </div>
 
-            <h1 className="text-3xl font-bold text-green text-center mb-2">
-              Join the Cre8tly Team
-            </h1>
+          <h1 className="text-3xl font-bold text-green text-center mb-2">
+            Join the Cre8tly Team
+          </h1>
 
-            <p className="text-gray-300 text-center mb-8">
-              Apply to become part of the fastest-growing creator platform.
-              <br /> We're hiring independent contractors.
-            </p>
+          <p className="text-gray-300 text-center mb-8">
+            Apply to become part of the fastest-growing creator platform.
+            <br /> We're hiring independent contractors.
+          </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 name="name"
@@ -175,11 +178,17 @@ export default function Careers() {
                 {loading ? "Submitting..." : "Submit Application"}
               </button>
             </form>
-          </div>
         </div>
-      </section>
+      </div>
+    </div>
 
-      <Footer />
-    </>
+    {/* Footer stays at bottom without pushing scroll */}
+    <Footer />
+  </div>
+</>
+     
   );
 }
+
+
+

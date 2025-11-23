@@ -13,6 +13,8 @@ export default function PromptMemoryDashboard() {
 
   useEffect(() => {
     if (!user?.id) return;
+    setLoading(true);
+
     async function fetchPrompts() {
       try {
         const res = await api.get(
@@ -64,27 +66,29 @@ export default function PromptMemoryDashboard() {
       ) : (
         <PromptMemoryTable prompts={prompts} />
       )}
-      <div className="flex items-center justify-center gap-4 mt-6">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
-        >
-          Previous
-        </button>
+      {prompts.length > 0 && (
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+          >
+            Previous
+          </button>
 
-        <span className="text-white text-sm">
-          Page {page} of {totalPages}
-        </span>
+          <span className="text-white text-sm">
+            Page {page} of {totalPages}
+          </span>
 
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-          className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
-        >
-          Next
-        </button>
-      </div>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

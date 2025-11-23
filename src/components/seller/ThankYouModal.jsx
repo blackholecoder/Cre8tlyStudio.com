@@ -4,6 +4,7 @@ export default function ThankYouModal({
   setMessage,
   onClose,
   loading,
+  onMarkSent,
 }) {
   if (!visible) return null;
 
@@ -64,7 +65,8 @@ export default function ThankYouModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-[#1E293B] flex justify-between items-center border-t border-gray-700">
+        {/* Footer */}
+        <div className="px-6 py-4 bg-[#1E293B] flex justify-end items-center gap-3 border-t border-gray-700">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition"
@@ -73,13 +75,18 @@ export default function ThankYouModal({
           </button>
 
           <a
-            href={`mailto:?subject=Thank%20you!&body=${encodeURIComponent(
-              message
-            )}`}
-            className="px-6 py-2 bg-green text-black font-semibold rounded-lg hover:bg-green/80 transition"
+            href={`mailto:?subject=Thank%20you!&body=${encodeURIComponent(message)}`}
+            className="px-4 py-2 bg-green text-black font-semibold rounded-lg hover:bg-green/80 transition"
           >
-            Send Email
+            Open Email App
           </a>
+
+          <button
+            onClick={onMarkSent}
+            className="px-4 py-2 bg-blue text-white font-semibold rounded-lg hover:bg-blue/80 transition"
+          >
+            Mark as Sent
+          </button>
         </div>
       </div>
     </div>

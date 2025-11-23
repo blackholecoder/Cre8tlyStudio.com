@@ -1,23 +1,26 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../admin/AuthContext.jsx";
-
 import api from "../../api/axios.jsx";
 import LoadingState from "../dashboard/LoadingState.jsx";
-import EmptyState from "../dashboard/EmptyState.jsx";
 import PromptMemoryTable from "../dashboard/PromptMemoryTable.jsx";
 
 export default function PromptMemoryDashboard() {
   const { user } = useAuth();
-  const [prompts, setPrompts] = useState([]); 
+  const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (!user?.id) return;
     async function fetchPrompts() {
       try {
-        const res = await api.get(`/lead-magnets/prompt-memory/${user.id}`);
-        setPrompts(res.data);
+        const res = await api.get(
+          `/lead-magnets/prompt-memory/${user.id}?page=${page}&limit=20`
+        );
+
+        setPrompts(res.data.prompts);
+        setTotalPages(res.data.totalPages);
       } catch (err) {
         console.error("Failed to load prompts:", err);
       } finally {
@@ -25,7 +28,7 @@ export default function PromptMemoryDashboard() {
       }
     }
     fetchPrompts();
-  }, [user]);
+  }, [user, page]);
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
@@ -40,25 +43,48 @@ export default function PromptMemoryDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-3 mb-8">
-      </div>
+      <div className="flex gap-3 mb-8"></div>
 
       {/* Content */}
       {loading ? (
-  <LoadingState label="Loading your digital products..." />
-) : prompts.length === 0 ? (
-  <div className="text-center py-20 border border-gray-700 rounded-xl bg-gray-900/40">
-    <h2 className="text-2xl font-semibold text-white mb-2">
-      No Prompts Yet
-    </h2>
-    <p className="text-gray-400 max-w-md mx-auto">
-      You don’t have any saved prompts yet.  
-      Create your first <span className="text-green-400 font-semibold">Digital Product</span> to start building your prompt memory.
-    </p>
-  </div>
-) : (
-  <PromptMemoryTable prompts={prompts} />
-)}
+        <LoadingState label="Loading your digital products..." />
+      ) : prompts.length === 0 ? (
+        <div className="text-center py-20 border border-gray-700 rounded-xl bg-gray-900/40">
+          <h2 className="text-2xl font-semibold text-white mb-2">
+            No Prompts Yet
+          </h2>
+          <p className="text-gray-400 max-w-md mx-auto">
+            You don’t have any saved prompts yet. Create your first{" "}
+            <span className="text-green-400 font-semibold">
+              Digital Product
+            </span>{" "}
+            to start building your prompt memory.
+          </p>
+        </div>
+      ) : (
+        <PromptMemoryTable prompts={prompts} />
+      )}
+      <div className="flex items-center justify-center gap-4 mt-6">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        <span className="text-white text-sm">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

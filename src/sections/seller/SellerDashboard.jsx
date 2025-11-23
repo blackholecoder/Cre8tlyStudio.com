@@ -5,6 +5,7 @@ import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import ThankYouModal from "../../components/seller/ThankYouModal";
+import { Check } from "lucide-react";
 
 export default function SellerDashboard() {
   const { user } = useAuth();
@@ -18,8 +19,10 @@ export default function SellerDashboard() {
   const [thankYouMessage, setThankYouMessage] = useState("");
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
+  const [currentSaleId, setCurrentSaleId] = useState(null);
 
   useEffect(() => {
+    if (!user?.id) return;
     if (!user?.stripe_connect_account_id) {
       setLoading(false);
       return;
@@ -64,26 +67,53 @@ export default function SellerDashboard() {
     }
   };
 
-const handleGenerateThankYou = async (sale) => {
-  try {
-    setLoadingMessage(true);
-    setShowThankYouModal(true);
+  const handleGenerateThankYou = async (sale) => {
+    try {
+      setLoadingMessage(true);
+      setShowThankYouModal(true);
+      setCurrentSaleId(sale.id);
 
-    const res = await axiosInstance.post("/seller/generate-thank-you", {
-      buyerEmail: sale.buyer_email,
-      productName: sale.product_name,
+      const res = await axiosInstance.post("/seller/generate-thank-you", {
+        saleId: sale.id,
+        buyerEmail: sale.buyer_email,
+        productName: sale.product_name,
+      });
+
+      if (res.data.success) {
+        setThankYouMessage(res.data.message); // FIXED
+      } else {
+        setThankYouMessage("AI could not generate a message."); // FIXED
+      }
+    } catch (err) {
+      console.error(err);
+      setThankYouMessage("AI generation failed."); // FIXED
+    } finally {
+      setLoadingMessage(false);
+    }
+  };
+
+  const handleMarkThankYouSent = async (saleId) => {
+  try {
+    const res = await axiosInstance.post("/seller/mark-thank-you-sent", {
+      saleId,
     });
 
     if (res.data.success) {
-      setThankYouMessage(res.data.message);  // FIXED
+      // update UI without refresh
+      setSales((prev) =>
+        prev.map((s) =>
+          s.id === saleId ? { ...s, thank_you_sent: 1 } : s
+        )
+      );
+
+      toast.success("Thank-you marked as sent");
+      setShowThankYouModal(false);
     } else {
-      setThankYouMessage("AI could not generate a message."); // FIXED
+      toast.error("Failed to update status");
     }
   } catch (err) {
-    console.error(err);
-    setThankYouMessage("AI generation failed."); // FIXED
-  } finally {
-    setLoadingMessage(false);
+    console.error("❌ Error marking thank-you sent:", err);
+    toast.error("Server error");
   }
 };
 
@@ -223,7 +253,7 @@ const handleGenerateThankYou = async (sale) => {
                   <th className="py-2 px-3">Product</th>
                   <th className="py-2 px-3">Buyer Email</th>
                   <th className="py-2 px-3">Date</th>
-                  <th className="py-2 px-3">Download</th>
+                  <th className="py-2 px-3">Email Sent</th>
                 </tr>
               </thead>
               <tbody>
@@ -240,12 +270,16 @@ const handleGenerateThankYou = async (sale) => {
                       {new Date(s.delivered_at).toLocaleString()}
                     </td>
                     <td className="py-2 px-3">
-                      <button
-                        onClick={() => handleGenerateThankYou(s)}
-                        className="text-green hover:text-green/70 underline"
-                      >
-                        Auto-Gen Thank You
-                      </button>
+                      {s.thank_you_sent ? (
+                        <Check className="w-5 h-5 text-green" />
+                      ) : (
+                        <button
+                          onClick={() => handleGenerateThankYou(s)}
+                          className="text-green hover:text-green/70 underline"
+                        >
+                          Auto-Gen Thank You
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -257,39 +291,39 @@ const handleGenerateThankYou = async (sale) => {
         )}
       </div>
       {sales.length > 0 && (
-  <div className="flex justify-center items-center gap-6 mt-6">
-    {/* Prev */}
-    <button
-      onClick={() => setPage((p) => Math.max(1, p - 1))}
-      disabled={page === 1}
-      className={`px-4 py-2 rounded-lg ${
-        page === 1
-          ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
-          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
-      }`}
-    >
-      Prev
-    </button>
+        <div className="flex justify-center items-center gap-6 mt-6">
+          {/* Prev */}
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className={`px-4 py-2 rounded-lg ${
+              page === 1
+                ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
+                : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+            }`}
+          >
+            Prev
+          </button>
 
-    {/* Page status */}
-    <span className="text-gray-300 text-sm">
-      Page {page} of {pages}
-    </span>
+          {/* Page status */}
+          <span className="text-gray-300 text-sm">
+            Page {page} of {pages}
+          </span>
 
-    {/* Next */}
-    <button
-      onClick={() => setPage((p) => Math.min(pages, p + 1))}
-      disabled={page === pages}
-      className={`px-4 py-2 rounded-lg ${
-        page === pages
-          ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
-          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
-      }`}
-    >
-      Next
-    </button>
-  </div>
-)}
+          {/* Next */}
+          <button
+            onClick={() => setPage((p) => Math.min(pages, p + 1))}
+            disabled={page === pages}
+            className={`px-4 py-2 rounded-lg ${
+              page === pages
+                ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
+                : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       <ThankYouModal
         visible={showThankYouModal}
@@ -297,6 +331,8 @@ const handleGenerateThankYou = async (sale) => {
         setMessage={setThankYouMessage}
         onClose={() => setShowThankYouModal(false)}
         loading={loadingMessage}
+        onMarkSent={() => handleMarkThankYouSent(currentSaleId)}
+        
       />
     </motion.div>
   );

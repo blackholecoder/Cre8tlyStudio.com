@@ -9,11 +9,15 @@ export default function PromptMemoryDashboard() {
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [tableReady, setTableReady] = useState(false);
+
+
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (!user?.id) return;
     setLoading(true);
+    setTableReady(false);
 
     async function fetchPrompts() {
       try {
@@ -49,24 +53,29 @@ export default function PromptMemoryDashboard() {
 
       {/* Content */}
       {loading ? (
-        <LoadingState label="Loading your digital products..." />
-      ) : prompts.length === 0 ? (
-        <div className="text-center py-20 border border-gray-700 rounded-xl bg-gray-900/40">
-          <h2 className="text-2xl font-semibold text-white mb-2">
-            No Prompts Yet
-          </h2>
-          <p className="text-gray-400 max-w-md mx-auto">
-            You don’t have any saved prompts yet. Create your first{" "}
-            <span className="text-green-400 font-semibold">
-              Digital Product
-            </span>{" "}
-            to start building your prompt memory.
-          </p>
-        </div>
-      ) : (
-        <PromptMemoryTable prompts={prompts} />
-      )}
-      {prompts.length > 0 && (
+  <div className="flex flex-col items-center justify-center py-24 text-white">
+    <div className="relative">
+
+      {/* Glowing pulse ring */}
+      <div className="absolute inset-0 rounded-full bg-green-500/20 blur-2xl animate-ping"></div>
+
+      {/* Center spinner */}
+      <div className="w-14 h-14 border-4 border-t-transparent border-green-400 rounded-full animate-spin"></div>
+    </div>
+
+    {/* Loading text */}
+    <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
+      Fetching your prompt memory...
+    </p>
+
+    <p className="text-sm text-gray-400 mt-2">
+      Loading your saved prompts from Cre8tly Studio.
+    </p>
+  </div>
+) : !loading && prompts.length > 0 ? (
+  <PromptMemoryTable prompts={prompts} onReady={() => setTableReady(true)} />
+) : null}
+      {tableReady && !loading && prompts.length > 0 && (
         <div className="flex items-center justify-center gap-4 mt-6">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}

@@ -33,11 +33,212 @@ Instantly generate beautifully branded, conversion-ready ebooks, guides, PDFs th
 Instantly generate beautifully branded, conversion-ready ebooks, guides and PDFs that help you turn followers into paying customers, faster than ever before.">
     <title>Cre8tlyStudio | Automated Content Generation</title>
     <link rel="icon" type="image/svg+xml" href="cre8tly-fav-white.svg" />
-    <script type="module" crossorigin src="/assets/index-6f893b5b.js"></script>
+    <script type="module" crossorigin src="/assets/index-b5e710a3.js"></script>
     <link rel="stylesheet" href="/assets/index-bf84ae4a.css">
   </head>
   <body>
     <div id="root"></div>
+
+   
+
+  <script>
+    
+
+ window.addEventListener("scroll", () => {
+  document.hiddenByScrolling = true;
+  setTimeout(() => {
+    document.hiddenByScrolling = false;
+  }, 500);
+});
+
+["resize", "orientationchange"].forEach(evt => {
+  window.addEventListener(evt, () => {
+    document.hiddenDuringUI = true;
+    setTimeout(() => {
+      document.hiddenDuringUI = false;
+    }, 800);
+  });
+});
+
+(function () {
+
+  if (localStorage.getItem("accessToken")) return; 
+
+
+
+  let exitAllowed = false;
+setTimeout(() => (exitAllowed = true), 1500);
+
+  /* -----------------------------
+      Track UTM + device + browser
+  ------------------------------ */
+  const urlParams = new URLSearchParams(window.location.search);
+  const utms = {};
+  ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","fbclid","ttclid"].forEach(k=>{
+    if (urlParams.has(k)) utms[k] = urlParams.get(k);
+  });
+
+  function getDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return "iOS";
+    if (/android/.test(ua)) return "Android";
+    if (/windows/.test(ua)) return "Windows";
+    if (/macintosh/.test(ua)) return "Mac";
+    if (/linux/.test(ua)) return "Linux";
+    return "Unknown";
+  }
+
+  function getBrowser() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome") && !ua.includes("Edg")) return "Chrome";
+    if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Edg")) return "Edge";
+    return "Unknown";
+  }
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+
+
+  /* -----------------------------
+       Scroll Depth Tracking
+  ------------------------------ */
+  let maxScroll = 0;
+  function trackScrollDepth() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (docHeight <= 0) return;
+    const pct = Math.round((scrollTop / docHeight) * 100);
+    if (pct > maxScroll) maxScroll = pct;
+  }
+  window.addEventListener("scroll", trackScrollDepth);
+
+
+
+  /* -----------------------------
+       Click Tracking
+  ------------------------------ */
+  const clickEvents = [];
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    clickEvents.push({
+      tag: t.tagName,
+      text: (t.innerText || "").substring(0, 80),
+      classes: t.className || "",
+      id: t.id || "",
+      timestamp: Date.now()
+    });
+  });
+
+
+
+  /* -----------------------------
+      Time on Page
+  ------------------------------ */
+  const start = Date.now();
+  function timeOnPage() {
+    return Math.round((Date.now() - start) / 1000);
+  }
+
+
+
+  /* -----------------------------
+      Send Initial Visit
+  ------------------------------ */
+  const payloadBase = {
+    page: window.location.pathname,
+    full_url: window.location.href,
+    referrer: document.referrer || null,
+    utm: utms,
+    device_type: getDeviceType(),
+    browser: getBrowser(),
+    screen_width: window.innerWidth,
+    screen_height: window.innerHeight,
+    timezone,
+    language: navigator.language || null
+  };
+
+  fetch("https://cre8tlystudio.com/api/web-analytics/track-visitor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payloadBase)
+  })
+    .then((res) => res.json())
+    .then((data) => {
+  console.log("TRACK VISITOR RESPONSE:", data);
+  console.log("Saving visitor ID now...");
+  if (data?.visitor_id) {
+  sessionStorage.setItem("visitor_id", data.visitor_id);
+  exitAllowed = true; // <-- THIS FIXES EVERYTHING
+} else {
+    console.log("❌ No visitor_id returned from server");
+  }
+})
+
+
+
+  /* -----------------------------
+      Exit Tracking
+  ------------------------------ */
+  function sendExitData() {
+    const VISITOR_ID = sessionStorage.getItem("visitor_id");
+
+    if (!VISITOR_ID) {
+      console.warn("⚠ Exit blocked — visitor_id not ready.");
+      return;
+    }
+
+    const exitPayload = {
+      visitor_id: VISITOR_ID,
+      page: window.location.pathname,
+      max_scroll: maxScroll,
+      time_on_page: timeOnPage(),
+      clicks: clickEvents.slice(0, 50)
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(exitPayload)],
+      { type: "application/json" }
+    );
+
+    navigator.sendBeacon(
+      "https://cre8tlystudio.com/api/web-analytics/track-exit",
+      blob
+    );
+  }
+
+window.addEventListener("beforeunload", () => {
+  const id = sessionStorage.getItem("visitor_id");
+  if (!exitAllowed || !id) return;
+  sendExitData();
+});
+
+document.addEventListener("visibilitychange", () => {
+  const id = sessionStorage.getItem("visitor_id");
+
+  if (
+    document.visibilityState === "hidden" &&
+    exitAllowed &&           // <—
+    id &&                    // <—
+    !document.hiddenByScrolling &&
+    !document.hiddenDuringUI &&
+    performance.now() > 800  // extra safety
+  ) {
+    sendExitData();
+  }
+});
+
+
+
+
+})();
+</script>
+
+
+
+
+
     
   </body>
 </html>

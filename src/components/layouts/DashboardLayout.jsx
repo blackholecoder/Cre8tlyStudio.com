@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }) {
     if (!user?.id) return;
     const fetchUnreadCount = async () => {
       try {
-        const res = await axiosInstance.get("/admin/messages/count");
+        const res = await axiosInstance.get("/messages/user/count");
         setUnreadCount(res.data.count || 0);
       } catch (err) {
         console.error("Failed to fetch unread count:", err);

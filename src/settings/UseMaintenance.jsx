@@ -8,7 +8,7 @@ export default function useMaintenance() {
   useEffect(() => {
     async function fetchStatus() {
       try {
-        const { data } = await axiosInstance.get("https://cre8tlystudio.com/api/settings/maintenance");
+        const { data } = await axiosInstance.get("/admin/settings/maintenance");
         setMaintenance(data.maintenance);
       } catch {
         setMaintenance(false);

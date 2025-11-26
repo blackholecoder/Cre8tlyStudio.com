@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Trash2,
 } from "lucide-react";
+import axiosInstance from "../api/axios";
 
 export default function Inbox() {
   const [messages, setMessages] = useState([]);
@@ -23,7 +24,7 @@ export default function Inbox() {
 
   async function fetchMessages() {
     try {
-      const res = await api.get("/admin/messages");
+      const res = await axiosInstance.get("/messages/user/");
       setMessages(res.data || []);
     } catch (err) {
       console.error("Failed to load messages:", err);
@@ -38,7 +39,7 @@ export default function Inbox() {
     if (!m.read_status) {
       try {
         setMarkingRead(true);
-        await api.post(`/admin/messages/${m.id}/read`);
+        await axiosInstance.post(`/messages/user/${m.id}/read`);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === m.id ? { ...msg, read_status: 1 } : msg
@@ -51,6 +52,11 @@ export default function Inbox() {
       }
     }
   }
+
+
+  // TODO WORK ON THE MESSAGES FOR PUBLIC WHICH NEED NEW ROUTES
+
+
 
   async function handleDelete(id) {
     toast.dismiss(); // clear any existing toasts first
@@ -66,7 +72,7 @@ export default function Inbox() {
               onClick={async () => {
                 try {
                   setDeleting(true);
-                  await api.delete(`/admin/messages/user/${id}`);
+                  await axiosInstance.delete(`/messages/user/user/${id}`);
                   setMessages((prev) => prev.filter((m) => m.id !== id));
                   setSelected(null);
                   toast.success("Message deleted successfully.", {

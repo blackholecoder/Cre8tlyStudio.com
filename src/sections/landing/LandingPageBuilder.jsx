@@ -171,6 +171,16 @@ export default function LandingPageBuilder() {
       newBlock.collapsed = false;
     }
 
+    if (type === "faq") {
+      newBlock.title = "Frequently Asked Questions";
+      newBlock.items = [
+        { q: "What is included?", a: "Everything you need to get started." },
+      ];
+      newBlock.text_color = "#FFFFFF";
+      newBlock.bg_color = "rgba(0,0,0,0.3)";
+      newBlock.alignment = "left";
+    }
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -773,7 +783,10 @@ export default function LandingPageBuilder() {
             >
               <div className="px-6 pb-6">
                 <span className="text-xs text-gray-400 italic block mb-5">
-                  Only completed PDFs will appear
+                  Only completed PDFs are shown.
+                  <br />
+                  If you’ve enabled the Stripe Button Block, this image will be
+                  used as the cover for every sellable PDF.
                 </span>
 
                 {/* PDF Dropdown */}
@@ -1199,7 +1212,8 @@ export default function LandingPageBuilder() {
                     style={{
                       width: "100%",
                       maxWidth: "480px",
-                      aspectRatio: "3 / 4",
+                      height: "auto", // <-- Add
+                      aspectRatio: "unset",
                       objectFit: "cover",
                       border: "2px solid rgba(255, 255, 255, 0.06)",
                       background: "#000",
@@ -1727,6 +1741,103 @@ export default function LandingPageBuilder() {
                                 — Verified Buyer, sample preview
                               </span>
                             </div>
+                          </div>
+                        );
+
+                      case "faq":
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              background: block.use_no_bg
+                                ? "transparent"
+                                : block.use_gradient
+                                  ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                                      block.gradient_start || "#F285C3"
+                                    }, ${block.gradient_end || "#7bed9f"})`
+                                  : block.match_main_bg
+                                    ? adjustForLandingOverlay(bgTheme)
+                                    : block.bg_color ||
+                                      bgTheme ||
+                                      "rgba(0,0,0,0.3)",
+                              color: block.text_color || "#FFFFFF",
+                              padding: "40px",
+                              borderRadius: block.use_no_bg ? "0px" : "20px",
+                              marginTop: "40px",
+                              textAlign: block.alignment || "left",
+                              maxWidth: "700px",
+                              marginLeft: "auto",
+                              marginRight: "auto",
+                            }}
+                          >
+                            <h2
+                              style={{
+                                fontSize: "1.8rem",
+                                fontWeight: 700,
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {block.title || "Frequently Asked Questions"}
+                            </h2>
+
+                            {block.items.map((item, i) => (
+                              <div
+                                key={i}
+                                style={{
+                                  marginBottom: "20px",
+                                  borderBottom: block.use_no_bg
+                                    ? "1px solid rgba(255,255,255,0.2)"
+                                    : "1px solid rgba(255,255,255,0.15)",
+                                  paddingBottom: "16px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  const updated = [...block.items];
+                                  const el = document.getElementById(
+                                    `faq-prev-${index}-${i}`
+                                  );
+                                  if (el)
+                                    updated[i]._height = el.scrollHeight + "px";
+                                  updated[i].open = !updated[i].open;
+                                  updateBlock(index, "items", updated);
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    fontWeight: 700,
+                                    fontSize: "1.1rem",
+                                  }}
+                                >
+                                  <span>{item.q}</span>
+                                  <span>{item.open ? "−" : "+"}</span>
+                                </div>
+
+                                <div
+                                  id={`faq-prev-${index}-${i}`}
+                                  style={{
+                                    height: item.open
+                                      ? item._height || "auto"
+                                      : "0px",
+                                    overflow: "hidden",
+                                    transition: "height 0.35s ease",
+                                  }}
+                                >
+                                  <p
+                                    style={{
+                                      color: block.text_color
+                                        ? block.text_color + "CC"
+                                        : "#CCCCCC",
+                                      fontSize: "0.95rem",
+                                      marginTop: "12px",
+                                    }}
+                                  >
+                                    {item.a}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         );
 

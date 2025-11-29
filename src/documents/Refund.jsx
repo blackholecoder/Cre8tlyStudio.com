@@ -18,12 +18,23 @@ const Refund = () => {
         <p className="document-p-text">
           By completing a purchase, you acknowledge and agree that:
           <br /><br />
-          • You are purchasing access to digital services and instantly usable
-          content.<br />
-          • We do not provide refunds or exchanges for unused slots, cancelled
-          accounts, or change of mind.<br />
-          • Errors caused by incorrect prompt entry, theme selection, or user
-          setup are not eligible for refunds.<br />
+          • You are purchasing access to digital services and instantly usable content.<br />
+          • We do not provide refunds or exchanges for unused slots, cancelled accounts, or change of mind.<br />
+          • Errors caused by incorrect prompt entry, theme selection, or user setup are not eligible for refunds.<br />
+        </p>
+        <br />
+
+        <h1 className="document-title-text">Seller Products and Landing Page Purchases</h1>
+        <br />
+        <p className="document-p-text">
+          Cre8tly Studio allows independent sellers to offer digital products such
+          as PDFs, lead magnets, guides, and templates through their custom landing
+          pages. When you purchase a digital product from a seller:
+          <br /><br />
+          • All sales are final.<br />
+          • Digital product purchases are delivered instantly and are not eligible for refunds, returns, or exchanges.<br />
+          • Cre8tly Studio is not responsible for the seller’s content, descriptions, or deliverables.<br />
+          • Any issues with the product should be addressed directly with the seller, although Cre8tly Studio may assist in reviewing technical problems involving file delivery.<br />
         </p>
         <br />
 

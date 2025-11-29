@@ -7,6 +7,7 @@ import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
 import ReplyBox from "../../components/community/ReplyBox";
 import { Img } from "react-image";
+import { headerLogo } from "../../assets/images";
 
 export default function CommunityPost() {
   const { user } = useAuth();
@@ -49,6 +50,12 @@ export default function CommunityPost() {
   const load = async () => {
     try {
       const res = await axiosInstance.get(`/community/posts/${postId}`);
+      if (res.data.post?.is_admin_post === 1) {
+        res.data.post.author = "Cre8tly Studio";
+        res.data.post.author_image = headerLogo;
+        res.data.post.author_role = "admin";
+      }
+
       setPost(res.data.post);
 
       const res2 = await axiosInstance.get(
@@ -246,7 +253,9 @@ export default function CommunityPost() {
 
   if (!post) return null;
 
-  const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
+const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
+const isStudioPost = post.author === "Cre8tly Studio"; 
+
   const timeAgo = (d) => {
     const date = new Date(d);
     const diff = Math.floor((Date.now() - date) / 1000);
@@ -266,9 +275,9 @@ export default function CommunityPost() {
 
   return (
     <div className="w-full flex justify-center items-start min-h-screen px-6 py-20">
-      <div className="bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">
+      <div className="w-full max-w-4xl bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">
         {/* Breadcrumb */}
-        <div className="w-full max-w-3xl mb-6 text-gray-400 text-sm flex items-center gap-2">
+        <div className="w-full mb-6 text-gray-400 text-sm flex items-center gap-2">
           <button
             onClick={() => navigate("/community")}
             className="flex items-center gap-1 text-green hover:text-green/80 transition"
@@ -292,11 +301,17 @@ export default function CommunityPost() {
         </div>
 
         {/* Main content */}
-        <div className="w-full max-w-3xl space-y-10">
+        <div className="w-full space-y-10">
           {/* Post Card */}
           <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-8 shadow-lg">
             <div className="flex items-center gap-4 mb-6">
-              {post.author_image ? (
+              {isStudioPost ? (
+                <img
+                  src={headerLogo}
+                  className="w-12 h-12 rounded-full object-cover"
+                  alt="Cre8tly Studio"
+                />
+              ) : post.author_image ? (
                 <Img
                   src={post.author_image}
                   loader={
@@ -312,15 +327,17 @@ export default function CommunityPost() {
                   className="w-12 h-12 rounded-full object-cover border border-green-600 transition-opacity duration-300"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-green-600/30 border border-green-600 flex items-center justify-center text-xl font-bold text-green-400">
+                <div className="w-12 h-12 rounded-full bg-green/90 border border-green flex items-center justify-center text-xl font-bold text-green">
                   {avatarInitial}
                 </div>
               )}
+
               <div>
                 <p className="text-white text-lg font-semibold flex items-center gap-2">
-                  {post.author}
-                  {isAdmin && (
-                    <span className="flex items-center gap-1 text-green-400 text-[10px] px-2 py-0.5 border border-green rounded-full">
+                  {isStudioPost ? "Cre8tly Studio" : post.author}
+
+                  {(isStudioPost || isAdmin) && (
+                    <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">
                       <ShieldCheck size={11} className="text-green" /> Official
                     </span>
                   )}
@@ -331,7 +348,7 @@ export default function CommunityPost() {
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold mb-4 text-white">{post.title}</h1>
+            <h1 className="text-2xl font-bold mb-4 text-gray-200">{post.title}</h1>
             <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
               {post.body}
             </p>

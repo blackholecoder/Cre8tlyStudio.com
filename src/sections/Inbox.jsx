@@ -139,7 +139,7 @@ export default function Inbox() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#030712] text-white flex flex-col lg:flex-row">
+    <div className="w-full min-h-screen bg-[#090b0f] text-white flex flex-col lg:flex-row">
       {/* 📥 Left Column — Message List */}
       <div className="flex-1 lg:max-w-[380px] border-r border-gray-800 h-screen overflow-y-auto p-6">
         <div className="border-b border-gray-800 pb-4 mb-6 flex items-center justify-between">

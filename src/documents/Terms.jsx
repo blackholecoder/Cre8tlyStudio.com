@@ -52,6 +52,43 @@ const Terms = () => {
           use. Pricing is subject to change at our discretion.
         </p>
         <br />
+        <h1 className="document-title-text">
+          Seller Dashboard, Marketplace Sales, and Stripe Connect
+        </h1>
+        <br />
+        <p className="document-p-text">
+          Cre8tly Studio provides tools that allow independent sellers to
+          upload, price, and sell their digital products through their own
+          landing pages using the Seller Dashboard. By becoming a seller, you
+          acknowledge and agree to the following:
+          <br />
+          <br />
+          • All seller payments and payouts are processed through Stripe
+          Connect, and sellers must maintain a valid Stripe Express account to
+          receive funds.
+          <br />
+          • Cre8tly Studio is a platform provider and is not the merchant of
+          record for seller products. All digital items sold through landing
+          pages are created and owned by the seller.
+          <br />
+          • Sellers are fully responsible for the accuracy, legality, and
+          quality of the digital products they provide, including PDFs, guides,
+          templates, or any uploaded content.
+          <br />
+          • All sales made through seller landing pages are final. Cre8tly
+          Studio does not issue refunds for seller products and is not
+          responsible for disputes between buyers and sellers.
+          <br />
+          • In the event of a technical issue involving file delivery, Cre8tly
+          Studio may assist in verifying delivery errors but is not required to
+          modify, replace, or refund seller content.
+          <br />
+          • Sellers are responsible for complying with all applicable laws,
+          including taxes, content rights, and consumer protection regulations
+          related to the digital products they offer.
+          <br />
+        </p>
+        <br />
 
         <h1 className="document-title-text">Digital Products and Slots</h1>
         <br />

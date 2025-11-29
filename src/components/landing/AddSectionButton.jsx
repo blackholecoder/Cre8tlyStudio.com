@@ -31,6 +31,7 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Social Links Row", value: "social_links" }, 
     { label: "Stripe Checkout", value: "stripe_checkout" }, 
     { label: "Verified Reviews ⭐", value: "verified_reviews" }, 
+    { label: "FAQ Accordion ❓", value: "faq" },
 
   ];
 

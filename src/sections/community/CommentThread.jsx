@@ -2,6 +2,7 @@ import ReplyBox from "../../components/community/ReplyBox";
 import { ShieldCheck, Heart } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import { Img } from "react-image";
+import { headerLogo } from "../../assets/images";
 
 export default function CommentThread({
   comment,
@@ -77,7 +78,24 @@ export default function CommentThread({
             {/* Author + Meta */}
             <div className="flex items-center gap-3 mb-2">
               {/* Avatar */}
-              {comment.author_image ? (
+              {comment.author_role === "admin" ? (
+                <div className="w-8 h-8 rounded-full  flex items-center justify-center text-[10px] font-semibold text-green">
+                 <Img
+                  src={headerLogo}
+                  loader={
+                    <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                  }
+                  unloader={
+                    <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                      {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  }
+                  decode={true}
+                  alt="User avatar"
+                  className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                />
+                </div>
+              ) : comment.author_image ? (
                 <Img
                   src={comment.author_image}
                   loader={
@@ -101,7 +119,9 @@ export default function CommentThread({
               {/* Author + Meta */}
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span className="font-semibold text-gray-200">
-                  {comment.author}
+                  {comment.author_role === "admin"
+                    ? "Cre8tly Studio"
+                    : comment.author}
                 </span>
                 {comment.author_role === "admin" && (
                   <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">

@@ -5,7 +5,7 @@ import ebookCover from './ultimate-branding.jpg'
 export {
   headerLogo,
   banner,
-  ebookCover
+  ebookCover,
  
 
 }

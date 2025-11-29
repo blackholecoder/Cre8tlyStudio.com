@@ -26,14 +26,20 @@ const Privacy = () => {
         <p className="document-p-text">
           We may collect personal information you provide directly to us, such
           as:
-          <br /><br />
-          • Name and contact information (email, phone, billing address)<br />
-          • Account login details (if you create an account)<br />
+          <br />
+          <br />
+          • Name and contact information (email, phone, billing address)
+          <br />
+          • Account login details (if you create an account)
+          <br />
           • Payment and billing information (processed securely by third-party
-          providers)<br />
+          providers)
+          <br />
           • Prompts, themes, and preferences you submit to generate lead magnets
-          or PDFs<br />
-          • Device and usage data (IP address, browser type, access times)<br />
+          or PDFs
+          <br />
+          • Device and usage data (IP address, browser type, access times)
+          <br />
         </p>
         <br />
 
@@ -41,15 +47,23 @@ const Privacy = () => {
         <br />
         <p className="document-p-text">
           We may use the information we collect for purposes including:
-          <br /><br />
-          • To process payments and deliver your purchased slots or PDFs<br />
-          • To provide, operate, and improve our Services<br />
-          • To personalize your experience (themes, saved prompts)<br />
-          • To respond to customer inquiries and provide support<br />
+          <br />
+          <br />
+          • To process payments and deliver your purchased slots or PDFs
+          <br />
+          • To provide, operate, and improve our Services
+          <br />
+          • To personalize your experience (themes, saved prompts)
+          <br />
+          • To respond to customer inquiries and provide support
+          <br />
           • To send updates, promotional offers, or newsletters (with your
-          consent)<br />
-          • To comply with legal obligations<br />
-          • To detect and prevent fraud or misuse of our Services<br />
+          consent)
+          <br />
+          • To comply with legal obligations
+          <br />
+          • To detect and prevent fraud or misuse of our Services
+          <br />
         </p>
         <br />
 
@@ -61,6 +75,77 @@ const Privacy = () => {
           Studio does not store your full payment details. Payment providers may
           collect certain personal data in accordance with their own privacy
           policies, which we encourage you to review.
+        </p>
+        <br />
+        <h1 className="document-title-text">
+          Seller Accounts and Stripe Connect
+        </h1>
+        <br />
+        <p className="document-p-text">
+          If you choose to become a seller on Cre8tly Studio, we may collect
+          additional information necessary to operate your Seller Dashboard and
+          process payments through Stripe Connect. This may include:
+          <br />
+          <br />
+          • Name, email, and business details used for your Stripe Express
+          account
+          <br />
+          • Digital products, PDFs, images, and descriptions you upload to the
+          platform
+          <br />
+          • Pricing information, customer purchase data, and sales analytics
+          <br />
+          • Transaction history and payout activity (visible to you, processed
+          by Stripe)
+          <br />
+          <br />
+          Stripe Connect handles identity verification, tax information, payout
+          processing, and bank account details. Cre8tly Studio does not store
+          your full financial or banking information. Any data collected by
+          Stripe is governed by Stripe’s own privacy policy.
+          <br />
+          <br />
+          When buyers purchase your digital products, limited information (such
+          as the customer’s email) may be shared with you solely for product
+          delivery or support. Sellers must use buyer information responsibly
+          and in accordance with applicable privacy laws.
+        </p>
+        <br />
+        <h1 className="document-title-text">
+          Seller Privacy and Data Handling Policy
+        </h1>
+        <br />
+        <p className="document-p-text">
+          Sellers on Cre8tly Studio are responsible for the handling, storage,
+          and use of any customer information they receive through product
+          purchases on their landing pages. By offering digital products as a
+          seller, you agree to the following:
+          <br />
+          <br />
+          • You will only use customer information (such as name or email) for
+          delivering the purchased digital product or providing requested
+          support.
+          <br />
+          • You may not sell, rent, share, export, or repurpose customer
+          information for advertising, marketing, or any unrelated activity
+          without explicit consent from the customer.
+          <br />
+          • You are responsible for complying with all applicable privacy laws
+          and data protection standards in your region, including but not
+          limited to GDPR or CCPA where required.
+          <br />
+          • You understand that Cre8tly Studio does not control or monitor how
+          you use customer information after it has been provided to you. You
+          are independently accountable for your actions as a seller.
+          <br />
+          • Any misuse of customer data, including spam, unauthorized marketing,
+          or failure to protect customer information, may result in suspension
+          or termination of your Seller Dashboard access.
+          <br />
+          <br />
+          Cre8tly Studio does not provide legal advice to sellers. You are
+          responsible for ensuring that your digital products and data practices
+          comply with all applicable laws and platform requirements.
         </p>
         <br />
 
@@ -88,11 +173,16 @@ const Privacy = () => {
         <p className="document-p-text">
           Depending on your location, you may have rights under applicable data
           protection laws (such as GDPR or CCPA). These may include:
-          <br /><br />
-          • The right to access, correct, or delete your personal information<br />
-          • The right to object to processing or withdraw consent<br />
-          • The right to request data portability<br />
-          • The right to lodge a complaint with a data protection authority<br />
+          <br />
+          <br />
+          • The right to access, correct, or delete your personal information
+          <br />
+          • The right to object to processing or withdraw consent
+          <br />
+          • The right to request data portability
+          <br />
+          • The right to lodge a complaint with a data protection authority
+          <br />
         </p>
         <br />
 

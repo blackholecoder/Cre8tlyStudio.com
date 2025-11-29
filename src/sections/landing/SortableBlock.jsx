@@ -23,6 +23,20 @@ function SortableBlock({
     transition,
   };
 
+  const getLabelContrast = (hex) => {
+    if (!hex) return "#1f2937"; // default dark gray
+
+    const color = hex.replace("#", "");
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+    return brightness > 160 ? "#1f2937" : "#f3f4f6";
+  };
+  
+
   return (
     <div
       ref={setNodeRef}
@@ -275,8 +289,57 @@ function SortableBlock({
                   transition: "background 0.4s ease, box-shadow 0.3s ease",
                 }}
               >
+                <div className="flex items-center gap-3 mt-3">
+                  <label
+                    className="text-sm font-semibold"
+                    style={{
+                      color: getLabelContrast(block.bg_color || bgTheme),
+                    }}
+                  >
+                    Match Content Background
+                  </label>
+                  <input
+                    type="checkbox"
+                    checked={block.match_main_bg || false}
+                    onChange={(e) =>
+                      updateBlock(index, "match_main_bg", e.target.checked)
+                    }
+                  />
+                </div>
+                <div className="mt-20 text-center">
+                  <p
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: block.text_color || "#000000" }}
+                  >
+                    {block.text ||
+                      "🔥 Limited Time Offer! Get your free eBook today!"}
+                  </p>
+
+                  {block.button_text && (
+                    <button
+                      className="inline-block px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+                      style={{
+                        background: block.use_gradient
+                          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                              block.gradient_start || "#F285C3"
+                            }, ${block.gradient_end || "#7bed9f"})`
+                          : block.bg_color || "#F285C3",
+                        color:
+                          block.button_text_color ||
+                          block.text_color ||
+                          "#ffffff",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                      }}
+                    >
+                      {block.button_text}
+                    </button>
+                  )}
+                </div>
                 {/* 📝 Banner Message */}
-                <label className="text-sm font-semibold text-gray-300">
+                <label
+                  className="text-sm font-semibold"
+                  style={{ color: getLabelContrast(block.bg_color || bgTheme) }}
+                >
                   Banner Message
                 </label>
                 <textarea
@@ -288,9 +351,15 @@ function SortableBlock({
 
                 {/* 🎨 Text Color Picker */}
                 <div className="flex items-center gap-4 mt-4">
-                  <label className="text-sm font-semibold text-gray-300">
+                  <label
+                    className="text-sm font-semibold"
+                    style={{
+                      color: getLabelContrast(block.bg_color || bgTheme),
+                    }}
+                  >
                     Text Color
                   </label>
+
                   <input
                     type="color"
                     value={block.text_color || "#000000"}
@@ -300,13 +369,17 @@ function SortableBlock({
                     className="w-10 h-10 rounded cursor-pointer color-circle"
                   />
                   <span className="text-xs text-gray-400">
-                    {block.text_color}
+                    {block.text_color || "#ffffff"}
                   </span>
                 </div>
-
                 {/* 🎨 Gradient or Solid Background */}
                 <div className="flex items-center gap-3 mt-4">
-                  <label className="text-sm font-semibold text-gray-300">
+                  <label
+                    className="text-sm font-semibold"
+                    style={{
+                      color: getLabelContrast(block.bg_color || bgTheme),
+                    }}
+                  >
                     Use Gradient Background
                   </label>
                   <input
@@ -314,18 +387,6 @@ function SortableBlock({
                     checked={block.use_gradient || false}
                     onChange={(e) =>
                       updateBlock(index, "use_gradient", e.target.checked)
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-3 mt-3">
-                  <label className="text-sm font-semibold text-gray-300">
-                    Match Content Background
-                  </label>
-                  <input
-                    type="checkbox"
-                    checked={block.match_main_bg || false}
-                    onChange={(e) =>
-                      updateBlock(index, "match_main_bg", e.target.checked)
                     }
                   />
                 </div>
@@ -381,7 +442,12 @@ function SortableBlock({
                   </div>
                 ) : (
                   <>
-                    <label className="text-sm font-semibold text-gray-300 mt-3">
+                    <label
+                      className="text-sm font-semibold mt-3"
+                      style={{
+                        color: getLabelContrast(block.bg_color || bgTheme),
+                      }}
+                    >
                       Solid Background Color
                     </label>
                     <div className="flex items-center gap-3 mt-2">
@@ -393,34 +459,45 @@ function SortableBlock({
                         }
                         className="color-circle"
                       />
-                      <span className="text-xs text-gray-400">
-                        {block.bg_color}
-                      </span>
+                      <div className="w-24">
+                        <input
+                          type="text"
+                          value={(block.bg_color || "#F285C3").toUpperCase()}
+                          onChange={(e) => {
+                            const val = e.target.value.toUpperCase();
+                            updateBlock(index, "bg_color", val);
+                          }}
+                          className="w-full text-xs bg-black border border-gray-700 rounded px-2 py-1 text-gray-300"
+                          placeholder="#F285C3"
+                        />
+                      </div>
                     </div>
                   </>
                 )}
 
-                {/* 💰 Offer Type Dropdown (replaces unsafe external link) */}
-                <div className="mt-5">
-                  <label className="text-sm font-semibold text-gray-300">
-                    Offer Type
-                  </label>
-                  <select
-                    value={block.offer_type || "free"}
-                    onChange={(e) =>
-                      updateBlock(index, "offer_type", e.target.value)
-                    }
-                    className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+                {/* 🎨 Button Text Color Picker */}
+                <div className="flex items-center gap-4 mt-4 mb-4">
+                  <label
+                    className="text-sm font-semibold"
+                    style={{
+                      color: getLabelContrast(block.bg_color || bgTheme),
+                    }}
                   >
-                    <option value="free">Email Download</option>
-                    <option value="paid">Stripe Checkout</option>
-                  </select>
+                    Button Text Color
+                  </label>
+                  <input
+                    type="color"
+                    value={block.button_text_color || "#ffffff"}
+                    onChange={(e) =>
+                      updateBlock(index, "button_text_color", e.target.value)
+                    }
+                    className="w-10 h-10 rounded cursor-pointer color-circle"
+                  />
+                  <span className="text-xs text-gray-400">
+                    {block.button_text_color}
+                  </span>
                 </div>
 
-                {/* 🏷 Button Text */}
-                <label className="text-sm font-semibold text-gray-300 mt-4">
-                  Button Text
-                </label>
                 <input
                   type="text"
                   placeholder="Claim Offer"
@@ -430,33 +507,47 @@ function SortableBlock({
                   }
                   className="w-full p-2 border border-gray-600 rounded bg-black text-white"
                 />
+                <div className="mt-5">
+                  <label
+                    className="text-sm font-semibold"
+                    style={{
+                      color: getLabelContrast(block.bg_color || bgTheme),
+                    }}
+                  >
+                    Offer Type
+                  </label>
+                  <div className="relative w-full">
+                    <select
+                      value={block.offer_type || "free"}
+                      onChange={(e) =>
+                        updateBlock(index, "offer_type", e.target.value)
+                      }
+                      className="w-full p-2 pr-10 border border-gray-600 rounded bg-black text-white appearance-none"
+                    >
+                      <option value="free">Email Download</option>
+                      <option value="paid">Stripe Checkout</option>
+                    </select>
+
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
 
                 {/* 🧩 Live Preview */}
-                <div className="mt-6 text-center">
-                  <p
-                    className="text-lg font-semibold mb-4"
-                    style={{ color: block.text_color || "#000000" }}
-                  >
-                    {block.text ||
-                      "🔥 Limited Time Offer! Get your free eBook today!"}
-                  </p>
-
-                  {block.button_text && (
-                    <button
-                      className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition-transform transform hover:scale-105"
-                      style={{
-                        background: block.use_gradient
-                          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                              block.gradient_start || "#F285C3"
-                            }, ${block.gradient_end || "#7bed9f"})`
-                          : block.bg_color || "#F285C3",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-                      }}
-                    >
-                      {block.button_text}
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
           )}
@@ -704,7 +795,9 @@ function SortableBlock({
                   }
                   className="w-10 h-10 rounded cursor-pointer border border-gray-600"
                 />
-                <span className="text-xs text-gray-400">{block.bg_color}</span>
+                <span className="text-xs text-gray-400">
+                  {block.bg_color || "#000000"}
+                </span>
               </div>
 
               {/* 🌫 Glass Background */}
@@ -918,6 +1011,28 @@ function SortableBlock({
               <h3 className="text-lg font-semibold text-silver mb-4">
                 Stripe Checkout Button
               </h3>
+              <div
+                className="mt-6 mb-12 p-6 text-center border border-gray-700 rounded-lg"
+                style={{
+                  textAlign: block.alignment,
+                  background: block.match_main_bg
+                    ? adjustForLandingOverlay(bgTheme)
+                    : bgTheme || "#0F172A",
+                }}
+              >
+                <button
+                  className="px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                  style={{
+                    background: block.button_color || "#10b981",
+                    color: block.text_color || "#000000",
+                  }}
+                >
+                  {block.button_text || "Buy & Download PDF"}
+                </button>
+                <p className="text-xs text-gray-400 mt-2">
+                  ${block.price?.toFixed(2) || "10.00"} USD
+                </p>
+              </div>
 
               {/* 🧾 PDF Selector */}
               <label className="text-sm font-semibold text-gray-300">
@@ -1039,23 +1154,6 @@ function SortableBlock({
               </div>
 
               {/* 💳 Live Preview */}
-              <div
-                className="mt-6 p-6 text-center border border-gray-700 rounded-lg"
-                style={{ textAlign: block.alignment }}
-              >
-                <button
-                  className="px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform hover:scale-105"
-                  style={{
-                    background: block.button_color || "#10b981",
-                    color: block.text_color || "#000000",
-                  }}
-                >
-                  {block.button_text || "Buy & Download PDF"}
-                </button>
-                <p className="text-xs text-gray-400 mt-2">
-                  ${block.price?.toFixed(2) || "10.00"} USD
-                </p>
-              </div>
             </div>
           )}
           {block.type === "referral_button" && (
@@ -1154,6 +1252,244 @@ function SortableBlock({
                   referral.
                 </p>
               </div>
+            </div>
+          )}
+
+          {block.type === "faq" && (
+            <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
+              <h3 className="text-lg font-semibold text-silver mb-4">
+                FAQ Section
+              </h3>
+
+              <label className="text-sm font-semibold text-gray-300 mt-6">
+                Section Title
+              </label>
+              <input
+                type="text"
+                value={block.title || ""}
+                onChange={(e) => updateBlock(index, "title", e.target.value)}
+                className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+              />
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="text-sm font-semibold text-gray-300">
+                    Text Color
+                  </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="color"
+                      value={block.text_color || "#ffffff"}
+                      onChange={(e) =>
+                        updateBlock(index, "text_color", e.target.value)
+                      }
+                      className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                    />
+                    <span className="text-xs text-gray-400">
+                      {block.text_color}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold text-gray-300">
+                    Background
+                  </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="color"
+                      value={block.bg_color || "#000000"}
+                      onChange={(e) =>
+                        updateBlock(index, "bg_color", e.target.value)
+                      }
+                      className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                    />
+                    <span className="text-xs text-gray-400">
+                      {block.bg_color || "#000000"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 mt-4">
+                <label className="text-sm font-semibold text-gray-300">
+                  Match Page Background
+                </label>
+                <input
+                  type="checkbox"
+                  checked={block.match_main_bg || false}
+                  onChange={(e) =>
+                    updateBlock(index, "match_main_bg", e.target.checked)
+                  }
+                />
+              </div>
+
+              <div className="flex items-center gap-3 mt-4">
+                <label className="text-sm font-semibold text-gray-300">
+                  Use Gradient
+                </label>
+                <input
+                  type="checkbox"
+                  checked={block.use_gradient || false}
+                  onChange={(e) =>
+                    updateBlock(index, "use_gradient", e.target.checked)
+                  }
+                />
+              </div>
+
+              {block.use_gradient && (
+                <div className="grid grid-cols-2 gap-4 mt-3">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-300">
+                      Start
+                    </label>
+                    <input
+                      type="color"
+                      value={block.gradient_start || "#F285C3"}
+                      onChange={(e) =>
+                        updateBlock(index, "gradient_start", e.target.value)
+                      }
+                      className="w-full h-10 rounded cursor-pointer border border-gray-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-gray-300">
+                      End
+                    </label>
+                    <input
+                      type="color"
+                      value={block.gradient_end || "#7bed9f"}
+                      onChange={(e) =>
+                        updateBlock(index, "gradient_end", e.target.value)
+                      }
+                      className="w-full h-10 rounded cursor-pointer border border-gray-600"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="text-sm font-semibold text-gray-300">
+                      Direction
+                    </label>
+                    <select
+                      value={block.gradient_direction || "90deg"}
+                      onChange={(e) =>
+                        updateBlock(index, "gradient_direction", e.target.value)
+                      }
+                      className="w-full p-2 border border-gray-600 rounded bg-black text-white"
+                    >
+                      <option value="90deg">Left → Right</option>
+                      <option value="180deg">Top → Bottom</option>
+                      <option value="45deg">Diagonal ↘</option>
+                      <option value="135deg">Diagonal ↙</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 mt-4">
+                <label className="text-sm font-semibold text-gray-300">
+                  No Background
+                </label>
+                <input
+                  type="checkbox"
+                  checked={block.use_no_bg || false}
+                  onChange={(e) =>
+                    updateBlock(index, "use_no_bg", e.target.checked)
+                  }
+                />
+              </div>
+
+              <label className="text-sm font-semibold text-gray-300 mt-4 block">
+                Alignment
+              </label>
+              <select
+                value={block.alignment || "left"}
+                onChange={(e) =>
+                  updateBlock(index, "alignment", e.target.value)
+                }
+                className="p-2 bg-black border border-gray-700 rounded text-white text-sm w-full"
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+
+              <div className="mt-6 space-y-4">
+                {(block.items || []).map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-[#1f2937]/60 p-4 rounded-lg border border-gray-700"
+                  >
+                    <div className="flex items-center justify-between">
+                      <input
+                        type="text"
+                        value={item.q}
+                        onChange={(e) => {
+                          const updated = [...block.items];
+                          updated[i].q = e.target.value;
+                          updateBlock(index, "items", updated);
+                        }}
+                        className="w-full bg-black border border-gray-600 rounded text-white p-2"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...block.items];
+                          updated[i].open = !updated[i].open;
+                          updateBlock(index, "items", updated);
+                        }}
+                        className="ml-3 text-gray-300 text-xl"
+                      >
+                        {item.open ? "−" : "+"}
+                      </button>
+                    </div>
+
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ${
+                        item.open ? "max-h-40 mt-3" : "max-h-0"
+                      }`}
+                    >
+                      <textarea
+                        value={item.a}
+                        onChange={(e) => {
+                          const updated = [...block.items];
+                          updated[i].a = e.target.value;
+                          updateBlock(index, "items", updated);
+                        }}
+                        className="w-full bg-black border border-gray-600 rounded text-white p-2 h-20"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = block.items.filter(
+                          (_, idx) => idx !== i
+                        );
+                        updateBlock(index, "items", updated);
+                      }}
+                      className="text-red-400 text-xs mt-3 hover:underline"
+                    >
+                      Remove Question
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  updateBlock(index, "items", [
+                    ...(block.items || []),
+                    { q: "New Question", a: "Your answer...", open: false },
+                  ])
+                }
+                className="mt-4 bg-green text-black rounded-lg px-4 py-2 text-sm font-semibold hover:bg-green/80"
+              >
+                Add FAQ Item
+              </button>
             </div>
           )}
         </div>

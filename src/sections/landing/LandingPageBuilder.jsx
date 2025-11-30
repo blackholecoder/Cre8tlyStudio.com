@@ -181,6 +181,31 @@ export default function LandingPageBuilder() {
       newBlock.alignment = "left";
     }
 
+    if (type === "image") {
+  newBlock.image_url = "";
+  newBlock.caption = "";
+  newBlock.padding = 0;
+  newBlock.full_width = false;
+  newBlock.alignment = "center";
+
+  // ✅ Shadow controls
+  newBlock.shadow = false;
+  newBlock.shadow_color = "rgba(0,0,0,0.5)";
+  newBlock.shadow_depth = 25;      // blur radius / softness
+  newBlock.shadow_offset = 10;     // distance from image
+  newBlock.shadow_angle = 135;     // degrees — allows rotation
+
+  // ✅ Background & gradient controls (already supported in builder UI)
+  newBlock.match_main_bg = false;
+  newBlock.use_no_bg = false;
+  newBlock.use_gradient = false;
+  newBlock.gradient_start = "#F285C3";
+  newBlock.gradient_end = "#7bed9f";
+  newBlock.gradient_direction = "90deg";
+  newBlock.bg_color = "#000000";
+}
+
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -597,7 +622,7 @@ export default function LandingPageBuilder() {
           ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-10 overflow-y-scroll">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-3 sm:p-6 md:p-10 overflow-y-scroll">
       <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-8">
         <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
           <Wand2 className="w-6 h-6 text-green" />
@@ -747,6 +772,7 @@ export default function LandingPageBuilder() {
                         removeBlock={removeBlock}
                         bgTheme={bgTheme}
                         pdfList={pdfList}
+                        landing={landing} 
                       />
                     ))}
                 </SortableContext>
@@ -1106,7 +1132,7 @@ export default function LandingPageBuilder() {
             <div
               className={`transition-all duration-500 ease-in-out overflow-hidden ${
                 showPreviewSection
-                  ? "max-h-[4000px] opacity-100"
+                  ? "max-h-[9999px] opacity-100"
                   : "max-h-0 opacity-0"
               }`}
             >
@@ -1838,6 +1864,65 @@ export default function LandingPageBuilder() {
                                 </div>
                               </div>
                             ))}
+                          </div>
+                        );
+
+                      case "image":
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              textAlign: block.alignment || "center",
+                              padding: block.padding
+                                ? `${block.padding}px`
+                                : "0px",
+                              margin: "20px 0",
+                              overflow: "visible",
+                            }}
+                          >
+                            <img
+                              src={block.image_url}
+                              alt=""
+                              className="rounded-lg"
+                              style={{
+                                maxWidth: block.full_width ? "100%" : "500px",
+                                width: "100%",
+                                height: "auto",
+                                objectFit: "contain",
+                                display: "block",
+                                margin: "0 auto",
+                                boxShadow: block.shadow
+                                  ? (() => {
+                                      const angle =
+                                        ((block.shadow_angle || 135) *
+                                          Math.PI) /
+                                        180;
+                                      const offsetX = Math.round(
+                                        Math.cos(angle) *
+                                          (block.shadow_offset || 10)
+                                      );
+                                      const offsetY = Math.round(
+                                        Math.sin(angle) *
+                                          (block.shadow_offset || 10)
+                                      );
+                                      return `${offsetX}px ${offsetY}px ${
+                                        block.shadow_depth || 25
+                                      }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
+                                    })()
+                                  : "none",
+                              }}
+                            />
+
+                            {block.caption && (
+                              <p
+                                className="mt-3 text-gray-300 text-sm italic"
+                                style={{
+                                  textAlign: block.alignment || "center",
+                                }}
+                              >
+                                {block.caption}
+                              </p>
+                            )}
                           </div>
                         );
 

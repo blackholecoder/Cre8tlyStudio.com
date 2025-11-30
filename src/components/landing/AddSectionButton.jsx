@@ -32,6 +32,7 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Stripe Checkout", value: "stripe_checkout" }, 
     { label: "Verified Reviews ⭐", value: "verified_reviews" }, 
     { label: "FAQ Accordion ❓", value: "faq" },
+    { label: "Image", value: "image" }
 
   ];
 

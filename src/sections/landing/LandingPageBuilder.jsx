@@ -48,7 +48,7 @@ export default function LandingPageBuilder() {
 
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState("");
-  const [appliedVersion, setAppliedVersion] = useState(""); 
+  const [appliedVersion, setAppliedVersion] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [templateName, setTemplateName] = useState("");
 
@@ -211,49 +211,72 @@ export default function LandingPageBuilder() {
     }
 
     if (type === "feature_offers_3") {
-  newBlock.items = [
-  {
-    image_url: "",
-    cover_url: "",
-    title: "Offer One",
-    text: "Short description of this offer.",
-    price: 10,
-    button_text: "Buy Now",
-    button_color: "#22c55e",
-    pdf_url: "",
-    use_pdf_cover: false,
-  },
-  {
-    image_url: "",
-    cover_url: "",
-    title: "Offer Two",
-    text: "Short description of this offer.",
-    price: 20,
-    button_text: "Buy Now",
-    button_color: "#22c55e",
-    pdf_url: "",
-    use_pdf_cover: false,
-  },
-];
+      newBlock.items = [
+        {
+          image_url: "",
+          cover_url: "",
+          title: "Offer One",
+          text: "Short description of this offer.",
+          price: 10,
+          button_text: "Buy Now",
+          button_color: "#22c55e",
+          pdf_url: "",
+          use_pdf_cover: false,
+        },
+        {
+          image_url: "",
+          cover_url: "",
+          title: "Offer Two",
+          text: "Short description of this offer.",
+          price: 20,
+          button_text: "Buy Now",
+          button_color: "#22c55e",
+          pdf_url: "",
+          use_pdf_cover: false,
+        },
+      ];
 
-  // Grid background & gradient controls
-  newBlock.bg_color = "rgba(0,0,0,0.4)";
-  newBlock.use_gradient = false;
-  newBlock.gradient_start = "#F285C3";
-  newBlock.gradient_end = "#7bed9f";
-  newBlock.gradient_direction = "90deg";
-  newBlock.match_main_bg = false;
-  newBlock.use_no_bg = false;
+      // Grid background & gradient controls
+      newBlock.bg_color = "rgba(0,0,0,0.4)";
+      newBlock.use_gradient = false;
+      newBlock.gradient_start = "#F285C3";
+      newBlock.gradient_end = "#7bed9f";
+      newBlock.gradient_direction = "90deg";
+      newBlock.match_main_bg = false;
+      newBlock.use_no_bg = false;
 
-  // Shared button text color for all three buttons
-  newBlock.button_text_color = "#000000";
+      // Shared button text color for all three buttons
+      newBlock.button_text_color = "#000000";
 
-  newBlock.alignment = "center";
-  newBlock.padding = 20;
+      newBlock.alignment = "center";
+      newBlock.padding = 20;
+      newBlock.collapsed = false;
+    }
+
+    if (type === "secure_checkout") {
+  newBlock.title = "Secure Checkout";
+  newBlock.subtext =
+    "Your information is protected by industry leading encryption and secure payment processing.";
+
+  newBlock.trust_items = [
+    "Secure SSL Encryption",
+    "Protected Checkout Page",
+    "Safe Payment Processing",
+  ];
+
+  newBlock.guarantee = "30 day money back guarantee on all purchases";
+
+  // optional image badge (left blank by default)
+  newBlock.payment_badge = "";
+
+  // NEW minimal style defaults
+  newBlock.text_color = "#FFFFFF";
+  newBlock.alignment = "center";   // ⭐ MUST BE CENTERED
+  newBlock.padding = 0;            // ⭐ no padding for minimal design
+  newBlock.bg_color = "transparent"; // ⭐ remove old card background
+
   newBlock.collapsed = false;
 }
-
-
 
 
     setLanding((prev) => ({
@@ -342,31 +365,31 @@ export default function LandingPageBuilder() {
   };
 
   const handleApplyVersion = async () => {
-  if (!selectedVersion) {
-    toast.error("Select a version first.");
-    return;
-  }
+    if (!selectedVersion) {
+      toast.error("Select a version first.");
+      return;
+    }
 
-  const snapshotRes = await fetchTemplateSnapshot(selectedVersion);
-  if (!snapshotRes.success) {
-    toast.error("Could not fetch snapshot.");
-    return;
-  }
+    const snapshotRes = await fetchTemplateSnapshot(selectedVersion);
+    if (!snapshotRes.success) {
+      toast.error("Could not fetch snapshot.");
+      return;
+    }
 
-  const applyRes = await restoreTemplate(landing.id, snapshotRes.snapshot);
+    const applyRes = await restoreTemplate(landing.id, snapshotRes.snapshot);
 
-  if (applyRes.success) {
-    toast.success("Template restored successfully!");
+    if (applyRes.success) {
+      toast.success("Template restored successfully!");
 
-    // Mark this version as the currently applied one
-    setAppliedVersion(selectedVersion);
+      // Mark this version as the currently applied one
+      setAppliedVersion(selectedVersion);
 
-    // Reload the landing page so UI reflects changes
-    refreshLanding();
-  } else {
-    toast.error("Failed to apply template");
-  }
-};
+      // Reload the landing page so UI reflects changes
+      refreshLanding();
+    } else {
+      toast.error("Failed to apply template");
+    }
+  };
 
   async function handleDeleteVersion() {
     toast.dismiss(); // clear any stacked toasts
@@ -649,62 +672,56 @@ export default function LandingPageBuilder() {
     }
   };
 
-const handleSaveTemplate = () => {
-  // If a version is selected, preload its real name
-  if (selectedVersion) {
-    const existing = versions.find(v => v.id === selectedVersion);
+  const handleSaveTemplate = () => {
+    // If a version is selected, preload its real name
+    if (selectedVersion) {
+      const existing = versions.find((v) => v.id === selectedVersion);
+
+      if (existing) {
+        setTemplateName(existing.name); // preload real version name
+      }
+    } else {
+      // No version selected — user is working on an unsaved version
+      setTemplateName(`Version ${versions.length + 1}`);
+    }
+
+    setShowSaveModal(true);
+  };
+
+  const confirmSaveTemplate = async () => {
+    const trimmed = templateName.trim();
+    if (!trimmed) {
+      toast.error("Please enter a name");
+      return;
+    }
+
+    // See if this name already exists
+    const existing = versions.find((v) => v.name === trimmed);
+
+    let res;
 
     if (existing) {
-      setTemplateName(existing.name); // preload real version name
+      // UPDATE EXISTING VERSION
+      res = await saveTemplate(
+        landing.id,
+        trimmed,
+        landing,
+        existing.id // <-- version ID for update
+      );
+    } else {
+      // CREATE NEW VERSION
+      res = await saveTemplate(landing.id, trimmed, landing);
     }
-  } else {
-    // No version selected — user is working on an unsaved version
-    setTemplateName(`Version ${versions.length + 1}`);
-  }
 
-  setShowSaveModal(true);
-};
-
-const confirmSaveTemplate = async () => {
-  const trimmed = templateName.trim();
-  if (!trimmed) {
-    toast.error("Please enter a name");
-    return;
-  }
-
-  // See if this name already exists
-  const existing = versions.find(v => v.name === trimmed);
-
-  let res;
-
-  if (existing) {
-    // UPDATE EXISTING VERSION
-    res = await saveTemplate(
-      landing.id,
-      trimmed,
-      landing,
-      existing.id // <-- version ID for update
-    );
-  } else {
-    // CREATE NEW VERSION
-    res = await saveTemplate(
-      landing.id,
-      trimmed,
-      landing
-    );
-  }
-
-  if (res.success) {
-    toast.success(existing ? "Version updated!" : "New version saved!");
-    loadVersions();
-    setShowSaveModal(false);
-    setTemplateName("");
-  } else {
-    toast.error("Could not save version.");
-  }
-};
-
-
+    if (res.success) {
+      toast.success(existing ? "Version updated!" : "New version saved!");
+      loadVersions();
+      setShowSaveModal(false);
+      setTemplateName("");
+    } else {
+      toast.error("Could not save version.");
+    }
+  };
 
   // 🎨 Determine the selected background theme
   const selectedTheme =
@@ -726,7 +743,7 @@ const confirmSaveTemplate = async () => {
         <VersionControls
           versions={versions}
           selectedVersion={selectedVersion}
-          setSelectedVersion={setSelectedVersion} 
+          setSelectedVersion={setSelectedVersion}
           appliedVersion={appliedVersion}
           handleLoadVersion={handleLoadVersion}
           handleApplyVersion={handleApplyVersion}
@@ -780,71 +797,68 @@ const confirmSaveTemplate = async () => {
               <AddSectionButton addBlock={addBlock} />
             </div>
             {/* 🔽 Collapse / Expand All Blocks */}
-<div
-  className="cursor-pointer bg-black/80 text-white px-4 py-3 rounded-lg border border-gray-600 mb-4 flex justify-between items-center"
-  onClick={() => setBlocksHidden(!blocksHidden)}
->
-  <span className="font-semibold">
-    {blocksHidden ? "Open All Blocks" : "Hide All Blocks"}
-  </span>
+            <div
+              className="cursor-pointer bg-black/80 text-white px-4 py-3 rounded-lg border border-gray-600 mb-4 flex justify-between items-center"
+              onClick={() => setBlocksHidden(!blocksHidden)}
+            >
+              <span className="font-semibold">
+                {blocksHidden ? "Open All Blocks" : "Hide All Blocks"}
+              </span>
 
-  <span
-    className={`transform transition-transform ${
-      blocksHidden ? "rotate-0" : "rotate-180"
-    }`}
-  >
-    ▼
-  </span>
-</div>
-
-
-
+              <span
+                className={`transform transition-transform ${
+                  blocksHidden ? "rotate-0" : "rotate-180"
+                }`}
+              >
+                ▼
+              </span>
+            </div>
 
             {/* DndContext */}
             <div className="space-y-4 mb-28">
               {!blocksHidden && (
-              <DndContext
-                collisionDetection={closestCenter}
-                onDragEnd={({ active, over }) => {
-                  if (!over || active.id === over.id) return;
-                  const oldIndex = landing.content_blocks.findIndex(
-                    (b) => b.id === active.id
-                  );
-                  const newIndex = landing.content_blocks.findIndex(
-                    (b) => b.id === over.id
-                  );
-                  const newBlocks = arrayMove(
-                    landing.content_blocks,
-                    oldIndex,
-                    newIndex
-                  );
-                  setLanding((prev) => ({
-                    ...prev,
-                    content_blocks: newBlocks,
-                  }));
-                }}
-              >
-                <SortableContext
-                  items={landing.content_blocks.map((b) => b.id)}
-                  strategy={verticalListSortingStrategy}
+                <DndContext
+                  collisionDetection={closestCenter}
+                  onDragEnd={({ active, over }) => {
+                    if (!over || active.id === over.id) return;
+                    const oldIndex = landing.content_blocks.findIndex(
+                      (b) => b.id === active.id
+                    );
+                    const newIndex = landing.content_blocks.findIndex(
+                      (b) => b.id === over.id
+                    );
+                    const newBlocks = arrayMove(
+                      landing.content_blocks,
+                      oldIndex,
+                      newIndex
+                    );
+                    setLanding((prev) => ({
+                      ...prev,
+                      content_blocks: newBlocks,
+                    }));
+                  }}
                 >
-                  {landing.content_blocks
-                    .filter((b) => b && b.type) // ✅ ignore empty / invalid blocks
-                    .map((block, index) => (
-                      <MemoizedSortableBlock
-                        key={block.id}
-                        id={block.id}
-                        block={block}
-                        index={index}
-                        updateBlock={updateBlock}
-                        removeBlock={removeBlock}
-                        bgTheme={bgTheme}
-                        pdfList={pdfList}
-                        landing={landing}
-                      />
-                    ))}
-                </SortableContext>
-              </DndContext>
+                  <SortableContext
+                    items={landing.content_blocks.map((b) => b.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {landing.content_blocks
+                      .filter((b) => b && b.type) // ✅ ignore empty / invalid blocks
+                      .map((block, index) => (
+                        <MemoizedSortableBlock
+                          key={block.id}
+                          id={block.id}
+                          block={block}
+                          index={index}
+                          updateBlock={updateBlock}
+                          removeBlock={removeBlock}
+                          bgTheme={bgTheme}
+                          pdfList={pdfList}
+                          landing={landing}
+                        />
+                      ))}
+                  </SortableContext>
+                </DndContext>
               )}
             </div>
           </div>

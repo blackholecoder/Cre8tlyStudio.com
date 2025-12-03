@@ -33,7 +33,8 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Offer Grid", value: "feature_offers_3" },
     { label: "Verified Reviews ⭐", value: "verified_reviews" }, 
     { label: "FAQ Accordion ❓", value: "faq" },
-    { label: "Image", value: "image" }
+    { label: "Image", value: "image" },
+    { label: "Secure Checkout", value: "secure_checkout" }
 
   ];
 

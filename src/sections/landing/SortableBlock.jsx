@@ -18,7 +18,7 @@ import ReferralButtonBlock from "../../components/landing/blocks/types/ReferralB
 import FAQBlock from "../../components/landing/blocks/types/FAQBlock";
 import ImageBlock from "../../components/landing/blocks/types/ImageBlock";
 import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOffers3Block";
-
+import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureCheckoutBlock";
 
 const BLOCK_LABELS = {
   heading: "Heading (H1)",
@@ -38,8 +38,8 @@ const BLOCK_LABELS = {
   faq: "FAQ Accordion",
   image: "Image",
   referral_button: "Referral Button",
+  secure_checkout: "Secure Checkout",
 };
-
 
 function SortableBlock({
   id,
@@ -122,6 +122,8 @@ function SortableBlock({
 
       case "feature_offers_3":
         return `${(block.items || []).length} offer cards`;
+        case "secure_checkout":
+  return block.title?.slice(0, 40) || "Secure Checkout";
 
       default:
         return "";
@@ -189,7 +191,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "list_heading" && (
             <ListHeadingBlock
               block={block}
@@ -197,7 +198,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "paragraph" && (
             <ParagraphBlock
               block={block}
@@ -205,11 +205,9 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "video" && (
             <VideoBlock block={block} index={index} updateBlock={updateBlock} />
           )}
-
           {block.type === "divider" && (
             <DividerBlock
               block={block}
@@ -217,7 +215,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "offer_banner" && (
             <OfferBannerBlock
               block={block}
@@ -226,7 +223,6 @@ function SortableBlock({
               bgTheme={bgTheme}
             />
           )}
-
           {block.type === "calendly" && (
             <CalendlyBlock
               block={block}
@@ -234,7 +230,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "social_links" && (
             <SocialLinksBlock
               block={block}
@@ -242,7 +237,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "verified_reviews" && (
             <VerifiedReviewsBlock
               block={block}
@@ -250,7 +244,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "countdown" && (
             <CountdownBlock
               block={block}
@@ -258,7 +251,6 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "stripe_checkout" && (
             <StripeCheckoutBlock
               block={block}
@@ -268,7 +260,6 @@ function SortableBlock({
               bgTheme={bgTheme}
             />
           )}
-
           {block.type === "referral_button" && (
             <ReferralButtonBlock
               block={block}
@@ -276,11 +267,9 @@ function SortableBlock({
               updateBlock={updateBlock}
             />
           )}
-
           {block.type === "faq" && (
             <FAQBlock block={block} index={index} updateBlock={updateBlock} />
           )}
-
           {block.type === "image" && (
             <ImageBlock
               block={block}
@@ -292,7 +281,6 @@ function SortableBlock({
               landing={landing}
             />
           )}
-
           {block.type === "feature_offers_3" && (
             <FeatureOffers3Block
               block={block}
@@ -301,6 +289,13 @@ function SortableBlock({
               bgTheme={bgTheme}
               landing={landing}
               pdfList={pdfList}
+            />
+          )}
+          {block.type === "secure_checkout" && (
+            <SecureCheckoutBlock
+              block={block}
+              index={index}
+              updateBlock={updateBlock}
             />
           )}
         </div>

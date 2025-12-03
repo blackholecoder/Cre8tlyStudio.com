@@ -15,11 +15,10 @@ export default function PreviewPanel({
   user,
   updateBlock,
   adjustForLandingOverlay,
-  blendColors
+  blendColors,
 }) {
   return (
     <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
-
       {/* Header toggle */}
       <div
         onClick={() => setShowPreviewSection(!showPreviewSection)}
@@ -53,797 +52,797 @@ export default function PreviewPanel({
           }}
         >
           {landing.content_blocks
-                  ?.filter((b) => b.type === "offer_banner")
-                  .map((block, index) => {
-                    const isGradient =
-                      selectedTheme?.includes("linear-gradient");
-                    const mainOverlayColor = isGradient
-                      ? selectedTheme // keep gradient as-is
-                      : blendColors(
-                          selectedTheme || "#1e0033",
-                          "rgba(255,255,255,0.04)"
-                        );
-                    const bannerBg = block.match_main_bg
-                      ? mainOverlayColor
-                      : block.use_gradient
+            ?.filter((b) => b.type === "offer_banner")
+            .map((block, index) => {
+              const isGradient = selectedTheme?.includes("linear-gradient");
+              const mainOverlayColor = isGradient
+                ? selectedTheme // keep gradient as-is
+                : blendColors(
+                    selectedTheme || "#1e0033",
+                    "rgba(255,255,255,0.04)"
+                  );
+              const bannerBg = block.match_main_bg
+                ? mainOverlayColor
+                : block.use_gradient
+                  ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                      block.gradient_start || "#F285C3"
+                    }, ${block.gradient_end || "#7bed9f"})`
+                  : block.bg_color || "#F285C3";
+
+              return (
+                <div
+                  key={index}
+                  className="relative shadow-lg"
+                  style={{
+                    background: bannerBg,
+                    color: block.text_color || "#fff",
+                    textAlign: "center",
+                    padding: `${block.padding || 40}px 20px`,
+                    fontWeight: 600,
+                    fontSize: "1.2rem",
+                    lineHeight: "1.5",
+                    position: "relative",
+                    top: "-40px",
+                    margin: "0 -30px 20px",
+                    borderRadius: "24px 24px 0 0",
+                    overflow: "hidden",
+
+                    // ✅ Match main background layer
+                    backdropFilter: "blur(6px)",
+                    backgroundBlendMode: "overlay",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    boxShadow: "0 4px 25px rgba(0,0,0,0.15)",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "1.5rem",
+                      fontWeight: 700,
+                      margin: "0 0 22px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {block.text ||
+                      "🔥 Limited Time Offer! Get your free eBook today!"}
+                  </p>
+
+                  <button
+                    style={{
+                      display: "inline-block",
+                      background: block.use_gradient
                         ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
                             block.gradient_start || "#F285C3"
                           }, ${block.gradient_end || "#7bed9f"})`
-                        : block.bg_color || "#F285C3";
+                        : block.bg_color || "#F285C3",
+                      color: block.button_text_color || "#fff",
+                      padding: "14px 32px",
+                      borderRadius: "10px",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                      textDecoration: "none",
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                      transition: "transform 0.25s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.05)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
+                    }}
+                  >
+                    {block.button_text || "Claim Offer"}
+                  </button>
+                </div>
+              );
+            })}
 
+          {landing.cover_image_url && (
+            <img
+              src={landing.cover_image_url}
+              alt="PDF Cover"
+              className="mx-auto mb-8 rounded-xl shadow-lg"
+              style={{
+                width: "100%",
+                maxWidth: "480px",
+                height: "auto", // <-- Add
+                aspectRatio: "unset",
+                objectFit: "cover",
+                border: "2px solid rgba(255, 255, 255, 0.06)",
+                background: "#000",
+                boxShadow:
+                  "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
+                borderRadius: "12px",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              }}
+            />
+          )}
+
+          {landing.content_blocks?.length ? (
+            landing.content_blocks.map((block, index) => {
+              const baseStyle = {
+                margin: "0 auto 24px",
+                maxWidth: "700px",
+                textAlign: "center",
+              };
+
+              switch (block.type) {
+                case "heading":
+                  return (
+                    <h1
+                      key={index}
+                      className="text-4xl font-bold leading-snug"
+                      style={{
+                        ...baseStyle,
+                        color: landing.font_color_h1 || "#FFFFFF",
+                      }}
+                    >
+                      {block.text || "Heading Example"}
+                    </h1>
+                  );
+
+                case "subheading":
+                  return (
+                    <h2
+                      key={index}
+                      className="text-2xl font-semibold leading-snug"
+                      style={{
+                        ...baseStyle,
+                        color: landing.font_color_h2 || "#E5E5E5",
+                      }}
+                    >
+                      {block.text || "Subheading Example"}
+                    </h2>
+                  );
+
+                case "subsubheading":
+                  return (
+                    <h3
+                      key={index}
+                      className="text-xl font-medium leading-snug"
+                      style={{
+                        ...baseStyle,
+                        color: landing.font_color_h3 || "#CCCCCC",
+                      }}
+                    >
+                      {block.text || "Supporting Header"}
+                    </h3>
+                  );
+
+                case "list_heading":
+                  return (
+                    <p
+                      key={index}
+                      style={{
+                        margin: "0 auto 10px",
+                        maxWidth: "700px",
+                        fontWeight: 700,
+                        fontSize: "1.15rem",
+                        textAlign: block.alignment || "left",
+                        color: landing.font_color_p || "#FFFFFF",
+                      }}
+                    >
+                      {block.text || "💎 List Heading Example"}
+                    </p>
+                  );
+
+                case "paragraph":
+                  if (block.bulleted) {
+                    const lines = (block.text || "")
+                      .split(/\n/)
+                      .filter(Boolean);
+                    return (
+                      <ul
+                        key={index}
+                        style={{
+                          margin: "0 auto 24px",
+                          maxWidth: "700px",
+                          color: landing.font_color_p || "#DDDDDD",
+                          textAlign: block.alignment || "left",
+                          lineHeight: "1.8",
+                          listStyle: "disc",
+                          paddingLeft: "1.5rem",
+                        }}
+                      >
+                        {lines.map((line, i) => (
+                          <li key={i}>{line}</li>
+                        ))}
+                      </ul>
+                    );
+                  }
+
+                  return (
+                    <p
+                      key={index}
+                      className="text-lg leading-relaxed"
+                      style={{
+                        margin: "0 auto 24px",
+                        maxWidth: "700px",
+                        color: landing.font_color_p || "#DDDDDD",
+                        textAlign: block.alignment || "left",
+                      }}
+                    >
+                      {block.text || "Your paragraph will appear here."}
+                    </p>
+                  );
+
+                case "video":
+                  if (!block.url) return null;
+
+                  let embedUrl = block.url.trim();
+
+                  if (embedUrl.includes("watch?v=")) {
+                    embedUrl = embedUrl.replace("watch?v=", "embed/");
+                  } else if (embedUrl.includes("youtu.be/")) {
+                    const id = embedUrl.split("youtu.be/")[1].split(/[?&]/)[0];
+                    embedUrl = `https://www.youtube.com/embed/${id}`;
+                  }
+
+                  if (
+                    embedUrl.includes("vimeo.com") &&
+                    !embedUrl.includes("player.vimeo.com")
+                  ) {
+                    const id = embedUrl.split("vimeo.com/")[1].split(/[?&]/)[0];
+                    embedUrl = `https://player.vimeo.com/video/${id}`;
+                  }
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        margin: "40px auto",
+                        maxWidth: "800px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <iframe
+                        src={embedUrl}
+                        title="Embedded Video"
+                        style={{
+                          width: "100%",
+                          aspectRatio: "16 / 9",
+                          border: "none",
+                          borderRadius: "12px",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+                        }}
+                        allow="autoplay; fullscreen"
+                        allowFullScreen
+                      ></iframe>
+
+                      {block.caption && (
+                        <p
+                          style={{
+                            marginTop: "12px",
+                            fontSize: "0.95rem",
+                            color: landing.font_color_p || "#DDD",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {block.caption}
+                        </p>
+                      )}
+                    </div>
+                  );
+                case "divider":
+                  if (block.style === "space") {
                     return (
                       <div
                         key={index}
-                        className="relative shadow-lg"
                         style={{
-                          background: bannerBg,
-                          color: block.text_color || "#fff",
-                          textAlign: "center",
-                          padding: `${block.padding || 40}px 20px`,
-                          fontWeight: 600,
-                          fontSize: "1.2rem",
-                          lineHeight: "1.5",
-                          position: "relative",
-                          top: "-40px",
-                          margin: "0 -30px 20px",
-                          borderRadius: "24px 24px 0 0",
-                          overflow: "hidden",
-
-                          // ✅ Match main background layer
-                          backdropFilter: "blur(6px)",
-                          backgroundBlendMode: "overlay",
-                          border: "1px solid rgba(255,255,255,0.06)",
-                          boxShadow: "0 4px 25px rgba(0,0,0,0.15)",
+                          height: `${block.height || 40}px`,
                         }}
-                      >
-                        <p
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: 700,
-                            margin: "0 0 22px",
-                            textAlign: "center",
-                          }}
-                        >
-                          {block.text ||
-                            "🔥 Limited Time Offer! Get your free eBook today!"}
-                        </p>
+                      ></div>
+                    );
+                  }
 
-                        {block.link_text && block.link_url && (
+                  return (
+                    <hr
+                      key={index}
+                      style={{
+                        border: "none",
+                        borderTop: `1px solid ${block.color || "rgba(255,255,255,0.2)"}`,
+                        width: "60%",
+                        margin: `${(block.height || 40) / 2}px auto`,
+                        opacity: 0.7,
+                      }}
+                    />
+                  );
+
+                case "spacer":
+                  if (block.style === "space") {
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          height: `${block.height || 40}px`,
+                        }}
+                      ></div>
+                    );
+                  }
+                  return (
+                    <hr
+                      key={index}
+                      style={{
+                        border: "none",
+                        borderTop: `1px solid ${block.color || "rgba(255,255,255,0.2)"}`,
+                        width: block.width || "60%",
+                        margin: `${(block.height || 40) / 2}px auto`,
+                        opacity: 0.7,
+                      }}
+                    />
+                  );
+
+                case "calendly":
+                  if (!block.calendly_url) return null;
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        margin: "40px auto",
+                        maxWidth: "900px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <iframe
+                        src={block.calendly_url}
+                        style={{
+                          width: "100%",
+                          height: `${block.height || 650}px`,
+                          border: "none",
+                          borderRadius: "12px",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+                        }}
+                        title="Calendly Scheduler"
+                      ></iframe>
+                    </div>
+                  );
+
+                case "social_links":
+                  const align = block.alignment || "center";
+                  const iconColor = block.icon_color || "#ffffff";
+                  const links = block.links || {};
+
+                  const iconSet = {
+                    instagram:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg",
+                    threads:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/threads.svg",
+                    twitter:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg",
+                    youtube:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg",
+                    linkedin:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg",
+                    facebook:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
+                    tiktok:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        textAlign: align,
+                        margin: "40px 0",
+                        display: "flex",
+                        justifyContent:
+                          align === "center"
+                            ? "center"
+                            : align === "right"
+                              ? "flex-end"
+                              : "flex-start",
+                        gap: "20px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {Object.entries(links)
+                        .filter(([platform, url]) => url && iconSet[platform])
+                        .map(([platform, url]) => (
                           <a
-                            href={block.link_url}
+                            key={platform}
+                            href={url}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
+                              width: "38px",
+                              height: "38px",
                               display: "inline-block",
-                              background: bannerBg,
-                              color: "#fff",
-                              padding: "14px 32px",
-                              borderRadius: "10px",
-                              fontWeight: 700,
-                              fontSize: "1rem",
-                              textDecoration: "none",
-                              boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-                              transition: "transform 0.25s ease",
+                              transition:
+                                "transform 0.25s ease, opacity 0.2s ease",
                             }}
-                            onMouseOver={(e) =>
-                              (e.currentTarget.style.transform = "scale(1.05)")
-                            }
-                            onMouseOut={(e) =>
-                              (e.currentTarget.style.transform = "scale(1)")
-                            }
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "scale(1.1)";
+                              e.currentTarget.style.opacity = "0.9";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "scale(1)";
+                              e.currentTarget.style.opacity = "1";
+                            }}
                           >
-                            {block.link_text}
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                WebkitMask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                                mask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                                backgroundColor: iconColor, // ✅ exact chosen color
+                                transition: "background-color 0.3s ease",
+                              }}
+                            />
                           </a>
-                        )}
-                      </div>
+                        ))}
+                    </div>
+                  );
+
+                case "countdown":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        margin: "40px auto",
+                        textAlign: block.alignment || "center",
+                        color: block.text_color || "#FFFFFF",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: "1.5rem",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        {block.text || "Offer Ends In:"}
+                      </p>
+                      <CountdownTimerPreview
+                        targetDate={block.target_date}
+                        variant={block.style_variant}
+                        bgTheme={bgTheme}
+                      />
+                    </div>
+                  );
+
+                case "stripe_checkout":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        textAlign: block.alignment || "center",
+                        margin: "40px auto",
+                      }}
+                    >
+                      <button
+                        onClick={async () => {
+                          if (!block.pdf_url) {
+                            toast.warn("Please select a PDF to sell first.");
+                            return;
+                          }
+
+                          try {
+                            const res = await axiosInstance.post(
+                              "/seller-checkout/create-checkout-session",
+                              {
+                                landingPageId: landing.id,
+                                sellerId: user?.id,
+                                pdfUrl: block.pdf_url,
+                                price_in_cents: Math.round(
+                                  (block.price || 10) * 100
+                                ),
+                              }
+                            );
+
+                            if (res.data?.url)
+                              window.location.href = res.data.url;
+                            else
+                              toast.error(
+                                "Unable to start checkout. Please try again."
+                              );
+                          } catch (err) {
+                            console.error("Stripe Checkout Error:", err);
+                            toast.error(
+                              "Error connecting to Stripe. Try again later."
+                            );
+                          }
+                        }}
+                        className="transition-transform hover:scale-105"
+                        style={{
+                          background: block.button_color || "#7bed9f",
+                          color: block.text_color || "#000", // ✅ new text color
+                          padding: "14px 36px",
+                          borderRadius: "8px",
+                          fontWeight: "bold",
+                          cursor: "pointer",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        {block.button_text || "Buy & Download PDF"}
+                      </button>
+
+                      <p style={{ marginTop: "8px", color: "#aaa" }}>
+                        ${block.price?.toFixed(2) || "10.00"} USD
+                      </p>
+
+                      {block.pdf_url && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          Selling:
+                          <a
+                            href={block.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green font-medium ml-1 underline hover:text-green transition"
+                          >
+                            Preview PDF
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  );
+
+                case "referral_button":
+                  // only allow employees to have active referral links
+                  if (user?.is_admin_employee !== 1) {
+                    return (
+                      <p
+                        key={index}
+                        style={{
+                          color: "#999",
+                          fontSize: "0.9rem",
+                          textAlign: "center",
+                          marginTop: "20px",
+                        }}
+                      >
+                        (Referral buttons are available to admin employees only)
+                      </p>
                     );
-                  })}
+                  }
 
-                {landing.cover_image_url && (
-                  <img
-                    src={landing.cover_image_url}
-                    alt="PDF Cover"
-                    className="mx-auto mb-8 rounded-xl shadow-lg"
-                    style={{
-                      width: "100%",
-                      maxWidth: "480px",
-                      height: "auto", // <-- Add
-                      aspectRatio: "unset",
-                      objectFit: "cover",
-                      border: "2px solid rgba(255, 255, 255, 0.06)",
-                      background: "#000",
-                      boxShadow:
-                        "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
-                      borderRadius: "12px",
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    }}
-                  />
-                )}
+                  const referralUrl = `https://cre8tlystudio.com/signup?ref_employee=${user?.id}`;
 
-                {landing.content_blocks?.length ? (
-                  landing.content_blocks.map((block, index) => {
-                    const baseStyle = {
-                      margin: "0 auto 24px",
-                      maxWidth: "700px",
-                      textAlign: "center",
-                    };
-
-                    switch (block.type) {
-                      case "heading":
-                        return (
-                          <h1
-                            key={index}
-                            className="text-4xl font-bold leading-snug"
-                            style={{
-                              ...baseStyle,
-                              color: landing.font_color_h1 || "#FFFFFF",
-                            }}
-                          >
-                            {block.text || "Heading Example"}
-                          </h1>
-                        );
-
-                      case "subheading":
-                        return (
-                          <h2
-                            key={index}
-                            className="text-2xl font-semibold leading-snug"
-                            style={{
-                              ...baseStyle,
-                              color: landing.font_color_h2 || "#E5E5E5",
-                            }}
-                          >
-                            {block.text || "Subheading Example"}
-                          </h2>
-                        );
-
-                      case "subsubheading":
-                        return (
-                          <h3
-                            key={index}
-                            className="text-xl font-medium leading-snug"
-                            style={{
-                              ...baseStyle,
-                              color: landing.font_color_h3 || "#CCCCCC",
-                            }}
-                          >
-                            {block.text || "Supporting Header"}
-                          </h3>
-                        );
-
-                      case "list_heading":
-                        return (
-                          <p
-                            key={index}
-                            style={{
-                              margin: "0 auto 10px",
-                              maxWidth: "700px",
-                              fontWeight: 700,
-                              fontSize: "1.15rem",
-                              textAlign: block.alignment || "left",
-                              color: landing.font_color_p || "#FFFFFF",
-                            }}
-                          >
-                            {block.text || "💎 List Heading Example"}
-                          </p>
-                        );
-
-                      case "paragraph":
-                        if (block.bulleted) {
-                          const lines = (block.text || "")
-                            .split(/\n/)
-                            .filter(Boolean);
-                          return (
-                            <ul
-                              key={index}
-                              style={{
-                                margin: "0 auto 24px",
-                                maxWidth: "700px",
-                                color: landing.font_color_p || "#DDDDDD",
-                                textAlign: block.alignment || "left",
-                                lineHeight: "1.8",
-                                listStyle: "disc",
-                                paddingLeft: "1.5rem",
-                              }}
-                            >
-                              {lines.map((line, i) => (
-                                <li key={i}>{line}</li>
-                              ))}
-                            </ul>
-                          );
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        textAlign: block.alignment || "center",
+                        margin: "40px auto",
+                      }}
+                    >
+                      <a
+                        href={referralUrl}
+                        style={{
+                          display: "inline-block",
+                          background: block.button_color || "#7bed9f",
+                          color: block.text_color || "#000000",
+                          padding: "14px 36px",
+                          borderRadius: "10px",
+                          fontWeight: 700,
+                          textDecoration: "none",
+                          boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                          transition: "transform 0.25s ease",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.transform = "scale(1.05)")
                         }
-
-                        return (
-                          <p
-                            key={index}
-                            className="text-lg leading-relaxed"
-                            style={{
-                              margin: "0 auto 24px",
-                              maxWidth: "700px",
-                              color: landing.font_color_p || "#DDDDDD",
-                              textAlign: block.alignment || "left",
-                            }}
-                          >
-                            {block.text || "Your paragraph will appear here."}
-                          </p>
-                        );
-
-                      case "video":
-                        if (!block.url) return null;
-
-                        let embedUrl = block.url.trim();
-
-                        if (embedUrl.includes("watch?v=")) {
-                          embedUrl = embedUrl.replace("watch?v=", "embed/");
-                        } else if (embedUrl.includes("youtu.be/")) {
-                          const id = embedUrl
-                            .split("youtu.be/")[1]
-                            .split(/[?&]/)[0];
-                          embedUrl = `https://www.youtube.com/embed/${id}`;
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.transform = "scale(1)")
                         }
+                      >
+                        {block.text || "Sign Up with My Referral"}
+                      </a>
 
-                        if (
-                          embedUrl.includes("vimeo.com") &&
-                          !embedUrl.includes("player.vimeo.com")
-                        ) {
-                          const id = embedUrl
-                            .split("vimeo.com/")[1]
-                            .split(/[?&]/)[0];
-                          embedUrl = `https://player.vimeo.com/video/${id}`;
-                        }
+                      <p
+                        style={{
+                          color: "#aaa",
+                          fontSize: "0.8rem",
+                          marginTop: "10px",
+                        }}
+                      >
+                        {`Referral link: ${referralUrl}`}
+                      </p>
+                    </div>
+                  );
 
-                        return (
+                case "verified_reviews":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        background: block.bg_color || "rgba(0,0,0,0.3)",
+                        color: block.text_color || "#FFFFFF",
+                        textAlign: block.alignment || "center",
+                        padding: "40px",
+                        borderRadius: "20px",
+                        marginTop: "40px",
+                      }}
+                    >
+                      <h2
+                        style={{
+                          fontSize: "1.8rem",
+                          fontWeight: 700,
+                          marginBottom: "10px",
+                        }}
+                      >
+                        {block.title || "Verified Buyer Reviews"}
+                      </h2>
+                      <p style={{ color: "#AAA", fontSize: "0.95rem" }}>
+                        (Buyers who purchased will be able to leave reviews
+                        here)
+                      </p>
+                      <div
+                        style={{
+                          marginTop: "20px",
+                          background: "rgba(255,255,255,0.08)",
+                          padding: "20px",
+                          borderRadius: "10px",
+                          color: "#CCC",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        ★★★★★ “Love this product!”
+                        <br />
+                        <span style={{ fontSize: "0.8rem", color: "#999" }}>
+                          — Verified Buyer, sample preview
+                        </span>
+                      </div>
+                    </div>
+                  );
+
+                case "faq":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        background: block.use_no_bg
+                          ? "transparent"
+                          : block.use_gradient
+                            ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                                block.gradient_start || "#F285C3"
+                              }, ${block.gradient_end || "#7bed9f"})`
+                            : block.match_main_bg
+                              ? adjustForLandingOverlay(bgTheme)
+                              : block.bg_color || bgTheme || "rgba(0,0,0,0.3)",
+                        color: block.text_color || "#FFFFFF",
+                        padding: "40px",
+                        borderRadius: block.use_no_bg ? "0px" : "20px",
+                        marginTop: "40px",
+                        textAlign: block.alignment || "left",
+                        maxWidth: "700px",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                      }}
+                    >
+                      <h2
+                        style={{
+                          fontSize: "1.8rem",
+                          fontWeight: 700,
+                          marginBottom: "20px",
+                        }}
+                      >
+                        {block.title || "Frequently Asked Questions"}
+                      </h2>
+
+                      {block.items.map((item, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            marginBottom: "20px",
+                            borderBottom: block.use_no_bg
+                              ? "1px solid rgba(255,255,255,0.2)"
+                              : "1px solid rgba(255,255,255,0.15)",
+                            paddingBottom: "16px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            const updated = [...block.items];
+                            const el = document.getElementById(
+                              `faq-prev-${index}-${i}`
+                            );
+                            if (el) updated[i]._height = el.scrollHeight + "px";
+                            updated[i].open = !updated[i].open;
+                            updateBlock(index, "items", updated);
+                          }}
+                        >
                           <div
-                            key={index}
                             style={{
-                              margin: "40px auto",
-                              maxWidth: "800px",
-                              textAlign: "center",
-                            }}
-                          >
-                            <iframe
-                              src={embedUrl}
-                              title="Embedded Video"
-                              style={{
-                                width: "100%",
-                                aspectRatio: "16 / 9",
-                                border: "none",
-                                borderRadius: "12px",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-                              }}
-                              allow="autoplay; fullscreen"
-                              allowFullScreen
-                            ></iframe>
-
-                            {block.caption && (
-                              <p
-                                style={{
-                                  marginTop: "12px",
-                                  fontSize: "0.95rem",
-                                  color: landing.font_color_p || "#DDD",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                {block.caption}
-                              </p>
-                            )}
-                          </div>
-                        );
-
-                      case "spacer":
-                        if (block.style === "space") {
-                          return (
-                            <div
-                              key={index}
-                              style={{
-                                height: `${block.height || 40}px`,
-                              }}
-                            ></div>
-                          );
-                        }
-                        return (
-                          <hr
-                            key={index}
-                            style={{
-                              border: "none",
-                              borderTop: `1px solid ${block.color || "rgba(255,255,255,0.2)"}`,
-                              width: block.width || "60%",
-                              margin: `${(block.height || 40) / 2}px auto`,
-                              opacity: 0.7,
-                            }}
-                          />
-                        );
-
-                      case "calendly":
-                        if (!block.calendly_url) return null;
-
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              margin: "40px auto",
-                              maxWidth: "900px",
-                              textAlign: "center",
-                            }}
-                          >
-                            <iframe
-                              src={block.calendly_url}
-                              style={{
-                                width: "100%",
-                                height: `${block.height || 650}px`,
-                                border: "none",
-                                borderRadius: "12px",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-                              }}
-                              title="Calendly Scheduler"
-                            ></iframe>
-                          </div>
-                        );
-
-                      case "social_links":
-                        const align = block.alignment || "center";
-                        const iconColor = block.icon_color || "#ffffff";
-                        const links = block.links || {};
-
-                        const iconSet = {
-                          instagram:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg",
-                          threads:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/threads.svg",
-                          twitter:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg",
-                          youtube:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg",
-                          linkedin:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg",
-                          facebook:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
-                          tiktok:
-                            "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
-                        };
-
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              textAlign: align,
-                              margin: "40px 0",
                               display: "flex",
-                              justifyContent:
-                                align === "center"
-                                  ? "center"
-                                  : align === "right"
-                                    ? "flex-end"
-                                    : "flex-start",
-                              gap: "20px",
-                              flexWrap: "wrap",
+                              justifyContent: "space-between",
+                              fontWeight: 700,
+                              fontSize: "1.1rem",
                             }}
                           >
-                            {Object.entries(links)
-                              .filter(
-                                ([platform, url]) => url && iconSet[platform]
-                              )
-                              .map(([platform, url]) => (
-                                <a
-                                  key={platform}
-                                  href={url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={{
-                                    width: "38px",
-                                    height: "38px",
-                                    display: "inline-block",
-                                    transition:
-                                      "transform 0.25s ease, opacity 0.2s ease",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform =
-                                      "scale(1.1)";
-                                    e.currentTarget.style.opacity = "0.9";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform =
-                                      "scale(1)";
-                                    e.currentTarget.style.opacity = "1";
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      width: "100%",
-                                      height: "100%",
-                                      WebkitMask: `url(${iconSet[platform]}) no-repeat center / contain`,
-                                      mask: `url(${iconSet[platform]}) no-repeat center / contain`,
-                                      backgroundColor: iconColor, // ✅ exact chosen color
-                                      transition: "background-color 0.3s ease",
-                                    }}
-                                  />
-                                </a>
-                              ))}
+                            <span>{item.q}</span>
+                            <span>{item.open ? "−" : "+"}</span>
                           </div>
-                        );
 
-                      case "countdown":
-                        return (
                           <div
-                            key={index}
+                            id={`faq-prev-${index}-${i}`}
                             style={{
-                              margin: "40px auto",
-                              textAlign: block.alignment || "center",
-                              color: block.text_color || "#FFFFFF",
-                            }}
-                          >
-                            <p
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "1.5rem",
-                                marginBottom: "10px",
-                              }}
-                            >
-                              {block.text || "Offer Ends In:"}
-                            </p>
-                            <CountdownTimerPreview
-                              targetDate={block.target_date}
-                              variant={block.style_variant}
-                              bgTheme={bgTheme}
-                            />
-                          </div>
-                        );
-
-                      case "stripe_checkout":
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              textAlign: block.alignment || "center",
-                              margin: "40px auto",
-                            }}
-                          >
-                            <button
-                              onClick={async () => {
-                                if (!block.pdf_url) {
-                                  toast.warn(
-                                    "Please select a PDF to sell first."
-                                  );
-                                  return;
-                                }
-
-                                try {
-                                  const res = await axiosInstance.post(
-                                    "/seller-checkout/create-checkout-session",
-                                    {
-                                      landingPageId: landing.id,
-                                      sellerId: user?.id,
-                                      pdfUrl: block.pdf_url,
-                                      price_in_cents: Math.round(
-                                        (block.price || 10) * 100
-                                      ),
-                                    }
-                                  );
-
-                                  if (res.data?.url)
-                                    window.location.href = res.data.url;
-                                  else
-                                    toast.error(
-                                      "Unable to start checkout. Please try again."
-                                    );
-                                } catch (err) {
-                                  console.error("Stripe Checkout Error:", err);
-                                  toast.error(
-                                    "Error connecting to Stripe. Try again later."
-                                  );
-                                }
-                              }}
-                              className="transition-transform hover:scale-105"
-                              style={{
-                                background: block.button_color || "#7bed9f",
-                                color: block.text_color || "#000", // ✅ new text color
-                                padding: "14px 36px",
-                                borderRadius: "8px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                              }}
-                            >
-                              {block.button_text || "Buy & Download PDF"}
-                            </button>
-
-                            <p style={{ marginTop: "8px", color: "#aaa" }}>
-                              ${block.price?.toFixed(2) || "10.00"} USD
-                            </p>
-
-                            {block.pdf_url && (
-                              <p className="text-xs text-gray-400 mt-2">
-                                Selling:
-                                <a
-                                  href={block.pdf_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-green font-medium ml-1 underline hover:text-green transition"
-                                >
-                                  Preview PDF
-                                </a>
-                              </p>
-                            )}
-                          </div>
-                        );
-
-                      case "referral_button":
-                        // only allow employees to have active referral links
-                        if (user?.is_admin_employee !== 1) {
-                          return (
-                            <p
-                              key={index}
-                              style={{
-                                color: "#999",
-                                fontSize: "0.9rem",
-                                textAlign: "center",
-                                marginTop: "20px",
-                              }}
-                            >
-                              (Referral buttons are available to admin employees
-                              only)
-                            </p>
-                          );
-                        }
-
-                        const referralUrl = `https://cre8tlystudio.com/signup?ref_employee=${user?.id}`;
-
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              textAlign: block.alignment || "center",
-                              margin: "40px auto",
-                            }}
-                          >
-                            <a
-                              href={referralUrl}
-                              style={{
-                                display: "inline-block",
-                                background: block.button_color || "#7bed9f",
-                                color: block.text_color || "#000000",
-                                padding: "14px 36px",
-                                borderRadius: "10px",
-                                fontWeight: 700,
-                                textDecoration: "none",
-                                boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-                                transition: "transform 0.25s ease",
-                              }}
-                              onMouseOver={(e) =>
-                                (e.currentTarget.style.transform =
-                                  "scale(1.05)")
-                              }
-                              onMouseOut={(e) =>
-                                (e.currentTarget.style.transform = "scale(1)")
-                              }
-                            >
-                              {block.text || "Sign Up with My Referral"}
-                            </a>
-
-                            <p
-                              style={{
-                                color: "#aaa",
-                                fontSize: "0.8rem",
-                                marginTop: "10px",
-                              }}
-                            >
-                              {`Referral link: ${referralUrl}`}
-                            </p>
-                          </div>
-                        );
-
-                      case "verified_reviews":
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              background: block.bg_color || "rgba(0,0,0,0.3)",
-                              color: block.text_color || "#FFFFFF",
-                              textAlign: block.alignment || "center",
-                              padding: "40px",
-                              borderRadius: "20px",
-                              marginTop: "40px",
-                            }}
-                          >
-                            <h2
-                              style={{
-                                fontSize: "1.8rem",
-                                fontWeight: 700,
-                                marginBottom: "10px",
-                              }}
-                            >
-                              {block.title || "Verified Buyer Reviews"}
-                            </h2>
-                            <p style={{ color: "#AAA", fontSize: "0.95rem" }}>
-                              (Buyers who purchased will be able to leave
-                              reviews here)
-                            </p>
-                            <div
-                              style={{
-                                marginTop: "20px",
-                                background: "rgba(255,255,255,0.08)",
-                                padding: "20px",
-                                borderRadius: "10px",
-                                color: "#CCC",
-                                fontStyle: "italic",
-                              }}
-                            >
-                              ★★★★★ “Love this product!”
-                              <br />
-                              <span
-                                style={{ fontSize: "0.8rem", color: "#999" }}
-                              >
-                                — Verified Buyer, sample preview
-                              </span>
-                            </div>
-                          </div>
-                        );
-
-                      case "faq":
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              background: block.use_no_bg
-                                ? "transparent"
-                                : block.use_gradient
-                                  ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                                      block.gradient_start || "#F285C3"
-                                    }, ${block.gradient_end || "#7bed9f"})`
-                                  : block.match_main_bg
-                                    ? adjustForLandingOverlay(bgTheme)
-                                    : block.bg_color ||
-                                      bgTheme ||
-                                      "rgba(0,0,0,0.3)",
-                              color: block.text_color || "#FFFFFF",
-                              padding: "40px",
-                              borderRadius: block.use_no_bg ? "0px" : "20px",
-                              marginTop: "40px",
-                              textAlign: block.alignment || "left",
-                              maxWidth: "700px",
-                              marginLeft: "auto",
-                              marginRight: "auto",
-                            }}
-                          >
-                            <h2
-                              style={{
-                                fontSize: "1.8rem",
-                                fontWeight: 700,
-                                marginBottom: "20px",
-                              }}
-                            >
-                              {block.title || "Frequently Asked Questions"}
-                            </h2>
-
-                            {block.items.map((item, i) => (
-                              <div
-                                key={i}
-                                style={{
-                                  marginBottom: "20px",
-                                  borderBottom: block.use_no_bg
-                                    ? "1px solid rgba(255,255,255,0.2)"
-                                    : "1px solid rgba(255,255,255,0.15)",
-                                  paddingBottom: "16px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => {
-                                  const updated = [...block.items];
-                                  const el = document.getElementById(
-                                    `faq-prev-${index}-${i}`
-                                  );
-                                  if (el)
-                                    updated[i]._height = el.scrollHeight + "px";
-                                  updated[i].open = !updated[i].open;
-                                  updateBlock(index, "items", updated);
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    fontWeight: 700,
-                                    fontSize: "1.1rem",
-                                  }}
-                                >
-                                  <span>{item.q}</span>
-                                  <span>{item.open ? "−" : "+"}</span>
-                                </div>
-
-                                <div
-                                  id={`faq-prev-${index}-${i}`}
-                                  style={{
-                                    height: item.open
-                                      ? item._height || "auto"
-                                      : "0px",
-                                    overflow: "hidden",
-                                    transition: "height 0.35s ease",
-                                  }}
-                                >
-                                  <p
-                                    style={{
-                                      color: block.text_color
-                                        ? block.text_color + "CC"
-                                        : "#CCCCCC",
-                                      fontSize: "0.95rem",
-                                      marginTop: "12px",
-                                    }}
-                                  >
-                                    {item.a}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        );
-
-                      case "image":
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              textAlign: block.alignment || "center",
-                              padding: block.padding
-                                ? `${block.padding}px`
+                              height: item.open
+                                ? item._height || "auto"
                                 : "0px",
-                              margin: "20px 0",
-                              overflow: "visible",
+                              overflow: "hidden",
+                              transition: "height 0.35s ease",
                             }}
                           >
-                            <img
-                              src={block.image_url}
-                              alt=""
-                              className="rounded-lg"
+                            <p
                               style={{
-                                maxWidth: block.full_width ? "100%" : "500px",
-                                width: "100%",
-                                height: "auto",
-                                objectFit: "contain",
-                                display: "block",
-                                margin: "0 auto",
-                                boxShadow: block.shadow
-                                  ? (() => {
-                                      const angle =
-                                        ((block.shadow_angle || 135) *
-                                          Math.PI) /
-                                        180;
-                                      const offsetX = Math.round(
-                                        Math.cos(angle) *
-                                          (block.shadow_offset || 10)
-                                      );
-                                      const offsetY = Math.round(
-                                        Math.sin(angle) *
-                                          (block.shadow_offset || 10)
-                                      );
-                                      return `${offsetX}px ${offsetY}px ${
-                                        block.shadow_depth || 25
-                                      }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
-                                    })()
-                                  : "none",
+                                color: block.text_color
+                                  ? block.text_color + "CC"
+                                  : "#CCCCCC",
+                                fontSize: "0.95rem",
+                                marginTop: "12px",
                               }}
-                            />
-
-                            {block.caption && (
-                              <p
-                                className="mt-3 text-gray-300 text-sm italic"
-                                style={{
-                                  textAlign: block.alignment || "center",
-                                }}
-                              >
-                                {block.caption}
-                              </p>
-                            )}
+                            >
+                              {item.a}
+                            </p>
                           </div>
-                        );
+                        </div>
+                      ))}
+                    </div>
+                  );
 
-                      default:
-                        return null;
-                    }
-                  })
-                ) : (
-                  <p className="text-gray-400 italic">
-                    Start adding sections to preview your landing page...
-                  </p>
-                )}
+                case "image":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        textAlign: block.alignment || "center",
+                        padding: block.padding ? `${block.padding}px` : "0px",
+                        margin: "20px 0",
+                        overflow: "visible",
+                      }}
+                    >
+                      <img
+                        src={block.image_url}
+                        alt=""
+                        className="rounded-lg"
+                        style={{
+                          maxWidth: block.full_width ? "100%" : "500px",
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "contain",
+                          display: "block",
+                          margin: "0 auto",
+                          boxShadow: block.shadow
+                            ? (() => {
+                                const angle =
+                                  ((block.shadow_angle || 135) * Math.PI) / 180;
+                                const offsetX = Math.round(
+                                  Math.cos(angle) * (block.shadow_offset || 10)
+                                );
+                                const offsetY = Math.round(
+                                  Math.sin(angle) * (block.shadow_offset || 10)
+                                );
+                                return `${offsetX}px ${offsetY}px ${
+                                  block.shadow_depth || 25
+                                }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
+                              })()
+                            : "none",
+                        }}
+                      />
+
+                      {block.caption && (
+                        <p
+                          className="mt-3 text-gray-300 text-sm italic"
+                          style={{
+                            textAlign: block.alignment || "center",
+                          }}
+                        >
+                          {block.caption}
+                        </p>
+                      )}
+                    </div>
+                  );
+
+                default:
+                  return null;
+              }
+            })
+          ) : (
+            <p className="text-gray-400 italic">
+              Start adding sections to preview your landing page...
+            </p>
+          )}
         </div>
       </div>
     </div>

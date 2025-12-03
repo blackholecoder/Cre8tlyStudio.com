@@ -31,6 +31,7 @@ function SortableBlock({
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -49,6 +50,61 @@ function SortableBlock({
     return brightness > 160 ? "#1f2937" : "#f3f4f6";
   };
 
+function getBlockLabel(block) {
+  switch (block.type) {
+    case "heading":
+    case "subheading":
+    case "subsubheading":
+    case "list_heading":
+      return block.text?.slice(0, 40) || "(empty heading)";
+
+    case "paragraph":
+      return block.text?.slice(0, 40) || "(empty paragraph)";
+
+    case "offer_banner":
+      return block.button_text?.slice(0, 30) || "(no button text)";
+
+    case "divider":
+      return block.style === "space"
+        ? `space • ${block.height || 40}px`
+        : `line • ${block.color || "#fff"} • ${block.height || 40}px`;
+
+    case "image":
+      return block.image_url
+        ? block.image_url.split("/").pop().slice(0, 30)
+        : "(no image)";
+
+    case "social_links":
+      return `${Object.values(block.links || {}).filter(Boolean).length} links`;
+
+    case "video":
+      return block.url?.slice(0, 35) || "(no video URL)";
+
+    case "faq":
+      return `${block.items?.length || 0} questions`;
+
+    case "stripe_checkout":
+      return `$${block.price || 10} • checkout`;
+
+    case "calendly":
+      return block.calendly_url?.slice(0, 35) || "(no url)";
+
+    case "verified_reviews":
+      return block.title?.slice(0, 30) || "(reviews section)";
+
+    case "countdown":
+      return block.text?.slice(0, 30) || "(countdown timer)";
+
+    case "referral_button":
+      return block.text?.slice(0, 30) || "(referral button)";
+
+    default:
+      return "";
+  }
+}
+
+
+
   return (
     <div
       ref={setNodeRef}
@@ -56,6 +112,7 @@ function SortableBlock({
       className="mb-6 bg-black/70 border border-gray-600 hover:border-gray-400 
                  rounded-xl p-5 relative shadow-inner text-white transition-all duration-300"
     >
+      
       {/* 🧩 Drag Handle */}
       <div
         {...attributes}
@@ -69,20 +126,29 @@ function SortableBlock({
 
       {/* 🧩 Collapse / Expand Header */}
       <div
-        className="flex items-center justify-between cursor-pointer mb-3"
-        onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
-      >
-        <h3 className="font-semibold text-lg text-green capitalize">
-          {block.type.replace("_", " ")} Block
-        </h3>
-        <span
-          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-            block.collapsed ? "rotate-0" : "rotate-180"
-          }`}
-        >
-          ▼
-        </span>
-      </div>
+  className="flex items-center justify-between cursor-pointer mb-3"
+  onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
+>
+  <div className="flex flex-col">
+    <h3 className="font-semibold text-lg text-green capitalize">
+      {block.type.replace("_", " ")} Block
+    </h3>
+
+    {/* 👇 Add the preview label here */}
+    <span className="text-xs text-gray-400 italic mt-0.5">
+      {getBlockLabel(block)}
+    </span>
+  </div>
+
+  <span
+    className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+      block.collapsed ? "rotate-0" : "rotate-180"
+    }`}
+  >
+    ▼
+  </span>
+</div>
+
 
       {/* 🪄 Editable Fields (Collapsible) */}
       <div

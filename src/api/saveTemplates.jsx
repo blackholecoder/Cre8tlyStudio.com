@@ -1,12 +1,23 @@
 import axiosInstance from "../api/axios";
 
-export async function saveTemplate(landingPageId, name, snapshot) {
+export async function saveTemplate(landingPageId, name, snapshot, versionId = null) {
   try {
+    if (versionId) {
+      // UPDATE EXISTING VERSION
+      const res = await axiosInstance.put(
+        `/landing/update-template/${versionId}`,
+        { name, snapshot }
+      );
+      return res.data;
+    }
+
+    // CREATE NEW VERSION
     const res = await axiosInstance.post(
       `/landing/save-template/${landingPageId}`,
       { name, snapshot }
     );
     return res.data;
+
   } catch (err) {
     console.error("❌ saveTemplate error:", err);
     return { success: false };

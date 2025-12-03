@@ -48,8 +48,11 @@ export default function LandingPageBuilder() {
 
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState("");
+  const [appliedVersion, setAppliedVersion] = useState(""); 
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [templateName, setTemplateName] = useState("");
+
+  const [blocksHidden, setBlocksHidden] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -293,27 +296,32 @@ export default function LandingPageBuilder() {
   };
 
   const handleApplyVersion = async () => {
-    if (!selectedVersion) {
-      toast.error("Select a version first.");
-      return;
-    }
+  if (!selectedVersion) {
+    toast.error("Select a version first.");
+    return;
+  }
 
-    const snapshotRes = await fetchTemplateSnapshot(selectedVersion);
-    if (!snapshotRes.success) {
-      toast.error("Could not fetch snapshot.");
-      return;
-    }
+  const snapshotRes = await fetchTemplateSnapshot(selectedVersion);
+  if (!snapshotRes.success) {
+    toast.error("Could not fetch snapshot.");
+    return;
+  }
 
-    const applyRes = await restoreTemplate(landing.id, snapshotRes.snapshot);
+  const applyRes = await restoreTemplate(landing.id, snapshotRes.snapshot);
 
-    if (applyRes.success) {
-      toast.success("Template restored successfully!");
-      // refresh landing page
-      refreshLanding();
-    } else {
-      toast.error("Failed to apply template");
-    }
-  };
+  if (applyRes.success) {
+    toast.success("Template restored successfully!");
+
+    // Mark this version as the currently applied one
+    setAppliedVersion(selectedVersion);
+
+    // Reload the landing page so UI reflects changes
+    refreshLanding();
+  } else {
+    toast.error("Failed to apply template");
+  }
+};
+
 
   async function handleDeleteVersion() {
     toast.dismiss(); // clear any stacked toasts
@@ -596,27 +604,67 @@ export default function LandingPageBuilder() {
     }
   };
 
-  const handleSaveTemplate = async () => {
-    setShowSaveModal(true); // open modal instead of prompt
-  };
+const handleSaveTemplate = () => {
+  // If a version is selected, preload its real name
+  if (selectedVersion) {
+    const existing = versions.find(v => v.id === selectedVersion);
 
-  const confirmSaveTemplate = async () => {
-    if (!templateName.trim()) {
-      toast.error("Please enter a name");
-      return;
+    if (existing) {
+      setTemplateName(existing.name); // preload real version name
     }
+  } else {
+    // No version selected — user is working on an unsaved version
+    setTemplateName(`Version ${versions.length + 1}`);
+  }
 
-    const res = await saveTemplate(landing.id, templateName.trim(), landing);
+  setShowSaveModal(true);
+};
 
-    if (res.success) {
-      toast.success("Template version saved!");
-      loadVersions();
-      setShowSaveModal(false);
-      setTemplateName("");
-    } else {
-      toast.error("Could not save version.");
-    }
-  };
+
+
+
+
+
+const confirmSaveTemplate = async () => {
+  const trimmed = templateName.trim();
+  if (!trimmed) {
+    toast.error("Please enter a name");
+    return;
+  }
+
+  // See if this name already exists
+  const existing = versions.find(v => v.name === trimmed);
+
+  let res;
+
+  if (existing) {
+    // UPDATE EXISTING VERSION
+    res = await saveTemplate(
+      landing.id,
+      trimmed,
+      landing,
+      existing.id // <-- version ID for update
+    );
+  } else {
+    // CREATE NEW VERSION
+    res = await saveTemplate(
+      landing.id,
+      trimmed,
+      landing
+    );
+  }
+
+  if (res.success) {
+    toast.success(existing ? "Version updated!" : "New version saved!");
+    loadVersions();
+    setShowSaveModal(false);
+    setTemplateName("");
+  } else {
+    toast.error("Could not save version.");
+  }
+};
+
+
 
   // 🎨 Determine the selected background theme
   const selectedTheme =
@@ -638,6 +686,8 @@ export default function LandingPageBuilder() {
         <VersionControls
           versions={versions}
           selectedVersion={selectedVersion}
+          setSelectedVersion={setSelectedVersion} 
+          appliedVersion={appliedVersion}
           handleLoadVersion={handleLoadVersion}
           handleApplyVersion={handleApplyVersion}
           handleDeleteVersion={handleDeleteVersion}
@@ -689,8 +739,30 @@ export default function LandingPageBuilder() {
             <div className="flex justify-end mb-6">
               <AddSectionButton addBlock={addBlock} />
             </div>
+            {/* 🔽 Collapse / Expand All Blocks */}
+<div
+  className="cursor-pointer bg-black/80 text-white px-4 py-3 rounded-lg border border-gray-600 mb-4 flex justify-between items-center"
+  onClick={() => setBlocksHidden(!blocksHidden)}
+>
+  <span className="font-semibold">
+    {blocksHidden ? "Open All Blocks" : "Hide All Blocks"}
+  </span>
+
+  <span
+    className={`transform transition-transform ${
+      blocksHidden ? "rotate-0" : "rotate-180"
+    }`}
+  >
+    ▼
+  </span>
+</div>
+
+
+
+
             {/* DndContext */}
             <div className="space-y-4 mb-28">
+              {!blocksHidden && (
               <DndContext
                 collisionDetection={closestCenter}
                 onDragEnd={({ active, over }) => {
@@ -733,6 +805,7 @@ export default function LandingPageBuilder() {
                     ))}
                 </SortableContext>
               </DndContext>
+              )}
             </div>
           </div>
 

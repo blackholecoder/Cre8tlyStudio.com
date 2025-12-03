@@ -797,12 +797,20 @@ export default function PreviewPanel({
                         alt=""
                         className="rounded-lg"
                         style={{
-                          maxWidth: block.full_width ? "100%" : "500px",
+                          maxWidth: block.full_width
+                            ? "100%"
+                            : block.width
+                              ? `${block.width}%`
+                              : "100%",
                           width: "100%",
                           height: "auto",
                           objectFit: "contain",
                           display: "block",
                           margin: "0 auto",
+                          padding: block.padding ? `${block.padding}px` : "0px",
+                          borderRadius: block.radius
+                            ? `${block.radius}px`
+                            : "0px",
                           boxShadow: block.shadow
                             ? (() => {
                                 const angle =
@@ -833,6 +841,148 @@ export default function PreviewPanel({
                       )}
                     </div>
                   );
+
+                case "feature_offers_3": {
+  const items = block.items || [];
+
+  return (
+    <div
+      key={index}
+      style={{
+        background: block.use_no_bg
+          ? "transparent"
+          : block.use_gradient
+          ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+              block.gradient_start || "#F285C3"
+            }, ${block.gradient_end || "#7bed9f"})`
+          : block.match_main_bg
+          ? adjustForLandingOverlay(bgTheme)
+          : block.bg_color || bgTheme,
+
+        padding: "40px 20px",
+        borderRadius: block.use_no_bg ? "0px" : "20px",
+        marginTop: "40px",
+        maxWidth: "1100px",
+        minHeight: "200px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        transition: "all 0.25s ease",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "24px",
+        }}
+      >
+        {items.map((item, i) => {
+          const imageToShow = item.use_pdf_cover
+  ? item.cover_url || item.image_url || null
+  : item.image_url || item.cover_url || null;
+
+          return (
+            <div
+              key={i}
+              style={{
+                background: "rgba(0,0,0,0.45)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "16px",
+                padding: "20px",
+                textAlign: "center",
+              }}
+            >
+              {/* IMAGE */}
+              {imageToShow ? (
+                <img
+                  src={imageToShow}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    borderRadius: "12px",
+                    marginBottom: "16px",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    background: "rgba(255,255,255,0.05)",
+                    borderRadius: "12px",
+                    marginBottom: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  No Image
+                </div>
+              )}
+
+              {/* TITLE */}
+              <h3
+                style={{
+                  color: "white",
+                  fontSize: "1.25rem",
+                  fontWeight: 700,
+                  marginBottom: "8px",
+                }}
+              >
+                {item.title || "Offer Title"}
+              </h3>
+
+              {/* DESCRIPTION */}
+              <p
+                style={{
+                  color: "rgba(255,255,255,0.75)",
+                  fontSize: "0.95rem",
+                  marginBottom: "14px",
+                }}
+              >
+                {item.text || ""}
+              </p>
+
+              {/* PRICE */}
+              {item.price ? (
+                <p
+                  style={{
+                    color: "white",
+                    fontWeight: 800,
+                    fontSize: "1.3rem",
+                    marginBottom: "16px",
+                  }}
+                >
+                  ${Number(item.price).toFixed(2)}
+                </p>
+              ) : null}
+
+              {/* BUTTON */}
+              <button
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                  background: item.button_color || "#22c55e",
+                  color: block.button_text_color || "#000000",
+                  fontSize: "1rem",
+                }}
+              >
+                {item.button_text || "Buy Now"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
                 default:
                   return null;

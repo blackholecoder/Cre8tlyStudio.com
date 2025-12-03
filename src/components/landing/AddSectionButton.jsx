@@ -30,6 +30,7 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Countdown Timer", value: "countdown" },
     { label: "Social Links Row", value: "social_links" }, 
     { label: "Stripe Checkout", value: "stripe_checkout" }, 
+    { label: "Offer Grid", value: "feature_offers_3" },
     { label: "Verified Reviews ⭐", value: "verified_reviews" }, 
     { label: "FAQ Accordion ❓", value: "faq" },
     { label: "Image", value: "image" }

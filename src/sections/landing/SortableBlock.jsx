@@ -17,6 +17,29 @@ import StripeCheckoutBlock from "../../components/landing/blocks/types/StripeChe
 import ReferralButtonBlock from "../../components/landing/blocks/types/ReferralButtonBlock";
 import FAQBlock from "../../components/landing/blocks/types/FAQBlock";
 import ImageBlock from "../../components/landing/blocks/types/ImageBlock";
+import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOffers3Block";
+
+
+const BLOCK_LABELS = {
+  heading: "Heading (H1)",
+  subheading: "Subheading (H2)",
+  subsubheading: "Sub-Subheading (H3)",
+  list_heading: "List Heading",
+  paragraph: "Paragraph",
+  video: "Video",
+  divider: "Divider",
+  offer_banner: "Offer Banner",
+  calendly: "Calendly",
+  countdown: "Countdown Timer",
+  social_links: "Social Links Row",
+  stripe_checkout: "Stripe Checkout",
+  feature_offers_3: "Offer Grid",
+  verified_reviews: "Verified Reviews",
+  faq: "FAQ Accordion",
+  image: "Image",
+  referral_button: "Referral Button",
+};
+
 
 function SortableBlock({
   id,
@@ -30,7 +53,6 @@ function SortableBlock({
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
-
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -50,60 +72,61 @@ function SortableBlock({
     return brightness > 160 ? "#1f2937" : "#f3f4f6";
   };
 
-function getBlockLabel(block) {
-  switch (block.type) {
-    case "heading":
-    case "subheading":
-    case "subsubheading":
-    case "list_heading":
-      return block.text?.slice(0, 40) || "(empty heading)";
+  function getBlockLabel(block) {
+    switch (block.type) {
+      case "heading":
+      case "subheading":
+      case "subsubheading":
+      case "list_heading":
+        return block.text?.slice(0, 70) || "(empty heading)";
 
-    case "paragraph":
-      return block.text?.slice(0, 40) || "(empty paragraph)";
+      case "paragraph":
+        return block.text?.slice(0, 70) || "(empty paragraph)";
 
-    case "offer_banner":
-      return block.button_text?.slice(0, 30) || "(no button text)";
+      case "offer_banner":
+        return block.button_text?.slice(0, 70) || "(no button text)";
 
-    case "divider":
-      return block.style === "space"
-        ? `space • ${block.height || 40}px`
-        : `line • ${block.color || "#fff"} • ${block.height || 40}px`;
+      case "divider":
+        return block.style === "space"
+          ? `space • ${block.height || 40}px`
+          : `line • ${block.color || "#fff"} • ${block.height || 40}px`;
 
-    case "image":
-      return block.image_url
-        ? block.image_url.split("/").pop().slice(0, 30)
-        : "(no image)";
+      case "image":
+        return block.image_url
+          ? block.image_url.split("/").pop().slice(0, 30)
+          : "(no image)";
 
-    case "social_links":
-      return `${Object.values(block.links || {}).filter(Boolean).length} links`;
+      case "social_links":
+        return `${Object.values(block.links || {}).filter(Boolean).length} links`;
 
-    case "video":
-      return block.url?.slice(0, 35) || "(no video URL)";
+      case "video":
+        return block.url?.slice(0, 35) || "(no video URL)";
 
-    case "faq":
-      return `${block.items?.length || 0} questions`;
+      case "faq":
+        return `${block.items?.length || 0} questions`;
 
-    case "stripe_checkout":
-      return `$${block.price || 10} • checkout`;
+      case "stripe_checkout":
+        return `$${block.price || 10} • checkout`;
 
-    case "calendly":
-      return block.calendly_url?.slice(0, 35) || "(no url)";
+      case "calendly":
+        return block.calendly_url?.slice(0, 35) || "(no url)";
 
-    case "verified_reviews":
-      return block.title?.slice(0, 30) || "(reviews section)";
+      case "verified_reviews":
+        return block.title?.slice(0, 30) || "(reviews section)";
 
-    case "countdown":
-      return block.text?.slice(0, 30) || "(countdown timer)";
+      case "countdown":
+        return block.text?.slice(0, 30) || "(countdown timer)";
 
-    case "referral_button":
-      return block.text?.slice(0, 30) || "(referral button)";
+      case "referral_button":
+        return block.text?.slice(0, 30) || "(referral button)";
 
-    default:
-      return "";
+      case "feature_offers_3":
+        return `${(block.items || []).length} offer cards`;
+
+      default:
+        return "";
+    }
   }
-}
-
-
 
   return (
     <div
@@ -112,7 +135,6 @@ function getBlockLabel(block) {
       className="mb-6 bg-black/70 border border-gray-600 hover:border-gray-400 
                  rounded-xl p-5 relative shadow-inner text-white transition-all duration-300"
     >
-      
       {/* 🧩 Drag Handle */}
       <div
         {...attributes}
@@ -126,29 +148,28 @@ function getBlockLabel(block) {
 
       {/* 🧩 Collapse / Expand Header */}
       <div
-  className="flex items-center justify-between cursor-pointer mb-3"
-  onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
->
-  <div className="flex flex-col">
-    <h3 className="font-semibold text-lg text-green capitalize">
-      {block.type.replace("_", " ")} Block
-    </h3>
+        className="flex items-center justify-between cursor-pointer mb-3"
+        onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
+      >
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg text-green capitalize">
+            {BLOCK_LABELS[block.type] || "Block"}
+          </h3>
 
-    {/* 👇 Add the preview label here */}
-    <span className="text-xs text-gray-400 italic mt-0.5">
-      {getBlockLabel(block)}
-    </span>
-  </div>
+          {/* 👇 Add the preview label here */}
+          <span className="text-xs text-gray-400 italic mt-0.5">
+            {getBlockLabel(block)}
+          </span>
+        </div>
 
-  <span
-    className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-      block.collapsed ? "rotate-0" : "rotate-180"
-    }`}
-  >
-    ▼
-  </span>
-</div>
-
+        <span
+          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+            block.collapsed ? "rotate-0" : "rotate-180"
+          }`}
+        >
+          ▼
+        </span>
+      </div>
 
       {/* 🪄 Editable Fields (Collapsible) */}
       <div
@@ -269,6 +290,17 @@ function getBlockLabel(block) {
               getLabelContrast={getLabelContrast}
               adjustForLandingOverlay={adjustForLandingOverlay}
               landing={landing}
+            />
+          )}
+
+          {block.type === "feature_offers_3" && (
+            <FeatureOffers3Block
+              block={block}
+              index={index}
+              updateBlock={updateBlock}
+              bgTheme={bgTheme}
+              landing={landing}
+              pdfList={pdfList}
             />
           )}
         </div>

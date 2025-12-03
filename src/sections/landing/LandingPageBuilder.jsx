@@ -210,6 +210,52 @@ export default function LandingPageBuilder() {
       newBlock.bg_color = "#000000";
     }
 
+    if (type === "feature_offers_3") {
+  newBlock.items = [
+  {
+    image_url: "",
+    cover_url: "",
+    title: "Offer One",
+    text: "Short description of this offer.",
+    price: 10,
+    button_text: "Buy Now",
+    button_color: "#22c55e",
+    pdf_url: "",
+    use_pdf_cover: false,
+  },
+  {
+    image_url: "",
+    cover_url: "",
+    title: "Offer Two",
+    text: "Short description of this offer.",
+    price: 20,
+    button_text: "Buy Now",
+    button_color: "#22c55e",
+    pdf_url: "",
+    use_pdf_cover: false,
+  },
+];
+
+  // Grid background & gradient controls
+  newBlock.bg_color = "rgba(0,0,0,0.4)";
+  newBlock.use_gradient = false;
+  newBlock.gradient_start = "#F285C3";
+  newBlock.gradient_end = "#7bed9f";
+  newBlock.gradient_direction = "90deg";
+  newBlock.match_main_bg = false;
+  newBlock.use_no_bg = false;
+
+  // Shared button text color for all three buttons
+  newBlock.button_text_color = "#000000";
+
+  newBlock.alignment = "center";
+  newBlock.padding = 20;
+  newBlock.collapsed = false;
+}
+
+
+
+
     setLanding((prev) => ({
       ...prev,
       content_blocks: [...(prev.content_blocks || []), newBlock],
@@ -321,7 +367,6 @@ export default function LandingPageBuilder() {
     toast.error("Failed to apply template");
   }
 };
-
 
   async function handleDeleteVersion() {
     toast.dismiss(); // clear any stacked toasts
@@ -620,11 +665,6 @@ const handleSaveTemplate = () => {
   setShowSaveModal(true);
 };
 
-
-
-
-
-
 const confirmSaveTemplate = async () => {
   const trimmed = templateName.trim();
   if (!trimmed) {
@@ -710,7 +750,7 @@ const confirmSaveTemplate = async () => {
                   if (landing.username?.trim()?.length >= 3) {
                     try {
                       const res = await axiosInstance.get(
-                        `https://cre8tlystudio.com/api/landing/check-username/${landing.username.trim()}`
+                        `/landing/check-username/${landing.username.trim()}`
                       );
                       toast[res.data.available ? "success" : "error"](
                         res.data.message

@@ -95,9 +95,7 @@ export default function ImageBlock({
           <input
             type="checkbox"
             checked={block.use_no_bg || false}
-            onChange={(e) =>
-              updateBlock(index, "use_no_bg", e.target.checked)
-            }
+            onChange={(e) => updateBlock(index, "use_no_bg", e.target.checked)}
           />
         </div>
       </div>
@@ -169,12 +167,12 @@ export default function ImageBlock({
           background: block.use_no_bg
             ? "transparent"
             : block.use_gradient
-            ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                block.gradient_start || "#F285C3"
-              }, ${block.gradient_end || "#7bed9f"})`
-            : block.match_main_bg
-            ? adjustForLandingOverlay(bgTheme)
-            : block.bg_color || "transparent",
+              ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+                  block.gradient_start || "#F285C3"
+                }, ${block.gradient_end || "#7bed9f"})`
+              : block.match_main_bg
+                ? adjustForLandingOverlay(bgTheme)
+                : block.bg_color || "transparent",
         }}
       >
         {!block.image_url ? (
@@ -198,7 +196,8 @@ export default function ImageBlock({
             </svg>
 
             <p className="mt-3 text-sm text-gray-400">
-              <span className="text-green font-medium">Click to upload</span> or drag image
+              <span className="text-green font-medium">Click to upload</span> or
+              drag image
             </p>
 
             <input
@@ -247,14 +246,24 @@ export default function ImageBlock({
               alt=""
               className="rounded-lg mx-auto"
               style={{
-                maxWidth: block.full_width ? "100%" : "500px",
+                maxWidth: block.full_width
+                  ? "100%"
+                  : block.width
+                    ? `${block.width}%`
+                    : "100%",
                 width: "100%",
                 padding: `${block.padding || 0}px`,
+                borderRadius: `${block.radius || 0}px`,
                 boxShadow: block.shadow
                   ? (() => {
-                      const angle = ((block.shadow_angle || 135) * Math.PI) / 180;
-                      const x = Math.round(Math.cos(angle) * (block.shadow_offset || 10));
-                      const y = Math.round(Math.sin(angle) * (block.shadow_offset || 10));
+                      const angle =
+                        ((block.shadow_angle || 135) * Math.PI) / 180;
+                      const x = Math.round(
+                        Math.cos(angle) * (block.shadow_offset || 10)
+                      );
+                      const y = Math.round(
+                        Math.sin(angle) * (block.shadow_offset || 10)
+                      );
                       return `${x}px ${y}px ${
                         block.shadow_depth || 25
                       }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
@@ -288,9 +297,48 @@ export default function ImageBlock({
         <input
           type="number"
           value={block.padding || 0}
-          onChange={(e) => updateBlock(index, "padding", Number(e.target.value))}
+          onChange={(e) =>
+            updateBlock(index, "padding", Number(e.target.value))
+          }
           className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
         />
+      </div>
+      {/* Image Width */}
+      <div className="mt-6">
+        <label
+          className="text-sm font-semibold"
+          style={{ color: getLabelContrast(block.bg_color || bgTheme) }}
+        >
+          Image Width (%)
+        </label>
+        <input
+          type="range"
+          min="10"
+          max="100"
+          value={block.width || 100}
+          onChange={(e) => updateBlock(index, "width", Number(e.target.value))}
+          className="w-full mt-2"
+        />
+        <p className="text-xs text-gray-400 mt-1">{block.width || 100}%</p>
+      </div>
+
+      {/* Border Radius */}
+      <div className="mt-6">
+        <label
+          className="text-sm font-semibold"
+          style={{ color: getLabelContrast(block.bg_color || bgTheme) }}
+        >
+          Rounded Corners (px)
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={block.radius || 0}
+          onChange={(e) => updateBlock(index, "radius", Number(e.target.value))}
+          className="w-full mt-2"
+        />
+        <p className="text-xs text-gray-400 mt-1">{block.radius || 0}px</p>
       </div>
 
       {/* Shadow controls */}
@@ -305,9 +353,7 @@ export default function ImageBlock({
           <input
             type="color"
             value={block.shadow_color || "#000000"}
-            onChange={(e) =>
-              updateBlock(index, "shadow_color", e.target.value)
-            }
+            onChange={(e) => updateBlock(index, "shadow_color", e.target.value)}
             className="w-full h-10 rounded cursor-pointer border border-gray-600 mt-1"
           />
         </div>
@@ -398,9 +444,7 @@ export default function ImageBlock({
         <input
           type="checkbox"
           checked={block.shadow || false}
-          onChange={(e) =>
-            updateBlock(index, "shadow", e.target.checked)
-          }
+          onChange={(e) => updateBlock(index, "shadow", e.target.checked)}
         />
       </div>
 
@@ -414,9 +458,7 @@ export default function ImageBlock({
         <input
           type="checkbox"
           checked={block.full_width || false}
-          onChange={(e) =>
-            updateBlock(index, "full_width", e.target.checked)
-          }
+          onChange={(e) => updateBlock(index, "full_width", e.target.checked)}
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
     "linkedin",
     "facebook",
     "tiktok",
+    "pinterest", 
   ];
 
   const iconMap = {
@@ -26,6 +27,8 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
     tiktok:
       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
+      pinterest:
+  "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pinterest.svg",
   };
 
   return (

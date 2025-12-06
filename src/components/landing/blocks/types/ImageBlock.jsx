@@ -241,36 +241,55 @@ export default function ImageBlock({
           </label>
         ) : (
           <div>
-            <img
-              src={block.image_url}
-              alt=""
-              className="rounded-lg mx-auto"
-              style={{
-                maxWidth: block.full_width
-                  ? "100%"
-                  : block.width
-                    ? `${block.width}%`
-                    : "100%",
-                width: "100%",
-                padding: `${block.padding || 0}px`,
-                borderRadius: `${block.radius || 0}px`,
-                boxShadow: block.shadow
-                  ? (() => {
-                      const angle =
-                        ((block.shadow_angle || 135) * Math.PI) / 180;
-                      const x = Math.round(
-                        Math.cos(angle) * (block.shadow_offset || 10)
-                      );
-                      const y = Math.round(
-                        Math.sin(angle) * (block.shadow_offset || 10)
-                      );
-                      return `${x}px ${y}px ${
-                        block.shadow_depth || 25
-                      }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
-                    })()
-                  : "none",
-              }}
-            />
+            {(() => {
+              const isPng =
+  block.image_url &&
+  block.image_url.toLowerCase().match(/\.png(\?.*)?$/);
+
+
+              return (
+                <div
+                  style={{
+                    background: isPng
+                      ? `repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 50% / 20px 20px`
+                      : "transparent",
+                    padding: "10px",
+                    borderRadius: `${block.radius || 0}px`,
+                  }}
+                >
+                  <img
+                    src={block.image_url}
+                    alt=""
+                    className="rounded-lg mx-auto"
+                    style={{
+                      maxWidth: block.full_width
+                        ? "100%"
+                        : block.width
+                          ? `${block.width}%`
+                          : "100%",
+                      width: "100%",
+                      padding: `${block.padding || 0}px`,
+                      borderRadius: `${block.radius || 0}px`,
+                      boxShadow: block.shadow
+                        ? (() => {
+                            const angle =
+                              ((block.shadow_angle || 135) * Math.PI) / 180;
+                            const x = Math.round(
+                              Math.cos(angle) * (block.shadow_offset || 10)
+                            );
+                            const y = Math.round(
+                              Math.sin(angle) * (block.shadow_offset || 10)
+                            );
+                            return `${x}px ${y}px ${
+                              block.shadow_depth || 25
+                            }px ${block.shadow_color || "rgba(0,0,0,0.5)"}`;
+                          })()
+                        : "none",
+                    }}
+                  />
+                </div>
+              );
+            })()}
 
             <button
               type="button"

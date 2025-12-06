@@ -418,6 +418,8 @@ export default function PreviewPanel({
                       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
                     tiktok:
                       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
+                    pinterest:
+                      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pinterest.svg",
                   };
 
                   return (
@@ -560,7 +562,7 @@ export default function PreviewPanel({
                       </button>
 
                       <p style={{ marginTop: "8px", color: "#aaa" }}>
-                        ${block.price?.toFixed(2) || "10.00"} USD
+                        ${Number(block.price) > 0 ? Number(block.price).toFixed(2) : "10.00"} USD
                       </p>
 
                       {block.pdf_url && (

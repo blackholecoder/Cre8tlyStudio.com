@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 import Footer from "../sections/Footer.jsx";
 import CustomCursor from "../components/CustomCursor.jsx";
@@ -9,6 +9,7 @@ import axiosInstance from "../api/axios";
 export default function LoginPage() {
   const { login, saveAuth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,14 @@ export default function LoginPage() {
   const [twofaToken, setTwofaToken] = useState("");
   const [verifying, setVerifying] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const slug = params.get("ref");
+
+    if (slug) {
+      localStorage.setItem("ref_slug", slug);
+    }
+  }, [location.search]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -57,65 +66,75 @@ export default function LoginPage() {
   };
 
   function encodeBase64URL(buffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  }
 
   const handlePasskeyLogin = async () => {
-  try {
-    const { email } = form;
-    if (!email) {
-      setError("Enter your email first to use Passkey login.");
-      return;
+    try {
+      const { email } = form;
+      if (!email) {
+        setError("Enter your email first to use Passkey login.");
+        return;
+      }
+
+      // 1️⃣ Get challenge + credential request options
+      const { data: options } = await axiosInstance.post(
+        "/auth/webauthn/login-options",
+        { email }
+      );
+
+      // 2️⃣ Ask browser for credential
+      const credential = await navigator.credentials.get({
+        publicKey: {
+          ...options,
+          challenge: Uint8Array.from(
+            atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")),
+            (c) => c.charCodeAt(0)
+          ),
+          allowCredentials: options.allowCredentials.map((c) => ({
+            ...c,
+            id: Uint8Array.from(
+              atob(c.id.replace(/-/g, "+").replace(/_/g, "/")),
+              (c) => c.charCodeAt(0)
+            ),
+          })),
+        },
+      });
+
+      // 3️⃣ Send response back to server
+      const { data } = await axiosInstance.post("/auth/webauthn/login-verify", {
+        email,
+        assertionResp: {
+          id: credential.id,
+          rawId: encodeBase64URL(credential.rawId),
+          type: credential.type,
+          response: {
+            authenticatorData: encodeBase64URL(
+              credential.response.authenticatorData
+            ),
+            clientDataJSON: encodeBase64URL(credential.response.clientDataJSON),
+            signature: encodeBase64URL(credential.response.signature),
+            userHandle: credential.response.userHandle
+              ? encodeBase64URL(credential.response.userHandle)
+              : null,
+          },
+        },
+      });
+
+      if (data.success) {
+        saveAuth(data.user, data.accessToken, data.refreshToken);
+        navigate("/dashboard");
+      } else {
+        setError("Passkey login failed. Try again.");
+      }
+    } catch (err) {
+      console.error("Passkey login error:", err);
+      setError("Passkey login failed.");
     }
-
-    // 1️⃣ Get challenge + credential request options
-    const { data: options } = await axiosInstance.post("/auth/webauthn/login-options", { email });
-
-    // 2️⃣ Ask browser for credential
-    const credential = await navigator.credentials.get({
-      publicKey: {
-        ...options,
-        challenge: Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
-        allowCredentials: options.allowCredentials.map(c => ({
-          ...c,
-          id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
-        })),
-      },
-    });
-
-    // 3️⃣ Send response back to server
-   const { data } = await axiosInstance.post("/auth/webauthn/login-verify", {
-  email,
-  assertionResp: {
-    id: credential.id,
-    rawId: encodeBase64URL(credential.rawId),
-    type: credential.type,
-    response: {
-      authenticatorData: encodeBase64URL(credential.response.authenticatorData),
-      clientDataJSON: encodeBase64URL(credential.response.clientDataJSON),
-      signature: encodeBase64URL(credential.response.signature),
-      userHandle: credential.response.userHandle
-        ? encodeBase64URL(credential.response.userHandle)
-        : null,
-    },
-  },
-});
-
-    if (data.success) {
-      saveAuth(data.user, data.accessToken, data.refreshToken);
-      navigate("/dashboard");
-    } else {
-      setError("Passkey login failed. Try again.");
-    }
-  } catch (err) {
-    console.error("Passkey login error:", err);
-    setError("Passkey login failed.");
-  }
-};
-
+  };
 
   const handleVerify2FA = async () => {
     if (!twofaCode.trim()) {
@@ -150,6 +169,16 @@ export default function LoginPage() {
     }
   };
 
+  const handleSignUpRedirect = () => {
+    const refSlug = localStorage.getItem("ref_slug");
+
+    if (refSlug) {
+      navigate(`/sign-up?ref=${refSlug}`);
+    } else {
+      navigate("/sign-up");
+    }
+  };
+
   // Fade-out error after 5s
   useEffect(() => {
     if (error) {
@@ -163,7 +192,7 @@ export default function LoginPage() {
     }
   }, [error]);
 
-    useEffect(() => {
+  useEffect(() => {
     // Always restore scrolling when this page mounts
     document.body.style.overflow = "auto";
     document.body.style.position = "";
@@ -294,9 +323,18 @@ export default function LoginPage() {
               </p>
               <p className="text-sm text-gray-400 text-center mt-6">
                 Don’t have an account?{" "}
-                <a href="/sign-up" className="text-green hover:underline">
+                <button
+                  onClick={handleSignUpRedirect}
+                  className="text-green hover:underline"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
                   Sign Up
-                </a>
+                </button>
               </p>
             </>
           )}

@@ -19,7 +19,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
 
   const [searchParams] = useSearchParams();
-const refEmployee = searchParams.get("ref_employee");
+const refSlug = searchParams.get("ref");
+
 
 
   useEffect(() => {
@@ -37,10 +38,10 @@ const refEmployee = searchParams.get("ref_employee");
     setLoading(true);
     setError("");
     try {
-      // ✅ Send refEmployee only if present
-      const payload = refEmployee
-        ? { ...formData, refEmployee }
-        : formData;
+      // ✅ Send refSlug only if present
+      const payload = refSlug
+  ? { ...formData, refSlug }
+  : formData;
 
       const res = await axios.post(
         "https://cre8tlystudio.com/api/auth/signup",

@@ -14,7 +14,7 @@ import {
   MessageCircleQuestionMarkIcon,
   Crown,
   LayoutDashboard,
-  DollarSign
+  DollarSign,
 } from "lucide-react";
 
 const Nav = () => {
@@ -23,6 +23,11 @@ const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  const navigateWithReferral = (path) => {
+    const ref = localStorage.getItem("ref_slug");
+    if (ref) return navigate(`${path}?ref=${ref}`);
+    return navigate(path);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -37,29 +42,28 @@ const Nav = () => {
   }, [isOpen]);
 
   const noNavRoutes = [
-  "/dashboard",
-  "/books",
-  "/settings",
-  "/prompts",
-  "/notifications",
-  "/canvas-editor",
-  "/landing-page-builder",
-  "/leads",
-  "/landing-analytics",
-  "/seller-dashboard",
-];
+    "/dashboard",
+    "/books",
+    "/settings",
+    "/prompts",
+    "/notifications",
+    "/canvas-editor",
+    "/landing-page-builder",
+    "/leads",
+    "/landing-analytics",
+    "/seller-dashboard",
+  ];
 
-if (
-  noNavRoutes.includes(location.pathname) ||
-  location.pathname.startsWith("/community")
-) {
-  return null;
-}
-
+  if (
+    noNavRoutes.includes(location.pathname) ||
+    location.pathname.startsWith("/community")
+  ) {
+    return null;
+  }
 
   const filteredNavLinks = navLinks.filter((link) => {
     // Hide "How It Works" on /signup
-    if (link.label === "Home" && location.pathname === "/home") {
+    if (link.label === "Home" && location.pathname === "/") {
       return false;
     }
 
@@ -79,7 +83,10 @@ if (
         >
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" preventScrollReset={true}>
+            <div
+              className="flex-shrink-0 cursor-pointer"
+              onClick={() => navigateWithReferral("/")}
+            >
               <motion.img
                 src={headerLogo}
                 width={50}
@@ -88,7 +95,7 @@ if (
                 animate={{ opacity: 1 }}
                 transition={{ duration: 4.5, delay: 2 }}
               />
-            </Link>
+            </div>
           </div>
 
           <div
@@ -119,7 +126,7 @@ if (
             >
               {/* Always visible — Home */}
               <button
-                onClick={() => navigate("/home")}
+                onClick={() => navigateWithReferral("/")}
                 className="p-2 hover:bg-gray-800/60  transition"
                 title="Home"
               >
@@ -139,7 +146,7 @@ if (
                     <LayoutDashboard className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   <button
-                    onClick={() => navigate("/contact")}
+                    onClick={() => navigateWithReferral("/contact")}
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Help"
                   >
@@ -160,20 +167,20 @@ if (
                   {/* Not logged in — Show Login & Help */}
 
                   <button
-                    onClick={() => navigate("/sign-up")}
+                    onClick={() => navigateWithReferral("/sign-up")}
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Sign Up"
                   >
                     <Crown className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   <button
-                    onClick={() => navigate("/plans")}
+                    onClick={() => navigateWithReferral("/plans")}
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Pricing"
                   >
-                    <DollarSign  className="h-5 w-5 text-gray-300 hover:text-white" />
+                    <DollarSign className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
-                  
+
                   <button
                     onClick={() => navigate("/login")}
                     className="p-2 hover:bg-gray-800/60  transition"
@@ -183,7 +190,7 @@ if (
                   </button>
 
                   <button
-                    onClick={() => navigate("/contact")}
+                    onClick={() => navigateWithReferral("/contact")}
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Contact"
                   >
@@ -250,9 +257,8 @@ if (
             className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4 lead-text"
           >
             {filteredNavLinks.map((item) => {
-
-             if (item.label === "Home" && location.pathname === "/home")
-          return null;
+              if (item.label === "Home" && location.pathname === "/")
+                return null;
 
               if (
                 user &&
@@ -276,29 +282,31 @@ if (
               }
 
               return (
-                <a
+                <button
                   key={item.label}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
+                  onClick={() => {
+                    navigateWithReferral(item.href);
+                    setIsOpen(false);
+                  }}
                   className="font-montserrat text-md text-white-400 hover:text-white transition-all cursor-pointer"
                 >
                   {item.label}
-                </a>
+                </button>
               );
             })}
 
             {/* ✅ Add Plans link here */}
-      {!user && (
-        <Link
-          to="/plans"
-          onClick={() => setIsOpen(false)}
-          className="font-montserrat text-md text-white-400 hover:text-white transition-all"
-        >
-          Plans
-        </Link>
-      )}
-
-            
+            {!user && (
+              <button
+                onClick={() => {
+                  navigateWithReferral("/plans");
+                  setIsOpen(false);
+                }}
+                className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+              >
+                Plans
+              </button>
+            )}
 
             {user && (
               <button

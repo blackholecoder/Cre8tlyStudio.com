@@ -7,9 +7,15 @@ const PricingSection = () => {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
-  const handleSignUpRedirect = () => {
+const handleSignUpRedirect = () => {
+  const refSlug = localStorage.getItem("ref_slug");  // read the slug correctly
+
+  if (refSlug) {
+    window.location.href = `/sign-up?ref=${refSlug}`;
+  } else {
     window.location.href = "/sign-up";
-  };
+  }
+};
 
   const handleUpgradeRedirect = () => {
     window.location.href = "/plans";

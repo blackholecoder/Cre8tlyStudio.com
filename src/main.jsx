@@ -72,7 +72,7 @@ const AnimatedRoutes = () => {
         />
 
         {/* Redirect old /home to / */}
-        <Route path="/home" element={<Navigate to="/" replace />} />
+        
         <Route path="/canvas-editor" element={<CanvasEditor />} />
         <Route
           path="/settings"

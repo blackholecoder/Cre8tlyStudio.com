@@ -5,11 +5,27 @@ import { useAuth } from "../admin/AuthContext";
 import PlanDetailsModal from "../components/PlansDetailModal";
 import CustomCursor from "../components/CustomCursor";
 import { headerLogo } from "../assets/images";
+import { useLocation } from "react-router-dom";
 
 export default function PlansPage() {
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const location = useLocation();
   const { user } = useAuth();
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const fromUrl = params.get("ref");
+
+  if (fromUrl) {
+    localStorage.setItem("ref_slug", fromUrl);
+    return;
+  }
+
+  // If no ?ref in URL, do nothing.
+  // The stored slug (if any) remains untouched.
+}, [location]);
+
 
   const handleSelectPlan = async (planType) => {
     if (!user || !user.id) {
@@ -101,7 +117,14 @@ export default function PlansPage() {
           {!user ? (
             // Not logged in — show sign-up CTA
             <button
-              onClick={() => (window.location.href = "/sign-up")}
+              onClick={() => {
+                const refSlug = localStorage.getItem("ref_slug");
+                if (refSlug) {
+                  window.location.href = `/sign-up?ref=${refSlug}`;
+                } else {
+                  window.location.href = "/sign-up";
+                }
+              }}
               className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
             >
               Start Free

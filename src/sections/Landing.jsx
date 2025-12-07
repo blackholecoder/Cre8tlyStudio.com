@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import HowItWorks from "./HowItWorks";
 import VideoPlayer from "../components/VideoPlayer";
-import PremiumEbooksCTA from "./PremiumEbooksCTA";
 import AnimatedLogo from "../components/animation/AnimatedLogo";
+import YouTubeTrainingSection from "./YouTubeTrainingSection";
 
 const Landing = () => {
 
@@ -57,6 +57,7 @@ const Landing = () => {
         <div className="w-full max-w-5xl mt-12 rounded-2xl overflow-hidden">
           <VideoPlayer />
         </div>
+        <YouTubeTrainingSection />
       </section>
       
 

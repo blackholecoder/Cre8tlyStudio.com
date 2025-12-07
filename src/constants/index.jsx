@@ -10,10 +10,10 @@ import {
 
 export const navLinks = [
   { href: "/", label: "Home" },
-  { href: "sign-up", label: "Sign Up" },
-  { href: "contact", label: "Contact Us" },
-  { href: "shop", label: "Shop" },
-  { href: "login", label: "Login" },
+  { href: "/sign-up", label: "Sign Up" },
+  { href: "/contact", label: "Contact Us" },
+  { href: "/shop", label: "Shop" },
+  { href: "/login", label: "Login" },
 ];
 
 export const footerLinks2 = [

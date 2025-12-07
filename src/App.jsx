@@ -51,6 +51,15 @@ useEffect(() => {
     }
   }, [location]);
 
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("ref");
+
+  if (ref) {
+    localStorage.setItem("ref_slug", ref);
+  }
+}, []);
+
   // 🧭 If running inside Tauri, don’t render marketing site
 
   // 🌐 Normal web visitors get the full landing site

@@ -12,9 +12,9 @@ import {
   User,
   LogOut,
   MessageCircleQuestionMarkIcon,
-  Crown,
   LayoutDashboard,
   DollarSign,
+  Rocket 
 } from "lucide-react";
 
 const Nav = () => {
@@ -171,7 +171,7 @@ const Nav = () => {
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Sign Up"
                   >
-                    <Crown className="h-5 w-5 text-gray-300 hover:text-white" />
+                    <Rocket  className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   <button
                     onClick={() => navigateWithReferral("/plans")}

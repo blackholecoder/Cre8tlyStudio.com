@@ -14,18 +14,17 @@ export default function PlansPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const fromUrl = params.get("ref");
+    const params = new URLSearchParams(location.search);
+    const fromUrl = params.get("ref");
 
-  if (fromUrl) {
-    localStorage.setItem("ref_slug", fromUrl);
-    return;
-  }
+    if (fromUrl) {
+      localStorage.setItem("ref_slug", fromUrl);
+      return;
+    }
 
-  // If no ?ref in URL, do nothing.
-  // The stored slug (if any) remains untouched.
-}, [location]);
-
+    // If no ?ref in URL, do nothing.
+    // The stored slug (if any) remains untouched.
+  }, [location]);
 
   const handleSelectPlan = async (planType) => {
     if (!user || !user.id) {
@@ -163,6 +162,7 @@ export default function PlansPage() {
             <li>✅ Sell on Your Landing Page</li>
             <li>✅ Keep 80% of Every Sale</li>
             <li>✅ Pro Covers & Prompt Memory</li>
+            <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>
             <li>✅ Priority Support</li>
@@ -205,6 +205,7 @@ export default function PlansPage() {
             <li>✅ Sell on Your Landing Page</li>
             <li>✅ Keep 80% of Every Sale</li>
             <li>✅ Pro Covers & Prompt Memory</li>
+            <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>
             <li>✅ Priority Support</li>
@@ -239,8 +240,20 @@ export default function PlansPage() {
           <p className="text-4xl font-extrabold mb-2 text-pink-400">$850</p>
           <p className="text-gray-400 mb-6 text-sm leading-relaxed">
             AI-powered co-writer that helps you structure, write, and edit up to
-            750 pages while keeping your unique voice.
+            750 pages while keeping your unique voice and storytelling style.
           </p>
+          <ul className="text-sm text-gray-300 space-y-2 mb-8">
+            <li>✅ 750 Pages of Writing Power</li>
+            <li>✅ Save Unlimited Drafts</li>
+            <li>✅ Upload Any Text File or Document</li>
+            <li>✅ Continues Your Story From Memory</li>
+            <li>✅ Generate Chapters Instantly</li>
+            <li>✅ Pro-Level Book Covers</li>
+            <li>✅ Premium Font Selection</li>
+            <li>✅ Live Book Preview & Editing</li>
+            <li>✅ Rewrite, Expand, or Shorten Any Section</li>
+            <li>✅ One-Click Export (PDF & DOCX)</li>
+          </ul>
 
           <button
             onClick={() => setSelectedPlan("author")}

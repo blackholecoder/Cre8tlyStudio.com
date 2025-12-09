@@ -14,7 +14,7 @@ import {
   MessageCircleQuestionMarkIcon,
   LayoutDashboard,
   DollarSign,
-  Rocket 
+  Rocket,
 } from "lucide-react";
 
 const Nav = () => {
@@ -52,6 +52,15 @@ const Nav = () => {
     "/leads",
     "/landing-analytics",
     "/seller-dashboard",
+    "/docs/pro-document",
+    "/docs/lead-magnets",
+    "/docs/smartprompt",
+    "/docs/canvas-editor",
+    "/docs/landing-page-builder",
+    "/docs/analytics-docs",
+    "/docs/analytics",
+    "/docs/settings",
+    "/docs",
   ];
 
   if (
@@ -171,7 +180,7 @@ const Nav = () => {
                     className="p-2 hover:bg-gray-800/60  transition"
                     title="Sign Up"
                   >
-                    <Rocket  className="h-5 w-5 text-gray-300 hover:text-white" />
+                    <Rocket className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                   <button
                     onClick={() => navigateWithReferral("/plans")}

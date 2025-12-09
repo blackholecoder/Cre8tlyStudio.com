@@ -5,7 +5,7 @@ import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import ThankYouModal from "../../components/seller/ThankYouModal";
-import { Check } from "lucide-react";
+import { Check, Landmark } from "lucide-react";
 
 export default function SellerDashboard() {
   const { user } = useAuth();
@@ -93,30 +93,27 @@ export default function SellerDashboard() {
   };
 
   const handleMarkThankYouSent = async (saleId) => {
-  try {
-    const res = await axiosInstance.post("/seller/mark-thank-you-sent", {
-      saleId,
-    });
+    try {
+      const res = await axiosInstance.post("/seller/mark-thank-you-sent", {
+        saleId,
+      });
 
-    if (res.data.success) {
-      // update UI without refresh
-      setSales((prev) =>
-        prev.map((s) =>
-          s.id === saleId ? { ...s, thank_you_sent: 1 } : s
-        )
-      );
+      if (res.data.success) {
+        // update UI without refresh
+        setSales((prev) =>
+          prev.map((s) => (s.id === saleId ? { ...s, thank_you_sent: 1 } : s))
+        );
 
-      toast.success("Thank-you marked as sent");
-      setShowThankYouModal(false);
-    } else {
-      toast.error("Failed to update status");
+        toast.success("Thank-you marked as sent");
+        setShowThankYouModal(false);
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (err) {
+      console.error("❌ Error marking thank-you sent:", err);
+      toast.error("Server error");
     }
-  } catch (err) {
-    console.error("❌ Error marking thank-you sent:", err);
-    toast.error("Server error");
-  }
-};
-
+  };
 
   if (loading) {
     return (
@@ -157,8 +154,10 @@ export default function SellerDashboard() {
       animate={{ opacity: 1 }}
       className="p-8 text-white"
     >
-      <h1 className="text-3xl font-bold mb-6">Seller Dashboard</h1>
-
+      <div className="flex items-center gap-3 mb-6">
+        <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+        <Landmark size={22} className="text-green" />
+      </div>
       {/* 💰 Balance Overview */}
       {balance ? (
         <div className="grid md:grid-cols-3 gap-6 mb-10">
@@ -332,7 +331,6 @@ export default function SellerDashboard() {
         onClose={() => setShowThankYouModal(false)}
         loading={loadingMessage}
         onMarkSent={() => handleMarkThankYouSent(currentSaleId)}
-        
       />
     </motion.div>
   );

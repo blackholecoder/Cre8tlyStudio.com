@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { ResponsiveBar } from "@nivo/bar";
 import { useAuth } from "../../admin/AuthContext";
+import { BarChart2 } from "lucide-react";
 
 export default function LandingAnalytics() {
   const { user } = useAuth();
@@ -105,7 +106,10 @@ export default function LandingAnalytics() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-semibold">Views</h1>
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-xl font-semibold">Views</h1>
+            <BarChart2 size={22} className="text-white" />
+          </div>
           <div className="flex gap-2">
             {["7", "14", "30", "90"].map((r) => (
               <button
@@ -124,22 +128,24 @@ export default function LandingAnalytics() {
         </div>
 
         {/* Summary Cards */}
-{data && (
-  <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 mb-6">
-    {metrics.map((m) => (
-      <div
-        key={m.key}
-        className="flex flex-col items-center justify-center bg-[#0a0a0a] rounded-xl p-3 sm:p-4 shadow-md border border-[#2A2F3A]"
-      >
-        <p className="text-sm text-gray-400">{m.label}</p>
-        <p className="text-2xl font-semibold" style={{ color: m.color }}>
-          {data[m.key]?.reduce((acc, v) => acc + v.total, 0) || 0}
-        </p>
-      </div>
-    ))}
-  </div>
-)}
-
+        {data && (
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 mb-6">
+            {metrics.map((m) => (
+              <div
+                key={m.key}
+                className="flex flex-col items-center justify-center bg-[#0a0a0a] rounded-xl p-3 sm:p-4 shadow-md border border-[#2A2F3A]"
+              >
+                <p className="text-sm text-gray-400">{m.label}</p>
+                <p
+                  className="text-2xl font-semibold"
+                  style={{ color: m.color }}
+                >
+                  {data[m.key]?.reduce((acc, v) => acc + v.total, 0) || 0}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Total Views */}
         {data && (
@@ -239,15 +245,14 @@ export default function LandingAnalytics() {
                 },
               }}
               tooltip={({ id, value, indexValue, color }) => (
-  <div className="px-3 py-2 bg-[#111] border border-gray-700 rounded-lg">
-    <p className="text-sm font-medium" style={{ color }}>
-      {id}: {value}
-    </p>
-    <p className="text-xs text-gray-400">{indexValue}</p>
-  </div>
-)}
-groupMode="grouped" 
-
+                <div className="px-3 py-2 bg-[#111] border border-gray-700 rounded-lg">
+                  <p className="text-sm font-medium" style={{ color }}>
+                    {id}: {value}
+                  </p>
+                  <p className="text-xs text-gray-400">{indexValue}</p>
+                </div>
+              )}
+              groupMode="grouped"
             />
           ) : (
             <p className="text-center text-gray-500">No analytics data yet</p>

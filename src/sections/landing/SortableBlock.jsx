@@ -19,6 +19,7 @@ import FAQBlock from "../../components/landing/blocks/types/FAQBlock";
 import ImageBlock from "../../components/landing/blocks/types/ImageBlock";
 import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOffers3Block";
 import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureCheckoutBlock";
+import AudioPlayerBlock from "../../components/landing/blocks/types/AudioPlayerBlock";
 
 const BLOCK_LABELS = {
   heading: "Heading (H1)",
@@ -39,6 +40,7 @@ const BLOCK_LABELS = {
   image: "Image",
   referral_button: "Referral Button",
   secure_checkout: "Secure Checkout",
+  audio_player: "Audio Player",
 };
 
 function SortableBlock({
@@ -122,8 +124,10 @@ function SortableBlock({
 
       case "feature_offers_3":
         return `${(block.items || []).length} offer cards`;
-        case "secure_checkout":
-  return block.title?.slice(0, 40) || "Secure Checkout";
+      case "secure_checkout":
+        return block.title?.slice(0, 40) || "Secure Checkout";
+      case "audio_player":
+        return block.title?.slice(0, 35) || "Audio Player";
 
       default:
         return "";
@@ -296,6 +300,15 @@ function SortableBlock({
               block={block}
               index={index}
               updateBlock={updateBlock}
+            />
+          )}
+          {block.type === "audio_player" && (
+            <AudioPlayerBlock
+              block={block}
+              index={index}
+              bgTheme={bgTheme}
+              updateBlock={updateBlock}
+              landing={landing}
             />
           )}
         </div>

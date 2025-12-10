@@ -218,7 +218,7 @@ export default function ImageBlock({
 
                 try {
                   const res = await axiosInstance.post(
-                    "/landing/upload-image-block",
+                    "/landing/upload-media-block",
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" } }
                   );
@@ -243,9 +243,8 @@ export default function ImageBlock({
           <div>
             {(() => {
               const isPng =
-  block.image_url &&
-  block.image_url.toLowerCase().match(/\.png(\?.*)?$/);
-
+                block.image_url &&
+                block.image_url.toLowerCase().match(/\.png(\?.*)?$/);
 
               return (
                 <div

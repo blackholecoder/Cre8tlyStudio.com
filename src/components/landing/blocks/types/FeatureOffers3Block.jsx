@@ -94,7 +94,7 @@ export default function FeatureOffers3Block({
       formData.append("blockId", block.id);
 
       const res = await axiosInstance.post(
-        "/landing/upload-image-block",
+        "/landing/upload-media-block",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

@@ -332,13 +332,19 @@ export default function DashboardLayout({ children }) {
             >
               <div
                 className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-        ${
-          location.pathname === "/notifications"
-            ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-            : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-        }`}
+      ${
+        location.pathname === "/notifications"
+          ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
+          : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
+      }`}
               >
                 <Inbox size={22} />
+
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </div>
             </button>
 

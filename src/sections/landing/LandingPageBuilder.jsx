@@ -254,30 +254,57 @@ export default function LandingPageBuilder() {
     }
 
     if (type === "secure_checkout") {
-  newBlock.title = "Secure Checkout";
-  newBlock.subtext =
-    "Your information is protected by industry leading encryption and secure payment processing.";
+      newBlock.title = "Secure Checkout";
+      newBlock.subtext =
+        "Your information is protected by industry leading encryption and secure payment processing.";
 
-  newBlock.trust_items = [
-    "Secure SSL Encryption",
-    "Protected Checkout Page",
-    "Safe Payment Processing",
-  ];
+      newBlock.trust_items = [
+        "Secure SSL Encryption",
+        "Protected Checkout Page",
+        "Safe Payment Processing",
+      ];
 
-  newBlock.guarantee = "30 day money back guarantee on all purchases";
+      newBlock.guarantee = "30 day money back guarantee on all purchases";
 
-  // optional image badge (left blank by default)
-  newBlock.payment_badge = "";
+      // optional image badge (left blank by default)
+      newBlock.payment_badge = "";
 
-  // NEW minimal style defaults
-  newBlock.text_color = "#FFFFFF";
-  newBlock.alignment = "center";   // ⭐ MUST BE CENTERED
-  newBlock.padding = 0;            // ⭐ no padding for minimal design
-  newBlock.bg_color = "transparent"; // ⭐ remove old card background
+      // NEW minimal style defaults
+      newBlock.text_color = "#FFFFFF";
+      newBlock.alignment = "center"; // ⭐ MUST BE CENTERED
+      newBlock.padding = 0; // ⭐ no padding for minimal design
+      newBlock.bg_color = "transparent"; // ⭐ remove old card background
 
-  newBlock.collapsed = false;
-}
+      newBlock.collapsed = false;
+    }
 
+    if (type === "audio_player") {
+      newBlock.audio_url = "";
+      newBlock.cover_url = "";
+      newBlock.title = "Untitled Track";
+
+      newBlock.waveform_color = "#7bed9f";
+      newBlock.progress_color = "#22c55e";
+
+      newBlock.playlist = [];
+      newBlock.show_waveform = true;
+      newBlock.show_cover = true;
+      newBlock.show_title = true;
+
+      newBlock.alignment = "center";
+
+      // NEW THEMING CONTROLS
+      newBlock.match_main_bg = false;
+      newBlock.use_gradient = false;
+      newBlock.bg_color = "#0F172A"; // same as current dark block default
+      newBlock.gradient_start = "#7bed9f";
+      newBlock.gradient_end = "#22c55e";
+      newBlock.gradient_direction = "90deg";
+
+      newBlock.text_color = "#ffffff";
+
+      newBlock.collapsed = false;
+    }
 
     setLanding((prev) => ({
       ...prev,

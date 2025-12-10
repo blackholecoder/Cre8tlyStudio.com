@@ -1,7 +1,7 @@
 // src/components/AddSectionButton.jsx
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import { useAuth } from "../../admin/AuthContext"; 
+import { useAuth } from "../../admin/AuthContext";
 
 export default function AddSectionButton({ addBlock }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -28,20 +28,19 @@ export default function AddSectionButton({ addBlock }) {
     { label: "Offer Banner", value: "offer_banner" },
     { label: "Calendly", value: "calendly" },
     { label: "Countdown Timer", value: "countdown" },
-    { label: "Social Links Row", value: "social_links" }, 
-    { label: "Stripe Checkout", value: "stripe_checkout" }, 
+    { label: "Social Links Row", value: "social_links" },
+    { label: "Stripe Checkout", value: "stripe_checkout" },
     { label: "Offer Grid", value: "feature_offers_3" },
-    { label: "Verified Reviews ⭐", value: "verified_reviews" }, 
+    { label: "Verified Reviews ⭐", value: "verified_reviews" },
     { label: "FAQ Accordion ❓", value: "faq" },
     { label: "Image", value: "image" },
-    { label: "Secure Checkout", value: "secure_checkout" }
-
+    { label: "Secure Checkout", value: "secure_checkout" },
+    { label: "Audio Player", value: "audio_player" },
   ];
 
   if (user?.is_admin_employee === 1) {
     options.push({ label: "Referral Button", value: "referral_button" });
   }
-
 
   return (
     <div className="add-section-dropdown relative inline-block text-left">
@@ -61,8 +60,10 @@ export default function AddSectionButton({ addBlock }) {
 
       {/* Dropdown menu */}
       {showDropdown && (
-        <div className="absolute right-0 mt-3 w-56 bg-[#0F172A] border border-gray-700 
-                        rounded-xl shadow-xl overflow-hidden z-50">
+        <div
+          className="absolute right-0 mt-3 w-56 bg-[#0F172A] border border-gray-700 
+                        rounded-xl shadow-xl overflow-hidden z-50"
+        >
           {options.map((opt) => (
             <button
               key={opt.value}

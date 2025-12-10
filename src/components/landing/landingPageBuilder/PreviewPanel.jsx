@@ -562,7 +562,11 @@ export default function PreviewPanel({
                       </button>
 
                       <p style={{ marginTop: "8px", color: "#aaa" }}>
-                        ${Number(block.price) > 0 ? Number(block.price).toFixed(2) : "10.00"} USD
+                        $
+                        {Number(block.price) > 0
+                          ? Number(block.price).toFixed(2)
+                          : "10.00"}{" "}
+                        USD
                       </p>
 
                       {block.pdf_url && (
@@ -1112,6 +1116,273 @@ export default function PreviewPanel({
                     </div>
                   );
                 }
+
+                case "audio_player":
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        background: block.match_main_bg
+                          ? landing?.bg_theme || "#0d1117"
+                          : block.use_gradient
+                            ? `linear-gradient(${block.gradient_direction}, ${block.gradient_start}, ${block.gradient_end})`
+                            : block.bg_color || "#0d1117",
+                        border: "1px solid #1f2937",
+                        padding: block.padding ? `${block.padding}px` : "20px",
+                        borderRadius: "16px",
+                        maxWidth: "700px",
+                        margin: "45px auto",
+                        color: block.text_color || "#ffffff",
+                        fontFamily: "Inter, sans-serif",
+                        boxShadow: "0 0 25px rgba(0,0,0,0.35)",
+                        textAlign: block.alignment || "center",
+                      }}
+                    >
+                      {/* MAIN ROW */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "22px",
+                        }}
+                      >
+                        {/* COVER */}
+                        {block.show_cover !== false && block.cover_url && (
+                          <img
+                            src={block.cover_url}
+                            alt=""
+                            style={{
+                              width: "70px",
+                              height: "70px",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        )}
+
+                        {/* RIGHT SIDE */}
+                        <div style={{ flex: 1, textAlign: "left" }}>
+                          {/* TITLE + NOW PLAYING BARS */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                              marginBottom: "6px",
+                            }}
+                          >
+                            {block.show_title !== false && block.title && (
+                              <span
+                                style={{
+                                  fontSize: "1rem",
+                                  fontWeight: "600",
+                                  color: block.text_color || "#ffffff",
+                                }}
+                              >
+                                {block.title}
+                              </span>
+                            )}
+
+                            {/* Fake now-playing bars */}
+                            <div
+                              style={{
+                                width: "16px",
+                                height: "12px",
+                                display: "flex",
+                                alignItems: "flex-end",
+                                gap: "2px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  width: "3px",
+                                  height: "3px",
+                                  background: block.progress_color || "#22c55e",
+                                  opacity: 0.5,
+                                }}
+                              />
+                              <span
+                                style={{
+                                  width: "3px",
+                                  height: "6px",
+                                  background: block.progress_color || "#22c55e",
+                                  opacity: 0.5,
+                                }}
+                              />
+                              <span
+                                style={{
+                                  width: "3px",
+                                  height: "10px",
+                                  background: block.progress_color || "#22c55e",
+                                  opacity: 0.5,
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* CONTROLS ROW */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "18px",
+                            }}
+                          >
+                            {/* BACK 10s BUTTON */}
+                            <div
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "8px",
+                                background: "#1e293b",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill={block.progress_color || "#22c55e"}
+                              >
+                                <path d="M15 18V6l-9 6 9 6z" />
+                              </svg>
+                            </div>
+
+                            {/* PLAY BUTTON */}
+                            <div
+                              style={{
+                                width: "45px",
+                                height: "45px",
+                                borderRadius: "50%",
+                                background: block.progress_color || "#22c55e",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                              }}
+                            >
+                              <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="#000"
+                              >
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            </div>
+
+                            {/* FORWARD 10s BUTTON */}
+                            <div
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "8px",
+                                background: "#1e293b",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill={block.progress_color || "#22c55e"}
+                              >
+                                <path d="M9 6v12l9-6-9-6z" />
+                              </svg>
+                            </div>
+
+                            {/* Volume Slider */}
+                            <div style={{ width: "110px" }}>
+                              <div
+                                style={{
+                                  width: "100%",
+                                  height: "6px",
+                                  borderRadius: "4px",
+                                  background: "#1f2937",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: "80%",
+                                    height: "100%",
+                                    background:
+                                      block.progress_color || "#22c55e",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* SCRUBBER */}
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "8px",
+                              background: "#1f2937",
+                              borderRadius: "6px",
+                              overflow: "hidden",
+                              marginTop: "12px",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: "20%",
+                                height: "100%",
+                                background: block.progress_color || "#22c55e",
+                              }}
+                            />
+                          </div>
+
+                          {/* TIMES */}
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              marginTop: "6px",
+                              fontSize: "0.85rem",
+                              color: "#94a3b8",
+                            }}
+                          >
+                            <span>00:00</span>
+                            <span>03:30</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* WAVEFORM MOCK */}
+                      <div
+                        style={{
+                          marginTop: "18px",
+                          height: "30px",
+                          width: "100%",
+                          background: "#000",
+                          borderRadius: "4px",
+                          overflow: "hidden",
+                          position: "relative",
+                        }}
+                      >
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: `repeating-linear-gradient(
+              to right,
+              ${block.waveform_color || "#7bed9f"} 0px,
+              ${block.waveform_color || "#7bed9f"} 2px,
+              transparent 2px,
+              transparent 6px
+            )`,
+                            opacity: 0.9,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
 
                 default:
                   return null;

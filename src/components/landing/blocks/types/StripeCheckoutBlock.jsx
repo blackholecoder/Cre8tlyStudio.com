@@ -8,7 +8,6 @@ export default function StripeCheckoutBlock({
   pdfList,
   bgTheme,
 }) {
-
   console.log("PRICE VALUE + TYPE:", block.price, typeof block.price);
 
   return (
@@ -38,8 +37,7 @@ export default function StripeCheckoutBlock({
         </button>
 
         <p className="text-xs text-gray-400 mt-2">
-          ${(Number(block.price) > 0 ? Number(block.price).toFixed(2) : "10.00")}
-
+          ${Number(block.price) > 0 ? Number(block.price).toFixed(2) : "10.00"}
         </p>
       </div>
 
@@ -94,12 +92,12 @@ export default function StripeCheckoutBlock({
         Price (USD)
       </label>
       <input
-  type="text"
-  inputMode="decimal"
-  value={block.price ?? ""}
-  onChange={(e) => updateBlock(index, "price", e.target.value)}
-  className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
-/>
+        type="text"
+        inputMode="decimal"
+        value={block.price ?? ""}
+        onChange={(e) => updateBlock(index, "price", e.target.value)}
+        className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
+      />
 
       {/* COLORS */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-4">

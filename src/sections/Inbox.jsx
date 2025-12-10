@@ -53,10 +53,7 @@ export default function Inbox() {
     }
   }
 
-
   // TODO WORK ON THE MESSAGES FOR PUBLIC WHICH NEED NEW ROUTES
-
-
 
   async function handleDelete(id) {
     toast.dismiss(); // clear any existing toasts first
@@ -220,11 +217,15 @@ export default function Inbox() {
             {/* Message Content */}
             <div className="bg-[#111827]/60 border border-gray-800 rounded-2xl p-6 shadow-lg">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-800 pb-4 mb-4">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-white leading-tight">
                   {selected.title}
                 </h2>
-                <div className="flex items-center gap-2 text-xs text-gray-400 mt-2 sm:mt-0">
-                  <Calendar size={12} />
+
+                <div className="flex items-center gap-2 text-sm text-gray-400 mt-2 sm:mt-0">
+                  <Calendar
+                    size={14}
+                    className="opacity-75 relative top-[1px]"
+                  />
                   {new Date(selected.created_at).toLocaleString("en-US", {
                     month: "short",
                     day: "numeric",

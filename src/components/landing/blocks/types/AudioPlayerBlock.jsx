@@ -10,6 +10,8 @@ export default function AudioPlayerBlock({
   landing,
   bgTheme,
 }) {
+  const MAX_AUDIO_SECONDS = 3 * 60 * 60; // 3 hours
+
   const waveformRef = useRef(null);
   const waveSurfer = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -61,13 +63,13 @@ export default function AudioPlayerBlock({
     colorDebounce.current = setTimeout(() => {
       if (!block.show_waveform || !block.audio_url) return;
 
-      // Destroy old instance
+      // destroy old
       if (waveSurfer.current) {
         waveSurfer.current.destroy();
+        waveSurfer.current = null;
       }
 
-      // Create new waveform
-      waveSurfer.current = WaveSurfer.create({
+      const ws = WaveSurfer.create({
         container: waveformRef.current,
         waveColor: block.waveform_color,
         progressColor: block.progress_color,
@@ -76,33 +78,73 @@ export default function AudioPlayerBlock({
         responsive: true,
       });
 
-      // LOAD AUDIO
-      waveSurfer.current.load(block.audio_url);
+      waveSurfer.current = ws;
 
-      // When waveform is ready
-      waveSurfer.current.on("ready", () => {
-        const dur = waveSurfer.current.getDuration();
+      // LOAD AUDIO
+      ws.load(block.audio_url);
+
+      // READY
+      ws.on("ready", () => {
+        const dur = ws.getDuration();
         setDuration(dur);
       });
 
-      // When audio plays / updates
-      waveSurfer.current.on("audioprocess", () => {
-        if (!waveSurfer.current.isPlaying()) return;
+      // AUDIO PROCESS
+      ws.on("audioprocess", () => {
+        const inst = waveSurfer.current;
+        if (!inst || !inst.isPlaying()) return;
 
-        const t = waveSurfer.current.getCurrentTime();
+        const t = inst.getCurrentTime();
+        const dur = inst.getDuration();
+
+        if (
+          block.preview_enabled &&
+          block.preview_duration > 0 &&
+          t >= Math.min(block.preview_duration, dur)
+        ) {
+          inst.pause();
+          inst.seekTo(0);
+
+          setIsPlaying(false);
+          setCurrentTime(0);
+          setSeekValue(0);
+
+          toast.info("Preview ended. Purchase to unlock the full track.");
+          return;
+        }
+
         setCurrentTime(t);
-        setSeekValue((t / waveSurfer.current.getDuration()) * 100);
+        setSeekValue((t / dur) * 100);
       });
 
-      // When user clicks waveform to seek
-      waveSurfer.current.on("seek", (pct) => {
-        const newTime = waveSurfer.current.getDuration() * pct;
+      // SEEK HANDLER (clicking waveform)
+      ws.on("seek", (pct) => {
+        const inst = waveSurfer.current;
+        if (!inst) return;
+
+        const dur = inst.getDuration();
+        const newTime = pct * dur;
+
+        if (
+          block.preview_enabled &&
+          block.preview_duration > 0 &&
+          newTime >= Math.min(block.preview_duration, dur)
+        ) {
+          const limitPct = block.preview_duration / dur;
+          inst.seekTo(limitPct);
+
+          setCurrentTime(block.preview_duration);
+          setSeekValue(limitPct * 100);
+          return;
+        }
+
+        inst.seekTo(pct);
         setCurrentTime(newTime);
         setSeekValue(pct * 100);
       });
 
-      // When audio finishes
-      waveSurfer.current.on("finish", () => {
+      // ON FINISH
+      ws.on("finish", () => {
         setIsPlaying(false);
 
         const playlist = block.playlist || [];
@@ -115,12 +157,20 @@ export default function AudioPlayerBlock({
       });
     }, 300);
 
-    return () => clearTimeout(colorDebounce.current);
+    return () => {
+      clearTimeout(colorDebounce.current);
+      if (waveSurfer.current) {
+        waveSurfer.current.destroy();
+        waveSurfer.current = null;
+      }
+    };
   }, [
     block.audio_url,
     block.show_waveform,
     block.waveform_color,
     block.progress_color,
+    block.preview_enabled,
+    block.preview_duration,
   ]);
 
   const togglePlay = () => {
@@ -128,6 +178,88 @@ export default function AudioPlayerBlock({
     waveSurfer.current.playPause();
     setIsPlaying(waveSurfer.current.isPlaying());
   };
+
+  async function handleSinglePurchase(track, block, landing) {
+    const res = await axiosInstance.post(
+      "/seller-checkout/create-audio-checkout",
+      {
+        audio_type: "single",
+        landingPageId: landing.id,
+        blockId: block.id,
+        sellerId: landing.user_id,
+        audio_urls: [track.audio_url], // <- MUST be array
+        product_name: track.title || "Audio Track",
+        price_in_cents: Math.round((track.price || block.single_price) * 100),
+        cover_url: track.cover_url || block.cover_url || "",
+      }
+    );
+
+    if (res.data.url) {
+      window.location.href = res.data.url;
+    }
+  }
+
+  async function handleAlbumPurchase(block, landing) {
+    const res = await axiosInstance.post(
+      "/seller-checkout/create-audio-checkout",
+      {
+        audio_type: "album",
+        landingPageId: landing.id,
+        blockId: block.id,
+        sellerId: landing.user_id,
+        audio_urls: block.playlist.map((t) => t.audio_url), // all tracks
+        product_name: block.album_button_text?.trim() || "Buy Album",
+        price_in_cents: Math.round(block.album_price * 100),
+        cover_url: albumCover,
+      }
+    );
+
+    if (res.data.url) {
+      window.location.href = res.data.url;
+    }
+  }
+
+  function getPreviewOptions(duration) {
+    const maxPreview = Math.min(duration, 1800); // 30 minutes max
+    const options = [];
+
+    // Generate options every 30 seconds up to max preview
+    for (let sec = 10; sec <= maxPreview; sec += 30) {
+      const minutes = Math.floor(sec / 60);
+      const seconds = sec % 60;
+      const label =
+        minutes > 0
+          ? `${minutes}m ${seconds > 0 ? seconds + "s" : ""}`
+          : `${seconds}s`;
+
+      options.push({ value: sec, label });
+    }
+
+    return options;
+  }
+
+  function validateAudioDuration(file) {
+    return new Promise((resolve, reject) => {
+      const audio = document.createElement("audio");
+      audio.preload = "metadata";
+
+      audio.onloadedmetadata = () => {
+        URL.revokeObjectURL(audio.src);
+
+        if (audio.duration > MAX_AUDIO_SECONDS) {
+          reject(new Error("Audio exceeds the 3 hour maximum length"));
+        } else {
+          resolve();
+        }
+      };
+
+      audio.onerror = () => {
+        reject(new Error("Unable to read audio metadata"));
+      };
+
+      audio.src = URL.createObjectURL(file);
+    });
+  }
 
   return (
     <>
@@ -242,10 +374,32 @@ export default function AudioPlayerBlock({
               value={seekValue}
               onChange={(e) => {
                 const pct = Number(e.target.value);
+                const dur = duration || 1;
+                const newTime = (pct / 100) * dur;
+
+                const limit =
+                  block.preview_enabled && block.preview_duration > 0
+                    ? Math.min(block.preview_duration, dur)
+                    : null;
+
+                if (limit !== null && newTime >= limit) {
+                  const limitPct = limit / dur;
+                  console.log("Slider clamped", { newTime, limit, limitPct });
+
+                  setSeekValue(limitPct * 100);
+                  setCurrentTime(limit);
+
+                  if (waveSurfer.current) {
+                    waveSurfer.current.seekTo(limitPct);
+                  }
+                  return;
+                }
+
                 setSeekValue(pct);
                 if (waveSurfer.current) {
                   waveSurfer.current.seekTo(pct / 100);
                 }
+                setCurrentTime(newTime);
               }}
               className="w-full mt-4 accent-green cursor-pointer"
             />
@@ -287,31 +441,67 @@ export default function AudioPlayerBlock({
                   <li
                     key={i}
                     className={`p-3 rounded border cursor-pointer 
-              ${
-                isActive
-                  ? "bg-green/20 border-green"
-                  : "bg-[#1E293B] border-gray-700 hover:bg-[#2A3A4F]"
-              }
-            `}
+    ${
+      isActive
+        ? "bg-green/20 border-green"
+        : "bg-[#1E293B] border-gray-700 hover:bg-[#2A3A4F]"
+    }
+  `}
                     onClick={() => loadTrack(track)}
                   >
-                    {track.cover_url && (
-                      <img
-                        src={track.cover_url}
-                        className="w-10 h-10 object-cover rounded inline-block mr-3"
-                      />
-                    )}
-                    <span>{track.title}</span>
+                    <div className="flex items-center gap-3 w-full">
+                      {/* COVER */}
+                      {track.cover_url && (
+                        <img
+                          src={track.cover_url}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                      )}
+
+                      {/* TITLE (Fills remaining space) */}
+                      <span className="flex-1 text-white truncate">
+                        {track.title}
+                      </span>
+
+                      {/* DURATION (optional, matches live HTML) */}
+                      <span className="text-gray-400 text-sm mr-3">
+                        {track.duration || "--:--"}
+                      </span>
+
+                      {/* BUY BUTTON */}
+                      {block.sell_singles && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSinglePurchase(track, block, landing);
+                          }}
+                          className="px-3 py-1 rounded bg-green text-black font-semibold text-sm"
+                        >
+                          {block.single_button_text || "Buy"}
+                        </button>
+                      )}
+                    </div>
                   </li>
                 );
               })}
             </ul>
           </div>
         )}
+        {/* BUY FULL ALBUM */}
+        {block.sell_album && block.playlist.length > 0 && (
+          <button
+            type="button"
+            onClick={() => handleAlbumPurchase(block, landing)}
+            className="mt-4 w-full py-3 bg-green text-black font-semibold rounded-lg"
+          >
+            {block.album_button_text || "Buy Album"}
+          </button>
+        )}
       </div>
 
       {/* SETTINGS PANEL */}
-      <div className="mt-8 space-y-4">
+      <div className="p-4 bg-[#111]/40 border border-gray-800 rounded-lg space-y-4 mt-8">
         {/* Title */}
         <label className="text-sm text-gray-300">Track Title</label>
         <input
@@ -329,12 +519,19 @@ export default function AudioPlayerBlock({
             const file = e.target.files[0];
             if (!file) return;
 
+            if (file.size > 500 * 1024 * 1024) {
+              toast.error("Audio file is too large");
+              return;
+            }
+
             const formData = new FormData();
             formData.append("audio", file);
             formData.append("landingId", landing.id);
             formData.append("blockId", block.id);
             setIsUploading(true);
             try {
+              await validateAudioDuration(file);
+
               const res = await axiosInstance.post(
                 "/landing/upload-media-block",
                 formData,
@@ -346,6 +543,9 @@ export default function AudioPlayerBlock({
                   title: file.name.replace(/\.[^/.]+$/, "") || "Untitled Track",
                   audio_url: res.data.url,
                   cover_url: block.cover_url || "",
+                  price: block.single_price || "",
+                  stripe_product_id: "",
+                  stripe_price_id: "",
                 };
 
                 const updatedPlaylist = [...(block.playlist || []), newTrack];
@@ -363,7 +563,7 @@ export default function AudioPlayerBlock({
               }
             } catch (err) {
               console.error(err);
-              toast.error("Upload error");
+              toast.error(err.message || "Invalid audio file");
             } finally {
               setIsUploading(false);
             }
@@ -493,6 +693,114 @@ export default function AudioPlayerBlock({
           readOnly
           className="w-full p-2 rounded bg-black border border-gray-700 text-white"
         />
+
+        {/* --- SELLING OPTIONS ------------------------------------------------ */}
+        <div className="p-4 bg-[#111]/40 border border-gray-800 rounded-lg space-y-4">
+          <h3 className="text-silver font-semibold text-lg">Selling Options</h3>
+
+          {/* Sell Singles */}
+          <label className="flex items-center gap-3 text-sm text-gray-300">
+            <input
+              type="checkbox"
+              checked={block.sell_singles}
+              onChange={(e) =>
+                updateBlock(index, "sell_singles", e.target.checked)
+              }
+            />
+            Sell Individual Tracks
+          </label>
+
+          {/* Default single price */}
+          {block.sell_singles && (
+            <div>
+              <label className="text-sm text-gray-300">
+                Default Single Price
+              </label>
+              <input
+                className="w-full p-2 rounded bg-black border border-gray-700 text-white"
+                value={block.single_price}
+                onChange={(e) =>
+                  updateBlock(index, "single_price", e.target.value)
+                }
+                placeholder="0.00"
+              />
+            </div>
+          )}
+
+          {/* Sell Album */}
+          <label className="flex items-center gap-3 text-sm text-gray-300">
+            <input
+              type="checkbox"
+              checked={block.sell_album}
+              onChange={(e) =>
+                updateBlock(index, "sell_album", e.target.checked)
+              }
+            />
+            Sell Full Album
+          </label>
+
+          {/* Album Price + Button Text */}
+          {block.sell_album && (
+            <>
+              <label className="text-sm text-gray-300">Album Price</label>
+              <input
+                className="w-full p-2 rounded bg-black border border-gray-700 text-white"
+                value={block.album_price}
+                onChange={(e) =>
+                  updateBlock(index, "album_price", e.target.value)
+                }
+                placeholder="9.99"
+              />
+
+              <label className="text-sm text-gray-300">Album Button Text</label>
+              <input
+                className="w-full p-2 rounded bg-black border border-gray-700 text-white"
+                value={block.album_button_text}
+                onChange={(e) =>
+                  updateBlock(index, "album_button_text", e.target.value)
+                }
+              />
+            </>
+          )}
+          <label className="flex items-center gap-3 text-sm text-gray-300">
+            <input
+              type="checkbox"
+              checked={block.preview_enabled}
+              onChange={(e) => {
+                updateBlock(index, "preview_enabled", e.target.checked);
+
+                if (e.target.checked && !block.preview_duration) {
+                  updateBlock(index, "preview_duration", 10); // default 10s
+                }
+              }}
+            />
+            Limit Playback to Preview Only
+          </label>
+
+          {block.preview_enabled && (
+            <div>
+              <label className="text-sm text-gray-300">Preview Duration</label>
+
+              <select
+                className="w-full p-2 rounded bg-black border border-gray-700 text-white mt-1"
+                value={block.preview_duration}
+                onChange={(e) =>
+                  updateBlock(index, "preview_duration", Number(e.target.value))
+                }
+              >
+                {getPreviewOptions(duration).map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+
+              <p className="text-xs text-gray-400 mt-1">
+                Choose up to 30 minutes based on the audio length.
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Waveform Colors */}
         <div className="mt-8 space-y-6 p-4 rounded-lg bg-[#111]/40 border border-gray-800">

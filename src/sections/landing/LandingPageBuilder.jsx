@@ -303,6 +303,15 @@ export default function LandingPageBuilder() {
 
       newBlock.text_color = "#ffffff";
 
+      newBlock.sell_singles = false;
+      newBlock.sell_album = false;
+      newBlock.album_price = "";
+      newBlock.single_price = "";
+      newBlock.album_button_text = "Buy Album";
+      newBlock.single_button_text = "Buy Now";
+      newBlock.preview_enabled = false;
+      newBlock.preview_duration = 30; // seconds
+
       newBlock.collapsed = false;
     }
 

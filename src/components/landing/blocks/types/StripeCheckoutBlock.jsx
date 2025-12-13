@@ -8,8 +8,6 @@ export default function StripeCheckoutBlock({
   pdfList,
   bgTheme,
 }) {
-  console.log("PRICE VALUE + TYPE:", block.price, typeof block.price);
-
   return (
     <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
       <h3 className="text-lg font-semibold text-silver mb-4">

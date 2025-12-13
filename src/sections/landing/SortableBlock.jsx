@@ -20,6 +20,7 @@ import ImageBlock from "../../components/landing/blocks/types/ImageBlock";
 import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOffers3Block";
 import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureCheckoutBlock";
 import AudioPlayerBlock from "../../components/landing/blocks/types/AudioPlayerBlock";
+import { SortableContainerBlock } from "../../components/landing/blocks/types/SortableContainerBlock";
 
 const BLOCK_LABELS = {
   heading: "Heading (H1)",
@@ -41,6 +42,7 @@ const BLOCK_LABELS = {
   referral_button: "Referral Button",
   secure_checkout: "Secure Checkout",
   audio_player: "Audio Player",
+  container: "Section Container",
 };
 
 function SortableBlock({
@@ -76,6 +78,11 @@ function SortableBlock({
 
   function getBlockLabel(block) {
     switch (block.type) {
+      case "container":
+        return `${block.title || "Untitled Section"} • ${
+          (block.children || []).length
+        } blocks`;
+
       case "heading":
       case "subheading":
       case "subsubheading":
@@ -132,6 +139,25 @@ function SortableBlock({
       default:
         return "";
     }
+  }
+
+  if (block.type === "container") {
+    return (
+      <SortableContainerBlock
+        id={id}
+        block={block}
+        index={index}
+        updateBlock={updateBlock}
+        removeBlock={removeBlock}
+        bgTheme={bgTheme}
+        pdfList={pdfList}
+        landing={landing}
+        setNodeRef={setNodeRef}
+        attributes={attributes}
+        listeners={listeners}
+        style={style}
+      />
+    );
   }
 
   return (

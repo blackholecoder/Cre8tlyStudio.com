@@ -18,6 +18,7 @@ export default function AddSectionButton({ addBlock }) {
   }, []);
 
   const options = [
+    { label: "Section Container", value: "container" },
     { label: "Heading (H1)", value: "heading" },
     { label: "Subheading (H2)", value: "subheading" },
     { label: "Sub-Subheading (H3)", value: "subsubheading" },

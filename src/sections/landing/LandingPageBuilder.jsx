@@ -56,6 +56,239 @@ export default function LandingPageBuilder() {
 
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const findLocationById = (blocks, id) => {
+    const rootIndex = blocks.findIndex((b) => b.id === id);
+    if (rootIndex !== -1) {
+      return { parentId: null, index: rootIndex, block: blocks[rootIndex] };
+    }
+
+    for (const container of blocks) {
+      if (container.type !== "container") continue;
+      const childIndex = (container.children || []).findIndex(
+        (c) => c.id === id
+      );
+      if (childIndex !== -1) {
+        return {
+          parentId: container.id,
+          index: childIndex,
+          block: container.children[childIndex],
+        };
+      }
+    }
+
+    return null;
+  };
+
+  const removeAtLocation = (blocks, loc) => {
+    let removed;
+
+    if (loc.parentId === null) {
+      removed = blocks[loc.index];
+      return {
+        removed,
+        next: blocks.filter((_, i) => i !== loc.index),
+      };
+    }
+
+    return {
+      removed: blocks.find((b) => b.id === loc.parentId).children[loc.index],
+      next: blocks.map((b) =>
+        b.id !== loc.parentId
+          ? b
+          : {
+              ...b,
+              children: b.children.filter((_, i) => i !== loc.index),
+            }
+      ),
+    };
+  };
+
+  const insertAtLocation = (blocks, loc, item) => {
+    if (loc.parentId === null) {
+      const next = [...blocks];
+      next.splice(loc.index, 0, item);
+      return next;
+    }
+
+    return blocks.map((b) =>
+      b.id !== loc.parentId
+        ? b
+        : {
+            ...b,
+            children: [
+              ...(b.children || []).slice(0, loc.index),
+              item,
+              ...(b.children || []).slice(loc.index),
+            ],
+          }
+    );
+  };
+
+  // const handleDragEnd = ({ active, over }) => {
+  //   if (!over || active.id === over.id) return;
+
+  //   setLanding((prev) => {
+  //     console.log(JSON.stringify(landing.content_blocks, null, 2));
+  //     const blocks = prev.content_blocks;
+
+  //     const activeLoc = findLocationById(blocks, active.id);
+  //     if (!activeLoc) return prev;
+
+  //     const overId = over.id;
+  //     const overLoc = findLocationById(blocks, overId);
+
+  //     // CASE 1: Dropped on container body
+  //     if (
+  //       typeof overId === "string" &&
+  //       overId.startsWith("container-") &&
+  //       !overLoc
+  //     ) {
+  //       const containerId = overId.replace("container-", "");
+  //       const container = blocks.find((b) => b.id === containerId);
+  //       if (!container) return prev;
+
+  //       const { removed, next } = removeAtLocation(blocks, activeLoc);
+
+  //       return {
+  //         ...prev,
+  //         content_blocks: insertAtLocation(
+  //           next,
+  //           {
+  //             parentId: container.id,
+  //             index: container.children?.length || 0,
+  //           },
+  //           removed
+  //         ),
+  //       };
+  //     }
+
+  //     if (!overLoc) return prev;
+
+  //     const { removed, next } = removeAtLocation(blocks, activeLoc);
+
+  //     let insertIndex = overLoc.index;
+  //     let isAppend = false;
+
+  //     // ✅ Detect append-to-end
+  //     if (overLoc.parentId) {
+  //       const parent = blocks.find((b) => b.id === overLoc.parentId);
+  //       if (parent) {
+  //         const isLast = overLoc.index === (parent.children?.length || 0) - 1;
+
+  //         if (isLast) {
+  //           insertIndex = parent.children.length;
+  //           isAppend = true;
+  //         }
+  //       }
+  //     }
+
+  //     // ✅ ONLY adjust when NOT appending
+  //     if (
+  //       !isAppend &&
+  //       activeLoc.parentId === overLoc.parentId &&
+  //       activeLoc.index < overLoc.index
+  //     ) {
+  //       insertIndex -= 1;
+  //     }
+
+  //     return {
+  //       ...prev,
+  //       content_blocks: insertAtLocation(
+  //         next,
+  //         {
+  //           parentId: overLoc.parentId,
+  //           index: insertIndex,
+  //         },
+  //         removed
+  //       ),
+  //     };
+  //   });
+  // };
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+
+    setLanding((prev) => {
+      const blocks = prev.content_blocks;
+
+      const activeLoc = findLocationById(blocks, active.id);
+      if (!activeLoc) return prev;
+
+      const overId = over.id;
+      const overLoc = findLocationById(blocks, overId);
+
+      // 🔒 Determine target BEFORE removing
+      let targetParentId = null;
+      let targetIndex = null;
+
+      // ─────────────────────────────
+      // CASE 1: Dropped on container body
+      // ─────────────────────────────
+      if (
+        typeof overId === "string" &&
+        overId.startsWith("container-") &&
+        !overLoc
+      ) {
+        const containerId = overId.replace("container-", "");
+        const container = blocks.find((b) => b.id === containerId);
+        if (!container) return prev;
+
+        targetParentId = container.id;
+        targetIndex = container.children?.length || 0;
+      }
+
+      // ─────────────────────────────
+      // CASE 2: Dropped on a block
+      // ─────────────────────────────
+      else if (overLoc) {
+        targetParentId = overLoc.parentId;
+        targetIndex = overLoc.index;
+
+        if (activeLoc.block.type === "container" && overLoc.parentId) {
+          targetParentId = null;
+          targetIndex = blocks.length;
+        } else {
+          targetParentId = overLoc.parentId;
+          targetIndex = overLoc.index;
+        }
+
+        // ✅ append-to-end fix
+        if (overLoc.parentId) {
+          const parent = blocks.find((b) => b.id === overLoc.parentId);
+          if (parent && overLoc.index === (parent.children?.length || 0) - 1) {
+            targetIndex = parent.children.length;
+          }
+        }
+
+        // ✅ downward adjustment (only when needed)
+        if (
+          activeLoc.parentId === overLoc.parentId &&
+          activeLoc.index < overLoc.index
+        ) {
+          targetIndex -= 1;
+        }
+      }
+
+      // ❌ SAFETY: no valid target → do nothing
+      if (targetIndex === null) return prev;
+
+      // 🧩 NOW it is safe to remove
+      const { removed, next } = removeAtLocation(blocks, activeLoc);
+
+      return {
+        ...prev,
+        content_blocks: insertAtLocation(
+          next,
+          {
+            parentId: targetParentId,
+            index: targetIndex,
+          },
+          removed
+        ),
+      };
+    });
+  };
+
   const updateBlock = React.useCallback((index, key, value) => {
     setLanding((prev) => {
       const updatedBlocks = prev.content_blocks.map((b, i) =>
@@ -77,6 +310,17 @@ export default function LandingPageBuilder() {
       bulleted: false,
       collapsed: true,
     };
+
+    if (type === "container") {
+      newBlock = {
+        id: crypto.randomUUID(),
+        type: "container",
+        title: "New Section",
+        collapsed: false,
+        enabled: true,
+        children: [],
+      };
+    }
 
     // 🧩 Custom defaults for specific block types
     if (
@@ -856,24 +1100,7 @@ export default function LandingPageBuilder() {
               {!blocksHidden && (
                 <DndContext
                   collisionDetection={closestCenter}
-                  onDragEnd={({ active, over }) => {
-                    if (!over || active.id === over.id) return;
-                    const oldIndex = landing.content_blocks.findIndex(
-                      (b) => b.id === active.id
-                    );
-                    const newIndex = landing.content_blocks.findIndex(
-                      (b) => b.id === over.id
-                    );
-                    const newBlocks = arrayMove(
-                      landing.content_blocks,
-                      oldIndex,
-                      newIndex
-                    );
-                    setLanding((prev) => ({
-                      ...prev,
-                      content_blocks: newBlocks,
-                    }));
-                  }}
+                  onDragEnd={handleDragEnd}
                 >
                   <SortableContext
                     items={landing.content_blocks.map((b) => b.id)}

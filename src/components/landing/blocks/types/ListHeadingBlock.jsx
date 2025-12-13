@@ -24,6 +24,27 @@ export default function ListHeadingBlock({ block, index, updateBlock }) {
                    placeholder-gray-400 leading-snug resize-none transition-all duration-200"
         style={{ minHeight: "3.5rem", lineHeight: "1.4" }}
       />
+      <div className="flex gap-2 mt-3">
+        {["left", "center", "right"].map((align) => (
+          <button
+            key={align}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              updateBlock(index, "alignment", align);
+            }}
+            className={`px-3 py-1 text-xs rounded border transition-all
+              ${
+                block.alignment === align
+                  ? "bg-green-600/20 border-green-500 text-green-400"
+                  : "border-gray-600 text-gray-400 hover:border-gray-400"
+              }
+            `}
+          >
+            {align.charAt(0).toUpperCase() + align.slice(1)}
+          </button>
+        ))}
+      </div>
     </>
   );
 }

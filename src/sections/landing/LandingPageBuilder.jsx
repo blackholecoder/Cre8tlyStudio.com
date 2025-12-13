@@ -71,6 +71,7 @@ export default function LandingPageBuilder() {
     let newBlock = {
       id: crypto.randomUUID(),
       type,
+      enabled: true,
       padding: 20,
       alignment: "left",
       bulleted: false,

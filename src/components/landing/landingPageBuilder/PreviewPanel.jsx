@@ -167,104 +167,170 @@ export default function PreviewPanel({
               };
 
               switch (block.type) {
-                case "heading":
+                case "heading": {
+                  const alignment = block.alignment || "left";
+
+                  const containerStyle =
+                    alignment === "right"
+                      ? { marginLeft: "auto", marginRight: 0 }
+                      : { marginLeft: "auto", marginRight: "auto" };
+
                   return (
                     <h1
                       key={index}
                       className="text-4xl font-bold leading-snug"
                       style={{
                         ...baseStyle,
+                        ...containerStyle,
+                        maxWidth: 700,
+                        textAlign: alignment,
                         color: landing.font_color_h1 || "#FFFFFF",
                       }}
                     >
                       {block.text || "Heading Example"}
                     </h1>
                   );
+                }
 
-                case "subheading":
+                case "subheading": {
+                  const alignment = block.alignment || "left";
+
+                  const containerStyle =
+                    alignment === "right"
+                      ? { marginLeft: "auto", marginRight: 0 }
+                      : { marginLeft: "auto", marginRight: "auto" };
+
                   return (
                     <h2
                       key={index}
                       className="text-2xl font-semibold leading-snug"
                       style={{
                         ...baseStyle,
+                        ...containerStyle,
+                        maxWidth: 700,
+                        textAlign: alignment,
                         color: landing.font_color_h2 || "#E5E5E5",
                       }}
                     >
                       {block.text || "Subheading Example"}
                     </h2>
                   );
+                }
 
-                case "subsubheading":
+                case "subsubheading": {
+                  const alignment = block.alignment || "left";
+
+                  const containerStyle =
+                    alignment === "right"
+                      ? { marginLeft: "auto", marginRight: 0 }
+                      : { marginLeft: "auto", marginRight: "auto" };
+
                   return (
                     <h3
                       key={index}
                       className="text-xl font-medium leading-snug"
                       style={{
                         ...baseStyle,
+                        ...containerStyle,
+                        maxWidth: 700,
+                        textAlign: alignment,
                         color: landing.font_color_h3 || "#CCCCCC",
                       }}
                     >
                       {block.text || "Supporting Header"}
                     </h3>
                   );
+                }
 
-                case "list_heading":
+                case "list_heading": {
+                  const alignment = block.alignment || "left";
+
+                  const containerStyle =
+                    alignment === "right"
+                      ? { marginLeft: "auto", marginRight: 0 }
+                      : { marginLeft: "auto", marginRight: "auto" };
+
                   return (
                     <p
                       key={index}
                       style={{
-                        margin: "0 auto 10px",
-                        maxWidth: "700px",
+                        ...baseStyle,
+                        ...containerStyle,
+                        maxWidth: 700,
+                        marginBottom: 10,
                         fontWeight: 700,
                         fontSize: "1.15rem",
-                        textAlign: block.alignment || "left",
+                        textAlign: alignment,
                         color: landing.font_color_p || "#FFFFFF",
                       }}
                     >
                       {block.text || "💎 List Heading Example"}
                     </p>
                   );
+                }
 
-                case "paragraph":
+                case "paragraph": {
+                  const alignment = block.alignment || "left";
+
+                  const containerStyle =
+                    alignment === "right"
+                      ? { marginLeft: "auto", marginRight: 0 }
+                      : { marginLeft: "auto", marginRight: "auto" };
+
+                  // 🔹 BULLETED PREVIEW
                   if (block.bulleted) {
                     const lines = (block.text || "")
                       .split(/\n/)
                       .filter(Boolean);
+
                     return (
-                      <ul
+                      <div
                         key={index}
                         style={{
-                          margin: "0 auto 24px",
-                          maxWidth: "700px",
-                          color: landing.font_color_p || "#DDDDDD",
-                          textAlign: block.alignment || "left",
+                          ...containerStyle,
+                          maxWidth: 700,
+                          marginBottom: 24,
                           lineHeight: "1.8",
-                          listStyle: "disc",
-                          paddingLeft: "1.5rem",
                         }}
                       >
-                        {lines.map((line, i) => (
-                          <li key={i}>{line}</li>
-                        ))}
-                      </ul>
+                        <ul
+                          style={{
+                            listStyle: "disc",
+                            paddingLeft: "1.25rem",
+                            margin: 0,
+                            textAlign: "left", // 🔑 always left for bullets
+                            color:
+                              landing.font_color_p || "rgba(255,255,255,0.92)",
+                          }}
+                        >
+                          {lines.map((line, i) => (
+                            <li key={i} style={{ marginBottom: "0.35rem" }}>
+                              {line.replace(/^•\s*/, "")}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     );
                   }
 
+                  // 🔹 NORMAL PARAGRAPH PREVIEW
                   return (
                     <p
                       key={index}
                       className="text-lg leading-relaxed"
                       style={{
-                        margin: "0 auto 24px",
-                        maxWidth: "700px",
-                        color: landing.font_color_p || "#DDDDDD",
-                        textAlign: block.alignment || "left",
+                        ...containerStyle,
+                        maxWidth: 700,
+                        marginBottom: 24,
+                        textAlign: alignment,
+                        color: landing.font_color_p || "rgba(255,255,255,0.92)",
+                        whiteSpace: "pre-line",
                       }}
                     >
                       {block.text || "Your paragraph will appear here."}
                     </p>
                   );
+                }
 
                 case "video":
                   if (!block.url) return null;

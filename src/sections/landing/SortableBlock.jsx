@@ -138,8 +138,13 @@ function SortableBlock({
     <div
       ref={setNodeRef}
       style={style}
-      className="mb-6 bg-black/70 border border-gray-600 hover:border-gray-400 
-                 rounded-xl p-5 relative shadow-inner text-white transition-all duration-300"
+      className={`mb-6 bg-black/70 border rounded-xl p-5 relative shadow-inner text-white transition-all duration-300
+    ${
+      block.enabled !== false
+        ? "border-gray-600 hover:border-gray-400"
+        : "border-gray-700 opacity-50 grayscale"
+    }
+  `}
     >
       {/* 🧩 Drag Handle */}
       <div
@@ -167,14 +172,32 @@ function SortableBlock({
             {getBlockLabel(block)}
           </span>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation(); // 🚨 prevents collapse toggle
+              updateBlock(index, "enabled", block.enabled === false);
+            }}
+            className={`text-xs px-2 py-1 rounded transition-colors
+      ${
+        block.enabled !== false
+          ? "bg-green text-black hover:bg-green/30"
+          : "bg-gray/20 text-gray-400 hover:bg-gray-600/30"
+      }
+    `}
+          >
+            {block.enabled !== false ? "On" : "Off"}
+          </button>
 
-        <span
-          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-            block.collapsed ? "rotate-0" : "rotate-180"
-          }`}
-        >
-          ▼
-        </span>
+          <span
+            className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+              block.collapsed ? "rotate-0" : "rotate-180"
+            }`}
+          >
+            ▼
+          </span>
+        </div>
       </div>
 
       {/* 🪄 Editable Fields (Collapsible) */}

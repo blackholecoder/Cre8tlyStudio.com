@@ -31,6 +31,7 @@ import TextColorControls from "../../components/landing/landingPageBuilder/TextC
 import PreviewPanel from "../../components/landing/landingPageBuilder/PreviewPanel";
 import ToggleDownloadButton from "../../components/landing/landingPageBuilder/ToggleDownloadButton";
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
+import { BLOCK_LIMITS } from "./landingBlocksRules";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -124,86 +125,33 @@ export default function LandingPageBuilder() {
     );
   };
 
-  // const handleDragEnd = ({ active, over }) => {
-  //   if (!over || active.id === over.id) return;
+  const countBlocksByType = React.useCallback((blocks) => {
+    const counts = {};
 
-  //   setLanding((prev) => {
-  //     console.log(JSON.stringify(landing.content_blocks, null, 2));
-  //     const blocks = prev.content_blocks;
+    const walk = (list) => {
+      for (const block of list) {
+        counts[block.type] = (counts[block.type] || 0) + 1;
 
-  //     const activeLoc = findLocationById(blocks, active.id);
-  //     if (!activeLoc) return prev;
+        if (block.type === "container" && block.children?.length) {
+          walk(block.children);
+        }
+      }
+    };
 
-  //     const overId = over.id;
-  //     const overLoc = findLocationById(blocks, overId);
+    walk(blocks || []);
+    return counts;
+  }, []);
 
-  //     // CASE 1: Dropped on container body
-  //     if (
-  //       typeof overId === "string" &&
-  //       overId.startsWith("container-") &&
-  //       !overLoc
-  //     ) {
-  //       const containerId = overId.replace("container-", "");
-  //       const container = blocks.find((b) => b.id === containerId);
-  //       if (!container) return prev;
+  const canAddBlock = React.useCallback(
+    (type) => {
+      const limit = BLOCK_LIMITS[type];
+      if (!limit) return true;
 
-  //       const { removed, next } = removeAtLocation(blocks, activeLoc);
-
-  //       return {
-  //         ...prev,
-  //         content_blocks: insertAtLocation(
-  //           next,
-  //           {
-  //             parentId: container.id,
-  //             index: container.children?.length || 0,
-  //           },
-  //           removed
-  //         ),
-  //       };
-  //     }
-
-  //     if (!overLoc) return prev;
-
-  //     const { removed, next } = removeAtLocation(blocks, activeLoc);
-
-  //     let insertIndex = overLoc.index;
-  //     let isAppend = false;
-
-  //     // ✅ Detect append-to-end
-  //     if (overLoc.parentId) {
-  //       const parent = blocks.find((b) => b.id === overLoc.parentId);
-  //       if (parent) {
-  //         const isLast = overLoc.index === (parent.children?.length || 0) - 1;
-
-  //         if (isLast) {
-  //           insertIndex = parent.children.length;
-  //           isAppend = true;
-  //         }
-  //       }
-  //     }
-
-  //     // ✅ ONLY adjust when NOT appending
-  //     if (
-  //       !isAppend &&
-  //       activeLoc.parentId === overLoc.parentId &&
-  //       activeLoc.index < overLoc.index
-  //     ) {
-  //       insertIndex -= 1;
-  //     }
-
-  //     return {
-  //       ...prev,
-  //       content_blocks: insertAtLocation(
-  //         next,
-  //         {
-  //           parentId: overLoc.parentId,
-  //           index: insertIndex,
-  //         },
-  //         removed
-  //       ),
-  //     };
-  //   });
-  // };
+      const counts = countBlocksByType(landing?.content_blocks || []);
+      return (counts[type] || 0) < limit;
+    },
+    [landing?.content_blocks, countBlocksByType]
+  );
 
   const handleDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return;
@@ -300,6 +248,15 @@ export default function LandingPageBuilder() {
 
   const addBlock = (type) => {
     if (!type) return; // prevent invalid type
+
+    if (!canAddBlock(type)) {
+      toast.error(
+        `You can only add ${BLOCK_LIMITS[type]} ${
+          BLOCK_LABELS[type] || type
+        } block`
+      );
+      return;
+    }
 
     let newBlock = {
       id: crypto.randomUUID(),
@@ -938,6 +895,8 @@ export default function LandingPageBuilder() {
         `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
         {
           ...landing,
+          font: fontName, // ✅ override stale landing.font
+          font_file: fontFile,
           content_blocks: blocks,
           pdf_url: landing.pdf_url,
           cover_image_url: landing.cover_image_url,
@@ -1075,7 +1034,7 @@ export default function LandingPageBuilder() {
               Content
             </h1>
             <div className="flex justify-end mb-6">
-              <AddSectionButton addBlock={addBlock} />
+              <AddSectionButton addBlock={addBlock} canAddBlock={canAddBlock} />
             </div>
             {/* 🔽 Collapse / Expand All Blocks */}
             <div

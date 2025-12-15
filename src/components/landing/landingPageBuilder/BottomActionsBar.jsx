@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function BottomActionsBar({
   landing,
   user,
   handleSaveTemplate,
 }) {
+  const [copied, setCopied] = useState(false);
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-16 pt-8 border-t border-gray-700">
       {/* Left: Save buttons */}
@@ -46,13 +48,27 @@ export default function BottomActionsBar({
           {landing.username ? "View Live Page" : "Set Username to View Page"}
         </a>
 
-        <p className="text-xs text-gray-500 mt-1">
-          Live URL:{" "}
-          <span className="text-silver font-medium">
-            {landing.username
-              ? `https://${landing.username}.cre8tlystudio.com`
-              : "Not set"}
-          </span>
+        <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+          Copy Live URL:
+          {landing.username ? (
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `https://${landing.username}.cre8tlystudio.com`
+                );
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+              className="text-silver font-medium hover:opacity-80"
+            >
+              {copied
+                ? "Copied!"
+                : `https://${landing.username}.cre8tlystudio.com`}
+            </button>
+          ) : (
+            <span className="text-gray-400">Not set</span>
+          )}
         </p>
       </div>
     </div>

@@ -3,9 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 
-export default function AddSectionButton({ addBlock }) {
+export default function AddSectionButton({ addBlock, canAddBlock }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const { user } = useAuth();
+
+  const isDisabled = (value) => {
+    return typeof canAddBlock === "function" && !canAddBlock(value);
+  };
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -65,20 +69,33 @@ export default function AddSectionButton({ addBlock }) {
           className="absolute right-0 mt-3 w-56 bg-[#0F172A] border border-gray-700 
                         rounded-xl shadow-xl overflow-hidden z-50"
         >
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                addBlock(opt.value);
-                setShowDropdown(false);
-              }}
-              className="block w-full text-left px-5 py-3 text-gray-200 hover:bg-blue/20 transition-all"
-            >
-              {opt.label}
-            </button>
-          ))}
+          {options.map((opt) => {
+            const disabled = isDisabled(opt.value);
+
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={disabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (disabled) return;
+                  addBlock(opt.value);
+                  setShowDropdown(false);
+                }}
+                className={`block w-full text-left px-5 py-3 transition-all
+        ${
+          disabled
+            ? "text-gray-500 cursor-not-allowed opacity-40"
+            : "text-gray-200 hover:bg-blue/20"
+        }
+      `}
+                title={disabled ? "Block limit reached" : ""}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -6,107 +6,163 @@ export default function ColorThemeChooser({
   setBgTheme,
   includeGradients = true,
 }) {
-  // 🔹 Load collapse state from localStorage (collapsed by default)
   const [showThemes, setShowThemes] = useState(() => {
     const saved = localStorage.getItem("showThemes");
-    return saved === "true" ? true : false;
+    return saved === "true";
   });
 
-  // ✅ Persist state so it remembers between reloads
+  const [customSolid, setCustomSolid] = useState("#111827");
+  const [useCustomGradient, setUseCustomGradient] = useState(false);
+  const [gradStart, setGradStart] = useState("#0ea5e9");
+  const [gradEnd, setGradEnd] = useState("#22c55e");
+  const [gradDir, setGradDir] = useState("90deg");
+
   useEffect(() => {
     localStorage.setItem("showThemes", showThemes);
   }, [showThemes]);
 
-  // Combine solids and gradients safely
   const allThemes = useMemo(() => {
-    return includeGradients
-      ? [...(colorThemes || []), ...(gradientThemes || [])]
-      : colorThemes || [];
+    return includeGradients ? [...colorThemes, ...gradientThemes] : colorThemes;
   }, [includeGradients]);
 
-  // Find currently selected theme by either name or preview match
   const selected =
-    allThemes.find(
-      (t) => t.name === bgTheme || t.preview === bgTheme
-    ) || allThemes[0] || {};
+    allThemes.find((t) => t.preview === bgTheme || t.name === bgTheme) || {};
 
   const handleThemeSelect = (theme) => {
-    // Save the actual background value (gradient or solid)
     setBgTheme(theme.preview);
   };
 
+  const applyCustomSolid = () => {
+    setUseCustomGradient(false);
+    setBgTheme(customSolid);
+  };
+
+  const applyCustomGradient = () => {
+    const gradient = `linear-gradient(${gradDir}, ${gradStart}, ${gradEnd})`;
+    setBgTheme(gradient);
+  };
+
   return (
-    <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner hover:border-silver/60 transition-all">
-      {/* Header toggle */}
+    <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner">
+      {/* Header */}
       <div
-        onClick={() => setShowThemes((prev) => !prev)}
+        onClick={() => setShowThemes((p) => !p)}
         className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
       >
-        <h3 className="text-lg font-semibold text-silver tracking-wide">
-          Theme Color
-        </h3>
+        <h3 className="text-lg font-semibold text-silver">Background Theme</h3>
         <span
-          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-            showThemes ? "rotate-180" : "rotate-0"
+          className={`text-gray-400 transition-transform ${
+            showThemes ? "rotate-180" : ""
           }`}
         >
           ▼
         </span>
       </div>
 
-      {/* Collapsible content */}
+      {/* Content */}
       <div
-        className={`transition-all duration-500 ease-in-out overflow-hidden ${
-          showThemes ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+        className={`overflow-hidden transition-all duration-500 ${
+          showThemes ? "max-h-[900px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-6 pb-6">
-          {/* 🟩 Live Preview Box */}
+        <div className="px-6 pb-6 space-y-6">
+          {/* Live Preview */}
           <div
-            className="h-14 w-full rounded-lg border border-gray-700 mb-4 shadow-inner transition-all duration-500 ease-in-out"
+            className="h-14 rounded-lg border border-gray-700"
             style={{
-              background:
-                selected.preview ||
-                selected.color ||
-                "linear-gradient(to right, #000, #333)",
+              background: bgTheme || "linear-gradient(to right, #000, #333)",
             }}
-          ></div>
+          />
 
-          {/* 🎨 Grid of Swatches */}
+          {/* Presets */}
           <div
-            className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 overflow-y-auto rounded-lg border border-gray-800 p-2"
-            style={{ maxHeight: "300px" }}
+            className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 overflow-y-auto border border-gray-800 rounded-lg p-2"
+            style={{ maxHeight: "240px" }}
           >
             {allThemes.map((item) => (
               <button
-                key={item.name}
                 type="button"
+                key={item.name}
                 onClick={() => handleThemeSelect(item)}
-                className={`relative w-full h-12 rounded-lg transition-all duration-200 focus:outline-none border shadow-[inset_0_1px_3px_rgba(255,255,255,0.2)]
-                ${
+                className={`relative h-12 rounded-lg border transition-all ${
                   bgTheme === item.preview
-                    ? "border-green-400 ring-2 ring-green-500/60 scale-[1.05]"
-                    : "border-gray-700 hover:border-green-300 hover:scale-[1.02]"
+                    ? "border-green-400 ring-2 ring-green-500/60"
+                    : "border-gray-700 hover:border-green-300"
                 }`}
-                style={{
-                  background: item.preview,
-                }}
+                style={{ background: item.preview }}
               >
-                <span
-                  className={`absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase tracking-wide ${
-                    ["dark", "graphite", "royal"].includes(item.name)
-                      ? "text-white"
-                      : "text-black"
-                  }`}
-                >
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase text-black/80">
                   {item.label}
                 </span>
               </button>
             ))}
           </div>
 
-          <p className="text-xs text-gray-400 mt-3 text-center">
-            Click a color or gradient to set your background theme.
+          {/* Solid Color Picker */}
+          <div>
+            <p className="text-sm font-semibold text-gray-300 mb-2">
+              Custom Solid Color
+            </p>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={customSolid}
+                onChange={(e) => setCustomSolid(e.target.value)}
+                className="w-10 h-10 rounded cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={applyCustomSolid}
+                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-green text-sm hover:border-green"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+
+          {/* Gradient Picker */}
+          {includeGradients && (
+            <div>
+              <p className="text-sm font-semibold text-gray-300 mb-2">
+                Custom Gradient
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="color"
+                  value={gradStart}
+                  onChange={(e) => setGradStart(e.target.value)}
+                />
+                <input
+                  type="color"
+                  value={gradEnd}
+                  onChange={(e) => setGradEnd(e.target.value)}
+                />
+              </div>
+
+              <select
+                value={gradDir}
+                onChange={(e) => setGradDir(e.target.value)}
+                className="w-full mt-2 p-2 bg-black border border-gray-700 rounded text-white"
+              >
+                <option value="90deg">Left → Right</option>
+                <option value="180deg">Top → Bottom</option>
+                <option value="45deg">Diagonal ↘</option>
+                <option value="135deg">Diagonal ↙</option>
+              </select>
+
+              <button
+                type="button"
+                onClick={applyCustomGradient}
+                className="mt-3 w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-green-400"
+              >
+                Apply Gradient
+              </button>
+            </div>
+          )}
+
+          <p className="text-xs text-gray-400 text-center">
+            Presets or custom colors all save the same way.
           </p>
         </div>
       </div>

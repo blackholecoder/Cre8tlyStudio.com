@@ -22,6 +22,8 @@ export default function AudioPlayerBlock({
   const [seekValue, setSeekValue] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
+  const startTime = Date.now();
+
   const getLabelContrast = (hex) => {
     if (!hex) return "#f3f4f6";
 
@@ -511,7 +513,7 @@ export default function AudioPlayerBlock({
         />
 
         {/* Upload Audio */}
-        <input
+        {/* <input
           id={`audioUpload-${block.id}`}
           type="file"
           accept="audio/*"
@@ -535,7 +537,25 @@ export default function AudioPlayerBlock({
               const res = await axiosInstance.post(
                 "/landing/upload-media-block",
                 formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+                {
+                  timeout: 0,
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                  onUploadProgress: (e) => {
+                    if (e.total) {
+                      const percent = Math.round((e.loaded * 100) / e.total);
+                      console.log("Upload progress:", percent);
+                    }
+                  },
+                }
+              );
+
+              console.log(
+                "[UPLOAD COMPLETE]",
+                "Time:",
+                Math.round((Date.now() - startTime) / 1000),
+                "seconds"
               );
 
               if (res.data.success) {
@@ -569,6 +589,72 @@ export default function AudioPlayerBlock({
             }
           }}
           className="hidden"
+        /> */}
+        <input
+          id={`audioUpload-${block.id}`}
+          type="file"
+          accept="audio/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            setIsUploading(true);
+
+            try {
+              // 1️⃣ client side duration check
+              await validateAudioDuration(file);
+
+              // 2️⃣ ask backend for signed upload URL
+              const signRes = await axiosInstance.post("/landing/sign-upload", {
+                fileName: file.name,
+                mimeType: file.type,
+                landingId: landing.id,
+                blockId: block.id,
+              });
+
+              if (!signRes.data?.success) {
+                throw new Error("Failed to get upload URL");
+              }
+
+              const { uploadUrl, publicUrl } = signRes.data;
+
+              // 3️⃣ upload DIRECTLY to DigitalOcean Spaces
+              await fetch(uploadUrl, {
+                method: "PUT",
+                body: file,
+                headers: {
+                  "Content-Type": file.type,
+                  "x-amz-acl": "public-read", // 👈 REQUIRED
+                },
+              });
+
+              // 4️⃣ save to playlist
+              const newTrack = {
+                title: file.name.replace(/\.[^/.]+$/, ""),
+                audio_url: publicUrl,
+                cover_url: block.cover_url || "",
+                price: block.single_price || "",
+                stripe_product_id: "",
+                stripe_price_id: "",
+              };
+
+              const updatedPlaylist = [...(block.playlist || []), newTrack];
+
+              updateBlock(index, "playlist", updatedPlaylist);
+              updateBlock(index, "audio_url", newTrack.audio_url);
+              updateBlock(index, "audio_name", newTrack.title);
+              updateBlock(index, "title", newTrack.title);
+
+              toast.success("Audio uploaded successfully");
+            } catch (err) {
+              console.error(err);
+              toast.error(err.message || "Upload failed");
+            } finally {
+              setIsUploading(false);
+              e.target.value = ""; // reset input
+            }
+          }}
         />
 
         <label
@@ -578,6 +664,7 @@ export default function AudioPlayerBlock({
           Upload Audio
         </label>
         <button
+          type="button"
           onClick={() => {
             updateBlock(index, "audio_url", "");
             updateBlock(index, "audio_name", "");
@@ -667,6 +754,7 @@ export default function AudioPlayerBlock({
           Upload Cover
         </label>
         <button
+          type="button"
           onClick={() => {
             updateBlock(index, "cover_url", "");
             updateBlock(index, "cover_name", "");

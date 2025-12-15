@@ -1,19 +1,15 @@
-import { adjustForLandingOverlay } from "../../../../sections/landing/adjustForLandingOverlay";
-
 const getLabelContrast = (hex) => {
-    if (!hex) return "#1f2937"; // default dark gray
+  if (!hex) return "#1f2937"; // default dark gray
 
-    const color = hex.replace("#", "");
-    const r = parseInt(color.substring(0, 2), 16);
-    const g = parseInt(color.substring(2, 4), 16);
-    const b = parseInt(color.substring(4, 6), 16);
+  const color = hex.replace("#", "");
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
 
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
-    return brightness > 160 ? "#1f2937" : "#f3f4f6";
-  };
-
-
+  return brightness > 160 ? "#1f2937" : "#f3f4f6";
+};
 
 export default function OfferBannerBlock({
   block,
@@ -22,60 +18,21 @@ export default function OfferBannerBlock({
   bgTheme,
 }) {
   return (
-    <div
-      className="rounded-xl p-6 mt-3 shadow-inner transition-all relative"
-      style={{
-        background: block.match_main_bg
-          ? adjustForLandingOverlay(bgTheme)
-          : bgTheme || "linear-gradient(to bottom, #1e1e1e, #111)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-        transition: "background 0.4s ease",
-      }}
-    >
+    <div className="rounded-xl p-6 mt-3 border border-gray-700 bg-[#0b0f19]">
       <div
-        className="rounded-xl p-6 shadow-lg transition-all duration-300"
+        className="rounded-lg p-6 mb-8"
         style={{
-          background: block.match_main_bg
-            ? adjustForLandingOverlay(bgTheme)
-            : block.use_gradient
-              ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                  block.gradient_start || "#F285C3"
-                }, ${block.gradient_end || "#7bed9f"})`
-              : block.bg_color || "#F285C3",
-          color: block.text_color || "#fff",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.35)",
-          transition: "background 0.4s ease, box-shadow 0.3s ease",
+          background: bgTheme,
+          outline: "1px dashed rgba(255,255,255,0.15)",
         }}
       >
-        {/* Match Content BG */}
-        <div className="flex items-center gap-3 mt-3">
-          <label
-            className="text-sm font-semibold"
-            style={{
-              color: getLabelContrast(block.bg_color || bgTheme),
-            }}
-          >
-            Match Content Background
-          </label>
-          <input
-            type="checkbox"
-            checked={block.match_main_bg || false}
-            onChange={(e) =>
-              updateBlock(index, "match_main_bg", e.target.checked)
-            }
-          />
-        </div>
-
         {/* Preview heading */}
         <div className="mt-20 text-center">
           <p
             className="text-lg font-semibold mb-4"
             style={{ color: block.text_color || "#000000" }}
           >
-            {block.text ||
-              "🔥 Limited Time Offer! Get your free eBook today!"}
+            {block.text || "🔥 Limited Time Offer! Get your free eBook today!"}
           </p>
 
           {block.button_text && (
@@ -87,8 +44,7 @@ export default function OfferBannerBlock({
                       block.gradient_start || "#F285C3"
                     }, ${block.gradient_end || "#7bed9f"})`
                   : block.bg_color || "#F285C3",
-                color:
-                  block.button_text_color || block.text_color || "#ffffff",
+                color: block.button_text_color || block.text_color || "#ffffff",
                 boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
               }}
             >
@@ -125,9 +81,7 @@ export default function OfferBannerBlock({
           <input
             type="color"
             value={block.text_color || "#000000"}
-            onChange={(e) =>
-              updateBlock(index, "text_color", e.target.value)
-            }
+            onChange={(e) => updateBlock(index, "text_color", e.target.value)}
             className="w-10 h-10 rounded cursor-pointer color-circle"
           />
           <span className="text-xs text-gray-400">
@@ -143,7 +97,7 @@ export default function OfferBannerBlock({
               color: getLabelContrast(block.bg_color || bgTheme),
             }}
           >
-            Use Gradient Background
+            Use Gradient Button
           </label>
           <input
             type="checkbox"
@@ -205,15 +159,13 @@ export default function OfferBannerBlock({
                 color: getLabelContrast(block.bg_color || bgTheme),
               }}
             >
-              Solid Background Color
+              Solid Button Color
             </label>
             <div className="flex items-center gap-3 mt-2">
               <input
                 type="color"
                 value={block.bg_color || "#F285C3"}
-                onChange={(e) =>
-                  updateBlock(index, "bg_color", e.target.value)
-                }
+                onChange={(e) => updateBlock(index, "bg_color", e.target.value)}
                 className="color-circle"
               />
               <div className="w-24">
@@ -276,9 +228,7 @@ export default function OfferBannerBlock({
           <div className="relative w-full">
             <select
               value={block.offer_type || "free"}
-              onChange={(e) =>
-                updateBlock(index, "offer_type", e.target.value)
-              }
+              onChange={(e) => updateBlock(index, "offer_type", e.target.value)}
               className="w-full p-2 pr-10 border border-gray-600 rounded bg-black text-white appearance-none"
             >
               <option value="free">Email Download</option>

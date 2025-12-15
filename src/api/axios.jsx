@@ -1,12 +1,10 @@
 import axios from "axios";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "https://cre8tlystudio.com/api"
     : "https://cre8tlystudio.com/api";
-
-    
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -47,7 +45,9 @@ async function refreshToken() {
     const storedRefresh = localStorage.getItem("refreshToken");
     if (!storedRefresh) throw new Error("No refresh token found");
 
-    const res = await axios.post(`${BASE_URL}/auth/refresh`, { token: storedRefresh });
+    const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+      token: storedRefresh,
+    });
     const { accessToken, refreshToken: newRefresh } = res.data;
 
     // ✅ Safely store new tokens
@@ -97,11 +97,9 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshErr);
       }
     }
-    
 
     return Promise.reject(error);
   }
-  
 );
 
 axiosInstance.interceptors.response.use(
@@ -115,7 +113,5 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
 
 export default axiosInstance;

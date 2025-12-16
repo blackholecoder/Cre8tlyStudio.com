@@ -31,7 +31,7 @@ import TextColorControls from "../../components/landing/landingPageBuilder/TextC
 import PreviewPanel from "../../components/landing/landingPageBuilder/PreviewPanel";
 import ToggleDownloadButton from "../../components/landing/landingPageBuilder/ToggleDownloadButton";
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
-import { BLOCK_LIMITS } from "./landingBlocksRules";
+import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -124,6 +124,12 @@ export default function LandingPageBuilder() {
           }
     );
   };
+
+  const isPro =
+    user?.plan === "business_builder_pack" && user?.pro_status === "active";
+
+  const isBasic =
+    user?.plan === "business_basic_builder" && user?.basic_annual === 1;
 
   const countBlocksByType = React.useCallback((blocks) => {
     const counts = {};
@@ -248,6 +254,14 @@ export default function LandingPageBuilder() {
 
   const addBlock = (type) => {
     if (!type) return; // prevent invalid type
+
+    // 🚫 Pro-only block gate
+    if (!isPro && PRO_ONLY_BLOCKS.includes(type)) {
+      toast.error(
+        "This block is a Pro feature. Upgrade to Pro to unlock Audio, Calendly, and Reviews."
+      );
+      return;
+    }
 
     if (!canAddBlock(type)) {
       toast.error(
@@ -1099,7 +1113,26 @@ export default function LandingPageBuilder() {
             setCoverLoading={setCoverLoading}
           />
 
-          <LogoUploader landing={landing} setLanding={setLanding} />
+          {isPro ? (
+            <LogoUploader landing={landing} setLanding={setLanding} />
+          ) : (
+            <div className="mt-6 p-4 rounded-xl border border-gray-700 bg-black/60 text-center">
+              <p className="text-sm text-gray-300 font-medium">
+                Custom branding is a{" "}
+                <span className="text-purple-400 font-semibold">Pro</span>{" "}
+                feature
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Upgrade to Pro to upload and display your brand logo.
+              </p>
+              <a
+                href="/plans"
+                className="inline-block mt-3 text-sm px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
+              >
+                Upgrade to Pro
+              </a>
+            </div>
+          )}
 
           {/* Theme & Font Choosers */}
           <ThemeAndFontControls
@@ -1111,6 +1144,7 @@ export default function LandingPageBuilder() {
             setFontName={setFontName}
             fontFile={fontFile}
             setFontFile={setFontFile}
+            isPro={isPro}
           />
 
           {/* 🖋 Font Color Pickers */}

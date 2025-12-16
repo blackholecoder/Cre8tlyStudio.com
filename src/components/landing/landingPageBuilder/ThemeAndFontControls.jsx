@@ -3,8 +3,6 @@ import ColorThemeChooser from "../../ColorThemeChooser";
 import FontSelector from "../../prompt/FontSelector";
 import { colorThemes, gradientThemes } from "../../../constants";
 
-
-
 export default function ThemeAndFontControls({
   landing,
   setLanding,
@@ -14,6 +12,7 @@ export default function ThemeAndFontControls({
   setFontName,
   fontFile,
   setFontFile,
+  isPro,
 }) {
   const pageBuilderThemes = [...colorThemes, ...gradientThemes];
 
@@ -39,10 +38,11 @@ export default function ThemeAndFontControls({
         }}
         colorThemes={pageBuilderThemes}
         includeGradients={true}
+        isPro={isPro}
       />
 
       {/* FONT PICKER */}
-      <div className="relative z-[60] mt-6">
+      <div className="relative mt-6">
         <FontSelector
           fontName={fontName}
           setFontName={(name) => {

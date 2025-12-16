@@ -11,3 +11,12 @@ export const BLOCK_LIMITS = {
   countdown: 1,
   feature_offers_3: 3,
 };
+
+export const PRO_ONLY_BLOCKS = [
+  "audio_player",
+  "calendly",
+  "verified_reviews",
+  "feature_offers_3",
+  "countdown",
+  "secure_checkout",
+];

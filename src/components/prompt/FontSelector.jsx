@@ -11,7 +11,9 @@ export default function FontSelector({
 }) {
   const visibleFonts = availableFonts.map((f) => ({
     ...f,
-    locked: isFreePlan && !["Montserrat", "AdobeArabic", "Bebas Neue"].includes(f.name),
+    locked:
+      isFreePlan &&
+      !["Montserrat", "AdobeArabic", "Bebas Neue"].includes(f.name),
   }));
 
   const [selectedFont, setSelectedFont] = useState(

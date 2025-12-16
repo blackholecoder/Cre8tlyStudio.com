@@ -5,6 +5,7 @@ export default function ColorThemeChooser({
   bgTheme,
   setBgTheme,
   includeGradients = true,
+  isPro = false,
 }) {
   const [showThemes, setShowThemes] = useState(() => {
     const saved = localStorage.getItem("showThemes");
@@ -21,14 +22,22 @@ export default function ColorThemeChooser({
     localStorage.setItem("showThemes", showThemes);
   }, [showThemes]);
 
+  const solidThemes = colorThemes;
+  const gradientOnlyThemes = gradientThemes;
+
   const allThemes = useMemo(() => {
-    return includeGradients ? [...colorThemes, ...gradientThemes] : colorThemes;
+    return includeGradients
+      ? [...solidThemes, ...gradientOnlyThemes]
+      : solidThemes;
   }, [includeGradients]);
 
-  const selected =
-    allThemes.find((t) => t.preview === bgTheme || t.name === bgTheme) || {};
-
   const handleThemeSelect = (theme) => {
+    const isGradient = theme.preview?.includes("gradient");
+
+    if (isGradient && !isPro) {
+      return;
+    }
+
     setBgTheme(theme.preview);
   };
 
@@ -38,6 +47,8 @@ export default function ColorThemeChooser({
   };
 
   const applyCustomGradient = () => {
+    if (!isPro) return;
+
     const gradient = `linear-gradient(${gradDir}, ${gradStart}, ${gradEnd})`;
     setBgTheme(gradient);
   };
@@ -79,49 +90,72 @@ export default function ColorThemeChooser({
             className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 overflow-y-auto border border-gray-800 rounded-lg p-2"
             style={{ maxHeight: "240px" }}
           >
-            {allThemes.map((item) => (
-              <button
-                type="button"
-                key={item.name}
-                onClick={() => handleThemeSelect(item)}
-                className={`relative h-12 rounded-lg border transition-all ${
-                  bgTheme === item.preview
-                    ? "border-green-400 ring-2 ring-green-500/60"
-                    : "border-gray-700 hover:border-green-300"
-                }`}
-                style={{ background: item.preview }}
-              >
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase text-black/80">
-                  {item.label}
-                </span>
-              </button>
-            ))}
+            {allThemes.map((item) => {
+              const isGradient = item.preview?.includes("gradient");
+              const locked = isGradient && !isPro;
+
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => handleThemeSelect(item)}
+                  disabled={locked}
+                  className={`relative h-12 rounded-lg border transition-all
+        ${
+          bgTheme === item.preview
+            ? "border-green-400 ring-2 ring-green-500/60"
+            : "border-gray-700 hover:border-green-300"
+        }
+        ${locked ? "opacity-50 cursor-not-allowed" : ""}
+      `}
+                  style={{ background: item.preview }}
+                >
+                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase text-black/80">
+                    {item.label}
+                  </span>
+
+                  {locked && (
+                    <span className="absolute top-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-purple-600 text-white font-semibold">
+                      PRO
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
+          {!isPro && (
+            <p className="text-xs text-purple-400 mt-2 text-center">
+              Unlock custom colors and gradients with Pro for complete brand
+              control.
+            </p>
+          )}
 
           {/* Solid Color Picker */}
-          <div>
-            <p className="text-sm font-semibold text-gray-300 mb-2">
-              Custom Solid Color
-            </p>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={customSolid}
-                onChange={(e) => setCustomSolid(e.target.value)}
-                className="w-10 h-10 rounded cursor-pointer"
-              />
-              <button
-                type="button"
-                onClick={applyCustomSolid}
-                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-green text-sm hover:border-green"
-              >
-                Apply
-              </button>
+          {isPro && (
+            <div>
+              <p className="text-sm font-semibold text-gray-300 mb-2">
+                Custom Solid Color
+              </p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={customSolid}
+                  onChange={(e) => setCustomSolid(e.target.value)}
+                  className="w-10 h-10 rounded cursor-pointer"
+                />
+                <button
+                  type="button"
+                  onClick={applyCustomSolid}
+                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-green text-sm hover:border-green"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Gradient Picker */}
-          {includeGradients && (
+          {includeGradients && isPro && (
             <div>
               <p className="text-sm font-semibold text-gray-300 mb-2">
                 Custom Gradient

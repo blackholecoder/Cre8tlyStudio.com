@@ -45,6 +45,9 @@ export default function PlansPage() {
       } else if (planType === "business_builder_pack_monthly") {
         productType = "business_builder_pack";
         billingCycle = "monthly";
+      } else if (planType === "business_basic_builder") {
+        productType = "business_basic_builder";
+        billingCycle = "annual";
       }
 
       const res = await api.post(
@@ -147,6 +150,55 @@ export default function PlansPage() {
           )}
         </div>
 
+        {/* ---------- Business Basic (Annual) ---------- */}
+        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-emerald-400/50 transition">
+          <h2 className="text-2xl font-bold mb-2 text-emerald-400 design-text">
+            Business Basic <br />
+            (Annual)
+          </h2>
+
+          <p className="text-4xl font-extrabold mb-2 text-emerald-400">$65</p>
+          <p className="text-gray-400 mb-4 text-sm">
+            Billed annually ($780.00/year)
+          </p>
+
+          <ul className="text-sm text-gray-300 space-y-2 mb-8">
+            <li>✅ 7 Lead Magnet Slots /month</li>
+            <li>✅ Sell on Your Landing Page</li>
+            <li>✅ Keep 80% of Every Sale</li>
+            <li>✅ Pro Covers & Prompt Memory</li>
+            <li>✅ 5M Unsplash Library</li>
+            <li>✅ Custom Subdomain + Email Capture</li>
+            <li>❌ Gradient Themes</li>
+            <li>❌ Custom Branding</li>
+            <li>❌ Audio Player</li>
+            <li>❌ Calendly Integration</li>
+            <li>❌ Verified Reviews</li>
+            <li>❌ Advanced Analytics</li>
+          </ul>
+
+          <button
+            onClick={() => handleSelectPlan("business_basic_builder")}
+            disabled={loadingPlan === "business_basic_builder"}
+            className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
+              loadingPlan === "business_basic_builder"
+                ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
+                : "bg-gradient-to-r from-emerald-400 to-green-400 text-black border-emerald-400 hover:opacity-90 shadow-lg shadow-emerald-400/30"
+            }`}
+          >
+            {loadingPlan === "business_basic_builder"
+              ? "Redirecting..."
+              : "Get Basic Plan"}
+          </button>
+
+          <button
+            onClick={() => setSelectedPlan("business_basic_builder")}
+            className="mt-4 text-sm text-emerald-400 hover:underline text-center"
+          >
+            Learn More
+          </button>
+        </div>
+
         {/* ---------- Business Builder (Annual) ---------- */}
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-blue-500/50 transition">
           <h2 className="text-2xl font-bold mb-2 text-blue-400 design-text">
@@ -164,8 +216,12 @@ export default function PlansPage() {
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
-            <li>✅ Analytics Dashboard</li>
+            <li>✅ Custom Branding</li>
+            <li>✅ Advanced Analytics</li>
             <li>✅ Priority Support</li>
+            <li>✅ Audio Player</li>
+            <li>✅ Calendly Integration</li>
+            <li>✅ Verified Reviews</li>
           </ul>
 
           <button
@@ -209,6 +265,10 @@ export default function PlansPage() {
             <li>✅ Custom Subdomain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>
             <li>✅ Priority Support</li>
+            <li>✅ Audio Player</li>
+            <li>✅ Calendly Integration</li>
+            <li>✅ Verified Reviews</li>
+            <li>✅ Advanced Analytics</li>
           </ul>
 
           <button
@@ -235,7 +295,7 @@ export default function PlansPage() {
 
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
           <h2 className="text-2xl font-bold mb-2 text-pink-400 design-text">
-            Author’s Assistant
+            Author’s Assistant <br /> (1 Book)
           </h2>
           <p className="text-4xl font-extrabold mb-2 text-pink-400">$850</p>
           <p className="text-gray-400 mb-6 text-sm leading-relaxed">
@@ -256,13 +316,6 @@ export default function PlansPage() {
           </ul>
 
           <button
-            onClick={() => setSelectedPlan("author")}
-            className="text-pink-400 text-sm hover:underline mb-3"
-          >
-            Learn More
-          </button>
-
-          <button
             onClick={() => handleSelectPlan("author")}
             disabled={loadingPlan === "author"}
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg transition-all ${
@@ -274,6 +327,12 @@ export default function PlansPage() {
             {loadingPlan === "author"
               ? "Redirecting..."
               : "Unlock Author’s Assistant"}
+          </button>
+          <button
+            onClick={() => setSelectedPlan("author")}
+            className="text-pink-400 text-sm hover:underline mt-3"
+          >
+            Learn More
           </button>
         </div>
       </div>

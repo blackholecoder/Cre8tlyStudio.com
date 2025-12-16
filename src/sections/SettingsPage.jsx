@@ -363,45 +363,65 @@ export default function DashboardSettings() {
   const getUserPlan = () => {
     const plans = [];
 
-    // Business Builder Monthly
-    if (user.plan === "monthly") {
+    // Business Builder Monthly (Pro)
+    if (
+      user.plan === "business_builder_pack" &&
+      user.billing_type === "monthly" &&
+      user.pro_status === "active"
+    ) {
       plans.push({
         title: "Business Builder",
-        planKey: "business_monthly",
+        planKey: "business_builder_pack_monthly",
         billing: "monthly",
         description:
-          "15 monthly lead magnet slots, analytics, templates, and sales tools.",
+          "Monthly plan with 15 lead magnet slots and full premium tools.",
         remainingSlots: user.magnet_slots,
       });
     }
 
-    // Business Builder Annual
-    if (user.plan === "annual") {
+    // Business Builder Annual (Pro)
+    else if (
+      user.plan === "business_builder_pack" &&
+      user.billing_type === "annual" &&
+      user.pro_status === "active"
+    ) {
       plans.push({
         title: "Business Builder",
-        planKey: "business_annual",
+        planKey: "business_builder_pack_annual",
         billing: "annual",
         description:
-          "Annual plan with 15 monthly lead magnet slots and all premium tools.",
+          "Annual plan with 15 lead magnet slots and full premium tools.",
+        remainingSlots: user.magnet_slots,
+      });
+    }
+
+    // Business Basic (Annual)
+    if (user.plan === "business_basic_builder" && user.basic_annual === 1) {
+      plans.push({
+        title: "Business Basic",
+        planKey: "business_basic_builder",
+        billing: "annual",
+        description:
+          "Annual basic plan with 7 lead magnet slots and core selling tools.",
         remainingSlots: user.magnet_slots,
       });
     }
 
     // Free Trial
-    if (!user.plan && user.has_free_magnet == 1) {
+    if (!user.plan && user.has_free_magnet === 1) {
       plans.push({
         title: "Free Trial",
         planKey: "free",
         billing: "trial",
         description:
-          "Your Free Trial includes 1 lead magnet slot and 7-day access.",
+          "Your Free Trial includes 1 lead magnet slot and 7 day access.",
         expires: user.free_trial_expires_at,
         remainingSlots: user.magnet_slots,
       });
     }
 
-    // Author’s Assistant ADD-ON
-    if (user.has_book == 1) {
+    // Author’s Assistant add on
+    if (user.has_book === 1) {
       plans.push({
         title: "Author’s Assistant",
         planKey: "assistant",
@@ -416,7 +436,7 @@ export default function DashboardSettings() {
 
   const plans = getUserPlan();
 
-  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+  const isFreeTier = user?.has_free_magnet === 1 && !user?.plan;
 
   return (
     <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
@@ -455,11 +475,16 @@ export default function DashboardSettings() {
               {plans.map((plan, idx) => {
                 // Determine status badge
                 let statusBadge = "Active";
-                let statusColor = "text-green bg-green-400/10";
+                let statusColor = "text-green bg-green/10";
 
                 if (plan.planKey === "free" || plan.billing === "trial") {
                   statusBadge = "Free Trial";
                   statusColor = "text-amber-400 bg-amber-500/10";
+                }
+
+                if (plan.planKey === "business_basic_builder") {
+                  statusBadge = "Basic";
+                  statusColor = "text-emerald-400 bg-emerald-500/10";
                 }
 
                 // Trial expiration
@@ -508,8 +533,7 @@ export default function DashboardSettings() {
                       )}
 
                       {/* Business Builder icons */}
-                      {(plan.planKey === "business_monthly" ||
-                        plan.planKey === "business_annual") && (
+                      {plan.planKey.startsWith("business_builder_pack") && (
                         <svg
                           className="w-6 h-6 text-blue"
                           fill="none"
@@ -521,6 +545,22 @@ export default function DashboardSettings() {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             d="M3 10h11M9 21V3m12 7h-5a2 2 0 00-2 2v9"
+                          />
+                        </svg>
+                      )}
+
+                      {plan.planKey === "business_basic_builder" && (
+                        <svg
+                          className="w-6 h-6 text-emerald-400"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 3v18m9-9H3"
                           />
                         </svg>
                       )}
@@ -883,11 +923,11 @@ export default function DashboardSettings() {
             Upload New Brand File
           </h2>
 
-          {user?.has_free_magnet === 1 && user?.magnet_slots === 1 ? (
+          {isFreeTier ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
               <p className="text-gray-400 text-sm mb-4 max-w-[400px]">
                 🧩 Uploading a custom brand identity file is a{" "}
-                <span className="text-green font-semibold">Pro feature</span>.
+                <span className="text-green font-semibold">paid feature</span>.
                 Upgrade to personalize your tone, voice, and branding for all
                 generated products.
               </p>

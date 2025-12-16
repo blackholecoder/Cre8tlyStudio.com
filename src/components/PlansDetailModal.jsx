@@ -9,6 +9,23 @@ export default function PlanDetailsModal({ plan, onClose }) {
       content: `
 The Basic Creator Plan gives you 5 Lead Magnet Slots to design professional, conversion-ready lead magnets using Cre8tly’s AI tools. Access standard templates, custom branding, and editable layouts so you can attract new subscribers and showcase your expertise with ease.`,
     },
+    business_basic_builder: {
+      title: "Business Basic Builder",
+      content: `
+The Business Basic Builder plan is designed for creators and entrepreneurs who want to start selling without the full Pro commitment.
+
+This plan includes:
+• 7 Lead Magnet Slots  
+• Sell directly on your landing pages  
+• Keep 80% of every sale  
+• Pro Covers for books and lead magnets  
+• Prompt Memory for consistent AI writing  
+• Access to millions of royalty-free Unsplash images  
+• Built-in email capture for lead generation  
+
+Business Basic gives you everything you need to launch, validate, and grow without advanced analytics or custom landing page features. Upgrade anytime when you're ready to scale.`,
+    },
+
     pro: {
       title: "Pro Covers",
       content: `
@@ -29,16 +46,16 @@ The All-In-One Bundle gives you everything in a single discounted package:
 • 1 Author’s Assistant Book Slot (750 pages + editor)  
 A full creative suite that lets you write, design, and publish with complete control from start to finish.`,
     },
-  prompt_memory: {
-  title: "Prompt Memory Subscription",
-  content: `
+    prompt_memory: {
+      title: "Prompt Memory Subscription",
+      content: `
 The Prompt Memory Plan gives you a persistent AI memory across your entire Cre8tly Studio experience.
 It learns your tone, writing style, and preferences, letting you generate faster, more accurate, and
 on-brand results every time. Cancel anytime, no contracts.`,
-  },
-  business_builder_pack: {
-  title: "Pro Business Builder Pack",
-  content: `
+    },
+    business_builder_pack: {
+      title: "Pro Business Builder Pack",
+      content: `
 The Pro Business Builder Pack is the ultimate growth suite for creators, entrepreneurs, and marketers.
 It gives you unlimited access to build landing pages, capture leads automatically, and send high-converting emails using Cre8tly Studio’s advanced automation tools.
 
@@ -50,8 +67,8 @@ Features include:
 • Priority support and one-year updates
 
 This plan helps you automate your lead generation and sales process from start to finish—everything you need to scale your digital business.`,
-},
-}
+    },
+  };
 
   const { title, content } = descriptions[plan] || {};
 
@@ -71,7 +88,7 @@ This plan helps you automate your lead generation and sales process from start t
         <div className="text-center mt-8">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg font-semibold hover:opacity-90 transition"
+            className="px-6 py-2 bg-blue rounded-lg font-semibold hover:opacity-90 transition"
           >
             Got it
           </button>

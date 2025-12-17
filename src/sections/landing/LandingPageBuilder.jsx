@@ -5,7 +5,6 @@ import { useAuth } from "../../admin/AuthContext";
 import { colorThemes, gradientThemes } from "../../constants";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -529,6 +528,44 @@ export default function LandingPageBuilder() {
       newBlock.preview_duration = 30; // seconds
 
       newBlock.collapsed = false;
+    }
+
+    if (type === "button_url") {
+      newBlock.text = "Click Here";
+      newBlock.url = "";
+      newBlock.open_new_tab = true;
+
+      newBlock.alignment = "center";
+
+      // size
+      newBlock.width = 220;
+      newBlock.height = 48;
+      newBlock.padding_x = 24;
+      newBlock.padding_y = 12;
+
+      // border
+      newBlock.radius = 8;
+      newBlock.stroke_width = 0;
+      newBlock.stroke_color = "#000000";
+
+      // background
+      newBlock.use_gradient = false;
+      newBlock.bg_color = "#22c55e";
+      newBlock.gradient_start = "#22c55e";
+      newBlock.gradient_end = "#3b82f6";
+      newBlock.gradient_direction = "90deg";
+
+      // text
+      newBlock.text_color = "#000000";
+      newBlock.font_size = 16;
+      newBlock.font_weight = 600;
+
+      // shadow
+      newBlock.shadow_offset_x = 0;
+      newBlock.shadow_offset_y = 8;
+      newBlock.shadow_blur = 20;
+      newBlock.shadow_opacity = 35; // percent
+      newBlock.shadow_color = "#000000";
     }
 
     setLanding((prev) => ({

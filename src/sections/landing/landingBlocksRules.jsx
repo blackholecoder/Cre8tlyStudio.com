@@ -10,6 +10,7 @@ export const BLOCK_LIMITS = {
   faq: 1,
   countdown: 1,
   feature_offers_3: 3,
+  button_url: 3,
 };
 
 export const PRO_ONLY_BLOCKS = [
@@ -19,4 +20,5 @@ export const PRO_ONLY_BLOCKS = [
   "feature_offers_3",
   "countdown",
   "secure_checkout",
+  // "button_url",
 ];

@@ -21,6 +21,7 @@ import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOf
 import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureCheckoutBlock";
 import AudioPlayerBlock from "../../components/landing/blocks/types/AudioPlayerBlock";
 import { SortableContainerBlock } from "../../components/landing/blocks/types/SortableContainerBlock";
+import ButtonBlock from "../../components/landing/blocks/types/ButtonBlock";
 
 const BLOCK_LABELS = {
   heading: "Heading (H1)",
@@ -43,6 +44,7 @@ const BLOCK_LABELS = {
   secure_checkout: "Secure Checkout",
   audio_player: "Audio Player",
   container: "Section Container",
+  button_url: "Button Url",
 };
 
 function SortableBlock({
@@ -128,6 +130,11 @@ function SortableBlock({
 
       case "referral_button":
         return block.text?.slice(0, 30) || "(referral button)";
+
+      case "button_url":
+        return `${block.text || "Button"} • ${
+          block.url ? block.url.slice(0, 35) : "no url"
+        }`;
 
       case "feature_offers_3":
         return `${(block.items || []).length} offer cards`;
@@ -353,6 +360,15 @@ function SortableBlock({
           )}
           {block.type === "audio_player" && (
             <AudioPlayerBlock
+              block={block}
+              index={index}
+              bgTheme={bgTheme}
+              updateBlock={updateBlock}
+              landing={landing}
+            />
+          )}
+          {block.type === "button_url" && (
+            <ButtonBlock
               block={block}
               index={index}
               bgTheme={bgTheme}

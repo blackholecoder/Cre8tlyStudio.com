@@ -1288,6 +1288,75 @@ function renderPreviewBlock(block, index, context) {
           )}
         </div>
       );
+
+    case "button_url": {
+      const background = block.use_gradient
+        ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+            block.gradient_start || "#22c55e"
+          }, ${block.gradient_end || "#3b82f6"})`
+        : block.bg_color || "#22c55e";
+
+      const shadowOpacity =
+        typeof block.shadow_opacity === "number"
+          ? block.shadow_opacity / 100
+          : 0.35;
+
+      const shadow = `${block.shadow_offset_x ?? 0}px ${
+        block.shadow_offset_y ?? 8
+      }px ${block.shadow_blur ?? 20}px rgba(0,0,0,${shadowOpacity})`;
+      return (
+        <div
+          key={index}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "40px auto",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+
+              width: `${block.width ?? 220}px`,
+              height: `${block.height ?? 48}px`,
+              padding: `${block.padding_y ?? 12}px ${block.padding_x ?? 24}px`,
+
+              background,
+              color: block.text_color || "#000000",
+
+              fontSize: `${block.font_size ?? 16}px`,
+              fontWeight: block.font_weight ?? 600,
+
+              borderRadius: `${block.radius ?? 8}px`,
+              border: `${block.stroke_width ?? 0}px solid ${block.stroke_color || "#000"}`,
+
+              boxShadow: shadow,
+
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+          >
+            {block.text || "Click Here"}
+          </div>
+
+          {block.url && (
+            <p
+              style={{
+                marginTop: "8px",
+                fontSize: "0.75rem",
+                color: "#94a3b8",
+                wordBreak: "break-all",
+              }}
+            >
+              → {block.url}
+            </p>
+          )}
+        </div>
+      );
+    }
+
     default:
       return null;
   }

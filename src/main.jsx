@@ -4,7 +4,6 @@ import {
   useLocation,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
@@ -18,12 +17,11 @@ import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
 import PromptPage from "./sections/PromptPage.jsx";
 import SignupPage from "./sections/SignUp.jsx";
-import { Login, Nav } from "./sections/index.js";
+import { Landing, Login, Nav } from "./sections/index.js";
 import CustomerDashboard from "./sections/CustomerDashboard.jsx";
 import AdminDashboard from "./sections/AdminDashboard.jsx";
 import Contact from "./sections/Contact.jsx";
 import PlansPage from "./sections/PlansPage.jsx";
-import App from "./App.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-quill/dist/quill.snow.css";
@@ -58,6 +56,11 @@ import SettingsDocs from "./sections/docs/SettingsPageDocs.jsx";
 import LandingBuilderDocs from "./sections/docs/LandingPageBuilderDocs.jsx";
 import SellerDashboardDocs from "./sections/docs/SellerDashboardDocs.jsx";
 import LandingAnalyticsDocs from "./sections/docs/AnalyticsDocs.jsx";
+import Resources from "./sections/landing/Resources.jsx";
+import ResourcesVideos from "./sections/landing/ResourcesVideos.jsx";
+import SmartPromptPage from "./sections/landing/SmartPromptPage.jsx";
+import SiteLayout from "./components/layouts/SiteLayout.jsx";
+import LandingInfoPage from "./sections/landing/LandingInfoPage.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -66,19 +69,45 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="sync">
       <Routes location={location} key={location.pathname}>
         {/* Public site */}
-        <Route
-          path="/"
-          element={
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <App />
-            </motion.div>
-          }
-        />
+        <Route element={<SiteLayout />}>
+          <Route
+            index
+            element={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <Landing />
+              </motion.div>
+            }
+          />
+
+          <Route path="contact" element={<Contact />} />
+          <Route path="shop" element={<EbooksStore />} />
+
+          <Route path="terms" element={<Terms />} />
+          <Route path="privacy-policy" element={<Privacy />} />
+          <Route path="refund-policy" element={<Refund />} />
+          <Route path="cookie-policy" element={<Cookie />} />
+          <Route path="careers" element={<Careers />} />
+
+          <Route path="smart-prompt" element={<SmartPromptPage />} />
+          <Route path="landing" element={<LandingInfoPage />} />
+          <Route path="plans" element={<PlansPage />} />
+
+          <Route path="resources" element={<Resources />}>
+            <Route path="videos" element={<ResourcesVideos />} />
+          </Route>
+
+          {/* Auth */}
+          <Route path="sign-up" element={<SignupPage />} />
+          <Route path="login" element={<Login />} />
+
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+        </Route>
 
         {/* Redirect old /home to / */}
 
@@ -101,6 +130,9 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route path="books" element={<BooksDashboard />} />
+        <Route path="thank-you" element={<ThankYou />} />
+        <Route path="prompt" element={<PromptPage />} />
         <Route
           path="/community"
           element={
@@ -228,38 +260,7 @@ const AnimatedRoutes = () => {
           }
         />
 
-        <Route path="/thank-you" element={<ThankYou />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/shop" element={<EbooksStore />} />
-        <Route path="/books" element={<BooksDashboard />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy-policy" element={<Privacy />} />
-        <Route path="/refund-policy" element={<Refund />} />
-        <Route path="/cookie-policy" element={<Cookie />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/prompt" element={<PromptPage />} />
-
-        {/* Auth */}
-        <Route path="/sign-up" element={<SignupPage />} />
-        <Route path="/login" element={<Login />} />
-
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-
         {/* Private */}
-        <Route
-          path="/plans"
-          element={
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <PlansPage />
-            </motion.div>
-          }
-        />
 
         <Route
           path="/landing-page-builder"
@@ -511,29 +512,6 @@ const AnimatedRoutes = () => {
           }
         />
 
-        {/* Debug */}
-        <Route
-          path="/debug"
-          element={
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              style={{
-                backgroundColor: "#030712",
-                color: "#fff",
-                minHeight: "100vh",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              Debug Test Page
-            </motion.div>
-          }
-        />
-
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -567,7 +545,6 @@ const RootApp = () => {
               draggable
               theme="colored"
             />
-            <Nav />
             <AnimatedRoutes />
           </MagnetProvider>
         </BookProvider>

@@ -1,13 +1,5 @@
 import { banner, headerLogo } from "../assets/images";
 
-import {
-  FaYoutube,
-  FaFacebook,
-  FaInstagram,
-  FaAt,
-  FaPatreon,
-} from "react-icons/fa";
-
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/sign-up", label: "Sign Up" },
@@ -62,39 +54,6 @@ export const brand = {
     { name: "patreon", href: "https://www.patreon.com/dramamusic" },
   ],
 };
-
-export const links = [
-  {
-    href: "https://youtube.com/@DramaMusicTV",
-    icon: <FaYoutube className="w-6 h-6" />,
-    label: "YouTube",
-    color: "#FF0000",
-  },
-  {
-    href: "https://facebook.com/dramamusicofficial",
-    icon: <FaFacebook className="w-6 h-6" />,
-    label: "Facebook",
-    color: "#1877F2",
-  },
-  {
-    href: "https://instagram.com/itsdramamusic",
-    icon: <FaInstagram className="w-6 h-6" />,
-    label: "Instagram",
-    color: "#E1306C",
-  },
-  {
-    href: "https://www.threads.net/@itsdramamusic",
-    icon: <FaAt className="w-6 h-6" />,
-    label: "Threads",
-    color: "#FFD700",
-  },
-  {
-    href: "https://www.patreon.com/DramaMusic",
-    icon: <FaPatreon className="w-6 h-6" />,
-    label: "Patreon",
-    color: "#ffffff",
-  },
-];
 
 export const cannedPrompts = {
   beginner: [

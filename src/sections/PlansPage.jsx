@@ -3,8 +3,6 @@ import { toast } from "react-toastify";
 import api from "../api/axios";
 import { useAuth } from "../admin/AuthContext";
 import PlanDetailsModal from "../components/PlansDetailModal";
-import CustomCursor from "../components/CustomCursor";
-import { headerLogo } from "../assets/images";
 import { useLocation } from "react-router-dom";
 
 export default function PlansPage() {
@@ -28,7 +26,7 @@ export default function PlansPage() {
 
   const handleSelectPlan = async (planType) => {
     if (!user || !user.id) {
-      toast.error("Please sign in before selecting a plan");
+      toast.warning("Please sign up before selecting a plan");
       return;
     }
 
@@ -79,20 +77,13 @@ export default function PlansPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-white flex flex-col items-center px-6 py-20">
-      <CustomCursor />
-
+    <div className="min-h-screen bg-[#fff] text-white flex flex-col items-center px-6 py-20">
       {/* ===== Header ===== */}
       <div className="flex flex-col items-center mb-10">
-        <img
-          src={headerLogo}
-          alt="Cre8tly Studio Logo"
-          className="w-28 h-auto mb-6 hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_20px_rgba(147,51,234,0.4)]"
-        />
-        <h1 className="text-2xl font-extrabold tracking-tight text-center design-text">
+        <h1 className="text-4xl font-extrabold tracking-tight text-center design-text text-black mt-20">
           Pricing
         </h1>
-        <p className="text-gray-400 mt-4 text-center max-w-xl">
+        <p className="text-black mt-4 text-center max-w-xl">
           Start free. Upgrade anytime for professional tools, branding, and
           automation built for creators and entrepreneurs.
         </p>
@@ -127,9 +118,9 @@ export default function PlansPage() {
                   window.location.href = "/sign-up";
                 }
               }}
-              className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
+              className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-royalPurple text-white hover:opacity-90 transition"
             >
-              Start Free
+              Sign Up
             </button>
           ) : user?.has_free_magnet === 1 ? (
             // Logged in and already has free tier
@@ -152,12 +143,12 @@ export default function PlansPage() {
 
         {/* ---------- Business Basic (Annual) ---------- */}
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-emerald-400/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-emerald-400 design-text">
+          <h2 className="text-2xl font-bold mb-2 text-white design-text">
             Business Basic <br />
             (Annual)
           </h2>
 
-          <p className="text-4xl font-extrabold mb-2 text-emerald-400">$65</p>
+          <p className="text-4xl font-extrabold mb-2 text-white">$65</p>
           <p className="text-gray-400 mb-4 text-sm">
             Billed annually ($780.00/year)
           </p>
@@ -183,7 +174,7 @@ export default function PlansPage() {
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
               loadingPlan === "business_basic_builder"
                 ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
-                : "bg-gradient-to-r from-emerald-400 to-green-400 text-black border-emerald-400 hover:opacity-90 shadow-lg shadow-emerald-400/30"
+                : "text-white border-blue-400 hover:opacity-90 shadow-lg shadow-blue-400/30"
             }`}
           >
             {loadingPlan === "business_basic_builder"
@@ -193,7 +184,7 @@ export default function PlansPage() {
 
           <button
             onClick={() => setSelectedPlan("business_basic_builder")}
-            className="mt-4 text-sm text-emerald-400 hover:underline text-center"
+            className="mt-4 text-sm text-white hover:underline text-center"
           >
             Learn More
           </button>
@@ -230,7 +221,7 @@ export default function PlansPage() {
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
               loadingPlan === "business_builder_pack_annual"
                 ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
-                : "bg-gradient-to-r from-blue-500 to-indigo-400 text-white border-blue-400 hover:opacity-90 shadow-lg shadow-blue-400/30"
+                : "text-white border-blue-400 hover:opacity-90"
             }`}
           >
             {loadingPlan === "business_builder_pack_annual"
@@ -248,10 +239,10 @@ export default function PlansPage() {
 
         {/* ---------- Business Builder (Monthly) ---------- */}
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-sky-400/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-sky-400 design-text">
+          <h2 className="text-2xl font-bold mb-2 text-white design-text">
             Business Builder (Monthly)
           </h2>
-          <p className="text-4xl font-extrabold mb-2 text-sky-400">$199.99</p>
+          <p className="text-4xl font-extrabold mb-2 text-white">$199.99</p>
           <p className="text-gray-400 mb-4 text-sm">
             Billed monthly (12-month term)
           </p>
@@ -277,7 +268,7 @@ export default function PlansPage() {
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
               loadingPlan === "business_builder_pack_monthly"
                 ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
-                : "bg-gradient-to-r from-sky-400 to-sky-300 border-sky-400 text-black hover:opacity-90 shadow-lg shadow-sky-400/30"
+                : "text-white border-blue-400 hover:opacity-90"
             }`}
           >
             {loadingPlan === "business_builder_pack_monthly"
@@ -287,7 +278,7 @@ export default function PlansPage() {
 
           <button
             onClick={() => setSelectedPlan("business_builder_pack")}
-            className="mt-4 text-sm text-sky-400 hover:underline text-center"
+            className="mt-4 text-sm text-white hover:underline text-center"
           >
             Learn More
           </button>

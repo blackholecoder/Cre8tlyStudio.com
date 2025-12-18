@@ -52,7 +52,6 @@ export default function VideoPlayer() {
         playsInline
         muted={muted}
         preload="metadata"
-        poster="/assets/video-thumbnail.jpg"
       >
         <source
           src="https://cre8tlystudio.nyc3.cdn.digitaloceanspaces.com/Videos/new_cre8tly_video_v2.mp4"

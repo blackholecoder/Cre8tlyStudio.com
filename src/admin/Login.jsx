@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 import Footer from "../sections/Footer.jsx";
-import CustomCursor from "../components/CustomCursor.jsx";
 import { Eye, EyeOff } from "lucide-react";
 import axiosInstance from "../api/axios";
+import { headerLogo } from "../assets/images/index.js";
 
 export default function LoginPage() {
   const { login, saveAuth } = useAuth();
@@ -173,9 +173,9 @@ export default function LoginPage() {
     const refSlug = localStorage.getItem("ref_slug");
 
     if (refSlug) {
-      navigate(`/sign-up?ref=${refSlug}`);
+      navigate(`/plans?ref=${refSlug}`);
     } else {
-      navigate("/sign-up");
+      navigate("/plans");
     }
   };
 
@@ -207,28 +207,44 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        isolation: "isolate",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
-        <CustomCursor />
-        <div className="w-full max-w-md bg-metalBlack p-8 rounded-2xl border border-gray-800 shadow-2xl">
-          <h1 className="text-3xl font-bold text-green text-center mb-6">
-            Welcome Back
-          </h1>
-          <p className="text-gray-300 text-center mb-8">
-            Log in to your account to continue creating and managing your
-            digital products.
-          </p>
+    <div className="min-h-screen flex flex-col bg-white">
+      <section className="flex flex-col justify-center items-center flex-grow px-6 py-20">
+        <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-200 shadow-xl">
+          <div className="flex items-center gap-1 mb-5">
+            <img
+              src={headerLogo}
+              alt="Cre8tly Studio"
+              className="h-12 w-12 object-contain"
+            />
+
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg font-semibold text-gray-900">
+                Cre8tly Studio
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 mb-2">
+            <div className="flex flex-col">
+              <h3 className="text-3xl font-bold text-gray-900">
+                Sign in to your account
+              </h3>
+
+              <p className="text-sm text-gray-600 mb-5">
+                New to Cre8tly Studio?{" "}
+                <button
+                  onClick={handleSignUpRedirect}
+                  className="font-semibold hover:underline"
+                >
+                  Sign Up
+                </button>
+              </p>
+            </div>
+          </div>
 
           {error && (
             <div
-              className={`bg-red-900/60 border border-red-500 text-red-200 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-1000 ${
+              className={`bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-1000 ${
                 fade ? "opacity-0" : "opacity-100"
               }`}
             >
@@ -237,7 +253,6 @@ export default function LoginPage() {
           )}
 
           {!show2FA ? (
-            // 🔹 Normal login form
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="email"
@@ -246,8 +261,16 @@ export default function LoginPage() {
                 onChange={handleChange}
                 placeholder="Email Address"
                 required
-                className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+                className="
+                w-full h-[48px] px-4 py-3 rounded-lg
+                bg-white
+                border border-gray-300
+                text-gray-900
+                placeholder-gray-400
+                focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black 
+              "
               />
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -256,39 +279,57 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="Password"
                   required
-                  className="w-full px-4 py-3 pr-12 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+                  className="
+                  w-full h-[48px] px-4 py-3 pr-12 rounded-lg
+                  bg-white
+                  border border-gray-300
+                  text-gray-900
+                  placeholder-gray-400
+                  focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+                "
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-green text-black font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+                className="
+                w-full bg-black text-white
+                font-semibold py-3 rounded-lg
+                hover:opacity-90 transition
+              "
               >
                 {loading ? "Logging In..." : "Log In"}
               </button>
+
               <button
                 type="button"
                 onClick={handlePasskeyLogin}
-                className="w-full mt-2 bg-blue text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+                className="
+                w-full mt-2
+                bg-gray-100 text-gray-900
+                font-semibold py-3 rounded-lg
+                border border-gray-300
+                hover:bg-gray-200 transition
+              "
               >
                 Sign in with Passkey
               </button>
             </form>
           ) : (
-            // 🔹 2FA verification screen
             <div className="text-center">
-              <h2 className="text-lg font-semibold mb-3 text-white">
+              <h2 className="text-lg font-semibold mb-3 text-gray-900">
                 Two-Factor Authentication
               </h2>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 Enter the 6-digit code from your Authenticator app.
               </p>
 
@@ -298,13 +339,22 @@ export default function LoginPage() {
                 onChange={(e) => setTwofaCode(e.target.value)}
                 placeholder="123456"
                 maxLength="6"
-                className="w-32 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none mb-4"
+                className="
+                w-32 text-center py-2 px-3 rounded-md
+                bg-white border border-gray-300
+                text-gray-900
+                focus:ring-2 focus:ring-black/10 outline-none mb-4
+              "
               />
 
               <button
                 onClick={handleVerify2FA}
                 disabled={verifying}
-                className="w-full bg-green text-black font-semibold py-2 rounded-lg hover:opacity-90 transition"
+                className="
+                w-full bg-black text-white
+                font-semibold py-2 rounded-lg
+                hover:opacity-90 transition
+              "
               >
                 {verifying ? "Verifying..." : "Verify Code"}
               </button>
@@ -313,28 +363,10 @@ export default function LoginPage() {
 
           {!show2FA && (
             <>
-              <p className="text-sm text-gray-400 text-center mt-4">
-                <a
-                  href="/forgot-password"
-                  className="text-green hover:underline"
-                >
+              <p className="text-sm text-gray-600 text-center mt-4">
+                <a href="/forgot-password" className="hover:underline">
                   Forgot Password?
                 </a>
-              </p>
-              <p className="text-sm text-gray-400 text-center mt-6">
-                Don’t have an account?{" "}
-                <button
-                  onClick={handleSignUpRedirect}
-                  className="text-green hover:underline"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    cursor: "pointer",
-                  }}
-                >
-                  Sign Up
-                </button>
               </p>
             </>
           )}

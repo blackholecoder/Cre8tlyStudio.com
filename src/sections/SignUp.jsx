@@ -3,8 +3,8 @@ import { useAuth } from "../admin/AuthContext.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Footer from "../sections/Footer.jsx";
-import CustomCursor from "../components/CustomCursor.jsx";
 import { Eye, EyeOff } from "lucide-react";
+import { headerLogo } from "../assets/images/index.js";
 
 export default function SignupPage() {
   const { login } = useAuth();
@@ -19,9 +19,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
 
   const [searchParams] = useSearchParams();
-const refSlug = searchParams.get("ref");
-
-
+  const refSlug = searchParams.get("ref");
 
   useEffect(() => {
     if (error) {
@@ -33,15 +31,13 @@ const refSlug = searchParams.get("ref");
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
       // ✅ Send refSlug only if present
-      const payload = refSlug
-  ? { ...formData, refSlug }
-  : formData;
+      const payload = refSlug ? { ...formData, refSlug } : formData;
 
       const res = await axios.post(
         "https://cre8tlystudio.com/api/auth/signup",
@@ -65,7 +61,7 @@ const refSlug = searchParams.get("ref");
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     // Always restore scrolling when this page mounts
     document.body.style.overflow = "auto";
     document.body.style.position = "";
@@ -80,30 +76,45 @@ const refSlug = searchParams.get("ref");
   }, []);
 
   return (
-    <div
-      style={{
-        isolation: "isolate",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <CustomCursor />
-      <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
-        <div className="w-full max-w-md bg-metalBlack p-8 rounded-2xl border border-gray-800 shadow-2xl">
-          <h1 className="text-3xl font-bold text-green text-center mb-6">
-            Create Your Account
-          </h1>
-          <p className="text-gray-300 text-center mb-8">
-            Join Cre8tly Studio and start creating digital products instantly.
-          </p>
+    <div className="min-h-screen flex flex-col bg-white">
+      <section className="flex flex-col justify-center items-center flex-grow px-6 py-20">
+        <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-200 shadow-xl">
+          {/* Header */}
+          <div className="flex items-center gap-1 mb-5">
+            <img
+              src={headerLogo}
+              alt="Cre8tly Studio"
+              className="h-12 w-12 object-contain"
+            />
 
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg font-semibold text-gray-900">
+                Cre8tly Studio
+              </span>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="mb-5">
+            <h3 className="text-3xl font-bold text-gray-900">
+              Create your account
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Already have an account?{" "}
+              <a href="/login" className="font-semibold hover:underline">
+                Log in
+              </a>
+            </p>
+          </div>
+
+          {/* Error */}
           {error && (
-            <div className="bg-red-900/60 border border-red-500 text-red-200 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-700">
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-4 text-center transition-opacity duration-700">
               {error}
             </div>
           )}
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -112,8 +123,16 @@ const refSlug = searchParams.get("ref");
               onChange={handleChange}
               placeholder="Full Name"
               required
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+              className="
+              w-full h-[48px] px-4 py-3 rounded-lg
+              bg-white
+              border border-gray-300
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+            "
             />
+
             <input
               type="email"
               name="email"
@@ -121,8 +140,16 @@ const refSlug = searchParams.get("ref");
               onChange={handleChange}
               placeholder="Email Address"
               required
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+              className="
+              w-full h-[48px] px-4 py-3 rounded-lg
+              bg-white
+              border border-gray-300
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+            "
             />
+
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -131,32 +158,37 @@ const refSlug = searchParams.get("ref");
                 onChange={handleChange}
                 placeholder="Password"
                 required
-                className="w-full px-4 py-3 pr-12 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+                className="
+                w-full h-[48px] px-4 py-3 pr-12 rounded-lg
+                bg-white
+                border border-gray-300
+                text-gray-900
+                placeholder-gray-400
+                focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+              "
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-black"
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-green text-black font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+              className="
+              w-full bg-black text-white
+              font-semibold py-3 rounded-lg
+              hover:opacity-90 transition
+            "
             >
               {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
-
-          <p className="text-sm text-gray-400 text-center mt-6">
-            Already have an account?{" "}
-            <a href="/login" className="text-green hover:underline">
-              Log In
-            </a>
-          </p>
         </div>
       </section>
 

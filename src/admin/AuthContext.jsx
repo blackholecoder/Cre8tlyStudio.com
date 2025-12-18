@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children, navigate }) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -27,58 +27,55 @@ export function AuthProvider({ children, navigate }) {
 
   // 🔹 Save tokens & user
   function saveAuth(userData, token, refreshToken) {
-  const enriched = enrichUser(userData);
-  setUser(enriched);
-  setAccessToken(token);
-  localStorage.setItem("user", JSON.stringify(enriched));
-  localStorage.setItem("accessToken", token);
-  if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-}
-
-
- // 🔹 Login
-async function login(email, password) {
-  try {
-    const res = await axiosInstance.post("/auth/login", { email, password });
-    const data = res.data;
-
-    // 🧩 1. If the backend requires 2FA, don't store tokens yet
-    if (data.requires2FA && data.twofaToken) {
-      return {
-        requires2FA: true,
-        twofaToken: data.twofaToken, // temporary token for verification step
-        message: data.message,
-      };
-    }
-
-    // 🧩 2. Otherwise, normal login flow (save tokens only)
-    const accessToken = data.accessToken;
-    const refreshToken = data.refreshToken;
-
-    if (!accessToken) throw new Error("Missing access token from login");
-
-    setAccessToken(accessToken);
-    localStorage.setItem("accessToken", accessToken);
-    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-
-    // 🧩 3. Always pull fresh user data from /auth/me to include Stripe & latest fields
-    const meRes = await axiosInstance.get("/auth/me", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    const enriched = enrichUser(meRes.data);
+    const enriched = enrichUser(userData);
     setUser(enriched);
-    await refreshUser();
+    setAccessToken(token);
     localStorage.setItem("user", JSON.stringify(enriched));
-
-    return { requires2FA: false };
-  } catch (err) {
-    console.error("Login failed:", err);
-    throw err;
+    localStorage.setItem("accessToken", token);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
   }
-}
 
+  // 🔹 Login
+  async function login(email, password) {
+    try {
+      const res = await axiosInstance.post("/auth/login", { email, password });
+      const data = res.data;
 
+      // 🧩 1. If the backend requires 2FA, don't store tokens yet
+      if (data.requires2FA && data.twofaToken) {
+        return {
+          requires2FA: true,
+          twofaToken: data.twofaToken, // temporary token for verification step
+          message: data.message,
+        };
+      }
+
+      // 🧩 2. Otherwise, normal login flow (save tokens only)
+      const accessToken = data.accessToken;
+      const refreshToken = data.refreshToken;
+
+      if (!accessToken) throw new Error("Missing access token from login");
+
+      setAccessToken(accessToken);
+      localStorage.setItem("accessToken", accessToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+      // 🧩 3. Always pull fresh user data from /auth/me to include Stripe & latest fields
+      const meRes = await axiosInstance.get("/auth/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const enriched = enrichUser(meRes.data);
+      setUser(enriched);
+      await refreshUser();
+      localStorage.setItem("user", JSON.stringify(enriched));
+
+      return { requires2FA: false };
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw err;
+    }
+  }
 
   // 🔹 Refresh Access Token
   async function refreshAccessToken() {
@@ -117,7 +114,6 @@ async function login(email, password) {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    navigate("/");
   }
 
   useEffect(() => {

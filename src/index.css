@@ -3,6 +3,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ephesis&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ephesis&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -17,6 +18,19 @@
 
 .subscribe-bg {
   background-color: #ffffff;
+}
+h1 {
+  font-variation-settings:
+    "wght" 900,
+    "wdth" 75;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  word-spacing: 6px;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 5.5rem;
+  font-weight: 900;
+  line-height: 0.82;
 }
 
 @layer components {
@@ -110,7 +124,7 @@ input[type="url"],
 input[type="email"],
 textarea,
 select {
-  @apply bg-black text-white border border-gray-500 rounded-lg px-4 py-2 w-full
+  @apply bg-white text-white border border-gray-500 rounded-lg px-4 py-2 w-full
          focus:ring-2 focus:ring-[#7bed9f] focus:border-gray-400 focus:outline-none
          placeholder-gray-400 transition-all duration-200;
 }
@@ -253,15 +267,15 @@ input[type="color"]:focus {
   }
 
   .document-p-text {
-    @apply font-montserrat text-white text-lg leading-7;
+    @apply font-montserrat text-black text-lg leading-7;
   }
 
   .document-title-text {
-    @apply font-montserrat font-bold text-white text-3xl leading-7;
+    @apply font-montserrat font-bold text-black text-3xl leading-7 py-3;
   }
 
   .header-title-text {
-    @apply font-montserrat text-white font-bold text-4xl leading-7;
+    @apply font-montserrat text-black font-bold text-4xl leading-7;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -615,17 +629,10 @@ input[type="color"]:focus {
   body,
   #root {
     min-height: 100%;
-    background: linear-gradient(
-      180deg,
-      #000000 0%,
-      #06080f 25%,
-      #111827 55%,
-      #06080f 80%,
-      #000000 120%
-    );
+    background: #fff;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    background-color: #000 !important;
+    background-color: #fff !important;
     color: #fff;
     overscroll-behavior: none;
     overflow-x: hidden;

@@ -7,15 +7,15 @@ const PricingSection = () => {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
-const handleSignUpRedirect = () => {
-  const refSlug = localStorage.getItem("ref_slug");  // read the slug correctly
+  const handleSignUpRedirect = () => {
+    const refSlug = localStorage.getItem("ref_slug"); // read the slug correctly
 
-  if (refSlug) {
-    window.location.href = `/sign-up?ref=${refSlug}`;
-  } else {
-    window.location.href = "/sign-up";
-  }
-};
+    if (refSlug) {
+      window.location.href = `/sign-up?ref=${refSlug}`;
+    } else {
+      window.location.href = "/sign-up";
+    }
+  };
 
   const handleUpgradeRedirect = () => {
     window.location.href = "/plans";
@@ -99,7 +99,7 @@ const handleSignUpRedirect = () => {
           </div>
         </motion.div>
 
-        <p className="text-center text-sm text-silver mt-3">
+        <p className="text-center text-sm text-gray-700 mt-3">
           🔒 Secure checkout · No credit card required for free trial
         </p>
       </div>

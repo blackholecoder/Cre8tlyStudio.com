@@ -20,7 +20,6 @@ import {
   Landmark,
   CircleQuestionMark,
 } from "lucide-react";
-import CustomCursor from "../CustomCursor";
 import AnimatedLogo from "../animation/AnimatedLogo";
 
 export default function DashboardLayout({ children }) {
@@ -101,8 +100,6 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex bg-[#030712] text-white relative min-h-full">
-      <CustomCursor />
-
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 w-[120px] h-full bg-gray-900/95 border-r border-gray-800 

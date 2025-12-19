@@ -16,7 +16,7 @@ import {
   audioPlayer,
   freeSubDomain,
   tools,
-  comingSoon,
+  aiCopy,
 } from "../../assets/images";
 import { motion } from "framer-motion";
 
@@ -97,7 +97,7 @@ export default function LandingInfoPage() {
       title: "AI Powered Content Creation",
       description:
         "Generate headlines, descriptions, offers, buttons, and full landing page copy using built-in AI inside your landing page blocks.",
-      image: comingSoon,
+      image: aiCopy,
     },
     {
       title: "Save Versions and Iterate Without Risk",

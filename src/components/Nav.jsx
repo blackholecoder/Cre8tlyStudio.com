@@ -17,6 +17,8 @@ import {
   CreditCard,
   BarChart3,
   Database,
+  Download,
+  MailCheck,
 } from "lucide-react";
 
 const Nav = () => {
@@ -43,6 +45,17 @@ const Nav = () => {
     document.addEventListener("pointerdown", handler);
     return () => document.removeEventListener("pointerdown", handler);
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isOpen]);
 
   const MegaItem = ({ icon: Icon, title, desc, onClick, disabled }) => (
     <button
@@ -87,6 +100,24 @@ const Nav = () => {
     </button>
   );
 
+  function MenuItem({ title, desc, icon: Icon, onClick }) {
+    return (
+      <button
+        onClick={onClick}
+        className="w-full flex items-start gap-4 py-3 px-3 text-left hover:bg-gray-50 rounded-xl transition"
+      >
+        <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-lg bg-gray-100">
+          {Icon && <Icon className="h-5 w-5 text-gray-700" />}
+        </div>
+
+        <div>
+          <div className="font-bold text-gray-900">{title}</div>
+          <div className="text-sm text-gray-500">{desc}</div>
+        </div>
+      </button>
+    );
+  }
+
   const navigateWithReferral = (path) => {
     const ref = localStorage.getItem("ref_slug");
     if (ref) return navigate(`${path}?ref=${ref}`);
@@ -129,7 +160,7 @@ const Nav = () => {
 
   if (
     noNavRoutes.includes(location.pathname) ||
-    location.pathname.startsWith("/community")
+    location.pathname === "/community"
   ) {
     return null;
   }
@@ -241,8 +272,7 @@ const Nav = () => {
                       icon={Users}
                       title="Communities"
                       desc="Create engaged audiences"
-                      disabled
-                      // onClick={() => navigateWithReferral("/community")}
+                      onClick={() => navigateWithReferral("/community-feature")}
                     />
                   </div>
 
@@ -269,12 +299,9 @@ const Nav = () => {
 
                     <MegaItem
                       icon={Workflow}
-                      title="Funnels"
-                      desc="Automations that convert"
-                      disabled
-                      // onClick={() =>
-                      //   navigateWithReferral("/landing-page-builder")
-                      // }
+                      title="Authors Assistant"
+                      desc="Book writing software"
+                      onClick={() => navigateWithReferral("/authors-assistant")}
                     />
                   </div>
 
@@ -288,16 +315,14 @@ const Nav = () => {
                       icon={CreditCard}
                       title="Payments"
                       desc="Accept and track revenue"
-                      disabled
-                      // onClick={() => navigateWithReferral("/plans")}
+                      onClick={() => navigateWithReferral("/stripe-payments")}
                     />
 
                     <MegaItem
                       icon={BarChart3}
-                      title="Analytics"
+                      title="Growth & Analytics"
                       desc="Performance and insights"
-                      disabled
-                      // onClick={() => navigateWithReferral("/landing-analytics")}
+                      onClick={() => navigateWithReferral("/analytics")}
                     />
 
                     <MegaItem
@@ -445,83 +470,182 @@ const Nav = () => {
 
       {/* Mobile Menu */}
       <Transition
-        show={isOpen && window.innerWidth < 768}
+        show={isOpen}
         enter="transition duration-300 ease-out"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
         leave="transition duration-200 ease-in"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
         {(ref) => (
           <div
             ref={ref}
-            className="md:hidden fixed top-0 left-0 w-full h-screen bg-bioModal z-40 flex flex-col items-center pt-24 space-y-4 lead-text"
+            className="fixed inset-0 z-50 bg-white md:hidden flex flex-col"
           >
-            {filteredNavLinks.map((item) => {
-              if (item.label === "Home" && location.pathname === "/")
-                return null;
+            {/* TOP BAR */}
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <span className="font-extrabold text-lg text-black">
+                Cre8tly Studio
+              </span>
 
-              if (
-                user &&
-                (item.label === "Sign Up" ||
-                  item.label === "Contact Us" ||
-                  item.label === "Shop")
-              )
-                return null;
-
-              if (item.label === "Login" && user) {
-                return (
-                  <Link
-                    key="user-dashboard"
-                    to="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="font-montserrat text-md text-white-400 hover:text-white transition-all"
+              <div className="flex items-center gap-3">
+                {!user && (
+                  <button
+                    onClick={() => {
+                      navigateWithReferral("/plans");
+                      setIsOpen(false);
+                    }}
+                    className="rounded-full bg-black px-4 py-2 text-sm font-bold text-white"
                   >
-                    Dashboard
-                  </Link>
-                );
-              }
+                    Get Started
+                  </button>
+                )}
 
-              return (
                 <button
-                  key={item.label}
-                  onClick={() => {
-                    navigateWithReferral(item.href);
-                    setIsOpen(false);
-                  }}
-                  className="font-montserrat text-md text-white-400 hover:text-white transition-all cursor-pointer"
+                  onClick={() => setIsOpen(false)}
+                  className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-xl"
                 >
-                  {item.label}
+                  ✕
                 </button>
-              );
-            })}
+              </div>
+            </div>
 
-            {/* ✅ Add Plans link here */}
-            {!user && (
-              <button
-                onClick={() => {
-                  navigateWithReferral("/plans");
-                  setIsOpen(false);
-                }}
-                className="font-montserrat text-md text-white-400 hover:text-white transition-all"
-              >
-                Plans
-              </button>
-            )}
+            {/* SCROLL AREA */}
+            <div className="flex-1 overflow-y-auto px-6 py-8 overscroll-contain">
+              <div className="mx-auto max-w-md rounded-3xl border bg-white shadow-xl p-6 space-y-10">
+                {/* BUILD & LAUNCH */}
+                <div>
+                  <h3 className="text-sm font-extrabold tracking-wide mb-4 text-gray-600">
+                    BUILD & LAUNCH
+                  </h3>
 
-            {user && (
-              <button
-                onClick={() => {
-                  logout();
-                  setIsOpen(false);
-                  navigate("/login");
-                }}
-                className="font-montserrat text-md text-white-400 hover:text-white transition-all"
-              >
-                Logout
-              </button>
-            )}
+                  <MenuItem
+                    icon={Sparkles}
+                    title="Smart Prompt"
+                    desc="Turn ideas into structured prompts"
+                    onClick={() => {
+                      navigateWithReferral("/smart-prompt");
+                      setIsOpen(false);
+                    }}
+                  />
+
+                  <MenuItem
+                    icon={LayoutTemplate}
+                    title="Landing Pages"
+                    desc="Create high converting pages"
+                    onClick={() => {
+                      navigateWithReferral("/landing");
+                      setIsOpen(false);
+                    }}
+                  />
+
+                  <MenuItem
+                    icon={Download}
+                    title="Digital Products"
+                    desc="Sell PDFs, audio, and downloads"
+                    onClick={() => {
+                      navigateWithReferral("/products");
+                      setIsOpen(false);
+                    }}
+                  />
+                </div>
+
+                {/* SCALE */}
+                <div>
+                  <h3 className="text-sm font-extrabold tracking-wide mb-4 text-gray-600">
+                    SCALE
+                  </h3>
+
+                  {/* <MenuItem
+                    icon={MailCheck}
+                    title="Email & Automations"
+                    desc="Convert and retain your audience"
+                    disabled
+                    // onClick={() => {
+                    //   navigateWithReferral("/email");
+                    //   setIsOpen(false);
+                    // }}
+                  /> */}
+                  <MenuItem
+                    icon={BookOpen}
+                    title="Authors Assistant"
+                    desc="Book writing software"
+                    onClick={() => {
+                      navigateWithReferral("/authors-assistant");
+                      setIsOpen(false);
+                    }}
+                  />
+                </div>
+
+                {/* EARN & MEASURE */}
+                <div>
+                  <h3 className="text-sm font-extrabold tracking-wide mb-4 text-gray-600">
+                    EARN & MEASURE
+                  </h3>
+
+                  <MenuItem
+                    icon={CreditCard}
+                    title="Payments & Payouts"
+                    desc="Accept payments with Stripe"
+                    onClick={() => {
+                      navigateWithReferral("/stripe-payments");
+                      setIsOpen(false);
+                    }}
+                  />
+
+                  <MenuItem
+                    icon={BarChart3}
+                    title="Growth & Analytics"
+                    desc="Track clicks, downloads, and performance"
+                    onClick={() => {
+                      navigateWithReferral("/analytics");
+                      setIsOpen(false);
+                    }}
+                  />
+                </div>
+
+                {/* ACCOUNT */}
+                <div className="pt-4 border-t space-y-3">
+                  {!user && (
+                    <button
+                      onClick={() => {
+                        navigateWithReferral("/login");
+                        setIsOpen(false);
+                      }}
+                      className="w-full text-left font-semibold text-gray-700"
+                    >
+                      Log in
+                    </button>
+                  )}
+
+                  {user && (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate("/dashboard");
+                          setIsOpen(false);
+                        }}
+                        className="w-full text-left font-semibold text-gray-700"
+                      >
+                        Dashboard
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsOpen(false);
+                          navigate("/login");
+                        }}
+                        className="w-full text-left font-semibold text-gray-700"
+                      >
+                        Log out
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </Transition>

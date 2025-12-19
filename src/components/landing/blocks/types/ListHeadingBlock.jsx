@@ -1,11 +1,40 @@
 import React from "react";
 
-export default function ListHeadingBlock({ block, index, updateBlock }) {
+export default function ListHeadingBlock({
+  block,
+  index,
+  updateBlock,
+  openAIModal,
+}) {
   return (
     <>
       <label className="font-semibold text-sm mb-1">
         List Heading (bold line above bullet list)
       </label>
+
+      <div className="pb-2">
+        <button
+          type="button"
+          onClick={() =>
+            openAIModal({
+              blockType: "list_heading",
+              blockIndex: index,
+              currentText: block.text,
+              role: block.aiRole || "body",
+            })
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          className="
+      text-xs font-semibold px-3 py-1 rounded-md
+      bg-royalPurple text-white
+      hover:bg-royalPurple/80
+      transition
+    "
+          title="Use AI to write or improve this copy"
+        >
+          AI
+        </button>
+      </div>
 
       <textarea
         rows={2}

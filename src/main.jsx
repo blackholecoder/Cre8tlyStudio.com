@@ -17,7 +17,7 @@ import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
 import PromptPage from "./sections/PromptPage.jsx";
 import SignupPage from "./sections/SignUp.jsx";
-import { Landing, Login, Nav } from "./sections/index.js";
+import { Landing, Login } from "./sections/index.js";
 import CustomerDashboard from "./sections/CustomerDashboard.jsx";
 import AdminDashboard from "./sections/AdminDashboard.jsx";
 import Contact from "./sections/Contact.jsx";
@@ -61,6 +61,10 @@ import ResourcesVideos from "./sections/landing/ResourcesVideos.jsx";
 import SmartPromptPage from "./sections/landing/SmartPromptPage.jsx";
 import SiteLayout from "./components/layouts/SiteLayout.jsx";
 import LandingInfoPage from "./sections/landing/LandingInfoPage.jsx";
+import AnalyticsFeaturePage from "./sections/AnalyticsFeaturePage.jsx";
+import CommunityFeaturePage from "./sections/CommunityFeaturePage.jsx";
+import StripePayments from "./sections/StripePayments.jsx";
+import AuthorsAssistant from "./sections/AuthorsAssistantPage.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -100,6 +104,10 @@ const AnimatedRoutes = () => {
           <Route path="resources" element={<Resources />}>
             <Route path="videos" element={<ResourcesVideos />} />
           </Route>
+          <Route path="analytics" element={<AnalyticsFeaturePage />} />
+          <Route path="community-feature" element={<CommunityFeaturePage />} />
+          <Route path="stripe-payments" element={<StripePayments />} />
+          <Route path="authors-assistant" element={<AuthorsAssistant />} />
 
           {/* Auth */}
           <Route path="sign-up" element={<SignupPage />} />

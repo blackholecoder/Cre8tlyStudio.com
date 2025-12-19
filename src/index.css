@@ -124,7 +124,7 @@ input[type="url"],
 input[type="email"],
 textarea,
 select {
-  @apply bg-white text-white border border-gray-500 rounded-lg px-4 py-2 w-full
+  @apply bg-white text-black border border-gray-500 rounded-lg px-4 py-2 w-full
          focus:ring-2 focus:ring-[#7bed9f] focus:border-gray-400 focus:outline-none
          placeholder-gray-400 transition-all duration-200;
 }

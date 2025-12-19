@@ -1,8 +1,41 @@
 import React from "react";
 
-export default function ParagraphBlock({ block, index, updateBlock }) {
+export default function ParagraphBlock({
+  block,
+  index,
+  updateBlock,
+  openAIModal,
+}) {
   return (
     <>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-gray-500">Paragraph</span>
+      </div>
+
+      <div className="pb-2">
+        <button
+          type="button"
+          onClick={() =>
+            openAIModal({
+              blockType: "paragraph",
+              blockIndex: index,
+              currentText: block.text,
+              role: block.aiRole || "body",
+            })
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          className="
+      text-xs font-semibold px-3 py-1 rounded-md
+      bg-royalPurple text-white
+      hover:bg-royalPurple/80
+      transition
+    "
+          title="Use AI to write or improve this copy"
+        >
+          AI
+        </button>
+      </div>
+
       <textarea
         value={block.text}
         onChange={(e) => updateBlock(index, "text", e.target.value)}
@@ -36,9 +69,7 @@ export default function ParagraphBlock({ block, index, updateBlock }) {
           <input
             type="checkbox"
             checked={block.bulleted || false}
-            onChange={(e) =>
-              updateBlock(index, "bulleted", e.target.checked)
-            }
+            onChange={(e) => updateBlock(index, "bulleted", e.target.checked)}
             onFocus={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             className="w-4 h-4 accent-green-500"

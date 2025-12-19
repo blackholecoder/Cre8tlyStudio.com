@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import Footer from "../sections/Footer.jsx";
 import { Eye, EyeOff } from "lucide-react";
 import { headerLogo } from "../assets/images/index.js";
 
@@ -186,13 +185,11 @@ export default function SignupPage() {
               hover:opacity-90 transition
             "
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? "Creating Account..." : "Get Started"}
             </button>
           </form>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

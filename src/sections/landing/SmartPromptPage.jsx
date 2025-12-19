@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   brandIdentity,
   smartPrompt,
@@ -17,6 +19,14 @@ import {
 import { motion } from "framer-motion";
 
 export default function SmartPromptPage() {
+  const navigate = useNavigate();
+
+  const navigateWithReferral = (path) => {
+    const ref = localStorage.getItem("ref_slug");
+    if (ref) return navigate(`${path}?ref=${ref}`);
+    return navigate(path);
+  };
+
   const textVariant = (isEven) => ({
     hidden: {
       opacity: 0,
@@ -155,7 +165,7 @@ export default function SmartPromptPage() {
                 className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-16"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-80px" }}
               >
                 {/* Connector dot */}
                 <motion.div
@@ -193,7 +203,7 @@ export default function SmartPromptPage() {
                 >
                   <div className="bg-gray-100 aspect-[16/9] rounded-3xl overflow-hidden shadow-xl">
                     <img
-                      loading="lazy"
+                      loading="eager"
                       src={step.image}
                       alt={step.title}
                       className="w-full h-full object-cover"
@@ -205,6 +215,59 @@ export default function SmartPromptPage() {
           })}
         </div>
       </div>
+      {/* CTA */}
+      <section className="mt-40 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="
+      max-w-4xl mx-auto
+      rounded-2xl sm:rounded-3xl
+      bg-white
+      border border-gray-200
+      px-8 sm:px-10
+      py-14 sm:py-16
+      text-center
+      shadow-lg
+    "
+        >
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-4">
+            Ready to turn prompts into products?
+          </h2>
+
+          <p className="text-gray-600 max-w-xl mx-auto mb-10 text-lg">
+            Start creating, designing, and selling with Cre8tly Studio in
+            minutes.
+          </p>
+
+          <motion.button
+            type="button"
+            onClick={() => navigateWithReferral("/plans")}
+            whileHover={{ scale: 1.07 }}
+            whileTap={{ scale: 0.95 }}
+            animate={{
+              boxShadow: [
+                "0 0 0 rgba(0,0,0,0)",
+                "0 0 30px rgba(34,197,94,0.45)",
+                "0 0 0 rgba(0,0,0,0)",
+              ],
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="
+        inline-flex items-center justify-center gap-2
+        px-10 py-4
+        rounded-xl
+        bg-green
+        text-black
+        font-bold text-lg
+      "
+          >
+            Get started for free
+          </motion.button>
+        </motion.div>
+      </section>
     </main>
   );
 }

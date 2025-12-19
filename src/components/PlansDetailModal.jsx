@@ -17,7 +17,7 @@ The Business Basic Builder plan is designed for creators and entrepreneurs who w
 This plan includes:
 • 7 Lead Magnet Slots  
 • Sell directly on your landing pages  
-• Keep 80% of every sale  
+• No platform fees: keep what you make  
 • Pro Covers for books and lead magnets  
 • Prompt Memory for consistent AI writing  
 • Access to millions of royalty-free Unsplash images  
@@ -25,33 +25,11 @@ This plan includes:
 
 Business Basic gives you everything you need to launch, validate, and grow without advanced analytics or custom landing page features. Upgrade anytime when you're ready to scale.`,
     },
-
-    pro: {
-      title: "Pro Covers",
-      content: `
-The Pro Covers Plan includes everything in Basic, plus unlimited custom cover uploads for both books and lead magnets. Personalize your visuals with full creative control—upload, test, and update covers that match your unique style and brand. You’ll also gain access to thousands of royalty-free Unsplash images, making it easy to design stunning, professional-quality covers in seconds without worrying about licensing or costs.`,
-    },
     author: {
       title: "Author’s Assistant",
       content: `
 Transform your writing with intelligent support, not automation.
 The Author’s Assistant is your creative co-writer, an AI partner that helps you plan your story structure, build rich scenes, and craft powerful chapters without losing your authentic voice. Generate up to 750 pages with built-in editing tools that perfect your tone, pacing, and style. Plus, enjoy unlimited custom cover uploads to bring your book to life with a professional finish.`,
-    },
-    bundle: {
-      title: "All-In-One Bundle",
-      content: `
-The All-In-One Bundle gives you everything in a single discounted package:  
-• 5 Lead Magnet Slots to grow your audience  
-• Pro Covers for both books and lead magnets  
-• 1 Author’s Assistant Book Slot (750 pages + editor)  
-A full creative suite that lets you write, design, and publish with complete control from start to finish.`,
-    },
-    prompt_memory: {
-      title: "Prompt Memory Subscription",
-      content: `
-The Prompt Memory Plan gives you a persistent AI memory across your entire Cre8tly Studio experience.
-It learns your tone, writing style, and preferences, letting you generate faster, more accurate, and
-on-brand results every time. Cancel anytime, no contracts.`,
     },
     business_builder_pack: {
       title: "Pro Business Builder Pack",
@@ -61,6 +39,7 @@ It gives you unlimited access to build landing pages, capture leads automaticall
 
 Features include:
 • Unlimited landing pages and lead forms  
+• No platform fees: keep what you make
 • Custom domains and analytics tracking  
 • AI-powered email content generator  
 • Premium conversion templates  

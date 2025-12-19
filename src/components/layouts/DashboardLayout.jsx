@@ -16,9 +16,9 @@ import {
   MessageSquare,
   Bell,
   MailSearch,
-  PanelsTopLeft,
   Landmark,
   CircleQuestionMark,
+  LayoutTemplate,
 } from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
 
@@ -205,7 +205,7 @@ export default function DashboardLayout({ children }) {
                   : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
               }`}
                 >
-                  <PanelsTopLeft size={22} />
+                  <LayoutTemplate size={22} />
                 </div>
               </button>
             )}

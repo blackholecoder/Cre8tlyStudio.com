@@ -31,6 +31,7 @@ import PreviewPanel from "../../components/landing/landingPageBuilder/PreviewPan
 import ToggleDownloadButton from "../../components/landing/landingPageBuilder/ToggleDownloadButton";
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
+import AICopyModal from "./ai/AICopyModal";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -55,6 +56,18 @@ export default function LandingPageBuilder() {
   const [blocksHidden, setBlocksHidden] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Ai
+  const [aiContext, setAIContext] = useState(null);
+
+  const openAIModal = ({ blockType, blockIndex, currentText, role }) => {
+    setAIContext({
+      blockType,
+      blockIndex,
+      currentText,
+      role,
+    });
+  };
 
   const findLocationById = (blocks, id) => {
     const rootIndex = blocks.findIndex((b) => b.id === id);
@@ -1129,6 +1142,8 @@ export default function LandingPageBuilder() {
                           bgTheme={bgTheme}
                           pdfList={pdfList}
                           landing={landing}
+                          openAIModal={openAIModal} // 👈 ADD
+                          offerContext={landing?.offer_context}
                         />
                       ))}
                   </SortableContext>
@@ -1226,6 +1241,17 @@ export default function LandingPageBuilder() {
         }}
         onConfirm={confirmSaveTemplate}
       />
+      {aiContext && (
+        <AICopyModal
+          aiContext={aiContext}
+          onApply={(newText) => {
+            if (!newText?.trim()) return;
+            updateBlock(aiContext.blockIndex, "text", newText);
+            setAIContext(null);
+          }}
+          onClose={() => setAIContext(null)}
+        />
+      )}
     </div>
   );
 }

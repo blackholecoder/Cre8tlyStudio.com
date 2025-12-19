@@ -56,6 +56,7 @@ function SortableBlock({
   bgTheme,
   pdfList,
   landing,
+  openAIModal,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -249,6 +250,7 @@ function SortableBlock({
               block={block}
               index={index}
               updateBlock={updateBlock}
+              openAIModal={openAIModal}
             />
           )}
           {block.type === "list_heading" && (
@@ -256,6 +258,7 @@ function SortableBlock({
               block={block}
               index={index}
               updateBlock={updateBlock}
+              openAIModal={openAIModal}
             />
           )}
           {block.type === "paragraph" && (
@@ -263,6 +266,7 @@ function SortableBlock({
               block={block}
               index={index}
               updateBlock={updateBlock}
+              openAIModal={openAIModal}
             />
           )}
           {block.type === "video" && (
@@ -281,6 +285,7 @@ function SortableBlock({
               index={index}
               updateBlock={updateBlock}
               bgTheme={bgTheme}
+              openAIModal={openAIModal}
             />
           )}
           {block.type === "calendly" && (
@@ -328,7 +333,12 @@ function SortableBlock({
             />
           )}
           {block.type === "faq" && (
-            <FAQBlock block={block} index={index} updateBlock={updateBlock} />
+            <FAQBlock
+              block={block}
+              index={index}
+              updateBlock={updateBlock}
+              openAIModal={openAIModal}
+            />
           )}
           {block.type === "image" && (
             <ImageBlock
@@ -349,6 +359,7 @@ function SortableBlock({
               bgTheme={bgTheme}
               landing={landing}
               pdfList={pdfList}
+              openAIModal={openAIModal}
             />
           )}
           {block.type === "secure_checkout" && (

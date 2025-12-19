@@ -2,13 +2,14 @@ import { motion } from "framer-motion";
 import VideoPlayer from "../components/VideoPlayer";
 import Hero from "../components/hero/Hero";
 import PlatformShowcase from "../sections/landing/PlatformShowcase";
+import FAQSection from "../components/FAQSection";
 
 const Landing = () => {
   return (
     <div className="min-h-screen w-full text-white flex flex-col font-sans overflow-x-hidden">
       <Hero />
       {/* HERO */}
-      <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-32 relative overflow-hidden">
+      <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-32 relative ">
         <motion.h1
           className="text-[34px] sm:text-[44px] md:text-[64px] lg:text-[80px]
           font-extrabold tracking-tight text-black leading-[1.05]"
@@ -46,12 +47,13 @@ const Landing = () => {
         </motion.p>
 
         {/* Responsive full-width video */}
-        <div className="w-full max-w-5xl mt-12 rounded-2xl overflow-hidden">
+        <div className="w-full max-w-5xl mt-12 rounded-2xl ">
           <VideoPlayer />
         </div>
       </section>
 
       <PlatformShowcase />
+      <FAQSection />
     </div>
   );
 };

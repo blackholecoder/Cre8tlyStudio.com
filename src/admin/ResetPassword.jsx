@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../api/axios.jsx";
 import { toast } from "react-toastify";
-import Footer from "../sections/Footer.jsx";
+import { headerLogo } from "../assets/images/index.js";
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -52,96 +52,128 @@ export default function ResetPassword() {
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#030712",
-        isolation: "isolate",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <section className="flex flex-col justify-center items-center flex-grow text-white px-6 py-20">
+    <div className="min-h-screen flex flex-col bg-white">
+      <section className="flex flex-col justify-center items-center flex-grow px-6 py-20">
         <AnimatePresence mode="wait">
           {!success ? (
             <motion.div
               key="form"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl"
+              className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-200 shadow-xl"
             >
-              <h1 className="text-3xl font-bold text-green text-center mb-6">
-                Reset Password
-              </h1>
-              <p className="text-gray-300 text-center mb-8">
-                Enter your new password below to reset your account.
+              {/* Brand */}
+              <div className="flex items-center gap-2 mb-6">
+                <img
+                  src={headerLogo}
+                  alt="Cre8tly Studio"
+                  className="h-12 w-12 object-contain"
+                />
+                <span className="text-lg font-semibold text-gray-900">
+                  Cre8tly Studio
+                </span>
+              </div>
+
+              {/* Header */}
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Reset your password
+              </h2>
+
+              <p className="text-sm text-gray-600 mb-6">
+                Enter a new password for your account.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="New Password"
+                  placeholder="New password"
                   required
-                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+                  className="
+                    w-full h-[48px] px-4 rounded-lg
+                    bg-white
+                    border border-gray-300
+                    text-gray-900
+                    placeholder-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+                  "
                 />
+
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm New Password"
+                  placeholder="Confirm new password"
                   required
-                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green text-white"
+                  className="
+                    w-full h-[48px] px-4 rounded-lg
+                    bg-white
+                    border border-gray-300
+                    text-gray-900
+                    placeholder-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+                  "
                 />
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-green text-black font-semibold py-3 rounded-lg hover:opacity-90 transition-all"
+                  className="
+                    w-full bg-black text-white
+                    font-semibold py-3 rounded-lg
+                    hover:opacity-90 transition
+                  "
                 >
-                  {loading ? "Resetting..." : "Reset Password"}
+                  {loading ? "Resetting..." : "Reset password"}
                 </button>
               </form>
 
-              <p className="text-sm text-gray-400 text-center mt-6">
-                <a href="/login" className="text-green hover:underline">
+              {/* Back */}
+              <p className="text-sm text-gray-600 text-center mt-6">
+                Remembered your password?{" "}
+                <button
+                  onClick={() => navigate("/login")}
+                  className="font-semibold hover:underline"
+                >
                   Back to Login
-                </a>
+                </button>
               </p>
             </motion.div>
           ) : (
             <motion.div
               key="success"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4 }}
-              className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl text-center"
+              className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-200 shadow-xl text-center"
             >
-              <h1 className="text-3xl font-bold text-green mb-6">
-                Password Reset Successful
-              </h1>
-              <p className="text-gray-300 mb-6">
-                Your password has been updated successfully. You can now log in
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Password updated
+              </h2>
+
+              <p className="text-gray-600 mb-6">
+                Your password has been reset successfully. You can now sign in
                 with your new password.
               </p>
-              <div className="flex justify-center">
-                <button
-                  onClick={() => navigate("/login")}
-                  className="bg-green text-black font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-all"
-                >
-                  Go to Login
-                </button>
-              </div>
+
+              <button
+                onClick={() => navigate("/login")}
+                className="
+                  w-full bg-black text-white
+                  font-semibold py-3 rounded-lg
+                  hover:opacity-90 transition
+                "
+              >
+                Go to Login
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
       </section>
-
-      <Footer />
     </div>
   );
 }

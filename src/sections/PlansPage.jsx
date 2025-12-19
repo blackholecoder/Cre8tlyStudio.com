@@ -26,7 +26,9 @@ export default function PlansPage() {
 
   const handleSelectPlan = async (planType) => {
     if (!user || !user.id) {
-      toast.warning("Please sign up before selecting a plan");
+      toast.warning(
+        "Create a free account to continue. No credit card required."
+      );
       return;
     }
 
@@ -118,9 +120,9 @@ export default function PlansPage() {
                   window.location.href = "/sign-up";
                 }
               }}
-              className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-royalPurple text-white hover:opacity-90 transition"
+              className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-green text-black hover:opacity-90 transition"
             >
-              Sign Up
+              Start Building for Free
             </button>
           ) : user?.has_free_magnet === 1 ? (
             // Logged in and already has free tier
@@ -156,7 +158,7 @@ export default function PlansPage() {
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
             <li>✅ 7 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
-            <li>✅ Keep 80% of Every Sale</li>
+            <li>✅ No platform fees: keep what you make</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
@@ -203,7 +205,7 @@ export default function PlansPage() {
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
-            <li>✅ Keep 80% of Every Sale</li>
+            <li>✅ No platform fees: keep what you make</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
@@ -250,7 +252,7 @@ export default function PlansPage() {
           <ul className="text-sm text-gray-300 space-y-2 mb-8">
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
-            <li>✅ Keep 80% of Every Sale</li>
+            <li>✅ No platform fees: keep what you make</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>

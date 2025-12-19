@@ -1,6 +1,11 @@
 import React from "react";
 
-export default function HeadingBlock({ block, index, updateBlock }) {
+export default function HeadingBlock({
+  block,
+  index,
+  updateBlock,
+  openAIModal,
+}) {
   return (
     <>
       <label className="font-semibold text-sm mb-1">
@@ -10,6 +15,29 @@ export default function HeadingBlock({ block, index, updateBlock }) {
             ? "Subheading (H2)"
             : "Sub-Subheading (H3)"}
       </label>
+      <div className="pb-2">
+        <button
+          type="button"
+          onClick={() =>
+            openAIModal({
+              blockType: block.type,
+              blockIndex: index,
+              currentText: block.text,
+              role: block.aiRole || "body",
+            })
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          className="
+      text-xs font-semibold px-3 py-1 rounded-md
+      bg-royalPurple text-white
+      hover:bg-royalPurple/80
+      transition
+    "
+          title="Use AI to write or improve this copy"
+        >
+          AI
+        </button>
+      </div>
 
       <textarea
         rows={2}

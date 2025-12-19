@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
-import Footer from "../sections/Footer.jsx";
 import { Eye, EyeOff } from "lucide-react";
 import axiosInstance from "../api/axios";
 import { headerLogo } from "../assets/images/index.js";
@@ -372,8 +371,6 @@ export default function LoginPage() {
           )}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

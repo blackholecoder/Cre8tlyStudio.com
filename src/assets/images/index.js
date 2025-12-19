@@ -37,6 +37,10 @@ import freeSubDomain from "./subdomain.webp";
 import tools from "./tools.webp";
 import comingSoon from "./coming-soon.webp";
 
+// Authors Assistant
+import bookFeature from "./book-feature-prompt.webp";
+import aiCopy from "./ai-copy-landing.webp";
+
 export {
   headerLogo,
   banner,
@@ -74,4 +78,6 @@ export {
   freeSubDomain,
   tools,
   comingSoon,
+  bookFeature,
+  aiCopy,
 };

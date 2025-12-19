@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-export default function FAQBlock({ block, index, updateBlock }) {
+export default function FAQBlock({ block, index, updateBlock, openAIModal }) {
   // Sortable Item Wrapper (no listeners here anymore!)
   function SortableFAQItem({ i, children }) {
     const { attributes, listeners, setNodeRef, transform, transition } =
@@ -58,6 +58,32 @@ export default function FAQBlock({ block, index, updateBlock }) {
   return (
     <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
       <h3 className="text-lg font-semibold text-silver mb-4">FAQ Section</h3>
+
+      <div className="pb-2">
+        <button
+          type="button"
+          onClick={() =>
+            openAIModal({
+              blockType: "faq",
+              blockIndex: index,
+              currentText: (block.items || [])
+                .map((i) => `Q: ${i.q}\nA: ${i.a}`)
+                .join("\n\n"),
+              role: "faq",
+            })
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          className="
+      text-xs font-semibold px-3 py-1 rounded-md
+      bg-royalPurple text-white
+      hover:bg-royalPurple/80
+      transition
+    "
+          title="Generate or improve FAQs with AI"
+        >
+          AI
+        </button>
+      </div>
 
       {/* Section Title */}
       <label className="text-sm font-semibold text-gray-300 mt-6">

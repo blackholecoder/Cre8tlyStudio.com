@@ -1246,7 +1246,37 @@ export default function LandingPageBuilder() {
           aiContext={aiContext}
           onApply={(newText) => {
             if (!newText?.trim()) return;
-            updateBlock(aiContext.blockIndex, "text", newText);
+
+            // ✅ FAQ handling
+            if (aiContext.blockType === "faq") {
+              // Expect AI output like:
+              // Q: Question
+              // A: Answer
+
+              const parsedItems = newText
+                .split(/\n\s*\n/)
+                .map((chunk) => {
+                  const qMatch = chunk.match(/Q:\s*(.+)/i);
+                  const aMatch = chunk.match(/A:\s*(.+)/i);
+
+                  if (!qMatch || !aMatch) return null;
+
+                  return {
+                    q: qMatch[1].trim(),
+                    a: aMatch[1].trim(),
+                    open: false,
+                  };
+                })
+                .filter(Boolean);
+
+              if (parsedItems.length > 0) {
+                updateBlock(aiContext.blockIndex, "items", parsedItems);
+              }
+            } else {
+              // ✅ All other blocks
+              updateBlock(aiContext.blockIndex, "text", newText);
+            }
+
             setAIContext(null);
           }}
           onClose={() => setAIContext(null)}

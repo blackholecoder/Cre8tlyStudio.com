@@ -1,5 +1,4 @@
-import { useRef, useState, useEffect } from "react";
-import WaveSurfer from "wavesurfer.js";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../../../api/axios";
 import { toast } from "react-toastify";
 
@@ -12,17 +11,15 @@ export default function AudioPlayerBlock({
 }) {
   const MAX_AUDIO_SECONDS = 3 * 60 * 60; // 3 hours
 
-  const waveformRef = useRef(null);
-  const waveSurfer = useRef(null);
+  const audioRef = useRef(null);
+  const previewHitRef = useRef(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
-  const colorDebounce = useRef(null);
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [seekValue, setSeekValue] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-
-  const startTime = Date.now();
 
   const getLabelContrast = (hex) => {
     if (!hex) return "#f3f4f6";
@@ -56,130 +53,85 @@ export default function AudioPlayerBlock({
     setDuration(0);
     setSeekValue(0);
     setIsPlaying(false);
+    previewHitRef.current = false;
   };
 
-  // Initialize Waveform
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+  };
+
   useEffect(() => {
-    clearTimeout(colorDebounce.current);
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    colorDebounce.current = setTimeout(() => {
-      if (!block.show_waveform || !block.audio_url) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
 
-      // destroy old
-      if (waveSurfer.current) {
-        waveSurfer.current.destroy();
-        waveSurfer.current = null;
+    const onLoaded = () => {
+      setDuration(audio.duration || 0);
+    };
+
+    const onTimeUpdate = () => {
+      const t = audio.currentTime || 0;
+      const d = audio.duration || 1;
+
+      // 🔒 preview enforcement
+      if (
+        block.preview_enabled &&
+        block.preview_duration > 0 &&
+        t >= Math.min(block.preview_duration, d)
+      ) {
+        if (!previewHitRef.current) {
+          previewHitRef.current = true;
+          toast.info("Preview ended. Purchase to unlock the full track.");
+        }
+
+        audio.pause();
+        audio.currentTime = 0;
+        setCurrentTime(0);
+        setSeekValue(0);
+        return;
       }
 
-      const ws = WaveSurfer.create({
-        container: waveformRef.current,
-        waveColor: block.waveform_color,
-        progressColor: block.progress_color,
-        height: 30,
-        barWidth: 2,
-        responsive: true,
-      });
+      setCurrentTime(t);
+      setSeekValue((t / d) * 100);
+    };
 
-      waveSurfer.current = ws;
+    const onEnded = () => {
+      setIsPlaying(false);
 
-      // LOAD AUDIO
-      ws.load(block.audio_url);
+      const playlist = block.playlist || [];
+      const idx = playlist.findIndex((t) => t.audio_url === block.audio_url);
+      const next = playlist[idx + 1];
+      if (next) loadTrack(next);
+    };
 
-      // READY
-      ws.on("ready", () => {
-        const dur = ws.getDuration();
-        setDuration(dur);
-      });
-
-      // AUDIO PROCESS
-      ws.on("audioprocess", () => {
-        const inst = waveSurfer.current;
-        if (!inst || !inst.isPlaying()) return;
-
-        const t = inst.getCurrentTime();
-        const dur = inst.getDuration();
-
-        if (
-          block.preview_enabled &&
-          block.preview_duration > 0 &&
-          t >= Math.min(block.preview_duration, dur)
-        ) {
-          inst.pause();
-          inst.seekTo(0);
-
-          setIsPlaying(false);
-          setCurrentTime(0);
-          setSeekValue(0);
-
-          toast.info("Preview ended. Purchase to unlock the full track.");
-          return;
-        }
-
-        setCurrentTime(t);
-        setSeekValue((t / dur) * 100);
-      });
-
-      // SEEK HANDLER (clicking waveform)
-      ws.on("seek", (pct) => {
-        const inst = waveSurfer.current;
-        if (!inst) return;
-
-        const dur = inst.getDuration();
-        const newTime = pct * dur;
-
-        if (
-          block.preview_enabled &&
-          block.preview_duration > 0 &&
-          newTime >= Math.min(block.preview_duration, dur)
-        ) {
-          const limitPct = block.preview_duration / dur;
-          inst.seekTo(limitPct);
-
-          setCurrentTime(block.preview_duration);
-          setSeekValue(limitPct * 100);
-          return;
-        }
-
-        inst.seekTo(pct);
-        setCurrentTime(newTime);
-        setSeekValue(pct * 100);
-      });
-
-      // ON FINISH
-      ws.on("finish", () => {
-        setIsPlaying(false);
-
-        const playlist = block.playlist || [];
-        const indexNow = playlist.findIndex(
-          (t) => t.audio_url === block.audio_url
-        );
-
-        const next = playlist[indexNow + 1];
-        if (next) loadTrack(next);
-      });
-    }, 300);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("loadedmetadata", onLoaded);
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
 
     return () => {
-      clearTimeout(colorDebounce.current);
-      if (waveSurfer.current) {
-        waveSurfer.current.destroy();
-        waveSurfer.current = null;
-      }
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("loadedmetadata", onLoaded);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
     };
   }, [
     block.audio_url,
-    block.show_waveform,
-    block.waveform_color,
-    block.progress_color,
     block.preview_enabled,
     block.preview_duration,
+    block.playlist,
   ]);
-
-  const togglePlay = () => {
-    if (!waveSurfer.current) return;
-    waveSurfer.current.playPause();
-    setIsPlaying(waveSurfer.current.isPlaying());
-  };
 
   async function handleSinglePurchase(track, block, landing) {
     const res = await axiosInstance.post(
@@ -212,7 +164,7 @@ export default function AudioPlayerBlock({
         audio_urls: block.playlist.map((t) => t.audio_url), // all tracks
         product_name: block.album_button_text?.trim() || "Buy Album",
         price_in_cents: Math.round(block.album_price * 100),
-        cover_url: albumCover,
+        cover_url: block.cover_url || block.playlist?.[0]?.cover_url || "",
       }
     );
 
@@ -280,6 +232,8 @@ export default function AudioPlayerBlock({
             <div className="w-10 h-10 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
           </div>
         )}
+
+        <audio ref={audioRef} src={block.audio_url || ""} preload="metadata" />
         {/* PLAYER PREVIEW */}
         <div className="flex items-center gap-6 mt-4">
           {/* COVER */}
@@ -310,11 +264,10 @@ export default function AudioPlayerBlock({
               <div
                 className="w-[38px] h-[38px] rounded-lg bg-[#1e293b] flex items-center justify-center cursor-pointer"
                 onClick={() => {
-                  if (!waveSurfer.current) return;
-                  const ws = waveSurfer.current;
-                  ws.seekTo(
-                    Math.max(0, ws.getCurrentTime() - 10) / ws.getDuration()
-                  );
+                  const audio = audioRef.current;
+                  if (!audio) return;
+
+                  audio.currentTime = Math.max(0, audio.currentTime - 10);
                 }}
               >
                 <svg width="16" height="16" fill={block.progress_color}>
@@ -343,12 +296,11 @@ export default function AudioPlayerBlock({
               <div
                 className="w-[38px] h-[38px] rounded-lg bg-[#1e293b] flex items-center justify-center cursor-pointer"
                 onClick={() => {
-                  if (!waveSurfer.current) return;
-                  const ws = waveSurfer.current;
-                  ws.seekTo(
-                    Math.min(ws.getDuration(), ws.getCurrentTime() + 10) /
-                      ws.getDuration()
-                  );
+                  const audio = audioRef.current;
+                  if (!audio) return;
+
+                  const d = audio.duration || Infinity;
+                  audio.currentTime = Math.min(d, audio.currentTime + 10);
                 }}
               >
                 <svg width="16" height="16" fill={block.progress_color}>
@@ -375,32 +327,29 @@ export default function AudioPlayerBlock({
               max={100}
               value={seekValue}
               onChange={(e) => {
+                const audio = audioRef.current;
+                if (!audio) return;
+
                 const pct = Number(e.target.value);
-                const dur = duration || 1;
-                const newTime = (pct / 100) * dur;
+                const dur = audio.duration || 1;
+                let newTime = (pct / 100) * dur;
 
                 const limit =
                   block.preview_enabled && block.preview_duration > 0
                     ? Math.min(block.preview_duration, dur)
                     : null;
 
+                // 🔒 Preview clamp
                 if (limit !== null && newTime >= limit) {
-                  const limitPct = limit / dur;
-                  console.log("Slider clamped", { newTime, limit, limitPct });
-
-                  setSeekValue(limitPct * 100);
+                  newTime = limit;
+                  setSeekValue((limit / dur) * 100);
                   setCurrentTime(limit);
-
-                  if (waveSurfer.current) {
-                    waveSurfer.current.seekTo(limitPct);
-                  }
+                  audio.currentTime = limit;
                   return;
                 }
 
+                audio.currentTime = newTime;
                 setSeekValue(pct);
-                if (waveSurfer.current) {
-                  waveSurfer.current.seekTo(pct / 100);
-                }
                 setCurrentTime(newTime);
               }}
               className="w-full mt-4 accent-green cursor-pointer"
@@ -413,22 +362,6 @@ export default function AudioPlayerBlock({
             </div>
           </div>
         </div>
-
-        {/* REAL WAVEFORM */}
-        {block.show_waveform && (
-          <div ref={waveformRef} className="w-full mt-4" />
-        )}
-
-        <label className="text-sm text-gray-300 flex items-center gap-2 mt-4">
-          <input
-            type="checkbox"
-            checked={block.show_waveform}
-            onChange={(e) =>
-              updateBlock(index, "show_waveform", e.target.checked)
-            }
-          />
-          Show Waveform
-        </label>
 
         {/* PLAYLIST SECTION */}
         {block.playlist?.length > 0 && (
@@ -502,6 +435,167 @@ export default function AudioPlayerBlock({
         )}
       </div>
 
+      <div className="mt-8 space-y-6 p-4 rounded-lg bg-[#111]/40 border border-gray-800">
+        {/* Playback Appearance */}
+        <div>
+          <label className="text-sm font-semibold text-gray-300">
+            Playback Appearance
+          </label>
+
+          <div className="mt-3">
+            {/* Progress Color */}
+            <label className="text-sm text-gray-300 mb-1 block">
+              Progress Color
+            </label>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={block.progress_color}
+                onChange={(e) =>
+                  updateBlock(index, "progress_color", e.target.value)
+                }
+                className="w-10 h-10 rounded-full cursor-pointer border border-gray-600"
+              />
+
+              <input
+                type="text"
+                value={block.progress_color}
+                onChange={(e) =>
+                  updateBlock(index, "progress_color", e.target.value)
+                }
+                onBlur={(e) => {
+                  const cleaned = e.target.value.startsWith("#")
+                    ? e.target.value
+                    : `#${e.target.value}`;
+                  updateBlock(index, "progress_color", cleaned);
+                }}
+                className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
+                placeholder="#22c55e"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Match Background */}
+        <div className="flex items-center gap-3">
+          <label
+            className="text-sm font-semibold"
+            style={{ color: getLabelContrast(block.bg_color) }}
+          >
+            Match Section Background
+          </label>
+          <input
+            type="checkbox"
+            checked={block.match_main_bg}
+            onChange={(e) =>
+              updateBlock(index, "match_main_bg", e.target.checked)
+            }
+          />
+        </div>
+
+        {/* Use Gradient */}
+        <div className="flex items-center gap-3">
+          <label
+            className="text-sm font-semibold"
+            style={{ color: getLabelContrast(block.bg_color) }}
+          >
+            Use Gradient Background
+          </label>
+          <input
+            type="checkbox"
+            checked={block.use_gradient}
+            onChange={(e) =>
+              updateBlock(index, "use_gradient", e.target.checked)
+            }
+          />
+        </div>
+
+        {/* Gradient or Solid BG Logic */}
+        {block.use_gradient ? (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-300">Gradient Start</label>
+              <input
+                type="color"
+                value={block.gradient_start}
+                onChange={(e) =>
+                  updateBlock(index, "gradient_start", e.target.value)
+                }
+                className="w-full h-10 rounded mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-gray-300">Gradient End</label>
+              <input
+                type="color"
+                value={block.gradient_end}
+                onChange={(e) =>
+                  updateBlock(index, "gradient_end", e.target.value)
+                }
+                className="w-full h-10 rounded mt-1"
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-sm text-gray-300">
+                Gradient Direction
+              </label>
+              <select
+                value={block.gradient_direction}
+                onChange={(e) =>
+                  updateBlock(index, "gradient_direction", e.target.value)
+                }
+                className="w-full p-2 rounded bg-black border border-gray-700 text-white mt-1"
+              >
+                <option value="90deg">Left → Right</option>
+                <option value="180deg">Top → Bottom</option>
+                <option value="45deg">Diagonal ↘</option>
+                <option value="135deg">Diagonal ↙</option>
+              </select>
+            </div>
+          </div>
+        ) : (
+          <>
+            <label className="text-sm text-gray-300">Background Color</label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={block.bg_color}
+                onChange={(e) => updateBlock(index, "bg_color", e.target.value)}
+                className="w-10 h-10 rounded cursor-pointer"
+              />
+              <input
+                type="text"
+                value={block.bg_color}
+                onChange={(e) => updateBlock(index, "bg_color", e.target.value)}
+                className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Title Text Color */}
+        <div>
+          <label className="text-sm text-gray-300">Title Text Color</label>
+          <div className="flex items-center gap-3 mt-1">
+            <input
+              type="color"
+              value={block.text_color}
+              onChange={(e) => updateBlock(index, "text_color", e.target.value)}
+              className="w-10 h-10 rounded cursor-pointer"
+            />
+            <input
+              type="text"
+              value={block.text_color}
+              onChange={(e) => updateBlock(index, "text_color", e.target.value)}
+              className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* SETTINGS PANEL */}
       <div className="p-4 bg-[#111]/40 border border-gray-800 rounded-lg space-y-4 mt-8">
         {/* Title */}
@@ -512,84 +606,6 @@ export default function AudioPlayerBlock({
           className="w-full p-2 rounded bg-black border border-gray-700 text-white"
         />
 
-        {/* Upload Audio */}
-        {/* <input
-          id={`audioUpload-${block.id}`}
-          type="file"
-          accept="audio/*"
-          onChange={async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (file.size > 500 * 1024 * 1024) {
-              toast.error("Audio file is too large");
-              return;
-            }
-
-            const formData = new FormData();
-            formData.append("audio", file);
-            formData.append("landingId", landing.id);
-            formData.append("blockId", block.id);
-            setIsUploading(true);
-            try {
-              await validateAudioDuration(file);
-
-              const res = await axiosInstance.post(
-                "/landing/upload-media-block",
-                formData,
-                {
-                  timeout: 0,
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  onUploadProgress: (e) => {
-                    if (e.total) {
-                      const percent = Math.round((e.loaded * 100) / e.total);
-                      console.log("Upload progress:", percent);
-                    }
-                  },
-                }
-              );
-
-              console.log(
-                "[UPLOAD COMPLETE]",
-                "Time:",
-                Math.round((Date.now() - startTime) / 1000),
-                "seconds"
-              );
-
-              if (res.data.success) {
-                const newTrack = {
-                  title: file.name.replace(/\.[^/.]+$/, "") || "Untitled Track",
-                  audio_url: res.data.url,
-                  cover_url: block.cover_url || "",
-                  price: block.single_price || "",
-                  stripe_product_id: "",
-                  stripe_price_id: "",
-                };
-
-                const updatedPlaylist = [...(block.playlist || []), newTrack];
-
-                updateBlock(index, "playlist", updatedPlaylist);
-
-                // Load this new track immediately:
-                updateBlock(index, "audio_url", newTrack.audio_url);
-                updateBlock(index, "audio_name", newTrack.title);
-                updateBlock(index, "title", newTrack.title);
-
-                toast.success("Audio added to playlist!");
-              } else {
-                toast.error("Upload failed");
-              }
-            } catch (err) {
-              console.error(err);
-              toast.error(err.message || "Invalid audio file");
-            } finally {
-              setIsUploading(false);
-            }
-          }}
-          className="hidden"
-        /> */}
         <input
           id={`audioUpload-${block.id}`}
           type="file"
@@ -888,208 +904,6 @@ export default function AudioPlayerBlock({
               </p>
             </div>
           )}
-        </div>
-
-        {/* Waveform Colors */}
-        <div className="mt-8 space-y-6 p-4 rounded-lg bg-[#111]/40 border border-gray-800">
-          {/* Waveform + Progress Colors */}
-          <div>
-            <label className="text-sm font-semibold text-gray-300">
-              Waveform Appearance
-            </label>
-
-            <div className="grid grid-cols-2 gap-4 mt-2">
-              {/* Waveform Color */}
-              <div>
-                <label className="text-sm text-gray-300 mb-1 block">
-                  Waveform Color
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={block.waveform_color}
-                    onChange={(e) =>
-                      updateBlock(index, "waveform_color", e.target.value)
-                    }
-                    className="w-10 h-10 rounded-full cursor-pointer border border-gray-600"
-                  />
-                  <input
-                    type="text"
-                    value={block.waveform_color}
-                    onChange={(e) =>
-                      updateBlock(index, "waveform_color", e.target.value)
-                    }
-                    onBlur={(e) => {
-                      const cleaned = e.target.value.startsWith("#")
-                        ? e.target.value
-                        : `#${e.target.value}`;
-                      updateBlock(index, "waveform_color", cleaned);
-                    }}
-                    className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
-                    placeholder="#22c55e"
-                  />
-                </div>
-              </div>
-
-              {/* Progress Color */}
-              <div>
-                <label className="text-sm text-gray-300 mb-1 block">
-                  Progress Color
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={block.progress_color}
-                    onChange={(e) =>
-                      updateBlock(index, "progress_color", e.target.value)
-                    }
-                    className="w-10 h-10 rounded-full cursor-pointer border border-gray-600"
-                  />
-                  <input
-                    type="text"
-                    value={block.progress_color}
-                    onChange={(e) =>
-                      updateBlock(index, "progress_color", e.target.value)
-                    }
-                    onBlur={(e) => {
-                      const cleaned = e.target.value.startsWith("#")
-                        ? e.target.value
-                        : `#${e.target.value}`;
-                      updateBlock(index, "progress_color", cleaned);
-                    }}
-                    className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
-                    placeholder="#16a34a"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Match Background */}
-          <div className="flex items-center gap-3">
-            <label
-              className="text-sm font-semibold"
-              style={{ color: getLabelContrast(block.bg_color) }}
-            >
-              Match Section Background
-            </label>
-            <input
-              type="checkbox"
-              checked={block.match_main_bg}
-              onChange={(e) =>
-                updateBlock(index, "match_main_bg", e.target.checked)
-              }
-            />
-          </div>
-
-          {/* Use Gradient */}
-          <div className="flex items-center gap-3">
-            <label
-              className="text-sm font-semibold"
-              style={{ color: getLabelContrast(block.bg_color) }}
-            >
-              Use Gradient Background
-            </label>
-            <input
-              type="checkbox"
-              checked={block.use_gradient}
-              onChange={(e) =>
-                updateBlock(index, "use_gradient", e.target.checked)
-              }
-            />
-          </div>
-
-          {/* Gradient or Solid BG Logic (unchanged) */}
-          {block.use_gradient ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm text-gray-300">Gradient Start</label>
-                <input
-                  type="color"
-                  value={block.gradient_start}
-                  onChange={(e) =>
-                    updateBlock(index, "gradient_start", e.target.value)
-                  }
-                  className="w-full h-10 rounded mt-1"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-300">Gradient End</label>
-                <input
-                  type="color"
-                  value={block.gradient_end}
-                  onChange={(e) =>
-                    updateBlock(index, "gradient_end", e.target.value)
-                  }
-                  className="w-full h-10 rounded mt-1"
-                />
-              </div>
-
-              <div className="col-span-2">
-                <label className="text-sm text-gray-300">
-                  Gradient Direction
-                </label>
-                <select
-                  value={block.gradient_direction}
-                  onChange={(e) =>
-                    updateBlock(index, "gradient_direction", e.target.value)
-                  }
-                  className="w-full p-2 rounded bg-black border border-gray-700 text-white mt-1"
-                >
-                  <option value="90deg">Left → Right</option>
-                  <option value="180deg">Top → Bottom</option>
-                  <option value="45deg">Diagonal ↘</option>
-                  <option value="135deg">Diagonal ↙</option>
-                </select>
-              </div>
-            </div>
-          ) : (
-            <>
-              <label className="text-sm text-gray-300">Background Color</label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={block.bg_color}
-                  onChange={(e) =>
-                    updateBlock(index, "bg_color", e.target.value)
-                  }
-                  className="w-10 h-10 rounded cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={block.bg_color}
-                  onChange={(e) =>
-                    updateBlock(index, "bg_color", e.target.value)
-                  }
-                  className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
-                />
-              </div>
-            </>
-          )}
-
-          {/* Title Text Color */}
-          <div>
-            <label className="text-sm text-gray-300">Title Text Color</label>
-            <div className="flex items-center gap-3 mt-1">
-              <input
-                type="color"
-                value={block.text_color}
-                onChange={(e) =>
-                  updateBlock(index, "text_color", e.target.value)
-                }
-                className="w-10 h-10 rounded cursor-pointer"
-              />
-              <input
-                type="text"
-                value={block.text_color}
-                onChange={(e) =>
-                  updateBlock(index, "text_color", e.target.value)
-                }
-                className="w-24 p-1 bg-black border border-gray-700 rounded text-white text-sm"
-              />
-            </div>
-          </div>
         </div>
       </div>
     </>

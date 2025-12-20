@@ -511,11 +511,9 @@ export default function LandingPageBuilder() {
       newBlock.cover_url = "";
       newBlock.title = "Untitled Track";
 
-      newBlock.waveform_color = "#7bed9f";
       newBlock.progress_color = "#22c55e";
 
       newBlock.playlist = [];
-      newBlock.show_waveform = true;
       newBlock.show_cover = true;
       newBlock.show_title = true;
 

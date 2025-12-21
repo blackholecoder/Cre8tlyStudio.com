@@ -323,6 +323,7 @@ function SortableBlock({
               updateBlock={updateBlock}
               pdfList={pdfList}
               bgTheme={bgTheme}
+              landing={landing}
             />
           )}
           {block.type === "referral_button" && (

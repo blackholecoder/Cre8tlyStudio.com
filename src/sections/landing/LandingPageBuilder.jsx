@@ -385,6 +385,10 @@ export default function LandingPageBuilder() {
       newBlock.button_color = "#7bed9f";
       newBlock.alignment = "center";
       newBlock.collapsed = false;
+      newBlock.product_source = "internal";
+      newBlock.pdf_url = "";
+      newBlock.external_file_url = "";
+      newBlock.external_file_name = "";
     }
 
     if (type === "referral_button") {

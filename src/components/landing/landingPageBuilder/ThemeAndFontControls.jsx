@@ -23,7 +23,7 @@ export default function ThemeAndFontControls({
   }
 
   return (
-    <div className="mt-12 mb-12">
+    <div className="mb-12">
       {/* THEME PICKER */}
       <ColorThemeChooser
         bgTheme={bgTheme}
@@ -42,7 +42,7 @@ export default function ThemeAndFontControls({
       />
 
       {/* FONT PICKER */}
-      <div className="relative mt-6">
+      <div className="relative">
         <FontSelector
           fontName={fontName}
           setFontName={(name) => {

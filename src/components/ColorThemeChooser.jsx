@@ -18,6 +18,9 @@ export default function ColorThemeChooser({
   const [gradEnd, setGradEnd] = useState("#22c55e");
   const [gradDir, setGradDir] = useState("90deg");
 
+  const isValidHex = (value) =>
+    /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(value);
+
   useEffect(() => {
     localStorage.setItem("showThemes", showThemes);
   }, [showThemes]);
@@ -54,7 +57,7 @@ export default function ColorThemeChooser({
   };
 
   return (
-    <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner">
+    <div className="bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner">
       {/* Header */}
       <div
         onClick={() => setShowThemes((p) => !p)}
@@ -136,17 +139,58 @@ export default function ColorThemeChooser({
               <p className="text-sm font-semibold text-gray-300 mb-2">
                 Custom Solid Color
               </p>
-              <div className="flex items-center gap-3">
+
+              <div className="flex items-center gap-3 max-w-[520px]">
+                {/* Color picker */}
                 <input
                   type="color"
                   value={customSolid}
                   onChange={(e) => setCustomSolid(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer"
+                  className="
+                  w-10
+                  h-10
+                  aspect-square
+                  rounded-full
+                  border
+                  border-gray-600
+                  cursor-pointer
+                  appearance-none
+                  p-0
+                "
                 />
+
+                {/* Hex input */}
+                <input
+                  type="text"
+                  value={customSolid}
+                  onChange={(e) => setCustomSolid(e.target.value)}
+                  placeholder="#111827"
+                  className="
+                  w-full
+                  max-w-[420px]
+                  px-4
+                  py-2.5
+                  bg-black
+                  border
+                  border-gray-700
+                  rounded-lg
+                  text-white
+                  text-sm
+                  uppercase
+                "
+                />
+
                 <button
                   type="button"
                   onClick={applyCustomSolid}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-green text-sm hover:border-green"
+                  disabled={!isValidHex(customSolid)}
+                  className={`px-4 py-2 border rounded text-sm
+          ${
+            isValidHex(customSolid)
+              ? "bg-gray-800 border-gray-700 text-green hover:border-green"
+              : "bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed"
+          }
+        `}
                 >
                   Apply
                 </button>
@@ -162,22 +206,99 @@ export default function ColorThemeChooser({
               </p>
 
               <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="color"
-                  value={gradStart}
-                  onChange={(e) => setGradStart(e.target.value)}
-                />
-                <input
-                  type="color"
-                  value={gradEnd}
-                  onChange={(e) => setGradEnd(e.target.value)}
-                />
+                {/* Gradient start */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={gradStart}
+                    onChange={(e) => setGradStart(e.target.value)}
+                    className="
+                    w-10
+                    h-10
+                    aspect-square
+                    rounded-full
+                    border
+                    border-gray-600
+                    cursor-pointer
+                    appearance-none
+                    p-0
+                  "
+                  />
+                  <input
+                    type="text"
+                    value={gradStart}
+                    onChange={(e) => setGradStart(e.target.value)}
+                    placeholder="#0ea5e9"
+                    className="
+                    w-full
+                    max-w-[240px]
+                    px-4
+                    py-2.5
+                    bg-black
+                    border
+                    border-gray-700
+                    rounded-lg
+                    text-white
+                    text-sm
+                    uppercase
+                  "
+                  />
+                </div>
+
+                {/* Gradient end */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={gradEnd}
+                    onChange={(e) => setGradEnd(e.target.value)}
+                    className="
+                    w-10
+                    h-10
+                    aspect-square
+                    rounded-full
+                    border
+                    border-gray-600
+                    cursor-pointer
+                    appearance-none
+                    p-0
+                  "
+                  />
+                  <input
+                    type="text"
+                    value={gradEnd}
+                    onChange={(e) => setGradEnd(e.target.value)}
+                    placeholder="#22c55e"
+                    className="
+                    w-full
+                    max-w-[240px]
+                    px-4
+                    py-2.5
+                    bg-black
+                    border
+                    border-gray-700
+                    rounded-lg
+                    text-white
+                    text-sm
+                    uppercase
+                  "
+                  />
+                </div>
               </div>
 
               <select
                 value={gradDir}
                 onChange={(e) => setGradDir(e.target.value)}
-                className="w-full mt-2 p-2 bg-black border border-gray-700 rounded text-white"
+                className="
+                mt-3
+                w-full
+                max-w-[520px]
+                p-2.5
+                bg-black
+                border
+                border-gray-700
+                rounded-lg
+                text-white
+              "
               >
                 <option value="90deg">Left → Right</option>
                 <option value="180deg">Top → Bottom</option>
@@ -188,7 +309,14 @@ export default function ColorThemeChooser({
               <button
                 type="button"
                 onClick={applyCustomGradient}
-                className="mt-3 w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-green-400"
+                disabled={!isValidHex(gradStart) || !isValidHex(gradEnd)}
+                className={`mt-3 w-full px-4 py-2 border rounded
+        ${
+          isValidHex(gradStart) && isValidHex(gradEnd)
+            ? "bg-gray-800 border-gray-700 hover:border-green text-green"
+            : "bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed"
+        }
+      `}
               >
                 Apply Gradient
               </button>

@@ -1,8 +1,13 @@
 import React from "react";
 import CountdownTimerPreview from "../../../../sections/landing/Timer";
 
-
 export default function CountdownBlock({ block, index, updateBlock }) {
+  const previewStyles = {
+    minimal: "border-gray-700 bg-transparent",
+    boxed: "bg-black/60 border border-gray-600 shadow-md",
+    glow: "bg-black/70 border border-green/50 shadow-[0_0_20px_rgba(34,197,94,0.35)]",
+  };
+
   return (
     <div className="rounded-xl p-6 mt-3 bg-[#0F172A]/60 border border-gray-700 transition-all duration-300">
       <h3 className="text-lg font-semibold text-silver mb-4">
@@ -78,9 +83,7 @@ export default function CountdownBlock({ block, index, updateBlock }) {
         <label className="text-sm font-semibold text-gray-300">Style</label>
         <select
           value={block.style_variant || "minimal"}
-          onChange={(e) =>
-            updateBlock(index, "style_variant", e.target.value)
-          }
+          onChange={(e) => updateBlock(index, "style_variant", e.target.value)}
           className="p-2 bg-black border border-gray-700 rounded text-white text-sm"
         >
           <option value="minimal">Minimal</option>
@@ -91,11 +94,22 @@ export default function CountdownBlock({ block, index, updateBlock }) {
 
       {/* Live Preview */}
       <div
-        className="mt-6 p-4 border border-gray-700 rounded-lg text-center"
+        className={`
+    mt-6
+    p-4
+    rounded-lg
+    text-center
+    transition-all
+    duration-300
+    ${previewStyles[block.style_variant || "minimal"]}
+  `}
         style={{ color: block.text_color || "#FFFFFF" }}
       >
         <p className="font-semibold mb-2">{block.text}</p>
-        <CountdownTimerPreview targetDate={block.target_date} />
+        <CountdownTimerPreview
+          targetDate={block.target_date}
+          variant={block.style_variant}
+        />
       </div>
     </div>
   );

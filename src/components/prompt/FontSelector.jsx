@@ -51,8 +51,8 @@ export default function FontSelector({
   };
 
   return (
-    <div className="relative mt-6">
-      <label className="block text-silver mb-2 font-medium">Font Style</label>
+    <div className="w-full relative mt-4 bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
+      <h3 className="text-lg font-semibold text-silver pb-6">Font Style</h3>
 
       {/* 🔹 Live Preview (always visible on top) */}
       <div

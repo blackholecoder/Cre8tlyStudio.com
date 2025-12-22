@@ -47,6 +47,8 @@ export default function LandingPageBuilder() {
   const [showPreviewSection, setShowPreviewSection] = useState(false);
   const [showDownloadButton, setShowDownloadButton] = useState(false);
 
+  const [showLogoSection, setShowLogoSection] = useState(false);
+
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState("");
   const [appliedVersion, setAppliedVersion] = useState("");
@@ -1087,7 +1089,7 @@ export default function LandingPageBuilder() {
               />
               <p className="text-xs text-gray-200 mt-1 mb-10">
                 This will be used for your page URL:{" "}
-                <span className="text-yellow">
+                <span className="text-green">
                   {landing.username
                     ? `https://${landing.username}.cre8tlystudio.com`
                     : "https://yourname.cre8tlystudio.com"}
@@ -1130,8 +1132,8 @@ export default function LandingPageBuilder() {
             </div>
 
             {/* DndContext */}
-            <div className="space-y-4 mb-28">
-              {!blocksHidden && (
+            {!blocksHidden && (
+              <div className="space-y-4 mb-12 w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
                 <DndContext
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
@@ -1159,29 +1161,36 @@ export default function LandingPageBuilder() {
                       ))}
                   </SortableContext>
                 </DndContext>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* 🧾 PDF Attachment */}
-          <PdfSelector
-            pdfList={pdfList}
-            landing={landing}
-            setLanding={setLanding}
-            showPdfSection={showPdfSection}
-            setShowPdfSection={setShowPdfSection}
-            coverPreview={coverPreview}
-            setCoverPreview={setCoverPreview}
-            coverLoading={coverLoading}
-            setCoverLoading={setCoverLoading}
-          />
-          <ToggleDownloadButton
-            showDownloadButton={showDownloadButton}
-            setShowDownloadButton={setShowDownloadButton}
-          />
+          <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner pb-12">
+            <PdfSelector
+              pdfList={pdfList}
+              landing={landing}
+              setLanding={setLanding}
+              showPdfSection={showPdfSection}
+              setShowPdfSection={setShowPdfSection}
+              coverPreview={coverPreview}
+              setCoverPreview={setCoverPreview}
+              coverLoading={coverLoading}
+              setCoverLoading={setCoverLoading}
+            />
+            <ToggleDownloadButton
+              showDownloadButton={showDownloadButton}
+              setShowDownloadButton={setShowDownloadButton}
+            />
+          </div>
 
           {isPro ? (
-            <LogoUploader landing={landing} setLanding={setLanding} />
+            <LogoUploader
+              landing={landing}
+              setLanding={setLanding}
+              showLogoSection={showLogoSection}
+              setShowLogoSection={setShowLogoSection}
+            />
           ) : (
             <div className="mt-6 p-4 rounded-xl border border-gray-700 bg-black/60 text-center">
               <p className="text-sm text-gray-300 font-medium">

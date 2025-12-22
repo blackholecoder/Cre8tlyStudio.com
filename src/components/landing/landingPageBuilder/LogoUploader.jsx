@@ -3,15 +3,18 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 
-export default function LogoUploader({ landing, setLanding }) {
-  const [open, setOpen] = useState(true);
-
+export default function LogoUploader({
+  landing,
+  setLanding,
+  showLogoSection,
+  setShowLogoSection,
+}) {
   return (
     <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
       {/* HEADER (toggle) */}
       <div
         className="flex items-center justify-between mb-5 cursor-pointer"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setShowLogoSection((prev) => !prev)}
       >
         <label className="text-lg font-semibold text-silver tracking-wide">
           Brand Logo
@@ -24,7 +27,7 @@ export default function LogoUploader({ landing, setLanding }) {
 
           <span
             className={`text-gray-400 text-sm transition-transform duration-300 ${
-              open ? "rotate-180" : "rotate-0"
+              showLogoSection ? "rotate-180" : "rotate-0"
             }`}
           >
             ▼
@@ -35,7 +38,7 @@ export default function LogoUploader({ landing, setLanding }) {
       {/* COLLAPSIBLE CONTENT */}
       <div
         className={`transition-all duration-500 ease-in-out overflow-hidden ${
-          open ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          showLogoSection ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         {!landing.logo_url ? (

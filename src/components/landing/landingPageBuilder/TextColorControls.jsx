@@ -9,10 +9,8 @@ export default function TextColorControls({ landing, setLanding }) {
   ];
 
   return (
-    <div className="relative z-[10] mt-10 bg-[#111827] rounded-xl p-6 shadow-inner border border-gray-700">
-      <h3 className="text-silver text-lg font-semibold mb-4">
-        Text Colors
-      </h3>
+    <div className="relative z-[10] bg-[#0f1624]/80 rounded-xl p-6 shadow-inner border border-gray-700">
+      <h3 className="text-silver text-lg font-semibold mb-4">Text Colors</h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
         {fields.map(({ key, label }) => (

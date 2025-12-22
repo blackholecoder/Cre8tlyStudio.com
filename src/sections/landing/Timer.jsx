@@ -44,8 +44,7 @@ export default function CountdownTimerPreview({
     if (bgTheme.includes("emerald")) return "#10b981";
     if (bgTheme.includes("royal") || bgTheme.includes("purple"))
       return "#8b5cf6";
-    if (bgTheme.includes("pink") || bgTheme.includes("rose"))
-      return "#ec4899";
+    if (bgTheme.includes("pink") || bgTheme.includes("rose")) return "#ec4899";
     if (bgTheme.includes("yellow") || bgTheme.includes("amber"))
       return "#facc15";
     if (bgTheme.includes("blue")) return "#3b82f6";
@@ -62,11 +61,25 @@ export default function CountdownTimerPreview({
     minimal: "text-3xl",
     boxed:
       "text-3xl bg-[#0f172a] border border-gray-700 px-6 py-3 rounded-lg shadow-md",
-    glow: `text-3xl text-[${accent}] drop-shadow-[0_0_14px_${accent}] animate-pulse`,
+    glow: "text-3xl animate-pulse",
   };
 
   return (
-    <div className={`${baseClasses} ${styleMap[variant] || styleMap.minimal}`}>
+    <div
+      className={`${baseClasses} ${styleMap[variant] || styleMap.minimal}`}
+      style={
+        variant === "glow"
+          ? {
+              color: accent,
+              textShadow: `
+  0 0 6px ${accent},
+  0 0 14px ${accent},
+  0 0 28px ${accent}
+`,
+            }
+          : undefined
+      }
+    >
       {timeLeft || "00:00:00:00"}
     </div>
   );

@@ -28,27 +28,40 @@ export default function BottomActionsBar({
       </div>
 
       {/* Right: View Live Page */}
-      <div className="flex flex-col items-center sm:items-end mt-6 sm:mt-0">
+      <div className="flex flex-col items-center sm:items-end mt-6 sm:mt-0 gap-2">
         <a
           href={
             landing.username
               ? `https://${landing.username}.cre8tlystudio.com?owner_preview=${encodeURIComponent(
                   user?.id || ""
                 )}`
-              : "#"
+              : undefined
           }
           target="_blank"
           rel="noopener noreferrer"
-          className={`${
-            landing.username
-              ? "text-green font-semibold underline hover:text-white"
-              : "text-gray-400 cursor-not-allowed"
-          }`}
+          className={`
+      inline-flex items-center gap-2
+      px-4 py-1.5
+      rounded-full
+      text-xs font-semibold
+      border
+      transition-all
+      ${
+        landing.username
+          ? "bg-green/10 text-green border-green/30 hover:bg-green/20 hover:text-white"
+          : "bg-gray-800 text-gray-400 border-gray-700 cursor-not-allowed"
+      }
+    `}
+          onClick={(e) => {
+            if (!landing.username) e.preventDefault();
+          }}
         >
-          {landing.username ? "View Live Page" : "Set Username to View Page"}
+          <span className="w-2 h-2 rounded-full bg-current" />
+          {landing.username ? "View Live Page" : "Set username to view page"}
         </a>
 
-        <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+        {/* Copy URL */}
+        <p className="text-xs text-gray-500 flex items-center gap-2">
           Copy Live URL:
           {landing.username ? (
             <button

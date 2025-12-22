@@ -9,12 +9,10 @@ export default function VersionControls({
   handleApplyVersion,
   handleDeleteVersion,
 }) {
-
-  const applyDisabled =
-    !selectedVersion || selectedVersion === appliedVersion;
+  const applyDisabled = !selectedVersion || selectedVersion === appliedVersion;
 
   return (
-    <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner">
+    <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner pb-12">
       {/* Dropdown */}
       <div className="relative w-full mb-6">
         <select

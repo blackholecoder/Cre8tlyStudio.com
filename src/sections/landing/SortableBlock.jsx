@@ -22,6 +22,7 @@ import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureChe
 import AudioPlayerBlock from "../../components/landing/blocks/types/AudioPlayerBlock";
 import { SortableContainerBlock } from "../../components/landing/blocks/types/SortableContainerBlock";
 import ButtonBlock from "../../components/landing/blocks/types/ButtonBlock";
+import { BLOCK_PILL_STYLES, BLOCK_TYPE_TO_LABEL } from "../../constants";
 
 const BLOCK_LABELS = {
   heading: "Heading (H1)",
@@ -149,6 +150,34 @@ function SortableBlock({
     }
   }
 
+  function BlockValuePill({ value, disabled }) {
+    const label = BLOCK_TYPE_TO_LABEL[value] || value;
+
+    const colorClasses =
+      BLOCK_PILL_STYLES[label] || "bg-white/10 text-gray-300 border-white/20";
+
+    return (
+      <span
+        className={`
+        text-[13px]
+        font-semibold
+        uppercase
+        tracking-wide
+        px-2.5
+        py-0.5
+        rounded-full
+        border
+        leading-none
+        whitespace-nowrap
+        transition-all
+        ${disabled ? "opacity-40 grayscale" : colorClasses}
+      `}
+      >
+        {label}
+      </span>
+    );
+  }
+
   if (block.type === "container") {
     return (
       <SortableContainerBlock
@@ -197,12 +226,17 @@ function SortableBlock({
         onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
       >
         <div className="flex flex-col">
-          <h3 className="font-semibold text-lg text-green capitalize">
-            {BLOCK_LABELS[block.type] || "Block"}
-          </h3>
+          <div className="flex items-center gap-2">
+            <BlockValuePill
+              value={block.type}
+              disabled={block.enabled === false}
+            />
+            {block.enabled === false && (
+              <span className="text-[11px] text-gray-400 italic">disabled</span>
+            )}
+          </div>
 
-          {/* 👇 Add the preview label here */}
-          <span className="text-xs text-gray-400 italic mt-0.5">
+          <span className="text-xs text-gray-400 mt-0.5 leading-snug">
             {getBlockLabel(block)}
           </span>
         </div>
@@ -210,18 +244,20 @@ function SortableBlock({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation(); // 🚨 prevents collapse toggle
+              e.stopPropagation();
               updateBlock(index, "enabled", block.enabled === false);
             }}
-            className={`text-xs px-2 py-1 rounded transition-colors
-      ${
-        block.enabled !== false
-          ? "bg-green text-black hover:bg-green/30"
-          : "bg-gray/20 text-gray-400 hover:bg-gray-600/30"
-      }
-    `}
+            className={`relative inline-flex h-5 w-8 items-center rounded-full
+    transition-colors duration-200
+    ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
+  `}
           >
-            {block.enabled !== false ? "On" : "Off"}
+            <span
+              className={`absolute h-4 w-4 rounded-full bg-white
+      transition-transform duration-200
+      ${block.enabled !== false ? "translate-x-4" : "translate-x-0.5"}
+    `}
+            />
           </button>
 
           <span

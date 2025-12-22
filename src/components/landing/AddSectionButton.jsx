@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import { PRO_ONLY_BLOCKS } from "../../sections/landing/landingBlocksRules";
 import { toast } from "react-toastify";
+import { BLOCK_PILL_STYLES } from "../../constants";
 
 export default function AddSectionButton({ addBlock, canAddBlock }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -32,25 +33,25 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
 
   const options = [
     { label: "Section Container", value: "container" },
+    { label: "Divider", value: "divider" },
     { label: "Heading (H1)", value: "heading" },
     { label: "Subheading (H2)", value: "subheading" },
     { label: "Sub-Subheading (H3)", value: "subsubheading" },
     { label: "List Heading", value: "list_heading" },
     { label: "Paragraph", value: "paragraph" },
-    { label: "FAQ Accordion", value: "faq" },
-    { label: "Pro Image", value: "image" },
+    { label: "FAQ", value: "faq" },
     { label: "Video", value: "video" },
-    { label: "Divider", value: "divider" },
-    { label: "Offer Banner", value: "offer_banner" },
-    { label: "Social Links Row", value: "social_links" },
-    { label: "Stripe Checkout", value: "stripe_checkout" },
     { label: "Audio Player", value: "audio_player" },
-    { label: "Countdown Timer", value: "countdown" },
+    { label: "Pro Image", value: "image" },
     { label: "Offer Grid", value: "feature_offers_3" },
     { label: "Verified Reviews", value: "verified_reviews" },
-    { label: "Calendly", value: "calendly" },
+    { label: "Stripe Checkout", value: "stripe_checkout" },
+    { label: "Offer Banner", value: "offer_banner" },
     { label: "Secure Checkout", value: "secure_checkout" },
     { label: "Button Url", value: "button_url" },
+    { label: "Social Links Row", value: "social_links" },
+    { label: "Countdown Timer", value: "countdown" },
+    { label: "Calendly", value: "calendly" },
   ];
 
   if (user?.is_admin_employee === 1) {
@@ -104,12 +105,12 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
                   setShowDropdown(false);
                 }}
                 className={`block w-full text-left px-5 py-3 transition-all
-    ${
-      blockLimitReached
-        ? "text-gray-500 cursor-not-allowed opacity-40"
-        : "text-gray-200 hover:bg-blue/20"
-    }
-  `}
+  ${
+    blockLimitReached
+      ? "text-gray-500 cursor-not-allowed opacity-40"
+      : "text-gray-200 hover:bg-white/5"
+  }
+`}
                 title={
                   isProLocked(opt.value)
                     ? "Upgrade to Pro to unlock this block"
@@ -119,14 +120,33 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
                 }
               >
                 {/* ✅ span instead of div */}
-                <span className="flex items-center justify-between w-full">
-                  <span>{opt.label}</span>
-
-                  {isProLocked(opt.value) && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded bg-purple-600 text-white">
-                      PRO
+                <span className="flex items-center justify-between w-full gap-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`
+                      text-[10px]
+                      uppercase
+                      px-2
+                      py-0.5
+                      whitespace-nowrap
+                      border
+                      rounded-xl
+        ${
+          BLOCK_PILL_STYLES[opt.label] ||
+          "bg-white/5 text-white-400 border-white/20"
+        }
+      `}
+                    >
+                      {opt.label}
                     </span>
-                  )}
+
+                    {/* PRO badge */}
+                    {isProLocked(opt.value) && (
+                      <span className="text-[10px] px-2 py-0.5 text-royalPurple uppercase">
+                        PRO
+                      </span>
+                    )}
+                  </div>
                 </span>
               </button>
             );

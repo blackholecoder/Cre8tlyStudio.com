@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ToggleDownloadButton({
   showDownloadButton,
-  setShowDownloadButton
+  setShowDownloadButton,
 }) {
   return (
     <div className="mt-10 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
@@ -32,8 +32,7 @@ export default function ToggleDownloadButton({
       </div>
 
       <p className="text-xs text-gray-400 mt-2">
-        Turn this off if you want to hide the email download form on your public
-        page.
+        Turn this off to hide the email capture form for free PDF downloads.
       </p>
     </div>
   );

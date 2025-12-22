@@ -1046,20 +1046,10 @@ export default function LandingPageBuilder() {
 
         {/* Version Controls */}
 
-        <VersionControls
-          versions={versions}
-          selectedVersion={selectedVersion}
-          setSelectedVersion={setSelectedVersion}
-          appliedVersion={appliedVersion}
-          handleLoadVersion={handleLoadVersion}
-          handleApplyVersion={handleApplyVersion}
-          handleDeleteVersion={handleDeleteVersion}
-        />
-
         <form onSubmit={handleSave} className="space-y-4">
           {/* Headline */}
           <div>
-            <div className="max-w-[40%]">
+            <div className="max-w-[40%] pb-10">
               <label className="block font-semibold mb-1 text-silver ">
                 Page Url Username
               </label>
@@ -1084,7 +1074,16 @@ export default function LandingPageBuilder() {
                   }
                 }}
                 placeholder="e.g. cre8tlydesigns"
-                className="w-[40%] border border-gray-300 rounded-lg px-4 py-2"
+                className="
+                w-[40%] 
+                border 
+                rounded-lg 
+                px-4 
+                py-2
+                !bg-bioModal 
+                !border-white/10 
+                !text-white 
+                placeholder-white/30"
               />
               <p className="text-xs text-gray-200 mt-1 mb-10">
                 This will be used for your page URL:{" "}
@@ -1095,6 +1094,16 @@ export default function LandingPageBuilder() {
                 </span>
               </p>
             </div>
+
+            <VersionControls
+              versions={versions}
+              selectedVersion={selectedVersion}
+              setSelectedVersion={setSelectedVersion}
+              appliedVersion={appliedVersion}
+              handleLoadVersion={handleLoadVersion}
+              handleApplyVersion={handleApplyVersion}
+              handleDeleteVersion={handleDeleteVersion}
+            />
 
             <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
               Content
@@ -1166,6 +1175,10 @@ export default function LandingPageBuilder() {
             coverLoading={coverLoading}
             setCoverLoading={setCoverLoading}
           />
+          <ToggleDownloadButton
+            showDownloadButton={showDownloadButton}
+            setShowDownloadButton={setShowDownloadButton}
+          />
 
           {isPro ? (
             <LogoUploader landing={landing} setLanding={setLanding} />
@@ -1220,10 +1233,6 @@ export default function LandingPageBuilder() {
           />
 
           {/* Toggle Download Button */}
-          <ToggleDownloadButton
-            showDownloadButton={showDownloadButton}
-            setShowDownloadButton={setShowDownloadButton}
-          />
 
           {/* Save + View */}
           <BottomActionsBar

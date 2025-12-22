@@ -5,6 +5,8 @@ import CountdownTimerPreview from "../../../sections/landing/Timer";
 import axiosInstance from "../../../api/axios";
 
 function renderPreviewBlock(block, index, context) {
+  if (block.enabled === false) return null;
+
   const { landing, bgTheme, user, updateBlock, adjustForLandingOverlay } =
     context;
 
@@ -1283,9 +1285,9 @@ function renderPreviewBlock(block, index, context) {
             maxWidth: block.max_width || "100%",
           }}
         >
-          {(block.children || []).map((child, i) =>
-            renderPreviewBlock(child, i, context)
-          )}
+          {(block.children || [])
+            .filter((child) => child.enabled !== false)
+            .map((child, i) => renderPreviewBlock(child, i, context))}
         </div>
       );
 
@@ -1379,7 +1381,7 @@ export default function PreviewPanel({
     let results = [];
 
     for (const block of blocks) {
-      if (block.type === "offer_banner") {
+      if (block.type === "offer_banner" && block.enabled !== false) {
         results.push(block);
       }
 
@@ -1516,7 +1518,7 @@ export default function PreviewPanel({
 
           {landing.content_blocks?.length ? (
             landing.content_blocks
-              .filter((b) => b.type !== "offer_banner")
+              .filter((b) => b.type !== "offer_banner" && b.enabled !== false)
               .map((block, index) =>
                 renderPreviewBlock(block, index, {
                   landing,

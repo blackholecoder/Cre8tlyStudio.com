@@ -773,3 +773,62 @@ export const fontThemes = [
 
   { name: "Galvji", label: "Vexar", file: "/fonts/Galvji.ttf" },
 ];
+
+export const BLOCK_PILL_STYLES = {
+  // 🟢 Text & structure
+  "Heading (H1)": "text-green border-green bg-green/10",
+  "Subheading (H2)": "text-green border-green bg-green/10",
+  "Sub-Subheading (H3)": "text-green border-green bg-green/10",
+  "List Heading": "text-green border-green bg-green/10",
+  Paragraph: "text-green border-green bg-green/10",
+  FAQ: "text-green border-green bg-green/10",
+
+  // 🔵 Media
+  "Pro Image": "text-blue border-blue bg-blue/10",
+  Video: "text-blue border-blue bg-blue/10",
+  "Audio Player": "text-blue border-blue bg-blue/10",
+  "Offer Grid": "text-blue border-blue bg-blue/10",
+
+  // 🟣 Conversion
+  "Offer Banner": "text-royalPurple border-royalPurple bg-royalPurple/10",
+  "Stripe Checkout": "text-royalPurple border-royalPurple bg-royalPurple/10",
+  "Secure Checkout": "text-royalPurple border-royalPurple bg-royalPurple/10",
+  "Verified Reviews": "text-royalPurple border-royalPurple bg-royalPurple/10",
+  "Button Url": "text-royalPurple border-royalPurple bg-royalPurple/10",
+
+  // 🟠 Interaction
+  Calendly: "text-sherbert border-sherbert bg-sherbert/15",
+  "Countdown Timer": "text-sherbert border-sherbert bg-sherbert/15",
+  "Social Links Row": "text-sherbert border-sherbert bg-sherbert/15",
+
+  // ⚪ Layout
+  Divider: "text-white-400 border-white/20 bg-white/5",
+  "Section Container": "text-white-400 border-white/20 bg-white/5",
+};
+
+export const BLOCK_TYPE_TO_LABEL = {
+  heading: "Heading (H1)",
+  subheading: "Subheading (H2)",
+  subsubheading: "Sub-Subheading (H3)",
+  list_heading: "List Heading",
+  paragraph: "Paragraph",
+  faq: "FAQ",
+
+  image: "Pro Image",
+  video: "Video",
+  audio_player: "Audio Player",
+  feature_offers_3: "Offer Grid",
+
+  offer_banner: "Offer Banner",
+  stripe_checkout: "Stripe Checkout",
+  secure_checkout: "Secure Checkout",
+  verified_reviews: "Verified Reviews",
+  button_url: "Button Url",
+
+  calendly: "Calendly",
+  countdown: "Countdown Timer",
+  social_links: "Social Links Row",
+
+  divider: "Divider",
+  container: "Section Container",
+};

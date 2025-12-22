@@ -30,7 +30,20 @@ export function SortableContainerBlock({
     <div
       ref={setNodeRef}
       style={style}
-      className="mb-6 border-2 border-dashed border-green rounded-xl p-4 bg-black/60"
+      className={`
+    mb-6
+    rounded-xl
+    p-4
+    bg-black/60
+    transition-all duration-200
+
+    border
+    ${
+      isOver
+        ? "border-dashed border-green/50 bg-green/5"
+        : "border-white/10 hover:border-dashed hover:border-white/30"
+    }
+  `}
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-3">

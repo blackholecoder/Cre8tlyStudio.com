@@ -4,7 +4,9 @@ export default function ListHeadingBlock({
   block,
   index,
   updateBlock,
+  updateChildBlock,
   openAIModal,
+  containerIndex,
 }) {
   return (
     <>
@@ -19,6 +21,8 @@ export default function ListHeadingBlock({
             openAIModal({
               blockType: "list_heading",
               blockIndex: index,
+              updateChildBlock,
+              containerIndex,
               currentText: block.text,
               role: block.aiRole || "body",
             })

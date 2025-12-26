@@ -787,7 +787,8 @@ export const BLOCK_PILL_STYLES = {
   "Pro Image": "text-blue border-blue bg-blue/10",
   Video: "text-blue border-blue bg-blue/10",
   "Audio Player": "text-blue border-blue bg-blue/10",
-  "Offer Grid": "text-blue border-blue bg-blue/10",
+  "Single Offer": "text-blue border-blue bg-blue/10",
+  "Mini Offer": "text-blue border-blue bg-blue/10",
 
   // 🟣 Conversion
   "Offer Banner": "text-royalPurple border-royalPurple bg-royalPurple/10",
@@ -817,7 +818,8 @@ export const BLOCK_TYPE_TO_LABEL = {
   image: "Pro Image",
   video: "Video",
   audio_player: "Audio Player",
-  feature_offers_3: "Offer Grid",
+  single_offer: "Single Offer",
+  mini_offer: "Mini Offer",
 
   offer_banner: "Offer Banner",
   stripe_checkout: "Stripe Checkout",

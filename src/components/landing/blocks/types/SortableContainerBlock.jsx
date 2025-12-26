@@ -15,6 +15,7 @@ export function SortableContainerBlock({
   bgTheme,
   pdfList,
   landing,
+  openAIModal,
   setNodeRef,
   attributes,
   listeners,
@@ -25,6 +26,22 @@ export function SortableContainerBlock({
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: DROPPABLE_ID,
   });
+
+  const updateChildBlock = (childIndex, key, value) => {
+    updateBlock(index, "children", (prevChildren = []) => {
+      const updated = [...prevChildren];
+      updated[childIndex] = {
+        ...updated[childIndex],
+        [key]: value,
+      };
+      return updated;
+    });
+  };
+
+  const updateChildField = (i, key, value) => {
+    console.log("CHILD UPDATE:", key, value);
+    updateChildBlock(i, key, value);
+  };
 
   return (
     <div
@@ -95,11 +112,9 @@ export function SortableContainerBlock({
                 id={child.id}
                 block={child}
                 index={childIndex}
-                updateBlock={(i, key, value) => {
-                  const updated = [...block.children];
-                  updated[i] = { ...updated[i], [key]: value };
-                  updateBlock(index, "children", updated);
-                }}
+                updateChildBlock={updateChildBlock}
+                containerIndex={index}
+                updateBlock={updateChildField}
                 removeBlock={(i) => {
                   updateBlock(
                     index,
@@ -110,6 +125,7 @@ export function SortableContainerBlock({
                 bgTheme={bgTheme}
                 pdfList={pdfList}
                 landing={landing}
+                openAIModal={openAIModal}
               />
             ))}
           </SortableContext>

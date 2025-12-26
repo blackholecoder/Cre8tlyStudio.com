@@ -9,7 +9,8 @@ export const BLOCK_LIMITS = {
   video: 10,
   faq: 2,
   countdown: 2,
-  feature_offers_3: 3,
+  single_offer: 20,
+  mini_offer: 20,
   button_url: 10,
 };
 
@@ -17,7 +18,8 @@ export const PRO_ONLY_BLOCKS = [
   "audio_player",
   "calendly",
   "verified_reviews",
-  "feature_offers_3",
   "countdown",
   "secure_checkout",
+  "single_offer",
+  "mini_offer",
 ];

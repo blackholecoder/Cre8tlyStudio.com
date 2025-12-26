@@ -1,8 +1,6 @@
 import React from "react";
 import axiosInstance from "../../../api/axios";
 
-
-
 export default function PdfSelector({
   pdfList,
   landing,
@@ -89,7 +87,7 @@ export default function PdfSelector({
                 .filter((lm) => lm.status === "completed" && lm.pdf_url)
                 .map((lm) => (
                   <option key={lm.id} value={lm.pdf_url}>
-                    {lm.title || "Untitled PDF"} — (Ready)
+                    {lm.title || "Untitled PDF"}
                   </option>
                 ))}
             </select>

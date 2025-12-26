@@ -5,6 +5,8 @@ export default function HeadingBlock({
   index,
   updateBlock,
   openAIModal,
+  updateChildBlock,
+  containerIndex,
 }) {
   return (
     <>
@@ -22,6 +24,8 @@ export default function HeadingBlock({
             openAIModal({
               blockType: block.type,
               blockIndex: index,
+              containerIndex,
+              updateChildBlock,
               currentText: block.text,
               role: block.aiRole || "body",
             })
@@ -50,9 +54,15 @@ export default function HeadingBlock({
         }
         value={block.text}
         onChange={(e) => {
+          const value = e.target.value;
+
           e.target.style.height = "auto";
           e.target.style.height = `${e.target.scrollHeight}px`;
-          updateBlock(index, "text", e.target.value);
+          if (updateChildBlock) {
+            updateChildBlock(index, "text", value);
+          } else {
+            updateBlock(index, "text", value);
+          }
         }}
         onFocus={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}

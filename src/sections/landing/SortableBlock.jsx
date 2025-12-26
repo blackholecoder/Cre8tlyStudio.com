@@ -17,36 +17,13 @@ import StripeCheckoutBlock from "../../components/landing/blocks/types/StripeChe
 import ReferralButtonBlock from "../../components/landing/blocks/types/ReferralButtonBlock";
 import FAQBlock from "../../components/landing/blocks/types/FAQBlock";
 import ImageBlock from "../../components/landing/blocks/types/ImageBlock";
-import FeatureOffers3Block from "../../components/landing/blocks/types/FeatureOffers3Block";
 import SecureCheckoutBlock from "../../components/landing/blocks/types/SecureCheckoutBlock";
 import AudioPlayerBlock from "../../components/landing/blocks/types/AudioPlayerBlock";
 import { SortableContainerBlock } from "../../components/landing/blocks/types/SortableContainerBlock";
 import ButtonBlock from "../../components/landing/blocks/types/ButtonBlock";
 import { BLOCK_PILL_STYLES, BLOCK_TYPE_TO_LABEL } from "../../constants";
-
-const BLOCK_LABELS = {
-  heading: "Heading (H1)",
-  subheading: "Subheading (H2)",
-  subsubheading: "Sub-Subheading (H3)",
-  list_heading: "List Heading",
-  paragraph: "Paragraph",
-  video: "Video",
-  divider: "Divider",
-  offer_banner: "Offer Banner",
-  calendly: "Calendly",
-  countdown: "Countdown Timer",
-  social_links: "Social Links Row",
-  stripe_checkout: "Stripe Checkout",
-  feature_offers_3: "Offer Grid",
-  verified_reviews: "Verified Reviews",
-  faq: "FAQ Accordion",
-  image: "Image",
-  referral_button: "Referral Button",
-  secure_checkout: "Secure Checkout",
-  audio_player: "Audio Player",
-  container: "Section Container",
-  button_url: "Button Url",
-};
+import SingleOfferBlock from "../../components/landing/blocks/types/SingleOfferBlock";
+import MiniOfferBlock from "../../components/landing/blocks/types/MiniOfferBlock";
 
 function SortableBlock({
   id,
@@ -57,10 +34,20 @@ function SortableBlock({
   bgTheme,
   pdfList,
   landing,
+  updateChildBlock,
   openAIModal,
+  containerIndex,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
+
+  const updateField = (i, key, value) => {
+    if (Number.isInteger(containerIndex) && updateChildBlock) {
+      updateChildBlock(i, key, value);
+    } else {
+      updateBlock(i, key, value);
+    }
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -138,8 +125,12 @@ function SortableBlock({
           block.url ? block.url.slice(0, 35) : "no url"
         }`;
 
-      case "feature_offers_3":
-        return `${(block.items || []).length} offer cards`;
+      case "single_offer":
+        return block.title ? block.title.slice(0, 50) : "Single Offer";
+
+      case "mini_offer":
+        return block.title ? block.title.slice(0, 50) : "Mini Offer";
+
       case "secure_checkout":
         return block.title?.slice(0, 40) || "Secure Checkout";
       case "audio_player":
@@ -189,6 +180,7 @@ function SortableBlock({
         bgTheme={bgTheme}
         pdfList={pdfList}
         landing={landing}
+        openAIModal={openAIModal}
         setNodeRef={setNodeRef}
         attributes={attributes}
         listeners={listeners}
@@ -223,7 +215,7 @@ function SortableBlock({
       {/* 🧩 Collapse / Expand Header */}
       <div
         className="flex items-center justify-between cursor-pointer mb-3"
-        onClick={() => updateBlock(index, "collapsed", !block.collapsed)}
+        onClick={() => updateField(index, "collapsed", !block.collapsed)}
       >
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
@@ -245,7 +237,7 @@ function SortableBlock({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              updateBlock(index, "enabled", block.enabled === false);
+              updateField(index, "enabled", block.enabled === false);
             }}
             className={`relative inline-flex h-5 w-8 items-center rounded-full
     transition-colors duration-200
@@ -285,7 +277,9 @@ function SortableBlock({
             <HeadingBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateChildBlock={updateChildBlock}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
               openAIModal={openAIModal}
             />
           )}
@@ -293,7 +287,9 @@ function SortableBlock({
             <ListHeadingBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateChildBlock={updateChildBlock}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
               openAIModal={openAIModal}
             />
           )}
@@ -301,25 +297,27 @@ function SortableBlock({
             <ParagraphBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateChildBlock={updateChildBlock}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
               openAIModal={openAIModal}
             />
           )}
           {block.type === "video" && (
-            <VideoBlock block={block} index={index} updateBlock={updateBlock} />
+            <VideoBlock block={block} index={index} updateBlock={updateField} />
           )}
           {block.type === "divider" && (
             <DividerBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "offer_banner" && (
             <OfferBannerBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
               bgTheme={bgTheme}
               openAIModal={openAIModal}
             />
@@ -328,14 +326,14 @@ function SortableBlock({
             <CalendlyBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "social_links" && (
             <SocialLinksBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "verified_reviews" && (
@@ -349,14 +347,14 @@ function SortableBlock({
             <CountdownBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "stripe_checkout" && (
             <StripeCheckoutBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
               pdfList={pdfList}
               bgTheme={bgTheme}
               landing={landing}
@@ -366,14 +364,16 @@ function SortableBlock({
             <ReferralButtonBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "faq" && (
             <FAQBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateChildBlock={updateChildBlock}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
               openAIModal={openAIModal}
             />
           )}
@@ -381,18 +381,33 @@ function SortableBlock({
             <ImageBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
               bgTheme={bgTheme}
               getLabelContrast={getLabelContrast}
               adjustForLandingOverlay={adjustForLandingOverlay}
               landing={landing}
             />
           )}
-          {block.type === "feature_offers_3" && (
-            <FeatureOffers3Block
+          {block.type === "single_offer" && (
+            <SingleOfferBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
+              updateChildBlock={updateChildBlock}
+              bgTheme={bgTheme}
+              landing={landing}
+              pdfList={pdfList}
+              openAIModal={openAIModal}
+            />
+          )}
+          {block.type === "mini_offer" && (
+            <MiniOfferBlock
+              block={block}
+              index={index}
+              containerIndex={containerIndex}
+              updateBlock={updateField}
+              updateChildBlock={updateChildBlock}
               bgTheme={bgTheme}
               landing={landing}
               pdfList={pdfList}
@@ -403,7 +418,7 @@ function SortableBlock({
             <SecureCheckoutBlock
               block={block}
               index={index}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
             />
           )}
           {block.type === "audio_player" && (
@@ -411,7 +426,7 @@ function SortableBlock({
               block={block}
               index={index}
               bgTheme={bgTheme}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
               landing={landing}
             />
           )}
@@ -420,7 +435,7 @@ function SortableBlock({
               block={block}
               index={index}
               bgTheme={bgTheme}
-              updateBlock={updateBlock}
+              updateBlock={updateField}
               landing={landing}
             />
           )}

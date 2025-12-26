@@ -505,7 +505,9 @@ function renderPreviewBlock(block, index, context) {
         );
       }
 
-      const referralUrl = `https://cre8tlystudio.com/signup?ref_employee=${user?.id}`;
+      const referralUrl = landing?.referral_slug
+        ? `https://cre8tlystudio.com/r/${landing.referral_slug}`
+        : "https://cre8tlystudio.com/sign-up";
 
       return (
         <div
@@ -517,23 +519,25 @@ function renderPreviewBlock(block, index, context) {
         >
           <a
             href={referralUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               display: "inline-block",
               background: block.button_color || "#7bed9f",
               color: block.text_color || "#000000",
               padding: "14px 36px",
-              borderRadius: "10px",
+              borderRadius: "8px",
               fontWeight: 700,
               textDecoration: "none",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-              transition: "transform 0.25s ease",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+              transition: "transform 0.2s ease, box-shadow 0.3s ease",
             }}
             onMouseOver={(e) =>
               (e.currentTarget.style.transform = "scale(1.05)")
             }
             onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            {block.text || "Sign Up with My Referral"}
+            {block.button_text || block.text || "Sign Up with My Referral"}
           </a>
 
           <p
@@ -740,23 +744,18 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
 
-    case "feature_offers_3": {
-      const items = block.items || [];
+    case "single_offer": {
+      const textColor = block.text_color || "#ffffff";
+
+      const imageToShow = block.use_pdf_cover
+        ? block.cover_url || block.image_url || null
+        : block.image_url || block.cover_url || null;
 
       return (
         <div
           key={index}
           style={{
-            background: block.use_no_bg
-              ? "transparent"
-              : block.use_gradient
-                ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-                    block.gradient_start || "#F285C3"
-                  }, ${block.gradient_end || "#7bed9f"})`
-                : block.match_main_bg
-                  ? adjustForLandingOverlay(bgTheme)
-                  : block.bg_color || bgTheme,
-
+            background: "transparent",
             padding: "40px 20px",
             borderRadius: block.use_no_bg ? "0px" : "20px",
             marginTop: "40px",
@@ -767,115 +766,307 @@ function renderPreviewBlock(block, index, context) {
             transition: "all 0.25s ease",
           }}
         >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: "24px",
-            }}
-          >
-            {items.map((item, i) => {
-              const imageToShow = item.use_pdf_cover
-                ? item.cover_url || item.image_url || null
-                : item.image_url || item.cover_url || null;
-
-              return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div
+              style={{
+                background: "rgba(0,0,0,0.45)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "16px",
+                padding: "28px",
+                textAlign: "center",
+                color: textColor,
+                display: "flex",
+                flexDirection: "column",
+                width: block.card_width ? `${block.card_width}px` : "100%",
+                height:
+                  block.card_height === "auto"
+                    ? "auto"
+                    : block.card_height
+                      ? `${block.card_height}px`
+                      : "auto",
+                overflow: block.card_height === "auto" ? "visible" : "auto",
+              }}
+            >
+              {/* IMAGE */}
+              {imageToShow ? (
+                <div style={{ marginBottom: "16px" }}>
+                  <img
+                    src={imageToShow}
+                    alt=""
+                    style={{ width: "100%", display: "block" }}
+                  />
+                </div>
+              ) : (
                 <div
-                  key={i}
                   style={{
-                    background: "rgba(0,0,0,0.45)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    textAlign: "center",
+                    width: "100%",
+                    height: "160px",
+                    borderRadius: "12px",
+                    marginBottom: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "0.85rem",
                   }}
                 >
-                  {/* IMAGE */}
-                  {imageToShow ? (
-                    <img
-                      src={imageToShow}
-                      alt=""
-                      style={{
-                        width: "100%",
-                        borderRadius: "12px",
-                        marginBottom: "16px",
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "160px",
-                        background: "rgba(255,255,255,0.05)",
-                        borderRadius: "12px",
-                        marginBottom: "16px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "rgba(255,255,255,0.4)",
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      No Image
-                    </div>
-                  )}
+                  No Image
+                </div>
+              )}
 
-                  {/* TITLE */}
-                  <h3
-                    style={{
-                      color: "white",
-                      fontSize: "1.25rem",
-                      fontWeight: 700,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    {item.title || "Offer Title"}
-                  </h3>
+              {/* TITLE */}
+              <h3
+                style={{
+                  fontSize: "1.25rem",
+                  fontWeight: 700,
+                  marginBottom: "8px",
+                }}
+              >
+                {block.title || "Offer Title"}
+              </h3>
 
-                  {/* DESCRIPTION */}
-                  <p
+              {/* SHORT DESCRIPTION */}
+              {block.text && (
+                <p
+                  style={{
+                    opacity: 0.8,
+                    fontSize: "0.95rem",
+                    marginBottom: "12px",
+                  }}
+                >
+                  {block.text}
+                </p>
+              )}
+
+              {/* LONG DESCRIPTION */}
+              {block.use_long_description &&
+                block.long_text &&
+                (block.description_type === "bullets" ? (
+                  <ul style={{ paddingLeft: "18px", marginBottom: "14px" }}>
+                    {block.long_text.split("\n").map((line, idx) => (
+                      <li key={idx} style={{ marginBottom: "6px" }}>
+                        {line.replace(/^•\s*/, "")}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div
                     style={{
-                      color: "rgba(255,255,255,0.75)",
-                      fontSize: "0.95rem",
+                      fontSize: "0.9rem",
+                      textAlign: "left",
+                      opacity: 0.85,
                       marginBottom: "14px",
                     }}
                   >
-                    {item.text || ""}
-                  </p>
+                    {block.long_text}
+                  </div>
+                ))}
 
-                  {/* PRICE */}
-                  {item.price ? (
-                    <p
-                      style={{
-                        color: "white",
-                        fontWeight: 800,
-                        fontSize: "1.3rem",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      ${Number(item.price).toFixed(2)}
-                    </p>
-                  ) : null}
+              {/* PRICE */}
+              {block.price ? (
+                <p
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "1.3rem",
+                    marginBottom: "16px",
+                  }}
+                >
+                  ${Number(block.price).toFixed(2)}
+                </p>
+              ) : null}
 
-                  {/* BUTTON */}
-                  <button
+              {/* BUTTON */}
+              <button
+                style={{
+                  marginTop: "auto",
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                  background: block.button_color || "#22c55e",
+                  color: block.button_text_color || "#000000",
+                  fontSize: "1rem",
+                }}
+              >
+                {block.button_text || "Buy Now"}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    case "mini_offer": {
+      const textColor = block.text_color || "#ffffff";
+
+      const imageToShow = block.use_pdf_cover
+        ? block.cover_url || block.image_url || null
+        : block.image_url || block.cover_url || null;
+
+      const contentBackground = block.use_gradient
+        ? `linear-gradient(${block.gradient_direction || "135deg"},
+        ${block.gradient_start || "#a855f7"},
+        ${block.gradient_end || "#ec4899"})`
+        : block.bg_color || "#111827";
+
+      return (
+        <div
+          key={index}
+          style={{
+            background: "transparent",
+            padding: "40px 20px",
+            marginTop: "40px",
+            maxWidth: "1100px",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              borderRadius: "20px",
+              overflow: "hidden",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
+            }}
+          >
+            {/* LEFT PANEL – IMAGE */}
+            <div style={{ position: "relative", background: "#000" }}>
+              {imageToShow ? (
+                <img
+                  src={imageToShow}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    minHeight: "320px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  No Image
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT PANEL – CONTENT */}
+            <div
+              style={{
+                background: contentBackground,
+                color: textColor,
+                padding: "36px",
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100%",
+              }}
+            >
+              {/* TITLE */}
+              <h3
+                style={{
+                  fontSize: "1.6rem",
+                  fontWeight: 800,
+                  marginBottom: "12px",
+                }}
+              >
+                {block.title || "Offer Title"}
+              </h3>
+
+              {/* SHORT DESCRIPTION */}
+              {!block.use_long_description && block.text && (
+                <p
+                  style={{
+                    opacity: 0.9,
+                    fontSize: "1rem",
+                    marginBottom: "16px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {block.text}
+                </p>
+              )}
+
+              {/* LONG DESCRIPTION */}
+              {block.use_long_description &&
+                block.long_text &&
+                (block.description_type === "bullets" ? (
+                  <ul
                     style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      fontWeight: 700,
-                      border: "none",
-                      cursor: "pointer",
-                      background: item.button_color || "#22c55e",
-                      color: block.button_text_color || "#000000",
-                      fontSize: "1rem",
+                      paddingLeft: "18px",
+                      marginBottom: "18px",
+                      opacity: 0.9,
                     }}
                   >
-                    {item.button_text || "Buy Now"}
-                  </button>
+                    {block.long_text.split("\n").map((line, idx) => (
+                      <li key={idx} style={{ marginBottom: "8px" }}>
+                        {line.replace(/^•\s*/, "")}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div
+                    style={{
+                      fontSize: "0.95rem",
+                      opacity: 0.9,
+                      marginBottom: "18px",
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {block.long_text}
+                  </div>
+                ))}
+
+              {/* PRICE */}
+              {block.price ? (
+                <div
+                  style={{
+                    fontSize: "1.6rem",
+                    fontWeight: 800,
+                    marginBottom: "20px",
+                  }}
+                >
+                  ${Number(block.price).toFixed(2)}
                 </div>
-              );
-            })}
+              ) : null}
+
+              {/* CTA */}
+              <button
+                style={{
+                  marginTop: "auto",
+                  width: "100%",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                  background: block.button_color || "#22c55e",
+                  color: block.button_text_color || "#000000",
+                  fontSize: "1.05rem",
+                  transition: "transform 0.2s ease",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.04)")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                {block.button_text || "Buy Now"}
+              </button>
+            </div>
           </div>
         </div>
       );

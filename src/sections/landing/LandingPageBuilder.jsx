@@ -62,13 +62,8 @@ export default function LandingPageBuilder() {
   // Ai
   const [aiContext, setAIContext] = useState(null);
 
-  const openAIModal = ({ blockType, blockIndex, currentText, role }) => {
-    setAIContext({
-      blockType,
-      blockIndex,
-      currentText,
-      role,
-    });
+  const openAIModal = (context) => {
+    setAIContext(context);
   };
 
   const findLocationById = (blocks, id) => {
@@ -141,9 +136,6 @@ export default function LandingPageBuilder() {
 
   const isPro =
     user?.plan === "business_builder_pack" && user?.pro_status === "active";
-
-  const isBasic =
-    user?.plan === "business_basic_builder" && user?.basic_annual === 1;
 
   const countBlocksByType = React.useCallback((blocks) => {
     const counts = {};
@@ -259,9 +251,18 @@ export default function LandingPageBuilder() {
 
   const updateBlock = React.useCallback((index, key, value) => {
     setLanding((prev) => {
-      const updatedBlocks = prev.content_blocks.map((b, i) =>
-        i === index ? { ...b, [key]: value } : b
-      );
+      const updatedBlocks = prev.content_blocks.map((b, i) => {
+        if (i !== index) return b;
+
+        const resolvedValue =
+          typeof value === "function" ? value(b[key]) : value;
+
+        return {
+          ...b,
+          [key]: resolvedValue,
+        };
+      });
+
       return { ...prev, content_blocks: updatedBlocks };
     });
   }, []);
@@ -444,47 +445,62 @@ export default function LandingPageBuilder() {
       newBlock.bg_color = "#000000";
     }
 
-    if (type === "feature_offers_3") {
-      newBlock.items = [
-        {
-          image_url: "",
-          cover_url: "",
-          title: "Offer One",
-          text: "Short description of this offer.",
-          price: 10,
-          button_text: "Buy Now",
-          button_color: "#22c55e",
-          pdf_url: "",
-          use_pdf_cover: false,
-        },
-        {
-          image_url: "",
-          cover_url: "",
-          title: "Offer Two",
-          text: "Short description of this offer.",
-          price: 20,
-          button_text: "Buy Now",
-          button_color: "#22c55e",
-          pdf_url: "",
-          use_pdf_cover: false,
-        },
-      ];
+    if (type === "single_offer") {
+      // ✅ COMMERCE (same as stripe_checkout)
+      newBlock.price = 10;
+      newBlock.product_source = "internal";
+      newBlock.pdf_url = "";
+      newBlock.external_file_url = "";
+      newBlock.external_file_name = "";
 
-      // Grid background & gradient controls
+      // ✅ UI / PRESENTATION
+      newBlock.image_url = "";
+      newBlock.cover_url = "";
+      newBlock.title = "Offer One";
+      newBlock.text = "Short description of this offer.";
+      newBlock.long_text = "";
+      newBlock.use_long_description = false;
+      newBlock.description_type = "text";
+      newBlock.button_text = "Buy Now";
+      newBlock.button_color = "#22c55e";
+      newBlock.button_text_color = "#000000";
+      newBlock.use_pdf_cover = false;
+
+      // layout
       newBlock.bg_color = "rgba(0,0,0,0.4)";
       newBlock.use_gradient = false;
-      newBlock.gradient_start = "#F285C3";
-      newBlock.gradient_end = "#7bed9f";
-      newBlock.gradient_direction = "90deg";
-      newBlock.match_main_bg = false;
-      newBlock.use_no_bg = false;
+      newBlock.text_color = "#ffffff";
+      newBlock.card_width = 360;
+      newBlock.card_height = "auto";
+    }
 
-      // Shared button text color for all three buttons
+    if (type === "mini_offer") {
+      // ✅ COMMERCE (same as stripe_checkout)
+      newBlock.price = 10;
+      newBlock.product_source = "internal";
+      newBlock.pdf_url = "";
+      newBlock.external_file_url = "";
+      newBlock.external_file_name = "";
+
+      // ✅ UI / PRESENTATION
+      newBlock.image_url = "";
+      newBlock.cover_url = "";
+      newBlock.title = "Offer One";
+      newBlock.text = "Short description of this offer.";
+      newBlock.long_text = "";
+      newBlock.use_long_description = false;
+      newBlock.description_type = "text";
+      newBlock.button_text = "Buy Now";
+      newBlock.button_color = "#22c55e";
       newBlock.button_text_color = "#000000";
+      newBlock.use_pdf_cover = false;
 
-      newBlock.alignment = "center";
-      newBlock.padding = 20;
-      newBlock.collapsed = false;
+      // layout
+      newBlock.bg_color = "rgba(0,0,0,0.4)";
+      newBlock.use_gradient = false;
+      newBlock.text_color = "#ffffff";
+      newBlock.card_width = 360;
+      newBlock.card_height = "auto";
     }
 
     if (type === "secure_checkout") {
@@ -1261,24 +1277,21 @@ export default function LandingPageBuilder() {
         }}
         onConfirm={confirmSaveTemplate}
       />
-      {aiContext && (
+      {/* {aiContext && (
         <AICopyModal
           aiContext={aiContext}
           onApply={(newText) => {
             if (!newText?.trim()) return;
 
-            // ✅ FAQ handling
-            if (aiContext.blockType === "faq") {
-              // Expect AI output like:
-              // Q: Question
-              // A: Answer
+            const { blockType, blockIndex, containerIndex } = aiContext;
 
+            // ✅ FAQ handling
+            if (blockType === "faq") {
               const parsedItems = newText
                 .split(/\n\s*\n/)
                 .map((chunk) => {
                   const qMatch = chunk.match(/Q:\s*(.+)/i);
                   const aMatch = chunk.match(/A:\s*(.+)/i);
-
                   if (!qMatch || !aMatch) return null;
 
                   return {
@@ -1289,12 +1302,112 @@ export default function LandingPageBuilder() {
                 })
                 .filter(Boolean);
 
-              if (parsedItems.length > 0) {
-                updateBlock(aiContext.blockIndex, "items", parsedItems);
+              if (containerIndex !== undefined) {
+                // 🔁 FAQ inside container
+                updateBlock(containerIndex, "children", (children) => {
+                  const updated = [...children];
+                  updated[blockIndex] = {
+                    ...updated[blockIndex],
+                    items: parsedItems,
+                  };
+                  return updated;
+                });
+              } else {
+                // 🧱 top-level FAQ
+                updateBlock(blockIndex, "items", parsedItems);
               }
+
+              // ✅ Offer long description
+            } else if (blockType === "offer_long_description") {
+              if (containerIndex !== undefined) {
+                updateBlock(containerIndex, "children", (children) => {
+                  const updated = [...children];
+                  updated[blockIndex] = {
+                    ...updated[blockIndex],
+                    long_text: newText,
+                    use_long_description: true,
+                  };
+                  return updated;
+                });
+              } else {
+                updateBlock(blockIndex, "long_text", newText);
+                updateBlock(blockIndex, "use_long_description", true);
+              }
+
+              // ✅ DEFAULT TEXT BLOCKS (heading, paragraph, etc)
             } else {
-              // ✅ All other blocks
-              updateBlock(aiContext.blockIndex, "text", newText);
+              if (containerIndex !== undefined) {
+                updateBlock(containerIndex, "children", (children) => {
+                  const updated = [...children];
+                  updated[blockIndex] = {
+                    ...updated[blockIndex],
+                    text: newText,
+                  };
+                  return updated;
+                });
+              } else {
+                updateBlock(blockIndex, "text", newText);
+              }
+            }
+
+            setAIContext(null);
+          }}
+          onClose={() => setAIContext(null)}
+        />
+      )} */}
+      {aiContext && (
+        <AICopyModal
+          aiContext={aiContext}
+          onApply={(newText) => {
+            if (!newText?.trim()) return;
+
+            const { blockType, blockIndex, containerIndex, updateChildBlock } =
+              aiContext;
+            console.log("AI CONTEXT", aiContext);
+
+            // ✅ FAQ handling
+            if (blockType === "faq") {
+              const parsedItems = newText
+                .split(/\n\s*\n/)
+                .map((chunk) => {
+                  const qMatch = chunk.match(/Q:\s*(.+)/i);
+                  const aMatch = chunk.match(/A:\s*(.+)/i);
+                  if (!qMatch || !aMatch) return null;
+
+                  return {
+                    q: qMatch[1].trim(),
+                    a: aMatch[1].trim(),
+                    open: false,
+                  };
+                })
+                .filter(Boolean);
+
+              if (containerIndex !== undefined) {
+                updateChildBlock(blockIndex, "items", parsedItems);
+              } else {
+                updateBlock(blockIndex, "items", parsedItems);
+              }
+
+              // ✅ Offer long description
+            } else if (blockType === "offer_long_description") {
+              if (containerIndex !== undefined) {
+                updateChildBlock(blockIndex, "long_text", newText);
+                updateChildBlock(blockIndex, "use_long_description", true);
+              } else {
+                updateBlock(blockIndex, "long_text", newText);
+                updateBlock(blockIndex, "use_long_description", true);
+              }
+
+              // ✅ DEFAULT TEXT BLOCKS (heading, paragraph, etc)
+            } else {
+              if (
+                containerIndex !== undefined &&
+                typeof updateChildBlock === "function"
+              ) {
+                updateChildBlock(blockIndex, "text", newText);
+              } else {
+                updateBlock(blockIndex, "text", newText);
+              }
             }
 
             setAIContext(null);

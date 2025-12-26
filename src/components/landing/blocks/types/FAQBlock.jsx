@@ -14,7 +14,14 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-export default function FAQBlock({ block, index, updateBlock, openAIModal }) {
+export default function FAQBlock({
+  block,
+  index,
+  updateBlock,
+  updateChildBlock,
+  openAIModal,
+  containerIndex,
+}) {
   // Sortable Item Wrapper (no listeners here anymore!)
   function SortableFAQItem({ i, children }) {
     const { attributes, listeners, setNodeRef, transform, transition } =
@@ -66,6 +73,8 @@ export default function FAQBlock({ block, index, updateBlock, openAIModal }) {
             openAIModal({
               blockType: "faq",
               blockIndex: index,
+              updateChildBlock,
+              containerIndex,
               currentText: (block.items || [])
                 .map((i) => `Q: ${i.q}\nA: ${i.a}`)
                 .join("\n\n"),

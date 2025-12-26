@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import axiosInstance from "../../../../api/axios";
 import { toast } from "react-toastify";
+import MiniOfferAdvanced from "./MiniOfferAdvanced";
 
 export default function MiniOfferBlock({
   block,
@@ -27,6 +28,17 @@ export default function MiniOfferBlock({
       updateBlock(index, key, value);
     }
   };
+
+  useEffect(() => {
+    if (!block.offer_page) {
+      updateField("offer_page", {
+        enabled: false,
+        blocks: [],
+        bullets: [],
+        trust_items: [],
+      });
+    }
+  }, []);
 
   const safeHexColor = (color, fallback = "#000000") => {
     if (!color) return fallback;
@@ -89,8 +101,6 @@ export default function MiniOfferBlock({
         overflowY: "auto",
       }}
     >
-      <h3 className="text-lg font-semibold text-green mb-6">Single Offer</h3>
-
       {/* BACKGROUND CONTROLS */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         {/* Background Color */}
@@ -193,62 +203,18 @@ export default function MiniOfferBlock({
         </div>
       )}
 
-      {/* TEXT COLOR */}
+      {/* BODY TEXT COLOR */}
       <div className="flex items-center gap-3 mb-8">
         <label className="text-sm font-semibold text-gray-300">
-          Button Text Color
+          Main Text Color
         </label>
         <input
           type="color"
-          value={safeHexColor(block.button_text_color) || "#000000"}
-          onChange={(e) => updateField("button_text_color", e.target.value)}
+          value={safeHexColor(block.text_color) || "#ffffff"}
+          onChange={(e) => updateField("text_color", e.target.value)}
           className="w-8 h-8 rounded cursor-pointer border border-gray-700"
         />
-        <span className="text-xs text-gray-400">{block.button_text_color}</span>
-      </div>
-
-      <div className="mb-6">
-        <label className="text-sm font-semibold text-gray-300">
-          Card Width ({block.card_width || 360}px)
-        </label>
-        <input
-          type="range"
-          min={260}
-          max={520}
-          step={10}
-          value={block.card_width || 360}
-          onChange={(e) => updateField("card_width", Number(e.target.value))}
-          className="w-full mt-2"
-        />
-      </div>
-
-      <div className="mb-6">
-        <label className="text-sm font-semibold text-gray-300">
-          Card Height
-        </label>
-
-        <div className="flex items-center gap-3 mt-2">
-          <input
-            type="checkbox"
-            checked={block.card_height === "auto"}
-            onChange={(e) =>
-              updateField("card_height", e.target.checked ? "auto" : 420)
-            }
-          />
-          <span className="text-sm text-gray-400">Auto height</span>
-        </div>
-
-        {block.card_height !== "auto" && (
-          <input
-            type="range"
-            min={300}
-            max={700}
-            step={10}
-            value={block.card_height || 420}
-            onChange={(e) => updateField("card_height", Number(e.target.value))}
-            className="w-full mt-2"
-          />
-        )}
+        <span className="text-xs text-gray-400">{block.text_color}</span>
       </div>
 
       {/* OFFERS GRID */}
@@ -501,21 +467,6 @@ export default function MiniOfferBlock({
                   </p>
                 )}
 
-                <div className="flex items-center gap-3 mb-8">
-                  <label className="text-sm font-semibold text-gray-300">
-                    Text Color
-                  </label>
-                  <input
-                    type="color"
-                    value={safeHexColor(block.text_color) || "#ffffff"}
-                    onChange={(e) => updateField("text_color", e.target.value)}
-                    className="w-8 h-8 rounded cursor-pointer border border-gray-700"
-                  />
-                  <span className="text-xs text-gray-400">
-                    {block.text_color}
-                  </span>
-                </div>
-
                 <label className="text-sm font-semibold text-gray-300 mt-3 block">
                   Offer Title
                 </label>
@@ -532,59 +483,11 @@ export default function MiniOfferBlock({
                   {block.title?.length || 0}/60
                 </p>
 
-                <div className="mt-4">
-                  <label className="text-sm font-semibold text-gray-300 block mb-1">
-                    Description Format
-                  </label>
-
-                  <select
-                    value={block.description_type || "text"}
-                    onChange={(e) =>
-                      updateField("description_type", e.target.value)
-                    }
-                    className="w-full p-2 bg-black text-white border border-gray-600 rounded"
-                  >
-                    <option value="text">Paragraph</option>
-                    <option value="bullets">Bullet Points</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                  <label className="text-sm font-semibold text-gray-300">
-                    Description
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openAIModal({
-                        blockType: "offer_description",
-                        blockIndex: index,
-                        updateChildBlock,
-                        containerIndex,
-                        currentText: block.description || "",
-                        role: "sales",
-                      });
-                    }}
-                    className="text-xs font-semibold px-3 py-1 rounded-md
-      bg-royalPurple text-white hover:bg-royalPurple/80 transition"
-                  >
-                    AI
-                  </button>
-                </div>
-
-                <textarea
-                  value={block.description || ""}
-                  onChange={(e) => updateField("description", e.target.value)}
-                  rows={8}
-                  placeholder={
-                    block.description_type === "bullets"
-                      ? "• Benefit one\n• Benefit two\n• Benefit three"
-                      : "Write your offer description..."
-                  }
-                  className="w-full p-3 mt-2 text-white bg-black border border-gray-600 rounded
-    resize-y min-h-[160px]"
+                <MiniOfferAdvanced
+                  block={block}
+                  updateField={updateField}
+                  landing={landing}
+                  openAIModal={openAIModal}
                 />
 
                 {/* PRICE */}

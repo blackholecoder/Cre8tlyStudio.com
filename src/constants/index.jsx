@@ -834,3 +834,13 @@ export const BLOCK_TYPE_TO_LABEL = {
   divider: "Divider",
   container: "Section Container",
 };
+
+export const TRUST_ICONS = [
+  { key: "lock", icon: "🔒", label: "Secure" },
+  { key: "shield", icon: "🛡️", label: "Protected" },
+  { key: "bolt", icon: "⚡", label: "Instant" },
+  { key: "download", icon: "⬇️", label: "Download" },
+  { key: "check", icon: "✓", label: "Verified" },
+  { key: "star", icon: "⭐", label: "Trusted" },
+  { key: "card", icon: "💳", label: "Payments" },
+];

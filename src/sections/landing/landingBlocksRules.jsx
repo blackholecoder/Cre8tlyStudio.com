@@ -9,7 +9,7 @@ export const BLOCK_LIMITS = {
   video: 10,
   faq: 2,
   countdown: 2,
-  single_offer: 20,
+  single_offer: 5,
   mini_offer: 20,
   button_url: 10,
 };
@@ -20,6 +20,5 @@ export const PRO_ONLY_BLOCKS = [
   "verified_reviews",
   "countdown",
   "secure_checkout",
-  "single_offer",
   "mini_offer",
 ];

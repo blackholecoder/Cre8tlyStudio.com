@@ -501,6 +501,19 @@ export default function LandingPageBuilder() {
       newBlock.text_color = "#ffffff";
       newBlock.card_width = 360;
       newBlock.card_height = "auto";
+      newBlock.offer_page = {
+        enabled: false,
+        blocks: [
+          {
+            id: "uuid",
+            type: "paragraph",
+            text: "",
+            image_url: "",
+          },
+        ],
+        bullets: [],
+        trust_items: [],
+      };
     }
 
     if (type === "secure_checkout") {

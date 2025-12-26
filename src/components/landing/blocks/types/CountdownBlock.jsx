@@ -40,6 +40,23 @@ export default function CountdownBlock({ block, index, updateBlock }) {
         <span className="text-xs text-gray-400">{block.text_color}</span>
       </div>
 
+      {block.style_variant === "glow" && (
+        <div className="flex items-center gap-4 mt-4">
+          <label className="text-sm font-semibold text-gray-300">
+            Glow Color
+          </label>
+          <input
+            type="color"
+            value={block.glow_color || "#10b981"}
+            onChange={(e) => updateBlock(index, "glow_color", e.target.value)}
+            className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+          />
+          <span className="text-xs text-gray-400">
+            {block.glow_color || "theme accent"}
+          </span>
+        </div>
+      )}
+
       {/* Target Date */}
       <label className="text-sm font-semibold text-gray-300 mt-4 block">
         Target Date & Time
@@ -109,6 +126,8 @@ export default function CountdownBlock({ block, index, updateBlock }) {
         <CountdownTimerPreview
           targetDate={block.target_date}
           variant={block.style_variant}
+          textColor={block.text_color || "#FFFFFF"}
+          glowColor={block.glow_color}
         />
       </div>
     </div>

@@ -56,6 +56,7 @@ export default function VersionControls({
 
         {selectedVersion && (
           <button
+            type="button"
             onClick={handleDeleteVersion}
             className="px-6 py-2 rounded-lg bg-red-600/20 border border-red-500 text-red-300 
               hover:bg-red-600/30 hover:text-red-200 transition text-sm font-semibold"
@@ -65,6 +66,7 @@ export default function VersionControls({
         )}
         {selectedVersion && (
           <button
+            type="button"
             onClick={() => {
               setSelectedVersion("");
             }}

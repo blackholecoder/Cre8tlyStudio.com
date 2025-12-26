@@ -4,6 +4,8 @@ export default function CountdownTimerPreview({
   targetDate,
   variant = "minimal",
   bgTheme,
+  glowColor,
+  textColor,
 }) {
   const [timeLeft, setTimeLeft] = useState("");
 
@@ -54,6 +56,9 @@ export default function CountdownTimerPreview({
 
   const accent = getAccentColor();
 
+  const finalTextColor = textColor;
+  const finalGlowColor = glowColor || accent;
+
   const baseClasses =
     "font-mono tracking-widest transition-all duration-500 inline-block";
 
@@ -67,18 +72,18 @@ export default function CountdownTimerPreview({
   return (
     <div
       className={`${baseClasses} ${styleMap[variant] || styleMap.minimal}`}
-      style={
-        variant === "glow"
+      style={{
+        color: finalTextColor, // 👈 TEXT COLOR ONLY
+        ...(variant === "glow"
           ? {
-              color: accent,
               textShadow: `
-  0 0 6px ${accent},
-  0 0 14px ${accent},
-  0 0 28px ${accent}
-`,
+          0 0 6px ${finalGlowColor},
+          0 0 14px ${finalGlowColor},
+          0 0 28px ${finalGlowColor}
+        `,
             }
-          : undefined
-      }
+          : {}),
+      }}
     >
       {timeLeft || "00:00:00:00"}
     </div>

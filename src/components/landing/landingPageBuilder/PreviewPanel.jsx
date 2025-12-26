@@ -28,7 +28,7 @@ function renderPreviewBlock(block, index, context) {
       return (
         <h1
           key={index}
-          className="text-4xl font-bold leading-snug"
+          className="text-3xl font-bold leading-snug normal-case"
           style={{
             ...baseStyle,
             ...containerStyle,
@@ -390,33 +390,92 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
 
-    case "countdown":
+    case "countdown": {
+      const label = block.text || "Offer Ends In:";
+      const variant = block.style_variant || "minimal";
+      const textColor = block.text_color || "#fff";
+
+      const getAccentColor = () => {
+        const theme = bgTheme || "";
+        if (theme.includes("emerald")) return "#10b981";
+        if (theme.includes("purple") || theme.includes("royal"))
+          return "#8b5cf6";
+        if (theme.includes("pink") || theme.includes("rose")) return "#ec4899";
+        if (theme.includes("yellow") || theme.includes("amber"))
+          return "#facc15";
+        if (theme.includes("blue")) return "#3b82f6";
+        if (theme.includes("red")) return "#ef4444";
+        return "#10b981";
+      };
+
+      const accent = getAccentColor();
+      const finalGlowColor = block.glow_color || accent;
+
+      const styleMap = {
+        minimal: {
+          fontSize: "2rem",
+          fontFamily: "monospace",
+          letterSpacing: "2px",
+          color: textColor,
+        },
+        boxed: {
+          display: "inline-block",
+          background: "rgba(15,23,42,0.85)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: "12px",
+          padding: "12px 24px",
+          fontSize: "2rem",
+          fontFamily: "monospace",
+          letterSpacing: "2px",
+          color: textColor,
+        },
+        glow: {
+          fontSize: "2rem",
+          fontFamily: "monospace",
+          letterSpacing: "2px",
+          color: textColor,
+          textShadow: `
+        0 0 6px ${finalGlowColor},
+        0 0 14px ${finalGlowColor},
+        0 0 28px ${finalGlowColor}
+      `,
+        },
+      };
+
       return (
         <div
           key={index}
           style={{
-            margin: "40px auto",
-            textAlign: block.alignment || "center",
-            color: block.text_color || "#FFFFFF",
+            textAlign: "center",
+            padding: "50px 0",
           }}
         >
           <p
             style={{
-              fontWeight: "bold",
-              fontSize: "1.5rem",
+              fontWeight: 700,
+              fontSize: "1.3rem",
               marginBottom: "10px",
+              color: landing.font_color_h1 || "#fff",
             }}
           >
-            {block.text || "Offer Ends In:"}
+            {label}
           </p>
-          <CountdownTimerPreview
-            targetDate={block.target_date}
-            variant={block.style_variant}
-            bgTheme={bgTheme}
-          />
+
+          <div style={styleMap[variant] || styleMap.minimal}>12:34:56:78</div>
+
+          <div
+            style={{
+              color: landing.font_color_p || "#ccc",
+              fontSize: "0.9rem",
+              marginTop: "8px",
+              letterSpacing: "1px",
+            }}
+          >
+            DAYS&nbsp;&nbsp;|&nbsp;&nbsp;HRS&nbsp;&nbsp;|&nbsp;&nbsp;MIN&nbsp;&nbsp;|&nbsp;&nbsp;SEC
+          </div>
         </div>
       );
-
+    }
     case "stripe_checkout":
       return (
         <div
@@ -910,11 +969,12 @@ function renderPreviewBlock(block, index, context) {
         ${block.gradient_end || "#ec4899"})`
         : block.bg_color || "#111827";
 
+      const fullPreviewText = (block.description || "").replace(/•/g, "");
+
       return (
         <div
           key={index}
           style={{
-            background: "transparent",
             padding: "40px 20px",
             marginTop: "40px",
             maxWidth: "1100px",
@@ -924,16 +984,25 @@ function renderPreviewBlock(block, index, context) {
         >
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              display: "flex",
+              width: "100%",
+              maxWidth: "700px",
+              height: "300px",
+              margin: "0 auto",
               borderRadius: "20px",
               overflow: "hidden",
               border: "1px solid rgba(255,255,255,0.12)",
               boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
+              background: contentBackground,
             }}
           >
-            {/* LEFT PANEL – IMAGE */}
-            <div style={{ position: "relative", background: "#000" }}>
+            {/* LEFT PANEL – IMAGE (30%) */}
+            <div
+              style={{
+                flex: "0 0 30%",
+                background: "#000",
+              }}
+            >
               {imageToShow ? (
                 <img
                   src={imageToShow}
@@ -950,7 +1019,7 @@ function renderPreviewBlock(block, index, context) {
                   style={{
                     width: "100%",
                     height: "100%",
-                    minHeight: "320px",
+                    minHeight: "180px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -963,109 +1032,75 @@ function renderPreviewBlock(block, index, context) {
               )}
             </div>
 
-            {/* RIGHT PANEL – CONTENT */}
+            {/* RIGHT PANEL – CONTENT (70%) */}
             <div
               style={{
-                background: contentBackground,
+                flex: 1,
+                padding: "28px 32px",
                 color: textColor,
-                padding: "36px",
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "100%",
+                justifyContent: "center",
+                boxSizing: "border-box",
               }}
             >
-              {/* TITLE */}
-              <h3
+              <h1
+                className="normal-case"
                 style={{
-                  fontSize: "1.6rem",
+                  fontSize: "1.2rem",
                   fontWeight: 800,
-                  marginBottom: "12px",
+                  marginBottom: "10px",
                 }}
               >
                 {block.title || "Offer Title"}
-              </h3>
+              </h1>
 
-              {/* SHORT DESCRIPTION */}
-              {!block.use_long_description && block.text && (
-                <p
+              <div
+                style={{
+                  fontSize: "1rem",
+                  lineHeight: 1.5,
+                  marginBottom: "14px",
+                  maxWidth: "420px",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {fullPreviewText}
+              </div>
+
+              <div style={{ marginTop: "16px" }}>
+                <button
                   style={{
-                    opacity: 0.9,
-                    fontSize: "1rem",
-                    marginBottom: "16px",
-                    lineHeight: 1.5,
+                    width: "100%",
+                    maxWidth: "260px",
+                    padding: "14px",
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    background: block.button_color || "#22c55e",
+                    color: block.button_text_color || "#000000",
+                    fontSize: "1.05rem",
                   }}
                 >
-                  {block.text}
-                </p>
-              )}
+                  {block.button_text || "Buy Now"}
+                </button>
 
-              {/* LONG DESCRIPTION */}
-              {block.use_long_description &&
-                block.long_text &&
-                (block.description_type === "bullets" ? (
-                  <ul
-                    style={{
-                      paddingLeft: "18px",
-                      marginBottom: "18px",
-                      opacity: 0.9,
-                    }}
-                  >
-                    {block.long_text.split("\n").map((line, idx) => (
-                      <li key={idx} style={{ marginBottom: "8px" }}>
-                        {line.replace(/^•\s*/, "")}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
+                {block.price ? (
                   <div
                     style={{
-                      fontSize: "0.95rem",
-                      opacity: 0.9,
-                      marginBottom: "18px",
-                      lineHeight: 1.55,
+                      marginTop: "10px",
+                      fontSize: "1.05rem",
+                      fontWeight: 300,
                     }}
                   >
-                    {block.long_text}
+                    ${Number(block.price).toFixed(2)}
                   </div>
-                ))}
-
-              {/* PRICE */}
-              {block.price ? (
-                <div
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 800,
-                    marginBottom: "20px",
-                  }}
-                >
-                  ${Number(block.price).toFixed(2)}
-                </div>
-              ) : null}
-
-              {/* CTA */}
-              <button
-                style={{
-                  marginTop: "auto",
-                  width: "100%",
-                  padding: "14px",
-                  borderRadius: "10px",
-                  fontWeight: 700,
-                  border: "none",
-                  cursor: "pointer",
-                  background: block.button_color || "#22c55e",
-                  color: block.button_text_color || "#000000",
-                  fontSize: "1.05rem",
-                  transition: "transform 0.2s ease",
-                }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.transform = "scale(1.04)")
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
-                }
-              >
-                {block.button_text || "Buy Now"}
-              </button>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

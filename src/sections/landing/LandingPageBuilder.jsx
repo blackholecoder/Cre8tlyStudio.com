@@ -726,13 +726,14 @@ export default function LandingPageBuilder() {
           <div className="flex justify-center gap-3 mt-2">
             {/* DELETE BUTTON */}
             <button
+              type="button"
               onClick={async () => {
                 try {
                   const res = await deleteTemplate(selectedVersion);
 
                   if (res.success) {
                     toast.success("Version deleted.", {
-                      position: "top-right",
+                      position: "bottom-right",
                       style: {
                         background: "#0B0F19",
                         color: "#E5E7EB",
@@ -745,7 +746,7 @@ export default function LandingPageBuilder() {
                     loadVersions();
                   } else {
                     toast.error("Failed to delete version.", {
-                      position: "top-right",
+                      position: "bottom-right",
                       style: {
                         background: "#0B0F19",
                         color: "#E5E7EB",
@@ -757,7 +758,7 @@ export default function LandingPageBuilder() {
                 } catch (err) {
                   console.error("Delete error:", err);
                   toast.error("Error deleting version.", {
-                    position: "top-right",
+                    position: "bottom-right",
                     style: {
                       background: "#0B0F19",
                       color: "#E5E7EB",
@@ -785,7 +786,7 @@ export default function LandingPageBuilder() {
         </div>
       ),
       {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: false,
         closeOnClick: false,
         draggable: false,
@@ -946,6 +947,14 @@ export default function LandingPageBuilder() {
   };
 
   const handleSave = async (e) => {
+    const submitter = e?.nativeEvent?.submitter;
+
+    // 🚫 Block ALL submits except Save
+    if (!submitter || submitter.name !== "save-landing") {
+      e.preventDefault();
+      return;
+    }
+
     e.preventDefault();
 
     try {
@@ -1038,12 +1047,16 @@ export default function LandingPageBuilder() {
     }
 
     if (res.success) {
-      toast.success(existing ? "Version updated!" : "New version saved!");
+      toast.success(existing ? "Version updated!" : "New version saved!", {
+        position: "bottom-right",
+      });
       loadVersions();
       setShowSaveModal(false);
       setTemplateName("");
     } else {
-      toast.error("Could not save version.");
+      toast.error("Could not save version.", {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -1277,84 +1290,6 @@ export default function LandingPageBuilder() {
         }}
         onConfirm={confirmSaveTemplate}
       />
-      {/* {aiContext && (
-        <AICopyModal
-          aiContext={aiContext}
-          onApply={(newText) => {
-            if (!newText?.trim()) return;
-
-            const { blockType, blockIndex, containerIndex } = aiContext;
-
-            // ✅ FAQ handling
-            if (blockType === "faq") {
-              const parsedItems = newText
-                .split(/\n\s*\n/)
-                .map((chunk) => {
-                  const qMatch = chunk.match(/Q:\s*(.+)/i);
-                  const aMatch = chunk.match(/A:\s*(.+)/i);
-                  if (!qMatch || !aMatch) return null;
-
-                  return {
-                    q: qMatch[1].trim(),
-                    a: aMatch[1].trim(),
-                    open: false,
-                  };
-                })
-                .filter(Boolean);
-
-              if (containerIndex !== undefined) {
-                // 🔁 FAQ inside container
-                updateBlock(containerIndex, "children", (children) => {
-                  const updated = [...children];
-                  updated[blockIndex] = {
-                    ...updated[blockIndex],
-                    items: parsedItems,
-                  };
-                  return updated;
-                });
-              } else {
-                // 🧱 top-level FAQ
-                updateBlock(blockIndex, "items", parsedItems);
-              }
-
-              // ✅ Offer long description
-            } else if (blockType === "offer_long_description") {
-              if (containerIndex !== undefined) {
-                updateBlock(containerIndex, "children", (children) => {
-                  const updated = [...children];
-                  updated[blockIndex] = {
-                    ...updated[blockIndex],
-                    long_text: newText,
-                    use_long_description: true,
-                  };
-                  return updated;
-                });
-              } else {
-                updateBlock(blockIndex, "long_text", newText);
-                updateBlock(blockIndex, "use_long_description", true);
-              }
-
-              // ✅ DEFAULT TEXT BLOCKS (heading, paragraph, etc)
-            } else {
-              if (containerIndex !== undefined) {
-                updateBlock(containerIndex, "children", (children) => {
-                  const updated = [...children];
-                  updated[blockIndex] = {
-                    ...updated[blockIndex],
-                    text: newText,
-                  };
-                  return updated;
-                });
-              } else {
-                updateBlock(blockIndex, "text", newText);
-              }
-            }
-
-            setAIContext(null);
-          }}
-          onClose={() => setAIContext(null)}
-        />
-      )} */}
       {aiContext && (
         <AICopyModal
           aiContext={aiContext}
@@ -1365,7 +1300,7 @@ export default function LandingPageBuilder() {
               aiContext;
             console.log("AI CONTEXT", aiContext);
 
-            // ✅ FAQ handling
+            // FAQ handling
             if (blockType === "faq") {
               const parsedItems = newText
                 .split(/\n\s*\n/)
@@ -1388,7 +1323,7 @@ export default function LandingPageBuilder() {
                 updateBlock(blockIndex, "items", parsedItems);
               }
 
-              // ✅ Offer long description
+              // Offer long description
             } else if (blockType === "offer_long_description") {
               if (containerIndex !== undefined) {
                 updateChildBlock(blockIndex, "long_text", newText);
@@ -1398,7 +1333,7 @@ export default function LandingPageBuilder() {
                 updateBlock(blockIndex, "use_long_description", true);
               }
 
-              // ✅ DEFAULT TEXT BLOCKS (heading, paragraph, etc)
+              // DEFAULT TEXT BLOCKS (heading, paragraph, etc)
             } else {
               if (
                 containerIndex !== undefined &&

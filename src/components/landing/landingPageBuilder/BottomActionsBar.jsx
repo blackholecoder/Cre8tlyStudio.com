@@ -13,6 +13,7 @@ export default function BottomActionsBar({
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
         <button
           type="submit"
+          name="save-landing"
           className="bg-green text-black px-6 py-3 rounded-lg shadow hover:bg-green transition"
         >
           Save Changes

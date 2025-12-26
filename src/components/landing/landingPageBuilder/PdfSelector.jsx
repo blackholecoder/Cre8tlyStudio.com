@@ -141,6 +141,23 @@ export default function PdfSelector({
               </p>
             )}
           </div>
+          {coverPreview && (
+            <button
+              type="button"
+              onClick={() => {
+                setLanding((prev) => ({
+                  ...prev,
+                  pdf_url: "",
+                  cover_image_url: "",
+                }));
+                setCoverPreview("");
+                setCoverLoading(false);
+              }}
+              className="mt-4 text-sm text-red-400 hover:text-red-300 underline"
+            >
+              Remove PDF
+            </button>
+          )}
         </div>
       </div>
     </div>

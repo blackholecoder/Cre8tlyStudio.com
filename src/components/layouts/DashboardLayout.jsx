@@ -115,7 +115,7 @@ export default function DashboardLayout({ children }) {
                 <AnimatedLogo className="relative z-10 w-16 h-16 animate-glow" />
               </div>
 
-              <h1 className="text-[13px] font-semibold text-white text-center leading-snug mt-1">
+              <h1 className="text-[13px] font-semibold text-white text-center leading-snug mt-1 normal-case ">
                 Cre8tly
                 <br />
                 Studio

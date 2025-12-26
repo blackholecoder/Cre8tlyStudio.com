@@ -544,8 +544,8 @@ const RootApp = () => {
         <BookProvider>
           <MagnetProvider>
             <ToastContainer
-              position="top-center"
-              autoClose={3000}
+              position="bottom-right"
+              autoClose={2000}
               hideProgressBar={false}
               newestOnTop={true}
               closeOnClick

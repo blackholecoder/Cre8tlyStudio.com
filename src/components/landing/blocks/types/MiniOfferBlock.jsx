@@ -81,25 +81,17 @@ export default function MiniOfferBlock({
   //  BACKGROUND PREVIEW
   // -----------------------------
 
-  const previewBackground = block.use_no_bg
-    ? "transparent"
-    : block.match_main_bg
-      ? bgTheme
-      : block.use_gradient
-        ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-            block.gradient_start || "#F285C3"
-          }, ${block.gradient_end || "#7bed9f"})`
-        : block.bg_color || "#111827";
+  const previewBackground = block.match_main_bg
+    ? bgTheme // can already be gradient OR solid
+    : "#000000";
 
-  const offerPage = block.offer_page || {};
-
-  const cardPanelBackground = offerPage.use_no_bg
+  const cardPanelBackground = block.use_no_bg
     ? "transparent"
-    : offerPage.use_gradient
-      ? `linear-gradient(${offerPage.gradient_direction || "135deg"},
-        ${offerPage.gradient_start || "#a855f7"},
-        ${offerPage.gradient_end || "#ec4899"})`
-      : offerPage.bg_color || "#111827";
+    : block.use_gradient
+      ? `linear-gradient(${block.gradient_direction || "135deg"},
+        ${block.gradient_start || "#a855f7"},
+        ${block.gradient_end || "#ec4899"})`
+      : block.bg_color || "#111827";
 
   const fullPreviewText = (
     block.offer_page?.blocks?.map((b) => b.text)?.join(" ") || ""
@@ -130,14 +122,32 @@ export default function MiniOfferBlock({
           <label className="text-sm font-semibold text-gray-300">
             Background Color
           </label>
+
           <div className="flex items-center gap-2 mt-1">
+            {/* Color Picker */}
             <input
               type="color"
-              value={safeHexColor(block.bg_color)}
+              value={safeHexColor(block.bg_color, "#111827")}
               onChange={(e) => updateField("bg_color", e.target.value)}
-              className="w-10 h-10 rounded cursor-pointer border border-gray-700"
+              className="w-8 h-8 border border-gray-600 rounded cursor-pointer bg-transparent"
             />
-            <span className="text-xs text-gray-400">{block.bg_color}</span>
+
+            {/* Hex Input */}
+            <input
+              type="text"
+              value={block.bg_color || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+                  updateField(
+                    "bg_color",
+                    val.startsWith("#") ? val : `#${val}`
+                  );
+                }
+              }}
+              placeholder="#111827"
+              className="w-24 px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+            />
           </div>
         </div>
 
@@ -226,17 +236,33 @@ export default function MiniOfferBlock({
       )}
 
       {/* BODY TEXT COLOR */}
+      {/* Main Text Color */}
       <div className="flex items-center gap-3 mb-8">
         <label className="text-sm font-semibold text-gray-300">
           Main Text Color
         </label>
+
+        {/* Color Picker */}
         <input
           type="color"
-          value={safeHexColor(block.text_color) || "#ffffff"}
+          value={safeHexColor(block.text_color, "#ffffff")}
           onChange={(e) => updateField("text_color", e.target.value)}
-          className="w-8 h-8 rounded cursor-pointer border border-gray-700"
+          className="w-8 h-8 border border-gray-600 rounded cursor-pointer bg-transparent"
         />
-        <span className="text-xs text-gray-400">{block.text_color}</span>
+
+        {/* Hex Input */}
+        <input
+          type="text"
+          value={block.text_color || ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+              updateField("text_color", val.startsWith("#") ? val : `#${val}`);
+            }
+          }}
+          placeholder="#ffffff"
+          className="w-24 px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+        />
       </div>
 
       {/* OFFERS GRID */}

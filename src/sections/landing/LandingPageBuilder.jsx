@@ -32,6 +32,7 @@ import ToggleDownloadButton from "../../components/landing/landingPageBuilder/To
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
+import { MOTION_PRESETS } from "../../constants/motionPresets";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -295,6 +296,10 @@ export default function LandingPageBuilder() {
       alignment: "left",
       bulleted: false,
       collapsed: true,
+      motion: {
+        disabled: false, // animate by default
+        preset: null, // will inherit global preset
+      },
     };
 
     if (type === "container") {
@@ -666,7 +671,10 @@ export default function LandingPageBuilder() {
 
     snapshot.content_blocks = blocks;
 
-    setLanding(snapshot);
+    setLanding({
+      ...snapshot,
+      motion_settings: snapshot.motion_settings ?? landing.motion_settings,
+    });
 
     toast.success("Version loaded! (not yet applied)");
   };
@@ -692,7 +700,11 @@ export default function LandingPageBuilder() {
         ...b,
       }));
 
-      setLanding({ ...lp, content_blocks: blocks });
+      setLanding({
+        ...lp,
+        content_blocks: blocks,
+        motion_settings: lp.motion_settings || landing.motion_settings,
+      });
     } catch (err) {
       console.error(err);
       toast.error("Failed to refresh landing");
@@ -847,6 +859,9 @@ export default function LandingPageBuilder() {
         ]);
 
         const lp = landingRes.data.landingPage;
+
+        console.log("🟡 RAW lp.motion_settings FROM API", lp.motion_settings);
+
         const magnets = pdfRes.data.magnets || [];
 
         // parse blocks
@@ -861,11 +876,26 @@ export default function LandingPageBuilder() {
         }
 
         blocks = blocks.map((b) => ({
+          ...b, // keep existing properties first
           collapsed: b.collapsed ?? true,
-          ...b,
+          motion: b.motion ?? { disabled: false, preset: null },
         }));
 
-        setLanding({ ...lp, content_blocks: blocks });
+        const normalizedMotionSettings = {
+          enabled: lp.motion_settings?.enabled ?? false,
+          preset: lp.motion_settings?.preset ?? "fade-up",
+          duration: lp.motion_settings?.duration ?? 0.5,
+          delay: lp.motion_settings?.delay ?? 0,
+          stagger: lp.motion_settings?.stagger ?? 0.12,
+          easing: lp.motion_settings?.easing ?? "ease-out",
+          viewport_once: lp.motion_settings?.viewport_once ?? true,
+        };
+
+        setLanding({
+          ...lp,
+          motion_settings: normalizedMotionSettings,
+          content_blocks: blocks,
+        });
         setPdfList(magnets);
         setFontName(lp.font || "Montserrat");
         setFontFile(lp.font_file || "");
@@ -997,6 +1027,8 @@ export default function LandingPageBuilder() {
         b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
       );
 
+      console.log("🟢 SAVING motion_settings", landing.motion_settings);
+
       await axiosInstance.put(
         `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
         {
@@ -1008,6 +1040,7 @@ export default function LandingPageBuilder() {
           cover_image_url: landing.cover_image_url,
           logo_url: landing.logo_url,
           show_download_button: showDownloadButton,
+          motion_settings: landing.motion_settings,
         }
       );
 
@@ -1152,6 +1185,76 @@ export default function LandingPageBuilder() {
             <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
               Content
             </h1>
+            {/* ✅ Live Preview */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-sm text-silver font-medium">
+                Animate page sections
+              </span>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setLanding((prev) => ({
+                    ...prev,
+                    motion_settings: {
+                      ...(prev.motion_settings || {}),
+                      enabled: !prev.motion_settings?.enabled,
+                    },
+                  }))
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  landing.motion_settings?.enabled ? "bg-green" : "bg-gray-600"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    landing.motion_settings?.enabled
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+            {landing.motion_settings?.enabled && (
+              <div className="mb-4 max-w-xs">
+                <label className="block text-xs font-semibold text-gray-400 mb-1">
+                  Animation preset
+                </label>
+
+                <select
+                  value={landing.motion_settings?.preset || "fade-up"}
+                  onChange={(e) =>
+                    setLanding((prev) => ({
+                      ...prev,
+                      motion_settings: {
+                        ...(prev.motion_settings || {}),
+                        preset: e.target.value,
+                      },
+                    }))
+                  }
+                  className="
+                w-full
+                rounded-md
+                bg-black/40
+                border
+                border-gray-600
+                text-white
+                text-sm
+                px-3
+                py-2
+                focus:outline-none
+                focus:border-green
+      "
+                >
+                  {MOTION_PRESETS.map((preset) => (
+                    <option key={preset.value} value={preset.value}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="flex justify-end mb-6">
               <AddSectionButton addBlock={addBlock} canAddBlock={canAddBlock} />
             </div>

@@ -217,6 +217,7 @@ function SortableBlock({
         className="flex items-center justify-between cursor-pointer mb-3"
         onClick={() => updateField(index, "collapsed", !block.collapsed)}
       >
+        {/* LEFT */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <BlockValuePill
@@ -232,28 +233,78 @@ function SortableBlock({
             {getBlockLabel(block)}
           </span>
         </div>
-        <div className="flex items-center gap-3">
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
+          {/* PRIMARY: Enable block */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               updateField(index, "enabled", block.enabled === false);
             }}
-            className={`relative inline-flex h-5 w-8 items-center rounded-full
-    transition-colors duration-200
-    ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
-  `}
+            className={`
+        relative inline-flex 
+        h-5 w-9 
+        items-center 
+        rounded-full 
+        transition-colors duration-200
+        ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
+      `}
           >
             <span
-              className={`absolute h-4 w-4 rounded-full bg-white
-      transition-transform duration-200
-      ${block.enabled !== false ? "translate-x-4" : "translate-x-0.5"}
-    `}
+              className={`
+          h-4 w-4 
+          rounded-full 
+          bg-white 
+          transition-transform duration-200
+          ${block.enabled !== false ? "translate-x-4" : "translate-x-1"}
+        `}
             />
           </button>
 
+          {/* DIVIDER */}
+          <div className="h-4 w-px bg-white/10" />
+
+          {/* SECONDARY: Animate */}
+          <div
+            className="flex items-center gap-2 opacity-80 hover:opacity-100 transition"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="text-[11px] text-gray-400">Animate</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                updateField(index, "motion", {
+                  ...block.motion,
+                  disabled: !block.motion?.disabled,
+                })
+              }
+              className={`
+          relative inline-flex 
+          h-4 w-7 
+          items-center 
+          rounded-full 
+          transition-colors duration-200
+          ${block.motion?.disabled ? "bg-gray-700" : "bg-green/80"}
+        `}
+            >
+              <span
+                className={`
+            h-3 w-3 
+            rounded-full 
+            bg-white 
+            transition-transform duration-200
+            ${block.motion?.disabled ? "translate-x-1" : "translate-x-3"}
+          `}
+              />
+            </button>
+          </div>
+
+          {/* CHEVRON */}
           <span
-            className={`text-gray-400 text-sm transform transition-transform duration-300 ${
+            className={`text-gray-400 text-sm transition-transform duration-300 ${
               block.collapsed ? "rotate-0" : "rotate-180"
             }`}
           >

@@ -27,7 +27,7 @@ export default function CountdownBlock({ block, index, updateBlock }) {
       />
 
       {/* Text color */}
-      <div className="flex items-center gap-4 mt-4">
+      <div className="flex items-center gap-3 mt-4">
         <label className="text-sm font-semibold text-gray-300">
           Text Color
         </label>
@@ -37,11 +37,26 @@ export default function CountdownBlock({ block, index, updateBlock }) {
           onChange={(e) => updateBlock(index, "text_color", e.target.value)}
           className="w-10 h-10 rounded cursor-pointer border border-gray-600"
         />
-        <span className="text-xs text-gray-400">{block.text_color}</span>
+        <input
+          type="text"
+          value={block.text_color || ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+              updateBlock(
+                index,
+                "text_color",
+                val.startsWith("#") ? val : `#${val}`
+              );
+            }
+          }}
+          placeholder="#ffffff"
+          className="w-24 flex-none px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+        />
       </div>
 
       {block.style_variant === "glow" && (
-        <div className="flex items-center gap-4 mt-4">
+        <div className="flex items-center gap-3 mt-4">
           <label className="text-sm font-semibold text-gray-300">
             Glow Color
           </label>
@@ -51,9 +66,22 @@ export default function CountdownBlock({ block, index, updateBlock }) {
             onChange={(e) => updateBlock(index, "glow_color", e.target.value)}
             className="w-10 h-10 rounded cursor-pointer border border-gray-600"
           />
-          <span className="text-xs text-gray-400">
-            {block.glow_color || "theme accent"}
-          </span>
+          <input
+            type="text"
+            value={block.glow_color || ""}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+                updateBlock(
+                  index,
+                  "glow_color",
+                  val.startsWith("#") ? val : `#${val}`
+                );
+              }
+            }}
+            placeholder="#10b981"
+            className="w-24 flex-none px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+          />
         </div>
       )}
 

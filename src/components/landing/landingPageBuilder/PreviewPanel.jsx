@@ -2,6 +2,7 @@ import React from "react";
 
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
+import MotionWrapper from "../motion/MotionWrapper";
 
 function renderPreviewBlock(block, index, context) {
   if (block.enabled === false) return null;
@@ -454,7 +455,7 @@ function renderPreviewBlock(block, index, context) {
               fontWeight: 700,
               fontSize: "1.3rem",
               marginBottom: "10px",
-              color: landing.font_color_h1 || "#fff",
+              color: textColor,
             }}
           >
             {label}
@@ -464,7 +465,7 @@ function renderPreviewBlock(block, index, context) {
 
           <div
             style={{
-              color: landing.font_color_p || "#ccc",
+              color: textColor,
               fontSize: "0.9rem",
               marginTop: "8px",
               letterSpacing: "1px",
@@ -980,15 +981,13 @@ function renderPreviewBlock(block, index, context) {
         ${block.gradient_end || "#ec4899"})`
         : block.bg_color || "#111827";
 
-      const offerPage = block.offer_page || {};
-
-      const cardPanelBackground = offerPage.use_no_bg
+      const cardPanelBackground = block.use_no_bg
         ? "transparent"
-        : offerPage.use_gradient
-          ? `linear-gradient(${offerPage.gradient_direction || "135deg"},
-        ${offerPage.gradient_start || "#a855f7"},
-        ${offerPage.gradient_end || "#ec4899"})`
-          : offerPage.bg_color || "#111827";
+        : block.use_gradient
+          ? `linear-gradient(${block.gradient_direction || "135deg"},
+        ${block.gradient_start || "#a855f7"},
+        ${block.gradient_end || "#ec4899"})`
+          : block.bg_color || "#111827";
 
       const fullPreviewText = (
         block.offer_page?.blocks?.map((b) => b.text)?.join(" ") || ""
@@ -1691,7 +1690,7 @@ export default function PreviewPanel({
           <h3 className="text-lg font-semibold text-silver tracking-wide">
             Landing Page Preview
           </h3>
-          <p className="mt-1 text-sm text-silver/80 leading-relaxed max-w-xl">
+          <p className="mt-1 text-sm text-silver/80 leading-relaxed max-w-xl italic">
             Your live page may appear slightly different due to device, screen
             size, or browser rendering.
           </p>
@@ -1811,7 +1810,7 @@ export default function PreviewPanel({
             />
           )}
 
-          {landing.content_blocks?.length ? (
+          {/* {landing.content_blocks?.length ? (
             landing.content_blocks
               .filter((b) => b.type !== "offer_banner" && b.enabled !== false)
               .map((block, index) =>
@@ -1826,6 +1825,33 @@ export default function PreviewPanel({
                   blendColors,
                 })
               )
+          ) : (
+            <p className="text-gray-400 italic">
+              Start adding sections to preview your landing page...
+            </p>
+          )} */}
+          {landing.content_blocks?.length ? (
+            landing.content_blocks
+              .filter((b) => b.type !== "offer_banner" && b.enabled !== false)
+              .map((block, index) => (
+                <MotionWrapper
+                  key={block.id || index}
+                  index={index}
+                  motionSettings={landing.motion_settings}
+                  blockMotion={block.motion}
+                >
+                  {renderPreviewBlock(block, index, {
+                    landing,
+                    selectedTheme,
+                    fontName,
+                    bgTheme,
+                    user,
+                    updateBlock,
+                    adjustForLandingOverlay,
+                    blendColors,
+                  })}
+                </MotionWrapper>
+              ))
           ) : (
             <p className="text-gray-400 italic">
               Start adding sections to preview your landing page...

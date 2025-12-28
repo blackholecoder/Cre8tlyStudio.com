@@ -1,7 +1,6 @@
 import React from "react";
 
 import { toast } from "react-toastify";
-import CountdownTimerPreview from "../../../sections/landing/Timer";
 import axiosInstance from "../../../api/axios";
 
 function renderPreviewBlock(block, index, context) {
@@ -564,8 +563,8 @@ function renderPreviewBlock(block, index, context) {
         );
       }
 
-      const referralUrl = landing?.referral_slug
-        ? `https://cre8tlystudio.com/r/${landing.referral_slug}`
+      const referralUrl = user?.referral_slug
+        ? `https://cre8tlystudio.com/r/${user.referral_slug}`
         : "https://cre8tlystudio.com/sign-up";
 
       return (
@@ -604,9 +603,21 @@ function renderPreviewBlock(block, index, context) {
               color: "#aaa",
               fontSize: "0.8rem",
               marginTop: "10px",
+              wordBreak: "break-all",
             }}
           >
             {`Referral link: ${referralUrl}`}
+          </p>
+
+          <p
+            style={{
+              color: "#aaa",
+              fontSize: "0.75rem",
+              marginTop: "6px",
+            }}
+          >
+            Referral link is shown here for preview only
+            <br /> and is not visible on the live page.
           </p>
         </div>
       );
@@ -969,7 +980,23 @@ function renderPreviewBlock(block, index, context) {
         ${block.gradient_end || "#ec4899"})`
         : block.bg_color || "#111827";
 
-      const fullPreviewText = (block.description || "").replace(/•/g, "");
+      const offerPage = block.offer_page || {};
+
+      const cardPanelBackground = offerPage.use_no_bg
+        ? "transparent"
+        : offerPage.use_gradient
+          ? `linear-gradient(${offerPage.gradient_direction || "135deg"},
+        ${offerPage.gradient_start || "#a855f7"},
+        ${offerPage.gradient_end || "#ec4899"})`
+          : offerPage.bg_color || "#111827";
+
+      const fullPreviewText = (
+        block.offer_page?.blocks?.map((b) => b.text)?.join(" ") || ""
+      ).replace(/•/g, "");
+
+      const hasDescription = fullPreviewText.trim().length > 0;
+      const isLongPreview =
+        hasDescription && fullPreviewText.trim().split(/\s+/).length > 20;
 
       return (
         <div
@@ -1042,13 +1069,14 @@ function renderPreviewBlock(block, index, context) {
                 flexDirection: "column",
                 justifyContent: "center",
                 boxSizing: "border-box",
+                background: cardPanelBackground,
               }}
             >
               <h1
                 className="normal-case"
                 style={{
                   fontSize: "1.2rem",
-                  fontWeight: 800,
+                  lineHeight: 1.5,
                   marginBottom: "10px",
                 }}
               >
@@ -1061,14 +1089,34 @@ function renderPreviewBlock(block, index, context) {
                   lineHeight: 1.5,
                   marginBottom: "14px",
                   maxWidth: "420px",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
                 }}
               >
-                {fullPreviewText}
+                <span
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {fullPreviewText}
+                </span>
+
+                {isLongPreview && (
+                  <span
+                    style={{
+                      display: "block",
+                      marginTop: "6px",
+                      fontWeight: 700,
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    See more
+                  </span>
+                )}
               </div>
 
               <div style={{ marginTop: "16px" }}>
@@ -1080,14 +1128,27 @@ function renderPreviewBlock(block, index, context) {
                     borderRadius: "10px",
                     fontWeight: 700,
                     border: "none",
-                    cursor: "pointer",
+                    fontSize: "1.05rem",
                     background: block.button_color || "#22c55e",
                     color: block.button_text_color || "#000000",
-                    fontSize: "1.05rem",
+                    cursor: hasDescription ? "pointer" : "not-allowed",
+                    opacity: hasDescription ? 1 : 0.6,
                   }}
                 >
                   {block.button_text || "Buy Now"}
                 </button>
+
+                {!hasDescription && (
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "0.85rem",
+                      opacity: 0.7,
+                    }}
+                  >
+                    Preview unavailable
+                  </div>
+                )}
 
                 {block.price ? (
                   <div
@@ -1228,7 +1289,6 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
     }
-
     case "audio_player":
       return (
         <div
@@ -1626,9 +1686,18 @@ export default function PreviewPanel({
         onClick={() => setShowPreviewSection(!showPreviewSection)}
         className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
       >
-        <h3 className="text-lg font-semibold text-silver tracking-wide">
-          Landing Page Preview
-        </h3>
+        {/* Left side: title + description */}
+        <div className="flex flex-col">
+          <h3 className="text-lg font-semibold text-silver tracking-wide">
+            Landing Page Preview
+          </h3>
+          <p className="mt-1 text-sm text-silver/80 leading-relaxed max-w-xl">
+            Your live page may appear slightly different due to device, screen
+            size, or browser rendering.
+          </p>
+        </div>
+
+        {/* Right side: chevron */}
         <span
           className={`text-gray-400 text-sm transform transition-transform duration-300 ${
             showPreviewSection ? "rotate-180" : "rotate-0"

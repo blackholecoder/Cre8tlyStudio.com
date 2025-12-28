@@ -80,15 +80,37 @@ export default function MiniOfferBlock({
   // -----------------------------
   //  BACKGROUND PREVIEW
   // -----------------------------
+
   const previewBackground = block.use_no_bg
     ? "transparent"
-    : block.use_gradient
-      ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
-          block.gradient_start || "#F285C3"
-        }, ${block.gradient_end || "#7bed9f"})`
-      : block.match_main_bg
-        ? bgTheme
+    : block.match_main_bg
+      ? bgTheme
+      : block.use_gradient
+        ? `linear-gradient(${block.gradient_direction || "90deg"}, ${
+            block.gradient_start || "#F285C3"
+          }, ${block.gradient_end || "#7bed9f"})`
         : block.bg_color || "#111827";
+
+  const offerPage = block.offer_page || {};
+
+  const cardPanelBackground = offerPage.use_no_bg
+    ? "transparent"
+    : offerPage.use_gradient
+      ? `linear-gradient(${offerPage.gradient_direction || "135deg"},
+        ${offerPage.gradient_start || "#a855f7"},
+        ${offerPage.gradient_end || "#ec4899"})`
+      : offerPage.bg_color || "#111827";
+
+  const fullPreviewText = (
+    block.offer_page?.blocks?.map((b) => b.text)?.join(" ") || ""
+  ).replace(/•/g, "");
+
+  const hasDescription = fullPreviewText.trim().length > 0;
+
+  const isLongPreview =
+    hasDescription && fullPreviewText.trim().split(/\s+/).length > 20;
+
+  const price = Number(block.price || 0);
 
   const textColor = block.text_color || "#ffffff";
 
@@ -96,7 +118,7 @@ export default function MiniOfferBlock({
     <div
       className="rounded-xl p-6 mt-6 border border-gray-700 transition-all duration-300"
       style={{
-        background: previewBackground,
+        background: "#0b1220",
         maxHeight: "80vh",
         overflowY: "auto",
       }}
@@ -240,7 +262,13 @@ export default function MiniOfferBlock({
               }}
             >
               {/* TOP IMAGE */}
-              <div className="relative bg-black aspect-square w-full overflow-hidden">
+              <div
+                className="relative bg-black w-full overflow-hidden rounded-xl"
+                style={{
+                  height: "320px", // 👈 desktop height
+                  maxHeight: "340px",
+                }}
+              >
                 {coverLoading ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70">
                     <div className="w-10 h-10 border-4 border-gray-500 border-t-green rounded-full animate-spin" />
@@ -250,11 +278,157 @@ export default function MiniOfferBlock({
                   </div>
                 ) : imageToShow ? (
                   <>
-                    <img
-                      src={imageToShow}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      alt=""
-                    />
+                    {/* Preview canvas */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: previewBackground }}
+                    >
+                      {hasDescription || block.title || price > 0 ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "90%",
+                            maxWidth: "480px", // 🔑 smaller, square-safe
+                            height: "200px",
+                            borderRadius: "16px",
+                            overflow: "hidden",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            boxShadow: "0 20px 45px rgba(0,0,0,0.45)",
+                            background: block.use_gradient
+                              ? `linear-gradient(${block.gradient_direction || "135deg"},
+              ${block.gradient_start || "#a855f7"},
+              ${block.gradient_end || "#ec4899"})`
+                              : block.bg_color || "#111827",
+                          }}
+                        >
+                          {/* LEFT IMAGE – only render if image exists */}
+                          {(block.use_pdf_cover && block.cover_url) ||
+                          block.image_url ? (
+                            <div
+                              style={{ flex: "0 0 30%", background: "#000" }}
+                            >
+                              <img
+                                src={
+                                  block.use_pdf_cover
+                                    ? block.cover_url
+                                    : block.image_url
+                                }
+                                alt=""
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                            </div>
+                          ) : null}
+
+                          {/* RIGHT CONTENT */}
+                          <div
+                            style={{
+                              flex: 1,
+                              padding: "16px",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              textAlign: "center",
+                              color: block.text_color || "#ffffff",
+                              background: cardPanelBackground,
+                            }}
+                          >
+                            <h3
+                              style={{
+                                fontSize: "0.95rem",
+                                fontWeight: 800,
+                                marginBottom: "6px",
+                              }}
+                            >
+                              {block.title || "Offer Title"}
+                            </h3>
+
+                            <div
+                              style={{
+                                fontSize: "0.8rem",
+                                lineHeight: 1.4,
+                                opacity: 0.9,
+                                maxWidth: "420px",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
+                                {fullPreviewText}
+                              </span>
+
+                              {isLongPreview && (
+                                <span
+                                  style={{
+                                    display: "block",
+                                    marginTop: "6px",
+                                    fontWeight: 700,
+                                    textDecoration: "underline",
+                                    cursor: "pointer",
+                                    fontSize: "0.75rem",
+                                    opacity: 0.95,
+                                  }}
+                                >
+                                  See more
+                                </span>
+                              )}
+                            </div>
+
+                            <button
+                              style={{
+                                marginTop: "auto",
+                                width: "100%",
+                                maxWidth: "180px",
+                                padding: "8px",
+                                borderRadius: "8px",
+                                fontWeight: 700,
+                                border: "none",
+                                background: block.button_color || "#22c55e",
+                                color: block.button_text_color || "#000000",
+                                fontSize: "0.8rem",
+                                opacity: hasDescription ? 1 : 0.6,
+                              }}
+                            >
+                              {block.button_text || "Buy Now"}
+                            </button>
+
+                            {price > 0 && (
+                              <div
+                                style={{
+                                  marginTop: "6px",
+                                  fontSize: "0.85rem",
+                                  opacity: 0.85,
+                                }}
+                              >
+                                ${price.toFixed(2)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            color: "rgba(255,255,255,0.5)",
+                            fontSize: "0.85rem",
+                            textAlign: "center",
+                            padding: "20px",
+                          }}
+                        >
+                          Fill in the fields to see your card preview
+                        </div>
+                      )}
+                    </div>
 
                     {!block.use_pdf_cover && (
                       <button
@@ -289,11 +463,7 @@ export default function MiniOfferBlock({
               <div
                 className="flex flex-col p-8 gap-4"
                 style={{
-                  background: block.use_gradient
-                    ? `linear-gradient(${block.gradient_direction || "135deg"},
-          ${block.gradient_start || "#a855f7"},
-          ${block.gradient_end || "#ec4899"})`
-                    : block.bg_color || "#111827",
+                  background: "#0f172a",
                   color: block.text_color || "#ffffff",
                 }}
               >
@@ -303,79 +473,8 @@ export default function MiniOfferBlock({
                 </label>
                 <select
                   value={block.pdf_url || ""}
-                  // onChange={async (e) => {
-                  //   const selectedUrl = e.target.value;
-
-                  //   console.log("🟡 PDF SELECTED", {
-                  //     selectedUrl,
-                  //     blockId: block.id,
-                  //     containerIndex,
-                  //     isContainerChild: containerIndex !== undefined,
-                  //     before: {
-                  //       pdf_url: block.pdf_url,
-                  //       product_source: block.product_source,
-                  //     },
-                  //   });
-
-                  //   updateField("pdf_url", selectedUrl);
-                  //   updateField("pdf_name", "");
-                  //   setCoverLoading(true);
-
-                  //   if (!selectedUrl) {
-                  //     updateField("cover_url", "");
-                  //     updateField("image_url", "");
-                  //     updateField("use_pdf_cover", false);
-                  //     setCoverLoading(false);
-                  //     return;
-                  //   }
-
-                  //   const selectedPdf = availablePdfs.find(
-                  //     (p) => p.pdf_url === selectedUrl
-                  //   );
-
-                  //   if (selectedPdf) {
-                  //     updateField("pdf_name", selectedPdf.title || "PDF");
-                  //     updateField("product_source", "internal");
-                  //     updateField("pdf_url", selectedPdf.pdf_url);
-
-                  //     updateField("use_pdf_cover", true);
-                  //   }
-
-                  //   setTimeout(() => {
-                  //     console.log("🟢 AFTER UPDATEFIELD", {
-                  //       blockId: block.id,
-                  //       containerIndex,
-                  //       after: {
-                  //         pdf_url: block.pdf_url,
-                  //         product_source: block.product_source,
-                  //         use_pdf_cover: block.use_pdf_cover,
-                  //       },
-                  //     });
-                  //   }, 0);
-
-                  //   try {
-                  //     const res = await axiosInstance.get(
-                  //       `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
-                  //     );
-
-                  //     if (res.data?.cover_image) {
-                  //       updateField("cover_url", res.data.cover_image);
-                  //     }
-                  //   } catch (err) {
-                  //     console.error("❌ Error loading PDF cover:", err);
-                  //   } finally {
-                  //     setCoverLoading(false);
-                  //   }
-                  // }}
                   onChange={async (e) => {
                     const selectedUrl = e.target.value;
-
-                    console.log("🟡 PDF SELECTED", {
-                      selectedUrl,
-                      blockId: block.id,
-                      containerIndex,
-                      isContainerChild: containerIndex !== undefined,
-                    });
 
                     // If cleared
                     if (!selectedUrl) {

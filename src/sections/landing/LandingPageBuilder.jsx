@@ -32,7 +32,7 @@ import ToggleDownloadButton from "../../components/landing/landingPageBuilder/To
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
-import { MOTION_PRESETS } from "../../constants/motionPresets";
+import AnimationSettingsPanel from "../../components/landing/landingPageBuilder/AnimationSettingsPanel";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -673,7 +673,10 @@ export default function LandingPageBuilder() {
 
     setLanding({
       ...snapshot,
-      motion_settings: snapshot.motion_settings ?? landing.motion_settings,
+      motion_settings: {
+        ...landing.motion_settings,
+        ...snapshot.motion_settings,
+      },
     });
 
     toast.success("Version loaded! (not yet applied)");
@@ -703,7 +706,10 @@ export default function LandingPageBuilder() {
       setLanding({
         ...lp,
         content_blocks: blocks,
-        motion_settings: lp.motion_settings || landing.motion_settings,
+        motion_settings: {
+          ...landing.motion_settings,
+          ...lp.motion_settings,
+        },
       });
     } catch (err) {
       console.error(err);
@@ -860,8 +866,6 @@ export default function LandingPageBuilder() {
 
         const lp = landingRes.data.landingPage;
 
-        console.log("🟡 RAW lp.motion_settings FROM API", lp.motion_settings);
-
         const magnets = pdfRes.data.magnets || [];
 
         // parse blocks
@@ -889,6 +893,7 @@ export default function LandingPageBuilder() {
           stagger: lp.motion_settings?.stagger ?? 0.12,
           easing: lp.motion_settings?.easing ?? "ease-out",
           viewport_once: lp.motion_settings?.viewport_once ?? true,
+          panel_open: lp.motion_settings?.panel_open ?? false,
         };
 
         setLanding({
@@ -1021,13 +1026,11 @@ export default function LandingPageBuilder() {
         toast.error(
           `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`
         );
-        return; // ❌ stop saving
+        return;
       }
       blocks = blocks.map((b) =>
         b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
       );
-
-      console.log("🟢 SAVING motion_settings", landing.motion_settings);
 
       await axiosInstance.put(
         `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
@@ -1185,75 +1188,10 @@ export default function LandingPageBuilder() {
             <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
               Content
             </h1>
+
             {/* ✅ Live Preview */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-sm text-silver font-medium">
-                Animate page sections
-              </span>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setLanding((prev) => ({
-                    ...prev,
-                    motion_settings: {
-                      ...(prev.motion_settings || {}),
-                      enabled: !prev.motion_settings?.enabled,
-                    },
-                  }))
-                }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  landing.motion_settings?.enabled ? "bg-green" : "bg-gray-600"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    landing.motion_settings?.enabled
-                      ? "translate-x-6"
-                      : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-            {landing.motion_settings?.enabled && (
-              <div className="mb-4 max-w-xs">
-                <label className="block text-xs font-semibold text-gray-400 mb-1">
-                  Animation preset
-                </label>
-
-                <select
-                  value={landing.motion_settings?.preset || "fade-up"}
-                  onChange={(e) =>
-                    setLanding((prev) => ({
-                      ...prev,
-                      motion_settings: {
-                        ...(prev.motion_settings || {}),
-                        preset: e.target.value,
-                      },
-                    }))
-                  }
-                  className="
-                w-full
-                rounded-md
-                bg-black/40
-                border
-                border-gray-600
-                text-white
-                text-sm
-                px-3
-                py-2
-                focus:outline-none
-                focus:border-green
-      "
-                >
-                  {MOTION_PRESETS.map((preset) => (
-                    <option key={preset.value} value={preset.value}>
-                      {preset.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <AnimationSettingsPanel landing={landing} setLanding={setLanding} />
 
             <div className="flex justify-end mb-6">
               <AddSectionButton addBlock={addBlock} canAddBlock={canAddBlock} />

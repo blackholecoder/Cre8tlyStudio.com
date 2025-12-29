@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { PRESET_VARIANTS } from "../../../constants/motionPresets";
 
 export default function MotionWrapper({
   children,
@@ -11,21 +12,31 @@ export default function MotionWrapper({
   const shouldAnimate =
     motionSettings?.enabled === true && blockMotion?.disabled !== true;
 
-  if (!shouldAnimate) return children;
+  if (!shouldAnimate) return <>{children}</>;
+
+  const preset = blockMotion?.preset || motionSettings?.preset || "fade-up";
+
+  const hidden = PRESET_VARIANTS[preset] || { opacity: 0 };
 
   const variants = {
-    hidden: {
-      opacity: 0,
-      y: motionSettings.preset === "fade-up" ? 30 : 0,
-    },
+    hidden,
     visible: {
       opacity: 1,
+      x: 0,
       y: 0,
+      scale: 1,
+      rotate: 0,
+      rotateX: 0,
+      rotateY: 0,
+      filter: "blur(0px)",
       transition: {
         duration: motionSettings.duration ?? 0.5,
         delay:
-          (motionSettings.delay ?? 0) + index * (motionSettings.stagger ?? 0.1),
+          (motionSettings.delay ?? 0) +
+          index * (motionSettings.stagger ?? 0.12),
         ease: motionSettings.easing ?? "easeOut",
+        type: preset === "bounce" ? "spring" : "tween",
+        bounce: preset === "bounce" ? 0.35 : 0,
       },
     },
   };

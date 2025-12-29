@@ -169,6 +169,9 @@ function SortableBlock({
     );
   }
 
+  const animationsEnabled =
+    landing?.motion_settings?.enabled === true && block.enabled !== false;
+
   if (block.type === "container") {
     return (
       <SortableContainerBlock
@@ -267,40 +270,48 @@ function SortableBlock({
           <div className="h-4 w-px bg-white/10" />
 
           {/* SECONDARY: Animate */}
-          <div
-            className="flex items-center gap-2 opacity-80 hover:opacity-100 transition"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="text-[11px] text-gray-400">Animate</span>
+          {animationsEnabled && (
+            <>
+              {/* DIVIDER */}
+              <div className="h-4 w-px bg-white/10" />
 
-            <button
-              type="button"
-              onClick={() =>
-                updateField(index, "motion", {
-                  ...block.motion,
-                  disabled: !block.motion?.disabled,
-                })
-              }
-              className={`
+              {/* SECONDARY: Animate */}
+              <div
+                className="flex items-center gap-2 opacity-80 hover:opacity-100 transition"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="text-[11px] text-gray-400">Animate</span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateField(index, "motion", {
+                      ...block.motion,
+                      disabled: !block.motion?.disabled,
+                    })
+                  }
+                  className={`
           relative inline-flex 
           h-4 w-7 
           items-center 
           rounded-full 
           transition-colors duration-200
-          ${block.motion?.disabled ? "bg-gray-700" : "bg-green/80"}
+          ${block.motion?.disabled ? "bg-zinc-700" : "bg-green/90"}
         `}
-            >
-              <span
-                className={`
+                >
+                  <span
+                    className={`
             h-3 w-3 
             rounded-full 
             bg-white 
             transition-transform duration-200
             ${block.motion?.disabled ? "translate-x-1" : "translate-x-3"}
           `}
-              />
-            </button>
-          </div>
+                  />
+                </button>
+              </div>
+            </>
+          )}
 
           {/* CHEVRON */}
           <span

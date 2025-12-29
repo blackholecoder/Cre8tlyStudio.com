@@ -33,9 +33,11 @@ import BottomActionsBar from "../../components/landing/landingPageBuilder/Bottom
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
 import AnimationSettingsPanel from "../../components/landing/landingPageBuilder/AnimationSettingsPanel";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [landing, setLanding] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fontName, setFontName] = useState("");
@@ -1135,6 +1137,7 @@ export default function LandingPageBuilder() {
               </label>
               <input
                 type="text"
+                maxLength={30}
                 value={landing.username || ""}
                 onChange={(e) =>
                   setLanding({ ...landing, username: e.target.value })
@@ -1148,8 +1151,11 @@ export default function LandingPageBuilder() {
                       toast[res.data.available ? "success" : "error"](
                         res.data.message
                       );
-                    } catch {
-                      toast.error("Error checking username");
+                    } catch (err) {
+                      const msg =
+                        err?.response?.data?.message ||
+                        "Error checking username";
+                      toast.error(msg);
                     }
                   }
                 }}
@@ -1186,16 +1192,50 @@ export default function LandingPageBuilder() {
             />
 
             <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
-              Content
+              Page Builder
             </h1>
-
-            {/* ✅ Live Preview */}
-
-            <AnimationSettingsPanel landing={landing} setLanding={setLanding} />
 
             <div className="flex justify-end mb-6">
               <AddSectionButton addBlock={addBlock} canAddBlock={canAddBlock} />
             </div>
+
+            {isPro ? (
+              <AnimationSettingsPanel
+                landing={landing}
+                setLanding={setLanding}
+              />
+            ) : (
+              <div className="relative mb-4 rounded-lg border border-gray-700 bg-black/30 min-h-[160px]">
+                {/* Blurred preview */}
+                <div className="pointer-events-none blur-sm opacity-60">
+                  <AnimationSettingsPanel
+                    landing={landing}
+                    setLanding={setLanding}
+                  />
+                </div>
+
+                {/* Lock overlay */}
+                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/70 py-8">
+                  <div className="max-w-sm text-center px-6">
+                    <div className="text-lg font-semibold text-white mb-2">
+                      Animation Settings
+                    </div>
+                    <p className="text-sm text-gray-300 mb-4">
+                      Animate blocks on scroll, control motion presets, delays,
+                      stagger effects, and easing.
+                    </p>
+
+                    <button
+                      onClick={() => navigate("/plans")}
+                      className="px-5 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 font-semibold text-sm"
+                    >
+                      Unlock with Pro
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* 🔽 Collapse / Expand All Blocks */}
             <div
               className="cursor-pointer bg-black/80 text-white px-4 py-3 rounded-lg border border-gray-600 mb-4 flex justify-between items-center"

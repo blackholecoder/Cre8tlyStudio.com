@@ -35,17 +35,19 @@ The Author’s Assistant is your creative co-writer, an AI partner that helps yo
       title: "Pro Business Builder Pack",
       content: `
 The Pro Business Builder Pack is the ultimate growth suite for creators, entrepreneurs, and marketers.
-It gives you unlimited access to build landing pages, capture leads automatically, and send high-converting emails using Cre8tly Studio’s advanced automation tools.
+It gives you unlimited access to build high-converting landing pages, capture leads automatically, and sell digital products with ease using Cre8tly Studio’s advanced tools.
 
 Features include:
-• Unlimited landing pages and lead forms  
-• No platform fees: keep what you make
+• Landing pages and lead forms  
+• Mini Offers for quick digital sales and upsells  
+• Animated sections and scroll effects for premium page engagement  
+• No platform fees, keep what you make  
 • Custom domains and analytics tracking  
 • AI-powered email content generator  
-• Premium conversion templates  
-• Priority support and one-year updates
+• Premium conversion-optimized templates  
+• Priority support and one-year updates  
 
-This plan helps you automate your lead generation and sales process from start to finish—everything you need to scale your digital business.`,
+This plan is designed to help you automate lead generation, increase conversions, and scale your digital business from start to finish.`,
     },
   };
 

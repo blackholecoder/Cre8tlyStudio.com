@@ -8,13 +8,13 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
     delay: landing.motion_settings?.delay ?? 0,
     stagger: landing.motion_settings?.stagger ?? 0.12,
     easing: landing.motion_settings?.easing ?? "ease-out",
-    panel_open: landing.motion_settings?.panel_open,
+    panel_open: landing.motion_settings?.panel_open ?? false,
   };
 
   return (
-    <div className="border border-gray-700 rounded-lg p-4 bg-black/30 mb-4">
+    <div className="border border-gray-700 rounded-lg px-4 py-1 bg-black/30 mb-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="relative flex items-center mb-4 mt-4">
         <div className="flex items-center gap-3">
           <span className="text-sm text-silver font-medium">
             Animate page sections
@@ -37,13 +37,13 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
                 },
               }))
             }
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              motion.enabled ? "bg-green" : "bg-gray-600"
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${
+              motion.enabled ? "bg-green" : "bg-zinc-700"
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                motion.enabled ? "translate-x-6" : "translate-x-1"
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                motion.enabled ? "translate-x-4" : "translate-x-1"
               }`}
             />
           </button>
@@ -67,21 +67,15 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
                 },
               }))
             }
-            className="p-1 rounded hover:bg-white/5 transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white transition"
           >
-            <svg
-              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+            <span
+              className={`inline-block transition-transform duration-200 ${
                 motion.panel_open ? "rotate-180" : "rotate-0"
               }`}
-              viewBox="0 0 20 20"
-              fill="currentColor"
             >
-              <path
-                fillRule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                clipRule="evenodd"
-              />
-            </svg>
+              ▼
+            </span>
           </button>
         )}
       </div>
@@ -91,7 +85,7 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
         <div className="space-y-4 max-w-md">
           {/* Preset */}
           <div>
-            <label className="block text-xs font-semibold text-gray-400 mb-1">
+            <label className="block text-xs font-semibold text-gray-400 mb-4">
               Animation preset
             </label>
             <select

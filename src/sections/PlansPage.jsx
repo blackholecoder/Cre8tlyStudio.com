@@ -162,12 +162,14 @@ export default function PlansPage() {
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
+            <li>❌ Animated Sections & Scroll Effects</li>
             <li>❌ Gradient Themes</li>
             <li>❌ Custom Branding</li>
             <li>❌ Audio Player</li>
             <li>❌ Calendly Integration</li>
             <li>❌ Verified Reviews</li>
             <li>❌ Advanced Analytics</li>
+            <li>❌ Mini Offers</li>
           </ul>
 
           <button
@@ -206,6 +208,7 @@ export default function PlansPage() {
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
             <li>✅ No platform fees: keep what you make</li>
+            <li>✅ Animated Sections & Scroll Effects</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
@@ -215,6 +218,7 @@ export default function PlansPage() {
             <li>✅ Audio Player</li>
             <li>✅ Calendly Integration</li>
             <li>✅ Verified Reviews</li>
+            <li>✅ Mini Offers</li>
           </ul>
 
           <button
@@ -253,6 +257,7 @@ export default function PlansPage() {
             <li>✅ 15 Lead Magnet Slots /month</li>
             <li>✅ Sell on Your Landing Page</li>
             <li>✅ No platform fees: keep what you make</li>
+            <li>✅ Animated Sections & Scroll Effects</li>
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
@@ -262,6 +267,7 @@ export default function PlansPage() {
             <li>✅ Calendly Integration</li>
             <li>✅ Verified Reviews</li>
             <li>✅ Advanced Analytics</li>
+            <li>✅ Mini Offers</li>
           </ul>
 
           <button

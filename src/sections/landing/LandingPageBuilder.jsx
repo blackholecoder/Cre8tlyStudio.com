@@ -33,7 +33,7 @@ import BottomActionsBar from "../../components/landing/landingPageBuilder/Bottom
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
 import AnimationSettingsPanel from "../../components/landing/landingPageBuilder/AnimationSettingsPanel";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -1084,6 +1084,17 @@ export default function LandingPageBuilder() {
     const trimmed = templateName.trim();
     if (!trimmed) {
       toast.error("Please enter a name");
+      return;
+    }
+
+    const MAX_VERSIONS = isPro ? 30 : 10;
+
+    if (!selectedVersion && versions.length >= MAX_VERSIONS) {
+      toast.error(
+        isPro
+          ? "You’ve reached the maximum of 30 saved versions."
+          : "Free accounts can save up to 10 versions. Upgrade to Pro to save more."
+      );
       return;
     }
 

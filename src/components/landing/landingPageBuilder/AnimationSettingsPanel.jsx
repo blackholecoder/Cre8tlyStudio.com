@@ -1,4 +1,5 @@
 import { MOTION_PRESETS } from "../../../constants/motionPresets";
+import { MotionPreview } from "./MotionPreview";
 
 export default function AnimationSettingsPanel({ landing, setLanding }) {
   const motion = {
@@ -38,7 +39,7 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
               }))
             }
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${
-              motion.enabled ? "bg-green" : "bg-zinc-700"
+              motion.enabled ? "bg-royalPurple" : "bg-zinc-700"
             }`}
           >
             <span
@@ -82,7 +83,10 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
 
       {/* Entire panel */}
       {motion.enabled && motion.panel_open && (
-        <div className="space-y-4 max-w-md">
+        <div
+          className="space-y-4 max-w-md pb-6 pt-6
+"
+        >
           {/* Preset */}
           <div>
             <label className="block text-xs font-semibold text-gray-400 mb-4">
@@ -180,6 +184,13 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
                 Material smooth
               </option>
             </select>
+            <MotionPreview
+              preset={motion.preset}
+              duration={motion.duration}
+              easing={motion.easing}
+              stagger={motion.stagger}
+              delay={motion.delay}
+            />
           </div>
         </div>
       )}
@@ -187,11 +198,13 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
   );
 }
 
-/* Small helper */
 function Range({ label, value, min, max, step, onChange }) {
+  const percent = ((value - min) / (max - min)) * 100;
+
   return (
     <div>
       <label className="block text-xs text-gray-400 mb-1">{label}</label>
+
       <input
         type="range"
         min={min}
@@ -199,9 +212,17 @@ function Range({ label, value, min, max, step, onChange }) {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full"
+        className="custom-range"
+        style={{
+          background: `linear-gradient(
+            to right,
+            #670fe7 ${percent}%,
+            #374151 ${percent}%
+          )`,
+        }}
       />
-      <div className="text-xs text-gray-500">{value}s</div>
+
+      <div className="text-xs text-gray-500 mt-1">{value}s</div>
     </div>
   );
 }

@@ -247,13 +247,13 @@ function SortableBlock({
               updateField(index, "enabled", block.enabled === false);
             }}
             className={`
-        relative inline-flex 
-        h-5 w-9 
-        items-center 
-        rounded-full 
-        transition-colors duration-200
-        ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
-      `}
+            relative inline-flex 
+            h-5 w-9 
+            items-center 
+            rounded-full 
+            transition-colors duration-200
+            ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
+          `}
           >
             <span
               className={`
@@ -296,7 +296,7 @@ function SortableBlock({
           items-center 
           rounded-full 
           transition-colors duration-200
-          ${block.motion?.disabled ? "bg-zinc-700" : "bg-green/90"}
+          ${block.motion?.disabled ? "bg-zinc-700" : "bg-royalPurple"}
         `}
                 >
                   <span

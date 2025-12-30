@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -21,10 +21,13 @@ export function SortableContainerBlock({
   listeners,
   style,
 }) {
-  const DROPPABLE_ID = `container-${block.id}`;
+  // const DROPPABLE_ID = `container-${block.id}`;
+  const DROPPABLE_ID = `container-body-${block.id}`;
+  const [isOverChild, setIsOverChild] = useState(false);
 
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: DROPPABLE_ID,
+    disabled: isOverChild,
   });
 
   const updateChildBlock = (childIndex, key, value) => {
@@ -98,8 +101,8 @@ export function SortableContainerBlock({
       {!block.collapsed && (
         <div
           ref={setDroppableRef}
-          className={`rounded-md p-2 transition-colors
-            ${isOver ? "bg-green/10" : ""}
+          className={`rounded-md p-1 transition-colors
+            ${isOver && !isOverChild ? "bg-green/10 border-green/50" : ""}
           `}
         >
           <SortableContext
@@ -113,6 +116,8 @@ export function SortableContainerBlock({
                 block={child}
                 index={childIndex}
                 updateChildBlock={updateChildBlock}
+                onHoverStart={() => setIsOverChild(true)}
+                onHoverEnd={() => setIsOverChild(false)}
                 containerIndex={index}
                 updateBlock={updateChildField}
                 removeBlock={(i) => {

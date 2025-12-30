@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../admin/AuthContext";
 import { colorThemes, gradientThemes } from "../../constants";
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { DndContext, closestCenter, pointerWithin } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -180,42 +180,38 @@ export default function LandingPageBuilder() {
       const overId = over.id;
       const overLoc = findLocationById(blocks, overId);
 
-      // 🔒 Determine target BEFORE removing
       let targetParentId = null;
       let targetIndex = null;
 
       // ─────────────────────────────
-      // CASE 1: Dropped on container body
+      // CASE 0: DROPPED ON CONTAINER BODY
       // ─────────────────────────────
-      if (
-        typeof overId === "string" &&
-        overId.startsWith("container-") &&
-        !overLoc
-      ) {
-        const containerId = overId.replace("container-", "");
+      if (typeof overId === "string" && overId.startsWith("container-body-")) {
+        const containerId = overId.replace("container-body-", "");
         const container = blocks.find((b) => b.id === containerId);
         if (!container) return prev;
 
-        targetParentId = container.id;
+        // prevent container-in-container
+        if (activeLoc.block.type === "container") return prev;
+
+        targetParentId = containerId;
         targetIndex = container.children?.length || 0;
       }
 
       // ─────────────────────────────
-      // CASE 2: Dropped on a block
+      // CASE 1: DROPPED ON A BLOCK
       // ─────────────────────────────
       else if (overLoc) {
         targetParentId = overLoc.parentId;
         targetIndex = overLoc.index;
 
-        if (activeLoc.block.type === "container" && overLoc.parentId) {
+        // prevent container nesting
+        if (activeLoc.block.type === "container" && overLoc.parentId !== null) {
           targetParentId = null;
           targetIndex = blocks.length;
-        } else {
-          targetParentId = overLoc.parentId;
-          targetIndex = overLoc.index;
         }
 
-        // ✅ append-to-end fix
+        // append-to-end when hovering last child
         if (overLoc.parentId) {
           const parent = blocks.find((b) => b.id === overLoc.parentId);
           if (parent && overLoc.index === (parent.children?.length || 0) - 1) {
@@ -223,20 +219,32 @@ export default function LandingPageBuilder() {
           }
         }
 
-        // ✅ downward adjustment (only when needed)
+        // 🔑 DOWNWARD ADJUSTMENT ONLY FOR ROOT
         if (
-          activeLoc.parentId === overLoc.parentId &&
+          activeLoc.parentId === null &&
+          overLoc.parentId === null &&
           activeLoc.index < overLoc.index
         ) {
           targetIndex -= 1;
         }
       }
 
-      // ❌ SAFETY: no valid target → do nothing
+      // no valid target
       if (targetIndex === null) return prev;
 
-      // 🧩 NOW it is safe to remove
+      // 🧩 remove AFTER target is resolved
       const { removed, next } = removeAtLocation(blocks, activeLoc);
+
+      // clamp index (safety)
+      if (targetParentId !== null) {
+        const parent = next.find((b) => b.id === targetParentId);
+        if (parent) {
+          targetIndex = Math.max(
+            0,
+            Math.min(targetIndex, parent.children.length)
+          );
+        }
+      }
 
       return {
         ...prev,
@@ -1258,7 +1266,7 @@ export default function LandingPageBuilder() {
             {!blocksHidden && (
               <div className="space-y-4 mb-12 w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
                 <DndContext
-                  collisionDetection={closestCenter}
+                  collisionDetection={pointerWithin}
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext

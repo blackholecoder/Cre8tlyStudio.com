@@ -66,6 +66,27 @@ const Privacy = () => {
           <br />
         </p>
         <br />
+        <h1 className="document-title-text">
+          Custom Domains and Technical Data
+        </h1>
+        <br />
+        <p className="document-p-text">
+          If you choose to connect a custom domain to your Cre8tly Studio
+          account, we may process limited technical information related to that
+          domain, such as the domain name, DNS configuration status, and
+          connection metadata, for the sole purpose of verifying domain
+          ownership, enabling secure connections, and providing the Services. We
+          do not access, store, or control your domain registrar account.
+        </p>
+        <br />
+        <p className="document-p-text">
+          Domain-related data is used strictly for operational and security
+          purposes, including preventing unauthorized domain use, abuse, or
+          misconfiguration, and is not shared with third parties except where
+          required to provide secure infrastructure services or comply with
+          legal obligations.
+        </p>
+        <br />
 
         <h1 className="document-title-text">Payment Processing</h1>
         <br />

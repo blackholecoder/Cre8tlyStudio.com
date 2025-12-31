@@ -636,33 +636,79 @@ function renderPreviewBlock(block, index, context) {
             marginTop: "40px",
           }}
         >
+          {/* Stars */}
+          <div
+            style={{
+              marginBottom: "12px",
+              fontSize: "1.6rem",
+              color: "#facc15",
+            }}
+          >
+            ⭐⭐⭐⭐⭐
+          </div>
+
+          {/* Title */}
           <h2
             style={{
               fontSize: "1.8rem",
               fontWeight: 700,
-              marginBottom: "10px",
+              marginBottom: "30px",
             }}
           >
-            {block.title || "Verified Buyer Reviews"}
+            {block.title || "Verified Reviews"}
           </h2>
-          <p style={{ color: "#AAA", fontSize: "0.95rem" }}>
-            (Buyers who purchased will be able to leave reviews here)
-          </p>
+
+          {/* Review Card */}
           <div
             style={{
-              marginTop: "20px",
-              background: "rgba(255,255,255,0.08)",
-              padding: "20px",
-              borderRadius: "10px",
-              color: "#CCC",
-              fontStyle: "italic",
+              background: "rgba(0,0,0,0.35)",
+              borderRadius: "16px",
+              padding: "26px",
+              maxWidth: "720px",
+              margin: "0 auto",
+              textAlign: "left",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
             }}
           >
-            ★★★★★ “Love this product!”
-            <br />
-            <span style={{ fontSize: "0.8rem", color: "#999" }}>
-              — Verified Buyer, sample preview
-            </span>
+            {/* Name + Rating Row */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "14px",
+              }}
+            >
+              <span
+                style={{
+                  color: "#7bed9f",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                }}
+              >
+                Brian Sheps
+              </span>
+
+              <span style={{ color: "#facc15", fontSize: "1.1rem" }}>
+                ⭐⭐⭐⭐⭐
+              </span>
+            </div>
+
+            {/* Review Text */}
+            <p style={{ fontSize: "1rem", lineHeight: 1.6 }}>
+              Amazing guide. I will be purchasing again real soon!
+            </p>
+
+            {/* Meta */}
+            <p
+              style={{
+                marginTop: "14px",
+                fontSize: "0.85rem",
+                opacity: 0.75,
+              }}
+            >
+              Verified Buyer · Sample Preview
+            </p>
           </div>
         </div>
       );
@@ -1119,6 +1165,18 @@ function renderPreviewBlock(block, index, context) {
               </div>
 
               <div style={{ marginTop: "16px" }}>
+                {block.price ? (
+                  <div
+                    style={{
+                      marginBottom: "10px",
+                      fontSize: "1.05rem",
+                      fontWeight: 300,
+                    }}
+                  >
+                    ${Number(block.price).toFixed(2)}
+                  </div>
+                ) : null}
+
                 <button
                   style={{
                     width: "100%",
@@ -1148,18 +1206,6 @@ function renderPreviewBlock(block, index, context) {
                     Preview unavailable
                   </div>
                 )}
-
-                {block.price ? (
-                  <div
-                    style={{
-                      marginTop: "10px",
-                      fontSize: "1.05rem",
-                      fontWeight: 300,
-                    }}
-                  >
-                    ${Number(block.price).toFixed(2)}
-                  </div>
-                ) : null}
               </div>
             </div>
           </div>
@@ -1809,27 +1855,6 @@ export default function PreviewPanel({
               }}
             />
           )}
-
-          {/* {landing.content_blocks?.length ? (
-            landing.content_blocks
-              .filter((b) => b.type !== "offer_banner" && b.enabled !== false)
-              .map((block, index) =>
-                renderPreviewBlock(block, index, {
-                  landing,
-                  selectedTheme,
-                  fontName,
-                  bgTheme,
-                  user,
-                  updateBlock,
-                  adjustForLandingOverlay,
-                  blendColors,
-                })
-              )
-          ) : (
-            <p className="text-gray-400 italic">
-              Start adding sections to preview your landing page...
-            </p>
-          )} */}
           {landing.content_blocks?.length ? (
             landing.content_blocks
               .filter((b) => b.type !== "offer_banner" && b.enabled !== false)

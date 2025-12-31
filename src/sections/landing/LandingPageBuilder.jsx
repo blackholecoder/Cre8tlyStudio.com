@@ -34,6 +34,7 @@ import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
 import AnimationSettingsPanel from "../../components/landing/landingPageBuilder/AnimationSettingsPanel";
 import { useNavigate } from "react-router-dom";
+import PageUrlUsernameField from "../../components/landing/landingPageBuilder/PageUrlUsernameField";
 
 export default function LandingPageBuilder() {
   const { user } = useAuth();
@@ -1150,55 +1151,7 @@ export default function LandingPageBuilder() {
         <form onSubmit={handleSave} className="space-y-4">
           {/* Headline */}
           <div>
-            <div className="max-w-[40%] pb-10">
-              <label className="block font-semibold mb-1 text-silver ">
-                Page Url Username
-              </label>
-              <input
-                type="text"
-                maxLength={30}
-                value={landing.username || ""}
-                onChange={(e) =>
-                  setLanding({ ...landing, username: e.target.value })
-                }
-                onBlur={async () => {
-                  if (landing.username?.trim()?.length >= 3) {
-                    try {
-                      const res = await axiosInstance.get(
-                        `/landing/check-username/${landing.username.trim()}`
-                      );
-                      toast[res.data.available ? "success" : "error"](
-                        res.data.message
-                      );
-                    } catch (err) {
-                      const msg =
-                        err?.response?.data?.message ||
-                        "Error checking username";
-                      toast.error(msg);
-                    }
-                  }
-                }}
-                placeholder="e.g. cre8tlydesigns"
-                className="
-                w-[40%] 
-                border 
-                rounded-lg 
-                px-4 
-                py-2
-                !bg-bioModal 
-                !border-white/10 
-                !text-white 
-                placeholder-white/30"
-              />
-              <p className="text-xs text-gray-200 mt-1 mb-10">
-                This will be used for your page URL:{" "}
-                <span className="text-green">
-                  {landing.username
-                    ? `https://${landing.username}.cre8tlystudio.com`
-                    : "https://yourname.cre8tlystudio.com"}
-                </span>
-              </p>
-            </div>
+            <PageUrlUsernameField landing={landing} setLanding={setLanding} />
 
             <VersionControls
               versions={versions}

@@ -41,6 +41,36 @@ const Terms = () => {
           (including the maximum 25-page PDF limit per slot).
         </p>
         <br />
+        <h1 className="document-title-text">Custom Domains</h1>
+        <br />
+        <p className="document-p-text">
+          Cre8tly Studio may allow eligible users to connect and use a custom
+          domain name with their landing pages and digital products. By adding a
+          custom domain, you represent and warrant that you are the legal owner
+          of the domain or have full authorization to use and control it. You
+          grant Cre8tly Studio permission to route traffic, provision security
+          certificates, and host content associated with the domain for the
+          purpose of providing the Services.
+        </p>
+        <br />
+        <p className="document-p-text">
+          Custom domains are not activated until ownership has been verified
+          through DNS configuration or other technical validation methods
+          determined by Cre8tly Studio. We do not serve content on unverified
+          domains. You are solely responsible for maintaining control of your
+          domain and ensuring that it does not infringe upon trademarks,
+          intellectual property rights, or applicable laws.
+        </p>
+        <br />
+        <p className="document-p-text">
+          Cre8tly Studio reserves the right, in its sole discretion, to suspend,
+          disable, or remove any custom domain that is used for unlawful
+          activity, trademark infringement, impersonation, abuse, or violation
+          of these Terms, without prior notice. Loss of access to a custom
+          domain does not entitle you to a refund of subscription fees or
+          credits.
+        </p>
+        <br />
 
         <h1 className="document-title-text">Purchases and Payments</h1>
         <br />
@@ -108,8 +138,9 @@ const Terms = () => {
           You may not use our Services for any unlawful purpose, to attempt
           unauthorized access to our systems, to exceed usage caps, to infringe
           on intellectual property rights, or to interfere with the operation of
-          the Services. We reserve the right to suspend or terminate accounts
-          engaged in abuse, fraud, or misuse.
+          the Services, including connecting or attempting to use a custom
+          domain without proper ownership or authorization. We reserve the right
+          to suspend or terminate accounts engaged in abuse, fraud, or misuse.
         </p>
         <br />
 

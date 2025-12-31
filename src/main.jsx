@@ -65,465 +65,489 @@ import AnalyticsFeaturePage from "./sections/AnalyticsFeaturePage.jsx";
 import CommunityFeaturePage from "./sections/CommunityFeaturePage.jsx";
 import StripePayments from "./sections/StripePayments.jsx";
 import AuthorsAssistant from "./sections/AuthorsAssistantPage.jsx";
+import SettingsDomains from "./settings/SettingsDomains.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="sync">
-      <Routes location={location} key={location.pathname}>
-        {/* Public site */}
-        <Route element={<SiteLayout />}>
+    <div className="min-h-screen bg-[#030712]">
+      <AnimatePresence mode="sync">
+        <Routes location={location} key={location.pathname}>
+          {/* Public site */}
+          <Route element={<SiteLayout />}>
+            <Route
+              index
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <Landing />
+                </motion.div>
+              }
+            />
+
+            <Route path="contact" element={<Contact />} />
+            <Route path="shop" element={<EbooksStore />} />
+
+            <Route path="terms" element={<Terms />} />
+            <Route path="privacy-policy" element={<Privacy />} />
+            <Route path="refund-policy" element={<Refund />} />
+            <Route path="cookie-policy" element={<Cookie />} />
+            <Route path="careers" element={<Careers />} />
+
+            <Route path="smart-prompt" element={<SmartPromptPage />} />
+            <Route path="landing" element={<LandingInfoPage />} />
+            <Route path="plans" element={<PlansPage />} />
+
+            <Route path="resources" element={<Resources />}>
+              <Route path="videos" element={<ResourcesVideos />} />
+            </Route>
+            <Route path="analytics" element={<AnalyticsFeaturePage />} />
+            <Route
+              path="community-feature"
+              element={<CommunityFeaturePage />}
+            />
+            <Route path="stripe-payments" element={<StripePayments />} />
+            <Route path="authors-assistant" element={<AuthorsAssistant />} />
+
+            {/* Auth */}
+            <Route path="sign-up" element={<SignupPage />} />
+            <Route path="login" element={<Login />} />
+
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+          </Route>
+
+          {/* Redirect old /home to / */}
+
+          <Route path="/canvas-editor" element={<CanvasEditor />} />
           <Route
-            index
+            path="/settings"
             element={
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <Landing />
-              </motion.div>
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <SettingsPage />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/settings/domains"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <SettingsDomains />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route path="books" element={<BooksDashboard />} />
+          <Route path="thank-you" element={<ThankYou />} />
+          <Route path="prompt" element={<PromptPage />} />
+          <Route
+            path="/community"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <CommunityHome />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/community-alerts"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <Notifications />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
             }
           />
 
-          <Route path="contact" element={<Contact />} />
-          <Route path="shop" element={<EbooksStore />} />
+          <Route
+            path="/community/topic/:topicId"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <CommunityTopic />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/community/post/:postId"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <CommunityPost />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
 
-          <Route path="terms" element={<Terms />} />
-          <Route path="privacy-policy" element={<Privacy />} />
-          <Route path="refund-policy" element={<Refund />} />
-          <Route path="cookie-policy" element={<Cookie />} />
-          <Route path="careers" element={<Careers />} />
+          <Route
+            path="/seller-dashboard"
+            element={
+              <PrivateRoute role={["marketer", "admin", "customer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen"
+                >
+                  <DashboardLayout>
+                    <SellerDashboard />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/prompts"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <DashboardLayout>
+                    <PromptMemoryDashboard />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <DashboardLayout>
+                    <Inbox />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
 
-          <Route path="smart-prompt" element={<SmartPromptPage />} />
-          <Route path="landing" element={<LandingInfoPage />} />
-          <Route path="plans" element={<PlansPage />} />
+          {/* Private */}
 
-          <Route path="resources" element={<Resources />}>
-            <Route path="videos" element={<ResourcesVideos />} />
-          </Route>
-          <Route path="analytics" element={<AnalyticsFeaturePage />} />
-          <Route path="community-feature" element={<CommunityFeaturePage />} />
-          <Route path="stripe-payments" element={<StripePayments />} />
-          <Route path="authors-assistant" element={<AuthorsAssistant />} />
+          <Route
+            path="/landing-page-builder"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <LandingPageBuilder />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/landing-analytics"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <LandingAnalytics />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
 
-          {/* Auth */}
-          <Route path="sign-up" element={<SignupPage />} />
-          <Route path="login" element={<Login />} />
+          <Route
+            path="/leads"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <Leads />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <CustomerDashboard />
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <DocsIndexPage />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/lead-magnets"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <LeadMagnet />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/pro-documents"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <ProDocuments />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/smartprompt"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <SmartPromptDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/canvas-editor"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <CanvasEditorDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/settings"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <SettingsDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/landing-page-builder"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <LandingBuilderDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/seller-dashboard"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <SellerDashboardDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/docs/analytics-docs"
+            element={
+              <PrivateRoute role={["customer", "admin", "marketer"]}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <DashboardLayout>
+                    <LandingAnalyticsDocs />
+                  </DashboardLayout>
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute role="admin">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="min-h-screen bg-[#030712]"
+                >
+                  <AdminDashboard />
+                </motion.div>
+              </PrivateRoute>
+            }
+          />
 
-          <Route path="forgot-password" element={<ForgotPassword />} />
-          <Route path="reset-password" element={<ResetPassword />} />
-        </Route>
-
-        {/* Redirect old /home to / */}
-
-        <Route path="/canvas-editor" element={<CanvasEditor />} />
-        <Route
-          path="/settings"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <SettingsPage />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route path="books" element={<BooksDashboard />} />
-        <Route path="thank-you" element={<ThankYou />} />
-        <Route path="prompt" element={<PromptPage />} />
-        <Route
-          path="/community"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CommunityHome />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community-alerts"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <Notifications />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/community/topic/:topicId"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CommunityTopic />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community/post/:postId"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CommunityPost />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/seller-dashboard"
-          element={
-            <PrivateRoute role={["marketer", "admin", "customer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen"
-              >
-                <DashboardLayout>
-                  <SellerDashboard />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/prompts"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <DashboardLayout>
-                  <PromptMemoryDashboard />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <DashboardLayout>
-                  <Inbox />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        {/* Private */}
-
-        <Route
-          path="/landing-page-builder"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LandingPageBuilder />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/landing-analytics"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LandingAnalytics />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/leads"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <Leads />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <CustomerDashboard />
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <DocsIndexPage />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/lead-magnets"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LeadMagnet />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/pro-documents"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <ProDocuments />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/smartprompt"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <SmartPromptDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/canvas-editor"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CanvasEditorDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/settings"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <SettingsDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/landing-page-builder"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LandingBuilderDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/seller-dashboard"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <SellerDashboardDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/analytics-docs"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LandingAnalyticsDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute role="admin">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <AdminDashboard />
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        {/* Catch-all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AnimatePresence>
+          {/* Catch-all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AnimatePresence>
+    </div>
   );
 };
 

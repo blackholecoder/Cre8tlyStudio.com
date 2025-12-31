@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { Img } from "react-image";
 
 export default function DashboardSettings() {
   const { user, setUser, refreshUser } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [settings, setSettings] = useState(null);
   const [file, setFile] = useState(null);
@@ -435,6 +436,9 @@ export default function DashboardSettings() {
   };
 
   const plans = getUserPlan();
+
+  const canUseCustomDomains =
+    user?.pro_status === "active" && user?.plan === "business_builder_pack";
 
   const isFreeTier = user?.has_free_magnet === 1 && !user?.plan;
 
@@ -884,6 +888,46 @@ export default function DashboardSettings() {
                   Connect with Stripe
                 </button>
               )}
+            </>
+          )}
+        </div>
+
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 relative overflow-hidden">
+          <h2 className="text-lg font-semibold text-gray-200">
+            Custom Domains
+          </h2>
+
+          <p className="text-sm text-gray-400 mb-4">
+            Connect your own domain to host landing pages on your brand.
+          </p>
+
+          {canUseCustomDomains ? (
+            <button
+              onClick={() => navigate("/settings/domains")}
+              className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+            >
+              Manage Custom Domains →
+            </button>
+          ) : (
+            <>
+              {/* Locked overlay */}
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-center px-6">
+                <div className="mb-3 text-3xl">🔒</div>
+                <p className="text-sm text-gray-300 mb-4 max-w-[360px]">
+                  Custom Domains are available on the{" "}
+                  <span className="text-green font-semibold">
+                    Business Builder
+                  </span>{" "}
+                  plan only.
+                </p>
+
+                <button
+                  onClick={() => navigate("/plans")}
+                  className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+                >
+                  Upgrade to Unlock
+                </button>
+              </div>
             </>
           )}
         </div>

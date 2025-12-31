@@ -162,6 +162,7 @@ export default function PlansPage() {
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
+            <li>❌ Custom Domain</li>
             <li>❌ Animated Sections & Scroll Effects</li>
             <li>❌ Gradient Themes</li>
             <li>❌ Custom Branding</li>
@@ -212,6 +213,7 @@ export default function PlansPage() {
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
+            <li>✅ Custom Domain + Email Capture</li>
             <li>✅ Custom Branding</li>
             <li>✅ Advanced Analytics</li>
             <li>✅ Priority Support</li>
@@ -261,6 +263,7 @@ export default function PlansPage() {
             <li>✅ Pro Covers & Prompt Memory</li>
             <li>✅ 5M Unsplash Library</li>
             <li>✅ Custom Subdomain + Email Capture</li>
+            <li>✅ Custom Domain + Email Capture</li>
             <li>✅ Analytics Dashboard</li>
             <li>✅ Priority Support</li>
             <li>✅ Audio Player</li>

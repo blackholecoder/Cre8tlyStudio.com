@@ -11,12 +11,14 @@ export default function SiteLayout() {
   }, [location.pathname]);
 
   return (
-    <>
+    <div className="min-h-screen bg-white text-black">
       <Nav />
-      <main className="min-h-screen">
+
+      <main className="relative min-h-screen bg-white">
         <Outlet />
-        <Footer />
       </main>
-    </>
+
+      <Footer />
+    </div>
   );
 }

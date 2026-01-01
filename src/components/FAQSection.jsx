@@ -54,7 +54,7 @@ export default function FAQAccordion() {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-6 py-24">
+    <section className=" w-full max-w-4xl mx-auto px-6 py-24">
       <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-12 text-gray-900">
         Frequently Asked Questions
       </h2>

@@ -671,10 +671,10 @@ input[type="color"]:focus {
   body,
   #root {
     min-height: 100%;
-    background: #fff;
+    background: #030712;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    background-color: #fff !important;
+    background-color: #030712 !important;
     color: #fff;
     overscroll-behavior: none;
     overflow-x: hidden;

@@ -6,7 +6,7 @@ import FAQSection from "../components/FAQSection";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen w-full text-white flex flex-col font-sans overflow-x-hidden">
+    <div className="min-h-screen w-full bg-white text-white flex flex-col font-sans overflow-x-hidden">
       <Hero />
       {/* HERO */}
       <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-32 relative ">
@@ -53,6 +53,7 @@ const Landing = () => {
       </section>
 
       <PlatformShowcase />
+
       <FAQSection />
     </div>
   );

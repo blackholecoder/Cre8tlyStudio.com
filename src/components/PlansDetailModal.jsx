@@ -1,7 +1,21 @@
 import { X } from "lucide-react";
+import { useEffect } from "react";
 
 export default function PlanDetailsModal({ plan, onClose }) {
   if (!plan) return null;
+
+  useEffect(() => {
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, []);
 
   const descriptions = {
     basic: {
@@ -56,19 +70,29 @@ This plan is designed for creators who want full brand control, higher trust, an
   const { title, content } = descriptions[plan] || {};
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-lg w-full text-white relative shadow-xl">
+    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-start sm:items-center justify-center p-4 sm:p-6">
+      {/* MODAL SHELL */}
+      <div className="bg-[#141414] border border-gray-700 rounded-2xl w-full max-w-lg relative max-h-[90vh] flex flex-col shadow-2xl shadow-black/40 mt-6 sm:mt-0">
+        {/* CLOSE BUTTON (always visible) */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-white transition"
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10"
         >
           <X size={22} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-center">{title}</h2>
-        <p className="text-gray-300 whitespace-pre-line leading-relaxed">
+
+        {/* HEADER */}
+        <div className="px-8 pt-8 pb-4">
+          <h2 className="text-2xl font-bold text-center text-white">{title}</h2>
+        </div>
+
+        {/* SCROLLABLE CONTENT */}
+        <div className="px-8 pb-6 overflow-y-auto text-gray-300 whitespace-pre-line leading-relaxed">
           {content}
-        </p>
-        <div className="text-center mt-8">
+        </div>
+
+        {/* FOOTER */}
+        <div className="px-8 pb-6 pt-4 text-center border-t border-gray-800">
           <button
             onClick={onClose}
             className="px-6 py-2 bg-blue rounded-lg font-semibold hover:opacity-90 transition"

@@ -95,37 +95,50 @@ export default function PlansPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-6xl mx-auto place-items-stretch">
         {/* ---------- Free Tier ---------- */}
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-green/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-white design-text">
-            Free Trial
+          {/* PLAN NAME */}
+          <h2 className="text-2xl font-bold mb-1 text-white design-text">
+            Free Builder Trial
           </h2>
-          <p className="text-4xl font-extrabold mb-2">$0</p>
-          <p className="text-gray-400 mb-4 text-sm">No credit card required</p>
 
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 1 Lead Magnet Slot (5 pages)</li>
-            <li>✅ Basic Templates</li>
-            <li>✅ AI-Assisted Writing Tools</li>
-            <li>⚡ 7-Day Trial Access</li>
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-white">$0</p>
+          <p className="text-gray-400 mb-3 text-sm">
+            No credit card required · 7 days
+          </p>
+
+          {/* OUTCOME ANCHOR */}
+          <p className="text-sm text-gray-300 mb-6">
+            Best for testing an idea and building your first lead magnet.
+          </p>
+
+          {/* INCLUDED */}
+          <ul className="text-sm text-gray-300 space-y-2 mb-6">
+            <li>✅ 1 lead magnet (up to 5 pages)</li>
+            <li>✅ Basic templates</li>
+            <li>✅ AI-assisted writing tools</li>
+            <li>⚡ Full access for 7 days</li>
           </ul>
 
-          {/* 🔹 Dynamic Free-Trial Button */}
+          {/* UPGRADE SEED */}
+          <p className="text-xs text-gray-500 mb-8">
+            Upgrade anytime to unlock selling, custom domains, analytics, and
+            branding.
+          </p>
+
+          {/* CTA LOGIC */}
           {!user ? (
-            // Not logged in — show sign-up CTA
             <button
               onClick={() => {
                 const refSlug = localStorage.getItem("ref_slug");
-                if (refSlug) {
-                  window.location.href = `/sign-up?ref=${refSlug}`;
-                } else {
-                  window.location.href = "/sign-up";
-                }
+                window.location.href = refSlug
+                  ? `/sign-up?ref=${refSlug}`
+                  : "/sign-up";
               }}
               className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-green text-black hover:opacity-90 transition"
             >
               Start Building for Free
             </button>
           ) : user?.has_free_magnet === 1 ? (
-            // Logged in and already has free tier
             <button
               disabled
               className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gray-700 text-gray-300 cursor-not-allowed"
@@ -133,7 +146,6 @@ export default function PlansPage() {
               Trial Active
             </button>
           ) : (
-            // Logged in but somehow no free tier (edge case)
             <button
               onClick={() => (window.location.href = "/dashboard")}
               className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-gradient-to-r from-green to-royalPurple text-black hover:opacity-90 transition"
@@ -144,35 +156,60 @@ export default function PlansPage() {
         </div>
 
         {/* ---------- Business Basic (Annual) ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-emerald-400/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-white design-text">
-            Business Basic <br />
-            (Annual)
-          </h2>
 
-          <p className="text-4xl font-extrabold mb-2 text-white">$65</p>
-          <p className="text-gray-400 mb-4 text-sm">
-            Billed annually ($780.00/year)
+        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-emerald-400/50 transition">
+          {/* PLAN NAME */}
+          <h2 className="text-2xl font-bold mb-1 text-white design-text">
+            Business Basic
+          </h2>
+          <p className="text-sm text-gray-400 mb-4">(Annual)</p>
+
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-white">$65</p>
+          <p className="text-gray-400 mb-3 text-sm">
+            Billed annually ($780/year)
           </p>
 
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 7 Lead Magnet Slots /month</li>
-            <li>✅ Sell on Your Landing Page</li>
-            <li>✅ No platform fees: keep what you make</li>
-            <li>✅ Pro Covers & Prompt Memory</li>
-            <li>✅ 5M Unsplash Library</li>
-            <li>✅ Custom Subdomain + Email Capture</li>
-            <li>❌ Custom Domain</li>
-            <li>❌ Animated Sections & Scroll Effects</li>
-            <li>❌ Gradient Themes</li>
-            <li>❌ Custom Branding</li>
-            <li>❌ Audio Player</li>
-            <li>❌ Calendly Integration</li>
-            <li>❌ Verified Reviews</li>
-            <li>❌ Advanced Analytics</li>
-            <li>❌ Mini Offers</li>
-          </ul>
+          {/* OUTCOME ANCHOR */}
+          <p className="text-sm text-gray-300 mb-6">
+            Best for launching a professional landing page and capturing leads.
+          </p>
 
+          {/* INCLUDED */}
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-gray-400 mb-2">
+              What’s included
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ 7 Lead Magnet Slots per month</li>
+              <li>✅ Sell directly on your landing page</li>
+              <li>✅ No platform fees, keep what you make</li>
+              <li>✅ Pro covers and prompt memory</li>
+              <li>✅ 5M Unsplash image library</li>
+              <li>✅ Custom subdomain and email capture</li>
+            </ul>
+          </div>
+
+          {/* UPGRADE SECTION */}
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+              Advanced tools for scaling revenue
+            </p>
+
+            <ul className="text-[13px] text-gray-500 space-y-1 opacity-70">
+              <li>• Custom domain</li>
+              <li>• Animations and scroll effects</li>
+              <li>• Gradient themes</li>
+              <li>• Custom branding</li>
+              <li>• Audio player</li>
+              <li>• Calendly integration</li>
+              <li>• Verified reviews</li>
+              <li>• Advanced analytics</li>
+              <li>• Mini offers</li>
+            </ul>
+          </div>
+
+          {/* CTA */}
           <button
             onClick={() => handleSelectPlan("business_basic_builder")}
             disabled={loadingPlan === "business_basic_builder"}
@@ -184,139 +221,215 @@ export default function PlansPage() {
           >
             {loadingPlan === "business_basic_builder"
               ? "Redirecting..."
-              : "Get Basic Plan"}
+              : "Start with Business Basic"}
           </button>
 
+          {/* SECONDARY */}
           <button
             onClick={() => setSelectedPlan("business_basic_builder")}
-            className="mt-4 text-sm text-white hover:underline text-center"
+            className="mt-4 text-sm text-gray-400 hover:text-white hover:underline text-center"
           >
-            Learn More
+            Learn more about this plan
           </button>
         </div>
 
         {/* ---------- Business Builder (Annual) ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-blue-500/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-blue-400 design-text">
-            Business Builder (Annual)
+
+        <div className="relative flex flex-col rounded-2xl border border-blue-500/40 bg-[#111]/90 p-10 text-left shadow-xl shadow-blue-500/10 transition hover:border-blue-400">
+          {/* PLAN IDENTITY */}
+          <h2 className="text-2xl font-bold mb-1 text-blue-400 design-text">
+            Business Builder
           </h2>
-          <p className="text-4xl font-extrabold mb-2 text-blue-400">$129.99</p>
-          <p className="text-gray-400 mb-4 text-sm">
+          <p className="text-sm text-gray-400 mb-4">
+            (Annual · Full Platform Access)
+          </p>
+
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-white">$129.99</p>
+          <p className="text-gray-400 mb-3 text-sm">
             Billed annually ($1,560/year)
           </p>
 
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 15 Lead Magnet Slots /month</li>
-            <li>✅ Sell on Your Landing Page</li>
-            <li>✅ No platform fees: keep what you make</li>
-            <li>✅ Animated Sections & Scroll Effects</li>
-            <li>✅ Pro Covers & Prompt Memory</li>
-            <li>✅ 5M Unsplash Library</li>
-            <li>✅ Custom Subdomain + Email Capture</li>
-            <li>✅ Custom Domain + Email Capture</li>
-            <li>✅ Custom Branding</li>
-            <li>✅ Advanced Analytics</li>
-            <li>✅ Priority Support</li>
-            <li>✅ Audio Player</li>
-            <li>✅ Calendly Integration</li>
-            <li>✅ Verified Reviews</li>
-            <li>✅ Mini Offers</li>
-          </ul>
+          {/* OUTCOME ANCHOR */}
+          <p className="text-sm text-gray-300 mb-6">
+            Built for creators and entrepreneurs who want to launch, sell, and
+            scale digital products from one platform.
+          </p>
 
+          {/* CORE CAPABILITIES */}
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-blue-400 mb-2">
+              Everything you need to sell
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ 15 lead magnet slots per month</li>
+              <li>✅ Sell directly on high-converting landing pages</li>
+              <li>✅ No platform fees, keep 100% of your sales</li>
+              <li>✅ Mini offers, verified reviews, and audio products</li>
+              <li>✅ Custom domain, branding, and advanced themes</li>
+              <li>✅ Advanced analytics and priority support</li>
+            </ul>
+          </div>
+
+          {/* FULL ACCESS (DE-EMPHASIZED BUT COMPLETE) */}
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+              Full feature access
+            </p>
+            <ul className="text-[13px] text-gray-500 space-y-1 opacity-75">
+              <li>• Animated sections and scroll effects</li>
+              <li>• Pro covers and prompt memory</li>
+              <li>• 5M Unsplash image library</li>
+              <li>• Audio player and Calendly integration</li>
+              <li>• Custom branding and gradient themes</li>
+              <li>• Advanced analytics and verified reviews</li>
+            </ul>
+          </div>
+
+          {/* CTA */}
           <button
             onClick={() => handleSelectPlan("business_builder_pack_annual")}
             disabled={loadingPlan === "business_builder_pack_annual"}
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
               loadingPlan === "business_builder_pack_annual"
                 ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
-                : "text-white border-blue-400 hover:opacity-90"
+                : "text-white bg-blue-500 border-blue-500 hover:bg-blue-400 shadow-lg shadow-blue-500/30"
             }`}
           >
             {loadingPlan === "business_builder_pack_annual"
               ? "Redirecting..."
-              : "Get Annual Plan"}
+              : "Build with Business Builder"}
           </button>
 
+          {/* SECONDARY */}
           <button
             onClick={() => setSelectedPlan("business_builder_pack")}
             className="mt-4 text-sm text-blue-400 hover:underline text-center"
           >
-            Learn More
+            See everything included
           </button>
         </div>
 
         {/* ---------- Business Builder (Monthly) ---------- */}
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-sky-400/50 transition">
-          <h2 className="text-2xl font-bold mb-2 text-white design-text">
-            Business Builder (Monthly)
+        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/70 p-10 text-left transition hover:border-sky-400/40">
+          {/* PLAN IDENTITY */}
+          <h2 className="text-2xl font-bold mb-1 text-white design-text">
+            Business Builder
           </h2>
-          <p className="text-4xl font-extrabold mb-2 text-white">$199.99</p>
-          <p className="text-gray-400 mb-4 text-sm">
-            Billed monthly (12-month term)
+          <p className="text-sm text-gray-400 mb-4">
+            Monthly billing · Same features as annual
           </p>
 
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 15 Lead Magnet Slots /month</li>
-            <li>✅ Sell on Your Landing Page</li>
-            <li>✅ No platform fees: keep what you make</li>
-            <li>✅ Animated Sections & Scroll Effects</li>
-            <li>✅ Pro Covers & Prompt Memory</li>
-            <li>✅ 5M Unsplash Library</li>
-            <li>✅ Custom Subdomain + Email Capture</li>
-            <li>✅ Custom Domain + Email Capture</li>
-            <li>✅ Analytics Dashboard</li>
-            <li>✅ Priority Support</li>
-            <li>✅ Audio Player</li>
-            <li>✅ Calendly Integration</li>
-            <li>✅ Verified Reviews</li>
-            <li>✅ Advanced Analytics</li>
-            <li>✅ Mini Offers</li>
-          </ul>
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-white">$199.99</p>
+          <p className="text-gray-400 mb-3 text-sm">
+            Billed monthly (12-month commitment)
+          </p>
 
+          {/* VALUE FRAMING */}
+          <p className="text-sm text-gray-300 mb-6">
+            For builders who want maximum flexibility while running their
+            business month-to-month.
+          </p>
+
+          {/* FEATURE SUMMARY (NOT FULL LIST) */}
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-sky-400 mb-2">
+              Full Business Builder access
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Everything included in Business Builder</li>
+              <li>✅ 15 lead magnets per month</li>
+              <li>✅ Selling, branding, analytics, and automation</li>
+              <li>✅ Custom domains, advanced themes, and integrations</li>
+              <li>✅ Priority support</li>
+            </ul>
+          </div>
+
+          {/* OPTIONAL REFERENCE (LIGHT) */}
+          <p className="text-xs text-gray-500 mb-8">
+            Prefer the best value? Save significantly with annual billing.
+          </p>
+
+          {/* CTA */}
           <button
             onClick={() => handleSelectPlan("business_builder_pack_monthly")}
             disabled={loadingPlan === "business_builder_pack_monthly"}
             className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg border transition-all ${
               loadingPlan === "business_builder_pack_monthly"
                 ? "opacity-50 cursor-not-allowed bg-gray-700 border-gray-700"
-                : "text-white border-blue-400 hover:opacity-90"
+                : "text-white border-sky-400 hover:bg-sky-400/10"
             }`}
           >
             {loadingPlan === "business_builder_pack_monthly"
               ? "Redirecting..."
-              : "Get Monthly Plan"}
+              : "Choose Monthly Billing"}
           </button>
 
+          {/* SECONDARY */}
           <button
             onClick={() => setSelectedPlan("business_builder_pack")}
-            className="mt-4 text-sm text-white hover:underline text-center"
+            className="mt-4 text-sm text-gray-400 hover:text-white hover:underline text-center"
           >
-            Learn More
+            Compare with annual option
           </button>
         </div>
 
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
-          <h2 className="text-2xl font-bold mb-2 text-pink-400 design-text">
-            Author’s Assistant <br /> (1 Book)
+          {/* IDENTITY */}
+          <h2 className="text-2xl font-bold mb-1 text-pink-400 design-text">
+            Author’s Assistant
           </h2>
-          <p className="text-4xl font-extrabold mb-2 text-pink-400">$850</p>
-          <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-            AI-powered co-writer that helps you structure, write, and edit up to
-            750 pages while keeping your unique voice and storytelling style.
+          <p className="text-sm text-gray-400 mb-4">
+            One book · Up to 750 pages
           </p>
-          <ul className="text-sm text-gray-300 space-y-2 mb-8">
-            <li>✅ 750 Pages of Writing Power</li>
-            <li>✅ Save Unlimited Drafts</li>
-            <li>✅ Upload Any Text File or Document</li>
-            <li>✅ Continues Your Story From Memory</li>
-            <li>✅ Generate Chapters Instantly</li>
-            <li>✅ Pro-Level Book Covers</li>
-            <li>✅ Premium Font Selection</li>
-            <li>✅ Live Book Preview & Editing</li>
-            <li>✅ Rewrite, Expand, or Shorten Any Section</li>
-            <li>✅ One-Click Export (PDF & DOCX)</li>
-          </ul>
 
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-pink-400">$850</p>
+
+          {/* OUTCOME ANCHOR */}
+          <p className="text-gray-300 mb-6 text-sm leading-relaxed">
+            An AI-powered co-writer built to help you structure, write, and
+            finish a full-length book while preserving your unique voice and
+            storytelling style.
+          </p>
+
+          {/* CORE CAPABILITIES */}
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Write with confidence
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Generate chapters and sections instantly</li>
+              <li>✅ Rewrite, expand, or shorten any passage</li>
+              <li>✅ Save unlimited drafts and revisions</li>
+              <li>✅ Continue your story with full context memory</li>
+            </ul>
+          </div>
+
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Maintain continuity
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Up to 750 pages of guided writing</li>
+              <li>✅ Upload existing documents or drafts</li>
+              <li>✅ Live book preview and editing</li>
+            </ul>
+          </div>
+
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Publish professionally
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Pro-level book covers</li>
+              <li>✅ Premium font selection</li>
+              <li>✅ One-click export (PDF and DOCX)</li>
+            </ul>
+          </div>
+
+          {/* CTA */}
           <button
             onClick={() => handleSelectPlan("author")}
             disabled={loadingPlan === "author"}
@@ -328,13 +441,14 @@ export default function PlansPage() {
           >
             {loadingPlan === "author"
               ? "Redirecting..."
-              : "Unlock Author’s Assistant"}
+              : "Write Your Book with Author’s Assistant"}
           </button>
+
           <button
             onClick={() => setSelectedPlan("author")}
-            className="text-pink-400 text-sm hover:underline mt-3"
+            className="text-pink-400 text-sm hover:underline mt-3 text-center"
           >
-            Learn More
+            Learn more about Author’s Assistant
           </button>
         </div>
       </div>

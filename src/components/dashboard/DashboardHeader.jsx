@@ -59,7 +59,9 @@ export default function DashboardHeader({
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
       {/* ---------- Left Section ---------- */}
       <div>
-        <h1 className="text-3xl font-bold text-white design-text">{title}</h1>
+        <h1 className="text-3xl font-bold text-white design-text normal-case">
+          {title}
+        </h1>
 
         {user && (
           <div className="text-[14px] text-gray-400 mt-1 mb-2">

@@ -33,6 +33,27 @@ h1 {
   line-height: 0.82;
 }
 
+.dashboard h1 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  word-spacing: normal;
+  text-transform: none;
+  font-variation-settings:
+    "wght" 700,
+    "wdth" 100;
+}
+.logoText h2 {
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  word-spacing: normal;
+  text-transform: none;
+  font-variation-settings:
+    "wght" 400,
+    "wdth" 100;
+}
+
 @layer components {
   .max-container {
     max-width: 1440px;

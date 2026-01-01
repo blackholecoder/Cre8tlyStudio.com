@@ -58,7 +58,7 @@ export default function CommunityHome() {
         </div>
 
         {/* Page Title */}
-        <h1 className="text-3xl font-bold mb-4 pb-8 text-center">
+        <h1 className="text-3xl font-bold mb-4 pb-8 text-center normal-case">
           Cre8tly Community 💬
         </h1>
 

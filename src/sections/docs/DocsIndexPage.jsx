@@ -69,6 +69,13 @@ export default function DocsIndexPage() {
         "Track views, clicks, analytics, sales, and sales across your entire system.",
       path: "/docs/analytics-docs",
     },
+    {
+      id: "custom-domains",
+      title: "Custom Domains",
+      description:
+        "Connect your own domain to Cre8tly, verify ownership, and host landing pages under your brand.",
+      path: "/docs/custom-domain",
+    },
   ];
 
   const filteredDocs = docs.filter(
@@ -80,7 +87,7 @@ export default function DocsIndexPage() {
   return (
     <div className="w-full max-w-4xl mx-auto py-10 px-6 text-silver">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold text-silver flex items-center gap-3 mb-2">
+        <h1 className="text-3xl font-bold text-silver flex items-center gap-3 mb-2 normal-case">
           <ShieldQuestionMark className="w-8 h-8 text-green" />
           Documentation
         </h1>

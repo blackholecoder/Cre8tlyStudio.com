@@ -140,7 +140,7 @@ export default function Inbox() {
       {/* 📥 Left Column — Message List */}
       <div className="flex-1 lg:max-w-[380px] border-r border-gray-800 h-screen overflow-y-auto p-6">
         <div className="border-b border-gray-800 pb-4 mb-6 flex items-center justify-between">
-          <h1 className="text-xl font-bold design-text">Inbox</h1>
+          <h1 className="text-xl font-bold design-text normal-case">Inbox</h1>
           <Bell size={18} className="text-green" />
         </div>
 

@@ -46,7 +46,7 @@ export default function Notifications() {
     <div className="w-full flex justify-center items-center min-h-[80vh] px-6 py-12">
       {/* 🔥 Background Container */}
       <div className="w-full max-w-2xl bg-gray-900/40 border border-gray-800 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center">
+        <h1 className="text-2xl font-bold mb-6 text-center normal-case">
           Notifications 🔔
         </h1>
 

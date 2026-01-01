@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="flex bg-[#030712] text-white relative min-h-screen">
+    <div className="dashboard flex bg-[#030712] text-white relative min-h-screen">
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 w-[120px] h-full bg-gray-900/95 border-r border-gray-800 
@@ -115,11 +115,11 @@ export default function DashboardLayout({ children }) {
                 <AnimatedLogo className="relative z-10 w-16 h-16 animate-glow" />
               </div>
 
-              <h1 className="text-[13px] font-semibold text-white text-center leading-snug mt-1 normal-case ">
+              <h2 className="logoText font-semibold text-white text-center leading-snug mt-1 normal-case ">
                 Cre8tly
                 <br />
                 Studio
-              </h1>
+              </h2>
             </div>
 
             <button

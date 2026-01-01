@@ -66,6 +66,7 @@ import CommunityFeaturePage from "./sections/CommunityFeaturePage.jsx";
 import StripePayments from "./sections/StripePayments.jsx";
 import AuthorsAssistant from "./sections/AuthorsAssistantPage.jsx";
 import SettingsDomains from "./settings/SettingsDomains.jsx";
+import CustomDomainsDocs from "./sections/docs/CustomDomainsDocs.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -517,6 +518,24 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <LandingAnalyticsDocs />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/docs/custom-domain"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <CustomDomainsDocs />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>

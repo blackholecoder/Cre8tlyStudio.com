@@ -155,7 +155,7 @@ export default function SellerDashboard() {
       className="p-8 text-white"
     >
       <div className="flex items-center gap-3 mb-6">
-        <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+        <h1 className="text-3xl font-bold normal-case">Seller Dashboard</h1>
         <Landmark size={22} className="text-green" />
       </div>
       {/* 💰 Balance Overview */}

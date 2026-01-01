@@ -11,7 +11,6 @@ export default function PromptMemoryDashboard() {
   const [page, setPage] = useState(1);
   const [tableReady, setTableReady] = useState(false);
 
-
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function PromptMemoryDashboard() {
     <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
       {/* Header */}
       <div className="flex flex-col mb-8 mt-2">
-        <h1 className="text-3xl font-bold text-white mb-2 design-text">
+        <h1 className="text-3xl font-bold text-white mb-2 design-text normal-case">
           My Prompt Memory
         </h1>
         <p className="text-gray-400 text-sm">
@@ -53,28 +52,30 @@ export default function PromptMemoryDashboard() {
 
       {/* Content */}
       {loading ? (
-  <div className="flex flex-col items-center justify-center py-24 text-white">
-    <div className="relative">
+        <div className="flex flex-col items-center justify-center py-24 text-white">
+          <div className="relative">
+            {/* Glowing pulse ring */}
+            <div className="absolute inset-0 rounded-full bg-green-500/20 blur-2xl animate-ping"></div>
 
-      {/* Glowing pulse ring */}
-      <div className="absolute inset-0 rounded-full bg-green-500/20 blur-2xl animate-ping"></div>
+            {/* Center spinner */}
+            <div className="w-14 h-14 border-4 border-t-transparent border-green-400 rounded-full animate-spin"></div>
+          </div>
 
-      {/* Center spinner */}
-      <div className="w-14 h-14 border-4 border-t-transparent border-green-400 rounded-full animate-spin"></div>
-    </div>
+          {/* Loading text */}
+          <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
+            Fetching your prompt memory...
+          </p>
 
-    {/* Loading text */}
-    <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
-      Fetching your prompt memory...
-    </p>
-
-    <p className="text-sm text-gray-400 mt-2">
-      Loading your saved prompts from Cre8tly Studio.
-    </p>
-  </div>
-) : !loading && prompts.length > 0 ? (
-  <PromptMemoryTable prompts={prompts} onReady={() => setTableReady(true)} />
-) : null}
+          <p className="text-sm text-gray-400 mt-2">
+            Loading your saved prompts from Cre8tly Studio.
+          </p>
+        </div>
+      ) : !loading && prompts.length > 0 ? (
+        <PromptMemoryTable
+          prompts={prompts}
+          onReady={() => setTableReady(true)}
+        />
+      ) : null}
       {tableReady && !loading && prompts.length > 0 && (
         <div className="flex items-center justify-center gap-4 mt-6">
           <button

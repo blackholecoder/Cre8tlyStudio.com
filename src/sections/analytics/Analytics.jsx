@@ -107,7 +107,7 @@ export default function LandingAnalytics() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-xl font-semibold">Views</h1>
+            <h1 className="text-xl font-semibold normal-case">Views</h1>
             <BarChart2 size={22} className="text-white" />
           </div>
           <div className="flex gap-2">

@@ -2,7 +2,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { useState, useMemo, useEffect } from "react";
 import { X, Download, ZoomIn, ZoomOut } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
-
+import DownloadLockWarningModal from "../modals/DownloadLockWarningModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
@@ -14,6 +14,7 @@ export default function PDFPreviewModal({
   fileTitle,
   partNumber,
   sourceType = "magnet",
+  magnetId,
   onClose,
 }) {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ export default function PDFPreviewModal({
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
   const [showUpgradeNotice, setShowUpgradeNotice] = useState(false);
+  const [showDownloadWarning, setShowDownloadWarning] = useState(false);
 
   const memoizedFile = useMemo(() => {
     if (!fileUrl) return null;
@@ -63,51 +65,51 @@ export default function PDFPreviewModal({
     return () => clearTimeout(timeout);
   }, [fileUrl]);
 
-  
   const handleDownload = async () => {
-  const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
-  if (isFreeTier) {
-    setShowUpgradeNotice(true);
-    return;
-  }
+    const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+    if (isFreeTier) {
+      setShowUpgradeNotice(true);
+      return;
+    }
 
-  try {
-    setDownloading(true);
+    try {
+      setDownloading(true);
 
-    // ✅ Create safe title for filename
-    const safeTitle = (fileTitle || "Cre8tly_Download")
-      .replace(/[^\w\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "_");
+      // ✅ Create safe title for filename
+      const safeTitle = (fileTitle || "Cre8tly_Download")
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "_");
 
-    // ✅ Build proxy download URL with title param (forces download)
-    const proxyDownloadUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(
-      fileUrl
-    )}&title=${encodeURIComponent(safeTitle)}`;
+      // ✅ Build proxy download URL with title param (forces download)
+      const proxyDownloadUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(
+        fileUrl
+      )}&title=${encodeURIComponent(safeTitle)}${
+        sourceType === "magnet" && magnetId ? `&magnetId=${magnetId}` : ""
+      }`;
 
-    const res = await fetch(proxyDownloadUrl);
-    if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
+      const res = await fetch(proxyDownloadUrl);
+      if (!res.ok) throw new Error(`Failed: ${res.status} ${res.statusText}`);
 
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${safeTitle}.pdf`; // backend already sets filename, but this ensures consistency
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${safeTitle}.pdf`; // backend already sets filename, but this ensures consistency
 
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-    await new Promise((r) => setTimeout(r, 2000));
-  } catch (err) {
-    console.error("Download error:", err);
-    alert("❌ Download failed. Please try again.");
-  } finally {
-    setDownloading(false);
-  }
-};
-
+      await new Promise((r) => setTimeout(r, 2000));
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("❌ Download failed. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!fileUrl) {
@@ -154,12 +156,12 @@ export default function PDFPreviewModal({
             <ZoomOut size={20} />
           </button>
           <button
-            onClick={handleDownload}
+            onClick={() => setShowDownloadWarning(true)}
             disabled={downloading}
             className={`p-2 rounded-lg transition text-white ${
               downloading
-                ? "bg-green-800 cursor-wait"
-                : "bg-green-600 hover:bg-green-600/90"
+                ? "bg-green cursor-wait"
+                : "bg-green/90 hover:bg-green/80"
             }`}
             title="Download"
           >
@@ -277,7 +279,8 @@ export default function PDFPreviewModal({
             </h2>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
               Downloads are available for Pro users only. Upgrade your plan to
-              unlock high-quality PDF exports, full lead magnet access, and more.
+              unlock high-quality PDF exports, full lead magnet access, and
+              more.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
@@ -296,6 +299,14 @@ export default function PDFPreviewModal({
           </div>
         </div>
       )}
+      <DownloadLockWarningModal
+        open={showDownloadWarning}
+        onCancel={() => setShowDownloadWarning(false)}
+        onConfirm={async () => {
+          setShowDownloadWarning(false);
+          await handleDownload();
+        }}
+      />
     </div>
   );
 }

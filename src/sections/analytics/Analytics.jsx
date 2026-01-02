@@ -105,10 +105,10 @@ export default function LandingAnalytics() {
     <div className="w-full min-h-screen text-white px-4 py-8 pt-24">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div className="flex items-center gap-2 mb-2">
             <h1 className="text-xl font-semibold normal-case">Views</h1>
-            <BarChart2 size={22} className="text-white" />
+            <BarChart2 size={22} className="text-white mt-[1px] sm:mt-0" />
           </div>
           <div className="flex gap-2">
             {["7", "14", "30", "90"].map((r) => (

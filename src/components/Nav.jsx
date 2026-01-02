@@ -504,7 +504,7 @@ const Nav = () => {
 
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-xl"
+                  className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-xl text-white hover:bg-gray-500 transition"
                 >
                   ✕
                 </button>
@@ -514,6 +514,19 @@ const Nav = () => {
             {/* SCROLL AREA */}
             <div className="flex-1 overflow-y-auto px-6 py-8 overscroll-contain">
               <div className="mx-auto max-w-md rounded-3xl border bg-white shadow-xl p-6 space-y-10">
+                {/* PRIMARY NAV */}
+                <div className="space-y-3">
+                  <MenuItem
+                    icon={CreditCard}
+                    title="Pricing"
+                    desc="Compare plans and features"
+                    onClick={() => {
+                      navigateWithReferral("/plans");
+                      setIsOpen(false);
+                    }}
+                  />
+                </div>
+
                 {/* BUILD & LAUNCH */}
                 <div>
                   <h3 className="text-sm font-extrabold tracking-wide mb-4 text-gray-600">
@@ -545,7 +558,7 @@ const Nav = () => {
                     title="Digital Products"
                     desc="Sell PDFs, audio, and downloads"
                     onClick={() => {
-                      navigateWithReferral("/products");
+                      navigateWithReferral("/landing");
                       setIsOpen(false);
                     }}
                   />
@@ -557,16 +570,16 @@ const Nav = () => {
                     SCALE
                   </h3>
 
-                  {/* <MenuItem
-                    icon={MailCheck}
-                    title="Email & Automations"
-                    desc="Convert and retain your audience"
-                    disabled
-                    // onClick={() => {
-                    //   navigateWithReferral("/email");
-                    //   setIsOpen(false);
-                    // }}
-                  /> */}
+                  <MenuItem
+                    icon={Users}
+                    title="Communities"
+                    desc="Create engaged audiences"
+                    onClick={() => {
+                      navigateWithReferral("/community-feature");
+                      setIsOpen(false);
+                    }}
+                  />
+
                   <MenuItem
                     icon={BookOpen}
                     title="Authors Assistant"

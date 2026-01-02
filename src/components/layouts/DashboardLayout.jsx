@@ -108,8 +108,8 @@ export default function DashboardLayout({ children }) {
       >
         {/* TOP (fixed) */}
         <div className="p-6">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col items-center justify-center py-2">
               <div className="relative flex items-center justify-center w-16 h-16 mb-3 overflow-visible">
                 <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse"></div>
                 <AnimatedLogo className="relative z-10 w-16 h-16 animate-glow" />

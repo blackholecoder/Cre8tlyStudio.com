@@ -95,7 +95,15 @@ export default function PromptForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+          e.preventDefault();
+        }
+      }}
+      className="space-y-6"
+    >
       <div>
         {/* Pages */}
         <div>
@@ -116,7 +124,6 @@ export default function PromptForm({
               }}
               className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
             />
-            
 
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">
               <button
@@ -187,65 +194,66 @@ export default function PromptForm({
       )}
 
       {/* Prompt Editor */}
-<div>
-  <div
-    className={`relative h-[250px] overflow-hidden rounded-lg border border-gray-600 ${
-      isFreePlan ? "bg-gray-50" : "bg-white"
-    }`}
-    style={{ color: "#111" }}
-  >
-    <ReactQuill
-      theme="snow"
-      value={text}
-      onChange={(value) => {
-        if (!isFreePlan) {
-          setText(value);
-          if (error) setError("");
-        }
-      }}
-      readOnly={isFreePlan} // ✅ disables editing
-      modules={{ toolbar: false }}
-      placeholder="Write your prompt..."
-      className="h-[250px]"
-    />
+      <div>
+        <div
+          className={`relative h-[250px] overflow-hidden rounded-lg border border-gray-600 ${
+            isFreePlan ? "bg-gray-50" : "bg-white"
+          }`}
+          style={{ color: "#111" }}
+        >
+          <ReactQuill
+            theme="snow"
+            value={text}
+            onChange={(value) => {
+              if (!isFreePlan) {
+                setText(value);
+                if (error) setError("");
+              }
+            }}
+            readOnly={isFreePlan} // ✅ disables editing
+            modules={{ toolbar: false }}
+            placeholder="Write your prompt..."
+            className="h-[250px]"
+          />
 
-    {/* Prevent highlight & copy for free users */}
-    {isFreePlan && (
-      <div
-        className="absolute inset-0 z-10 cursor-default select-none"
-        style={{
-          background: "transparent",
-          userSelect: "none",
-          pointerEvents: "auto",
-        }}
-      />
-    )}
-  </div>
+          {/* Prevent highlight & copy for free users */}
+          {isFreePlan && (
+            <div
+              className="absolute inset-0 z-10 cursor-default select-none"
+              style={{
+                background: "transparent",
+                userSelect: "none",
+                pointerEvents: "auto",
+              }}
+            />
+          )}
+        </div>
 
-  {/* Inline Error */}
-  {error && <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>}
+        {/* Inline Error */}
+        {error && (
+          <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>
+        )}
 
-  {/* Warning + Counter */}
-  <div className="flex justify-between items-center mt-2">
-    <p
-      className={`text-sm font-medium ${
-        warning.includes("⚠️")
-          ? "text-red-500"
-          : warning
-          ? "text-yellow"
-          : "text-gray-400"
-      }`}
-    >
-      {warning || " "}
-    </p>
-    <p
-      className={`text-xs ${tooLong ? "text-red-500" : "text-gray-400"}`}
-    >
-      {charCount.toLocaleString()} / 100,000
-    </p>
-  </div>
-</div>
-
+        {/* Warning + Counter */}
+        <div className="flex justify-between items-center mt-2">
+          <p
+            className={`text-sm font-medium ${
+              warning.includes("⚠️")
+                ? "text-red-500"
+                : warning
+                  ? "text-yellow"
+                  : "text-gray-400"
+            }`}
+          >
+            {warning || " "}
+          </p>
+          <p
+            className={`text-xs ${tooLong ? "text-red-500" : "text-gray-400"}`}
+          >
+            {charCount.toLocaleString()} / 100,000
+          </p>
+        </div>
+      </div>
 
       <CoverUpload cover={cover} setCover={setCover} />
 

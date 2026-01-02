@@ -194,47 +194,94 @@ export default function SellerDashboard() {
           Recent Payouts
         </h2>
         {payouts.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-left text-gray-300">
-              <thead>
-                <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
-                  <th className="py-2 px-3">Date</th>
-                  <th className="py-2 px-3">Amount</th>
-                  <th className="py-2 px-3">Status</th>
-                  <th className="py-2 px-3">Arrival</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payouts.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="border-b border-gray-800 hover:bg-gray-800/30"
-                  >
-                    <td className="py-2 px-3">
-                      {new Date(p.created * 1000).toLocaleDateString()}
-                    </td>
-                    <td className="py-2 px-3 font-semibold">
-                      ${(p.amount / 100).toFixed(2)}
-                    </td>
-                    <td className="py-2 px-3">
-                      <span
-                        className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                          p.status === "paid"
-                            ? "bg-green-500/10 text-green-400"
-                            : "bg-yellow-500/10 text-yellow-400"
-                        }`}
-                      >
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3">
-                      {new Date(p.arrival_date * 1000).toLocaleDateString()}
-                    </td>
+          <>
+            {/* ✅ Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full text-sm text-left text-gray-300">
+                <thead>
+                  <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
+                    <th className="py-2 px-3">Date</th>
+                    <th className="py-2 px-3">Amount</th>
+                    <th className="py-2 px-3">Status</th>
+                    <th className="py-2 px-3">Arrival</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {payouts.map((p) => (
+                    <tr
+                      key={p.id}
+                      className="border-b border-gray-800 hover:bg-gray-800/30"
+                    >
+                      <td className="py-2 px-3">
+                        {new Date(p.created * 1000).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 px-3 font-semibold">
+                        ${(p.amount / 100).toFixed(2)}
+                      </td>
+                      <td className="py-2 px-3">
+                        <span
+                          className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                            p.status === "paid"
+                              ? "bg-green-500/10 text-green-400"
+                              : "bg-yellow-500/10 text-yellow-400"
+                          }`}
+                        >
+                          {p.status}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3">
+                        {new Date(p.arrival_date * 1000).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ✅ Mobile cards */}
+            <div className="md:hidden space-y-4">
+              {payouts.map((p) => (
+                <div
+                  key={p.id}
+                  className="bg-[#0B0F19] border border-gray-800 rounded-xl p-4 shadow-md"
+                >
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-400">Date</span>
+                    <span>
+                      {new Date(p.created * 1000).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-400">Amount</span>
+                    <span className="font-semibold">
+                      ${(p.amount / 100).toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-400">Status</span>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        p.status === "paid"
+                          ? "bg-green-500/10 text-green-400"
+                          : "bg-yellow-500/10 text-yellow-400"
+                      }`}
+                    >
+                      {p.status}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Arrival</span>
+                    <span>
+                      {new Date(p.arrival_date * 1000).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <p className="text-gray-500 text-sm">
             No payouts have been made yet.
@@ -245,46 +292,98 @@ export default function SellerDashboard() {
         <h2 className="text-xl font-semibold text-white mb-4">Recent Sales</h2>
 
         {sales.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-left text-gray-300">
-              <thead>
-                <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
-                  <th className="py-2 px-3">Product</th>
-                  <th className="py-2 px-3">Buyer Email</th>
-                  <th className="py-2 px-3">Date</th>
-                  <th className="py-2 px-3">Email Sent</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sales.map((s) => (
-                  <tr
-                    key={s.id}
-                    className="border-b border-gray-800 hover:bg-gray-800/30"
-                  >
-                    <td className="py-2 px-3 font-semibold">
-                      {s.product_name}
-                    </td>
-                    <td className="py-2 px-3">{s.buyer_email}</td>
-                    <td className="py-2 px-3">
-                      {new Date(s.delivered_at).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3">
-                      {s.thank_you_sent ? (
-                        <Check className="w-5 h-5 text-green" />
-                      ) : (
-                        <button
-                          onClick={() => handleGenerateThankYou(s)}
-                          className="text-green hover:text-green/70 underline"
-                        >
-                          Auto-Gen Thank You
-                        </button>
-                      )}
-                    </td>
+          <>
+            {/* ✅ Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full text-sm text-left text-gray-300">
+                <thead>
+                  <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
+                    <th className="py-2 px-3">Product</th>
+                    <th className="py-2 px-3">Buyer Email</th>
+                    <th className="py-2 px-3">Date</th>
+                    <th className="py-2 px-3">Email Sent</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {sales.map((s) => (
+                    <tr
+                      key={s.id}
+                      className="border-b border-gray-800 hover:bg-gray-800/30"
+                    >
+                      <td className="py-2 px-3 font-semibold">
+                        {s.product_name}
+                      </td>
+                      <td className="py-2 px-3">{s.buyer_email}</td>
+                      <td className="py-2 px-3">
+                        {new Date(s.delivered_at).toLocaleString()}
+                      </td>
+                      <td className="py-2 px-3">
+                        {s.thank_you_sent ? (
+                          <Check className="w-5 h-5 text-green" />
+                        ) : (
+                          <button
+                            onClick={() => handleGenerateThankYou(s)}
+                            className="text-green hover:text-green/70 underline"
+                          >
+                            Auto-Gen Thank You
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ✅ Mobile cards */}
+            <div className="md:hidden space-y-4">
+              {sales.map((s) => (
+                <div
+                  key={s.id}
+                  className="bg-[#0B0F19] border border-gray-800 rounded-xl p-4 shadow-md"
+                >
+                  <div className="mb-2">
+                    <p className="text-xs text-gray-400 mb-1">Product</p>
+                    <p className="text-sm font-semibold text-white">
+                      {s.product_name}
+                    </p>
+                  </div>
+
+                  <div className="mb-2">
+                    <p className="text-xs text-gray-400 mb-1">Buyer</p>
+                    <p className="text-sm text-gray-300 break-all">
+                      {s.buyer_email}
+                    </p>
+                  </div>
+
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-400 mb-1">Date</p>
+                    <p className="text-sm text-gray-300">
+                      {new Date(s.delivered_at).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-800">
+                    <span className="text-xs text-gray-400">Thank You</span>
+
+                    {s.thank_you_sent ? (
+                      <span className="flex items-center gap-1 text-green text-sm font-semibold">
+                        <Check className="w-4 h-4" />
+                        Sent
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleGenerateThankYou(s)}
+                        className="text-green text-sm font-semibold hover:text-green/70 underline"
+                      >
+                        Auto-Gen
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <p className="text-gray-500 text-sm">No sales yet.</p>
         )}

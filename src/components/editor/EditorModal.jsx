@@ -11,7 +11,6 @@ import Image from "@tiptap/extension-image";
 import { colorThemes, fontThemes } from "../../constants";
 import { toast } from "react-toastify";
 
-
 function isDarkColor(hex) {
   if (!hex) return false;
   const h = hex.replace("#", "");
@@ -21,7 +20,6 @@ function isDarkColor(hex) {
   const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return brightness < 0.5; // true = dark
 }
-
 
 export default function EditorModal({
   leadMagnetId,
@@ -36,8 +34,9 @@ export default function EditorModal({
   const [iframeUrl, setIframeUrl] = useState("");
   const [highlightColor, setHighlightColor] = useState("#fff330");
   const iframeRef = useRef(null);
+  const iframeBlobRef = useRef(null);
 
-
+  const [hasEdited, setHasEdited] = useState(false);
 
   const handleHighlightColorChange = (e) => {
     const c = e.target.value;
@@ -70,9 +69,46 @@ export default function EditorModal({
       setToken(data.token);
       setMeta(data.meta);
       setEditableHtml(data.editableHtml || "");
+      setHasEdited(false);
+
+      let fullHtml = data.htmlTemplate;
+
+      if (data.editableHtml) {
+        fullHtml = fullHtml.replace(
+          /<div class="page-inner">([\s\S]*?)<\/div>/,
+          `<div class="page-inner">${data.editableHtml}</div>`
+        );
+      }
+
+      if (iframeBlobRef.current) {
+        URL.revokeObjectURL(iframeBlobRef.current);
+      }
+
+      const blob = new Blob([fullHtml], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframeBlobRef.current = url;
+      setIframeUrl(url);
+
       editor?.commands.setContent(data.editableHtml || "");
     })().catch(onClose);
   }, [open, leadMagnetId, editor]);
+
+  useEffect(() => {
+    return () => {
+      if (iframeBlobRef.current) {
+        URL.revokeObjectURL(iframeBlobRef.current);
+        iframeBlobRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open && iframeBlobRef.current) {
+      URL.revokeObjectURL(iframeBlobRef.current);
+      iframeBlobRef.current = null;
+      setIframeUrl("");
+    }
+  }, [open]);
 
   async function handleCommit() {
     setSaving(true);
@@ -85,15 +121,6 @@ export default function EditorModal({
       setSaving(false);
     }
   }
-
-  useEffect(() => {
-    if (editableHtml) {
-      const blob = new Blob([editableHtml], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      setIframeUrl(url);
-      return () => URL.revokeObjectURL(url);
-    }
-  }, [editableHtml]);
 
   useEffect(() => {
     const doc =
@@ -144,7 +171,6 @@ export default function EditorModal({
     }
   `;
     doc.head.appendChild(colorFix);
-
   }, [meta?.bgTheme, highlightColor, iframeUrl]);
 
   useEffect(() => {
@@ -179,9 +205,6 @@ export default function EditorModal({
         // Highlight text is always black for proper contrast on light backgrounds
         iframeDoc.documentElement.style.setProperty("--hl-text", "#000000");
 
-        // const res = await fetch(
-        //   `${import.meta.env.VITE_API_URL}${selectedFont.file}`
-        // );
         const res = await fetch(selectedFont.file);
         const buf = await res.arrayBuffer();
         const base64Font = btoa(
@@ -388,7 +411,6 @@ pre code {
         // const currentHTML = iframeDoc.body.innerHTML;
         // iframeDoc.body.innerHTML = currentHTML;
         try {
-          
         } catch {}
       } catch (err) {
         console.error("⚠️ Font apply failed:", err);
@@ -399,7 +421,6 @@ pre code {
 
     return () => iframe.removeEventListener("load", applyFontAfterLoad);
   }, [meta?.theme, iframeUrl]);
-
 
   useEffect(() => {
     if (!editor || !iframeRef.current) return;
@@ -436,11 +457,17 @@ pre code {
       };
 
       // Attach once iframe is ready
-      editor.on("update", updatePreview);
-      console.log("✅ Live preview handler attached after iframe load");
+      const handleEditorUpdate = ({ transaction }) => {
+        if (transaction.docChanged && !transaction.getMeta("setContent")) {
+          setHasEdited(true);
+        }
+        updatePreview();
+      };
+
+      editor.on("update", handleEditorUpdate);
 
       // Cleanup
-      return () => editor.off("update", updatePreview);
+      return () => editor.off("update", handleEditorUpdate);
     };
 
     // Wait for iframe to load fully before attaching
@@ -463,20 +490,18 @@ pre code {
     editor.commands.setContent(newHtml);
     toast.success(`Replaced all "${findText}" with "${replaceText}"`);
   }
-  
 
   return (
     <Dialog open={open} onClose={onClose} className="fixed inset-0 z-[9999]">
       {/* Background overlay */}
       <div className="fixed inset-0 bg-black/60" />
-      
 
       {/* Center modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
         <DialogPanel className="w-full max-w-[1650px] bg-[#0f0f10] rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-6 overflow-y-auto max-h-[95vh]">
           <div className="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-  <h2 className="text-lg font-semibold text-white">Live Editor</h2>
-</div>
+            <h2 className="text-lg font-semibold text-white">Live Editor</h2>
+          </div>
           {/* --- Editor + Preview --- */}
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 w-full">
             {/* ✏️ Left: Editor */}
@@ -493,7 +518,6 @@ pre code {
                 allowTransparency={true}
                 className="w-full flex-1 border border-gray-800 rounded-xl overflow-hidden min-h-[50vh] lg:h-[70vh]"
                 sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-pointer-lock allow-popups-to-escape-sandbox allow-modals"
-
                 style={{
                   position: "relative",
                   zIndex: 0, // 👈 ensures overlay (z-index 2147483647) sits above

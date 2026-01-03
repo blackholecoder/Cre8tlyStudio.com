@@ -378,6 +378,7 @@ export default function LandingPageBuilder() {
     if (type === "social_links") {
       newBlock.alignment = "center";
       newBlock.icon_style = "color";
+      newBlock.show_borders = false;
       newBlock.links = {
         instagram: "",
         twitter: "",
@@ -628,6 +629,32 @@ export default function LandingPageBuilder() {
       newBlock.shadow_blur = 20;
       newBlock.shadow_opacity = 35; // percent
       newBlock.shadow_color = "#000000";
+    }
+
+    if (type === "profile_card") {
+      newBlock.alignment = "center";
+
+      // image
+      newBlock.image_url = "";
+      newBlock.image_alt = "";
+      newBlock.image_size = 120;
+      newBlock.image_radius = 999;
+      newBlock.image_border_width = 1;
+      newBlock.image_border_color = "#e5e7eb";
+
+      // text content
+      newBlock.tagline = "Welcome";
+      newBlock.contact_type = "email"; // email | phone
+      newBlock.contact_value = "";
+
+      // styling
+      newBlock.tagline_color = "#111827";
+      newBlock.subtext_color = "#6b7280";
+
+      // visibility
+      newBlock.show_image = true;
+      newBlock.show_tagline = true;
+      newBlock.show_contact = true;
     }
 
     setLanding((prev) => ({

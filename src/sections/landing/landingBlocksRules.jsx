@@ -12,6 +12,7 @@ export const BLOCK_LIMITS = {
   single_offer: 5,
   mini_offer: 20,
   button_url: 10,
+  profile_card: 1,
 };
 
 export const PRO_ONLY_BLOCKS = [

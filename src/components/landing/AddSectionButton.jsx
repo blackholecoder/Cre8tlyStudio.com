@@ -43,6 +43,7 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
     { label: "Video", value: "video" },
     { label: "Audio Player", value: "audio_player" },
     { label: "Pro Image", value: "image" },
+    { label: "Profile Card", value: "profile_card" },
     { label: "Single Offer", value: "single_offer" },
     { label: "Mini Offer", value: "mini_offer" },
     { label: "Verified Reviews", value: "verified_reviews" },

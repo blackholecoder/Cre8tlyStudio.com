@@ -1,6 +1,8 @@
 import React from "react";
 
 export default function SocialLinksBlock({ block, index, updateBlock }) {
+  const showBorders = !!block.show_borders;
+
   const platforms = [
     "instagram",
     "threads",
@@ -9,7 +11,8 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
     "linkedin",
     "facebook",
     "tiktok",
-    "pinterest", 
+    "pinterest",
+    "substack",
   ];
 
   const iconMap = {
@@ -27,8 +30,10 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg",
     tiktok:
       "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
-      pinterest:
-  "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pinterest.svg",
+    pinterest:
+      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pinterest.svg",
+    substack:
+      "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/substack.svg",
   };
 
   return (
@@ -73,7 +78,13 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
         <label className="text-sm text-gray-300">Icon Style</label>
         <select
           value={block.icon_style || "color"}
-          onChange={(e) => updateBlock(index, "icon_style", e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            updateBlock(index, "icon_style", value);
+            if (value !== "mono") {
+              updateBlock(index, "show_borders", false);
+            }
+          }}
           className="p-2 bg-black border border-gray-700 rounded text-white text-sm"
         >
           <option value="color">Full Color</option>
@@ -81,49 +92,101 @@ export default function SocialLinksBlock({ block, index, updateBlock }) {
         </select>
       </div>
 
+      {block.icon_style === "mono" && (
+        <div className="flex items-center justify-between mt-4">
+          <label className="text-sm text-gray-300">Icon Borders</label>
+          <button
+            type="button"
+            onClick={() => updateBlock(index, "show_borders", !showBorders)}
+            className={`px-4 py-2 rounded-md text-sm border transition
+        ${
+          showBorders
+            ? "bg-white text-black border-white"
+            : "bg-black text-white border-gray-700"
+        }`}
+          >
+            {showBorders ? "On" : "Off"}
+          </button>
+        </div>
+      )}
+
       {/* Icon Color */}
-      <div className="flex items-center justify-between mt-4">
-        <label className="text-sm text-gray-300">Icon Color</label>
-        <input
-          type="color"
-          value={block.icon_color || "#ffffff"}
-          onChange={(e) => updateBlock(index, "icon_color", e.target.value)}
-          className="w-10 h-10 rounded border border-gray-600 cursor-pointer"
-        />
+      <div className="flex items-center mt-4">
+        <label className="text-sm text-gray-300 w-32">Icon Color</label>
+        <div className="flex items-center gap-3">
+          <input
+            type="color"
+            value={block.icon_color || "#ffffff"}
+            onChange={(e) => updateBlock(index, "icon_color", e.target.value)}
+            className="w-10 h-10 rounded border border-gray-600 cursor-pointer"
+          />
+          <input
+            type="text"
+            value={block.icon_color || "#ffffff"}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^#([0-9A-Fa-f]{0,6})$/.test(value)) {
+                updateBlock(index, "icon_color", value);
+              }
+            }}
+            placeholder="#ffffff"
+            className="w-24 p-2 rounded bg-black text-white text-sm border border-gray-700 placeholder-gray-500"
+          />
+        </div>
       </div>
 
       {/* Live Preview */}
-      <div
-        className="flex justify-center items-center gap-4 mt-6 flex-wrap"
-        style={{
-          justifyContent:
-            block.alignment === "center"
-              ? "center"
-              : block.alignment === "right"
-              ? "flex-end"
-              : "flex-start",
-        }}
-      >
-        {Object.entries(block.links || {})
-          .filter(([_, url]) => url)
-          .map(([platform]) => (
-            <div
-              key={platform}
-              title={platform}
-              style={{
-                width: 32,
-                height: 32,
-                WebkitMask: `url(${iconMap[platform]}) no-repeat center / contain`,
-                mask: `url(${iconMap[platform]}) no-repeat center / contain`,
-                backgroundColor:
+      <div className="mt-6">
+        <div className="text-xs text-gray-400 mb-2 tracking-wide">
+          Live Preview
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-black/20 px-6 py-5">
+          <div
+            className="flex items-center gap-4 flex-wrap"
+            style={{
+              justifyContent:
+                block.alignment === "center"
+                  ? "center"
+                  : block.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+            }}
+          >
+            {Object.entries(block.links || {})
+              .filter(([_, url]) => url)
+              .map(([platform], i) => {
+                const color =
                   block.icon_style === "mono"
-                    ? "#ffffff"
-                    : block.icon_color || "#ffffff",
-                transition: "transform 0.2s ease",
-              }}
-              className="hover:scale-110"
-            />
-          ))}
+                    ? "rgba(255,255,255,0.75)"
+                    : block.icon_color || "#ffffff";
+
+                return (
+                  <div
+                    key={platform}
+                    title={platform}
+                    className="flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 hover:opacity-90 hover:shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+                    style={{
+                      width: showBorders ? 34 : 26,
+                      height: showBorders ? 34 : 26,
+                      borderRadius: showBorders ? 10 : 0,
+                      border: showBorders ? `1.25px solid ${color}` : "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        WebkitMask: `url(${iconMap[platform]}) no-repeat center / contain`,
+                        mask: `url(${iconMap[platform]}) no-repeat center / contain`,
+                        backgroundColor: color,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </div>
       </div>
     </div>
   );

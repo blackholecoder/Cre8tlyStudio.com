@@ -4,6 +4,10 @@ import { Plus } from "lucide-react";
 
 const faqs = [
   {
+    q: "How is Cre8tly Studio AI different from ChatGPT?",
+    a: "ChatGPT is a general writing tool. Cre8tly Studio is a product building system. It uses your brand identity, past content, and preferences to create consistent, ready to publish digital assets that actually match how you speak.",
+  },
+  {
     q: "What is Cre8tly Studio?",
     a: "Cre8tly Studio is an all-in-one, AI powered platform that lets you create digital products, landing pages, PDFs, and sell them instantly from one place.\n\n And when we say all-in-one, we mean it. With Cre8tly Studio, you have all the tools you need to create, market, and sell professional digital products from the same dashboard — no messy integrations or prior tech skills required.",
   },

@@ -311,9 +311,11 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
 
-    case "social_links":
+    case "social_links": {
       const align = block.alignment || "center";
+      const iconStyle = block.icon_style || "color";
       const iconColor = block.icon_color || "#ffffff";
+      const showBorders = !!block.show_borders && iconStyle === "mono";
       const links = block.links || {};
 
       const iconSet = {
@@ -333,13 +335,14 @@ function renderPreviewBlock(block, index, context) {
           "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg",
         pinterest:
           "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pinterest.svg",
+        substack:
+          "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/substack.svg",
       };
 
       return (
         <div
           key={index}
           style={{
-            textAlign: align,
             margin: "40px 0",
             display: "flex",
             justifyContent:
@@ -354,41 +357,56 @@ function renderPreviewBlock(block, index, context) {
         >
           {Object.entries(links)
             .filter(([platform, url]) => url && iconSet[platform])
-            .map(([platform, url]) => (
-              <a
-                key={platform}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  width: "38px",
-                  height: "38px",
-                  display: "inline-block",
-                  transition: "transform 0.25s ease, opacity 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.1)";
-                  e.currentTarget.style.opacity = "0.9";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.opacity = "1";
-                }}
-              >
-                <div
+            .map(([platform, url]) => {
+              const color =
+                block.icon_style === "mono"
+                  ? "rgba(255,255,255,0.75)"
+                  : block.icon_color || "#ffffff";
+              return (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    WebkitMask: `url(${iconSet[platform]}) no-repeat center / contain`,
-                    mask: `url(${iconSet[platform]}) no-repeat center / contain`,
-                    backgroundColor: iconColor, // ✅ exact chosen color
-                    transition: "background-color 0.3s ease",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: showBorders ? "34px" : "26px",
+                    height: showBorders ? "34px" : "26px",
+                    borderRadius: showBorders ? "10px" : "0",
+                    border: showBorders ? `1.25px solid ${color}` : "none",
+                    transition:
+                      "transform 0.25s ease, opacity 0.2s ease, box-shadow 0.2s ease",
+                    textDecoration: "none",
                   }}
-                />
-              </a>
-            ))}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.1)";
+                    e.currentTarget.style.opacity = "0.9";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 12px rgba(255,255,255,0.35)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.opacity = "1";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      WebkitMask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                      mask: `url(${iconSet[platform]}) no-repeat center / contain`,
+                      backgroundColor: color,
+                    }}
+                  />
+                </a>
+              );
+            })}
         </div>
       );
+    }
 
     case "countdown": {
       const label = block.text || "Offer Ends In:";
@@ -856,6 +874,80 @@ function renderPreviewBlock(block, index, context) {
               }}
             >
               {block.caption}
+            </p>
+          )}
+        </div>
+      );
+
+    case "profile_card":
+      return (
+        <div
+          key={index}
+          style={{
+            textAlign: block.alignment || "center",
+            margin: "24px 0",
+            padding: "16px",
+          }}
+        >
+          {/* Profile Image */}
+          {block.image_url && (
+            <img
+              src={block.image_url}
+              alt=""
+              style={{
+                width: `${block.image_size || 120}px`,
+                height: `${block.image_size || 120}px`,
+                objectFit: "cover",
+                borderRadius: `${block.image_radius || 999}px`,
+                border: `${block.image_border_width || 1}px solid ${
+                  block.image_border_color || "#e5e7eb"
+                }`,
+                display: "block",
+                margin: "0 auto",
+              }}
+            />
+          )}
+
+          {/* Tagline */}
+          {block.tagline && (
+            <p
+              style={{
+                marginTop: "14px",
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: block.tagline_color || "#111827",
+                textAlign: block.alignment || "center",
+              }}
+            >
+              {block.tagline}
+            </p>
+          )}
+
+          {/* Contact */}
+          {block.contact_value && (
+            <p
+              style={{
+                marginTop: "6px",
+                fontSize: "0.9rem",
+                color: block.subtext_color || "#6b7280",
+                textAlign: block.alignment || "center",
+              }}
+            >
+              {block.contact_type === "phone" ? (
+                <a
+                  href={`tel:${block.contact_value}`}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {block.contact_value}
+                </a>
+              ) : (
+                <a
+                  href={`mailto:${block.contact_value}`}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {block.contact_value}
+                </a>
+              )}
             </p>
           )}
         </div>

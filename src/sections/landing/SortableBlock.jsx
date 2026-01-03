@@ -24,6 +24,7 @@ import ButtonBlock from "../../components/landing/blocks/types/ButtonBlock";
 import { BLOCK_PILL_STYLES, BLOCK_TYPE_TO_LABEL } from "../../constants";
 import SingleOfferBlock from "../../components/landing/blocks/types/SingleOfferBlock";
 import MiniOfferBlock from "../../components/landing/blocks/types/MiniOfferBlock";
+import ProfileCardBlock from "../../components/landing/blocks/types/ProfileCardBlock";
 
 function SortableBlock({
   id,
@@ -92,6 +93,11 @@ function SortableBlock({
           : `line • ${block.color || "#fff"} • ${block.height || 40}px`;
 
       case "image":
+        return block.image_url
+          ? block.image_url.split("/").pop().slice(0, 30)
+          : "(no image)";
+
+      case "profile_card":
         return block.image_url
           ? block.image_url.split("/").pop().slice(0, 30)
           : "(no image)";
@@ -498,6 +504,17 @@ function SortableBlock({
               index={index}
               bgTheme={bgTheme}
               updateBlock={updateField}
+              landing={landing}
+            />
+          )}
+          {block.type === "profile_card" && (
+            <ProfileCardBlock
+              block={block}
+              index={index}
+              updateBlock={updateField}
+              bgTheme={bgTheme}
+              getLabelContrast={getLabelContrast}
+              adjustForLandingOverlay={adjustForLandingOverlay}
               landing={landing}
             />
           )}

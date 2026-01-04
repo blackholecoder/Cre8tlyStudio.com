@@ -16,7 +16,7 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
   }, [hasCustomDomain]);
 
   return (
-    <div className="max-w-[40%] pb-10">
+    <div className="w-full pb-10">
       <label className="block font-semibold mb-1 text-silver">
         Page Url Username
       </label>
@@ -51,12 +51,12 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
           hasCustomDomain ? "Custom domain connected" : "e.g. cre8tlydesigns"
         }
         className={`
-          w-[40%]
+          w-75
           border
           rounded-lg
           px-4
           py-2
-          !border-white/10
+          !border-gray-700
           !text-white
           placeholder-white/30
           ${
@@ -71,16 +71,18 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
         {hasCustomDomain ? (
           <>
             Your page is live at{" "}
-            <span className="text-green">https://{primaryDomain}</span>
+            <span className="block text-green break-all">
+              https://{primaryDomain}
+            </span>
             <br />
-            <span className="text-gray-400">
+            <span className="block text-gray-400 mt-1">
               Subdomain is disabled while a custom domain is active.
             </span>
           </>
         ) : (
           <>
             This will be used for your page URL{" "}
-            <span className="text-green">
+            <span className="block text-green break-all">
               {landing.username
                 ? `https://${landing.username}.cre8tlystudio.com`
                 : "https://yourname.cre8tlystudio.com"}

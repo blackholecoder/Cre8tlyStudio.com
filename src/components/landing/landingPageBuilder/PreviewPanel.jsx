@@ -28,7 +28,7 @@ function renderPreviewBlock(block, index, context) {
       return (
         <h1
           key={index}
-          className="text-3xl font-bold leading-snug normal-case"
+          className="text-4xl font-bold leading-snug normal-case"
           style={{
             ...baseStyle,
             ...containerStyle,
@@ -827,8 +827,8 @@ function renderPreviewBlock(block, index, context) {
           key={index}
           style={{
             textAlign: block.alignment || "center",
-            padding: block.padding ? `${block.padding}px` : "0px",
-            margin: "20px 0",
+            padding: block.padding ? `min(${block.padding}px, 12px)` : "0px",
+            margin: "12px 0",
             overflow: "visible",
           }}
         >
@@ -847,7 +847,7 @@ function renderPreviewBlock(block, index, context) {
               objectFit: "contain",
               display: "block",
               margin: "0 auto",
-              padding: block.padding ? `${block.padding}px` : "0px",
+              padding: block.padding ? `min(${block.padding}px, 12px)` : "0px",
               borderRadius: block.radius ? `${block.radius}px` : "0px",
               boxShadow: block.shadow
                 ? (() => {
@@ -868,7 +868,7 @@ function renderPreviewBlock(block, index, context) {
 
           {block.caption && (
             <p
-              className="mt-3 text-gray-300 text-sm italic"
+              className="mt-2 sm:mt-3 text-gray-300 text-sm italic"
               style={{
                 textAlign: block.alignment || "center",
               }}
@@ -1734,7 +1734,8 @@ function renderPreviewBlock(block, index, context) {
           key={index}
           style={{
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column",
+            alignItems: "center",
             margin: "40px auto",
           }}
         >
@@ -1781,6 +1782,76 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
     }
+    case "scroll_arrow": {
+      const animationType = ["bounce", "float", "pulse"].includes(
+        block.animation_type
+      )
+        ? block.animation_type
+        : "bounce";
+
+      const arrowStyle = block.arrow_style || "single";
+
+      const styleMap = {
+        single: { count: 1, stagger: 0 },
+        double: { count: 2, stagger: 0.15 },
+        triple: { count: 3, stagger: 0.18 },
+      };
+
+      const { count, stagger } = styleMap[arrowStyle] || styleMap.single;
+
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent:
+              block.alignment === "left"
+                ? "flex-start"
+                : block.alignment === "right"
+                  ? "flex-end"
+                  : "center",
+            margin: "32px 0",
+            userSelect: "none",
+          }}
+        >
+          <div
+            style={{
+              width: block.size || 36,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              cursor: "pointer",
+              touchAction: "manipulation",
+              ["--arrow-speed"]: `${block.animation_speed || 1.2}s`,
+            }}
+          >
+            {Array.from({ length: count }).map((_, i) => (
+              <svg
+                key={i}
+                className={`scroll-arrow-item ${animationType}`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={block.color || "#ffffff"}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                width="100%"
+                height="100%"
+                style={{
+                  display: "block",
+                  marginTop: i === 0 ? 0 : "-10px", // 🔑 matches editor
+                  animationDelay: `${i * stagger}s`,
+                  animationDuration: `${block.animation_speed || 1.2}s`,
+                }}
+                aria-hidden="true"
+              >
+                {/* pointer only */}
+                <path d="M19 12l-7 7-7-7" />
+              </svg>
+            ))}
+          </div>
+        </div>
+      );
+    }
 
     default:
       return null;
@@ -1817,11 +1888,14 @@ export default function PreviewPanel({
   }
 
   return (
-    <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+    <div
+      className="mt-6 sm:mt-12
+ bg-[#111827]/80 border border-gray-700 rounded-xl sm:rounded-2xl shadow-inner  p-3 sm:p-6 transition-all hover:border-silver/60"
+    >
       {/* Header toggle */}
       <div
         onClick={() => setShowPreviewSection(!showPreviewSection)}
-        className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
+        className="flex items-center justify-between px-3 py-3 sm:px-6 sm:py-5 cursor-pointer select-none"
       >
         {/* Left side: title + description */}
         <div className="flex flex-col">
@@ -1853,7 +1927,7 @@ export default function PreviewPanel({
         }`}
       >
         <div
-          className="mt-8 p-10 rounded-xl text-center shadow-lg transition-all duration-500"
+          className="mt-4 sm:mt-8 p-4 sm:p-10 rounded-xl text-center shadow-lg transition-all duration-500"
           style={{
             background: adjustForLandingOverlay(selectedTheme),
             fontFamily: fontName,
@@ -1871,11 +1945,13 @@ export default function PreviewPanel({
                   alignItems: "center",
                   color: block.text_color || "#fff",
                   textAlign: "center",
-                  padding: `${block.padding || 50}px 20px`,
+                  padding: `${
+                    block.padding ? Math.min(block.padding, 28) : 28
+                  }px 16px`,
                   fontWeight: 600,
                   fontSize: "1.2rem",
                   lineHeight: "1.5",
-                  margin: "0 -30px 40px",
+                  margin: "0 0 40px",
                   borderRadius: "24px 24px 0 0",
                   boxShadow: "none",
                 }}
@@ -1931,7 +2007,7 @@ export default function PreviewPanel({
             <img
               src={landing.cover_image_url}
               alt="PDF Cover"
-              className="mx-auto mb-8 rounded-xl shadow-lg"
+              className="mx-auto mb-4 sm:mb-8 rounded-xl shadow-lg"
               style={{
                 width: "100%",
                 maxWidth: "480px",

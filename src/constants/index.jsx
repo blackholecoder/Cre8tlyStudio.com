@@ -790,6 +790,7 @@ export const BLOCK_PILL_STYLES = {
   "Single Offer": "text-blue border-blue bg-blue/10",
   "Mini Offer": "text-blue border-blue bg-blue/10",
   "Profile Card": "text-blue border-blue bg-blue/10",
+  "Scroll Arrow": "text-blue border-blue bg-blue/10",
 
   // 🟣 Conversion
   "Offer Banner": "text-royalPurple border-royalPurple bg-royalPurple/10",
@@ -806,6 +807,7 @@ export const BLOCK_PILL_STYLES = {
   // ⚪ Layout
   Divider: "text-white-400 border-white/20 bg-white/5",
   "Section Container": "text-white-400 border-white/20 bg-white/5",
+  "Referral Button": "text-white-400 border-white/20 bg-white/5",
 };
 
 export const BLOCK_TYPE_TO_LABEL = {
@@ -822,6 +824,7 @@ export const BLOCK_TYPE_TO_LABEL = {
   audio_player: "Audio Player",
   single_offer: "Single Offer",
   mini_offer: "Mini Offer",
+  scroll_arrow: "Scroll Arrow",
 
   offer_banner: "Offer Banner",
   stripe_checkout: "Stripe Checkout",
@@ -835,6 +838,7 @@ export const BLOCK_TYPE_TO_LABEL = {
 
   divider: "Divider",
   container: "Section Container",
+  referral_button: "Referral Button",
 };
 
 export const TRUST_ICONS = [
@@ -846,3 +850,21 @@ export const TRUST_ICONS = [
   { key: "star", icon: "⭐", label: "Trusted" },
   { key: "card", icon: "💳", label: "Payments" },
 ];
+
+export const SCROLL_ARROW_STYLES = {
+  single: {
+    label: "Single Arrow",
+    count: 1,
+    stagger: 0,
+  },
+  double: {
+    label: "Double Arrow",
+    count: 2,
+    stagger: 0.15,
+  },
+  triple: {
+    label: "Triple Arrow",
+    count: 3,
+    stagger: 0.18,
+  },
+};

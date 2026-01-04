@@ -25,6 +25,7 @@ import { BLOCK_PILL_STYLES, BLOCK_TYPE_TO_LABEL } from "../../constants";
 import SingleOfferBlock from "../../components/landing/blocks/types/SingleOfferBlock";
 import MiniOfferBlock from "../../components/landing/blocks/types/MiniOfferBlock";
 import ProfileCardBlock from "../../components/landing/blocks/types/ProfileCardBlock";
+import ScrollArrowBlock from "../../components/landing/blocks/types/ScrollArrowBlock";
 
 function SortableBlock({
   id,
@@ -127,9 +128,7 @@ function SortableBlock({
         return block.text?.slice(0, 30) || "(referral button)";
 
       case "button_url":
-        return `${block.text || "Button"} • ${
-          block.url ? block.url.slice(0, 35) : "no url"
-        }`;
+        return block.text || "Button";
 
       case "single_offer":
         return block.title ? block.title.slice(0, 50) : "Single Offer";
@@ -141,6 +140,9 @@ function SortableBlock({
         return block.title?.slice(0, 40) || "Secure Checkout";
       case "audio_player":
         return block.title?.slice(0, 35) || "Audio Player";
+
+      case "scroll_arrow":
+        return `Arrow • ${block.color || "#FFFFFF"}`;
 
       default:
         return "";
@@ -202,7 +204,11 @@ function SortableBlock({
     <div
       ref={setNodeRef}
       style={style}
-      className={`mb-6 bg-black/70 border rounded-xl p-5 relative shadow-inner text-white transition-all duration-300
+      className={`mb-4 sm:mb-6
+     bg-black/70 border rounded-lg sm:rounded-xl
+      p-3 sm:p-5
+      relative shadow-inner
+      text-white transition-all duration-300
     ${
       block.enabled !== false
         ? "border-gray-600 hover:border-gray-400"
@@ -215,7 +221,7 @@ function SortableBlock({
         {...attributes}
         {...listeners}
         title="Drag to reorder"
-        className="absolute -left-3 top-1/2 -translate-y-1/2 cursor-grab bg-gray-300 hover:bg-gray-400 
+        className="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 cursor-grab bg-gray-300 hover:bg-gray-400 
                    text-xs px-1 py-0.5 rounded"
       >
         ☰
@@ -223,7 +229,7 @@ function SortableBlock({
 
       {/* 🧩 Collapse / Expand Header */}
       <div
-        className="flex items-center justify-between cursor-pointer mb-3"
+        className="flex items-center justify-between cursor-pointer mb-2 sm:mb-3"
         onClick={() => updateField(index, "collapsed", !block.collapsed)}
       >
         {/* LEFT */}
@@ -244,7 +250,7 @@ function SortableBlock({
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 justify-end">
           {/* PRIMARY: Enable block */}
           <button
             type="button"
@@ -283,7 +289,7 @@ function SortableBlock({
 
               {/* SECONDARY: Animate */}
               <div
-                className="flex items-center gap-2 opacity-80 hover:opacity-100 transition"
+                className="flex items-center gap-2 shrink-0 opacity-80 hover:opacity-100 transition"
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="text-[11px] text-gray-400">Animate</span>
@@ -509,6 +515,17 @@ function SortableBlock({
           )}
           {block.type === "profile_card" && (
             <ProfileCardBlock
+              block={block}
+              index={index}
+              updateBlock={updateField}
+              bgTheme={bgTheme}
+              getLabelContrast={getLabelContrast}
+              adjustForLandingOverlay={adjustForLandingOverlay}
+              landing={landing}
+            />
+          )}
+          {block.type === "scroll_arrow" && (
+            <ScrollArrowBlock
               block={block}
               index={index}
               updateBlock={updateField}

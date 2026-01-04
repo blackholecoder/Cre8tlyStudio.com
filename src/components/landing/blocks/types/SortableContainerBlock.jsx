@@ -51,13 +51,12 @@ export function SortableContainerBlock({
       ref={setNodeRef}
       style={style}
       className={`
-    mb-6
-    rounded-xl
-    p-4
-    bg-black/60
-    transition-all duration-200
-
-    border
+      mb-4 sm:mb-6
+      rounded-xl
+      p-2 sm:p-4
+      bg-black/60
+      transition-all duration-200
+      border
     ${
       isOver
         ? "border-dashed border-green/50 bg-green/5"
@@ -101,7 +100,7 @@ export function SortableContainerBlock({
       {!block.collapsed && (
         <div
           ref={setDroppableRef}
-          className={`rounded-md p-1 transition-colors
+          className={`rounded-md p-0.5 sm:p-1 transition-colors
             ${isOver && !isOverChild ? "bg-green/10 border-green/50" : ""}
           `}
         >

@@ -656,6 +656,18 @@ export default function LandingPageBuilder() {
       newBlock.show_tagline = true;
       newBlock.show_contact = true;
     }
+    if (type === "scroll_arrow") {
+      // layout
+      newBlock.alignment = "center";
+      // appearance
+      newBlock.color = "#FFFFFF"; // safe default for dark backgrounds
+      newBlock.size = 36; // visually clear without being loud
+      // animation
+      newBlock.animated = true; // future-proof flag
+      newBlock.animation_type = "bounce"; // bounce | float | pulse
+      newBlock.animation_speed = 1.2;
+      newBlock.arrow_style = "single";
+    }
 
     setLanding((prev) => ({
       ...prev,
@@ -1166,15 +1178,13 @@ export default function LandingPageBuilder() {
           ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-3 sm:p-6 md:p-10 overflow-y-scroll">
-      <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-1 sm:p-6 md:p-10 overflow-y-scroll">
+      <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-3 sm:p-8">
         <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
           <Wand2 className="w-6 h-6 text-green" />
           Landing Page Builder
         </h1>
-
         {/* Version Controls */}
-
         <form onSubmit={handleSave} className="space-y-4">
           {/* Headline */}
           <div>

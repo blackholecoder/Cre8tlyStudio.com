@@ -1,5 +1,5 @@
 // src/components/AddSectionButton.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import { PRO_ONLY_BLOCKS } from "../../sections/landing/landingBlocksRules";
@@ -31,6 +31,21 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
     return () => document.removeEventListener("click", closeDropdown);
   }, []);
 
+  useEffect(() => {
+    if (showDropdown) {
+      // Lock background scroll
+      document.body.style.overflow = "hidden";
+    } else {
+      // Restore scroll
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup in case component unmounts while open
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showDropdown]);
+
   const options = [
     { label: "Section Container", value: "container" },
     { label: "Divider", value: "divider" },
@@ -45,6 +60,7 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
     { label: "Pro Image", value: "image" },
     { label: "Profile Card", value: "profile_card" },
     { label: "Single Offer", value: "single_offer" },
+    { label: "Scroll Arrow", value: "scroll_arrow" },
     { label: "Mini Offer", value: "mini_offer" },
     { label: "Verified Reviews", value: "verified_reviews" },
     { label: "Stripe Checkout", value: "stripe_checkout" },
@@ -78,10 +94,7 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
 
       {/* Dropdown menu */}
       {showDropdown && (
-        <div
-          className="absolute right-0 mt-3 w-56 bg-[#0F172A] border border-gray-700 
-                        rounded-xl shadow-xl overflow-hidden z-50"
-        >
+        <div className="absolute right-0 mt-3 w-64 sm:w-56 bg-[#0F172A] border border-gray-700 rounded-xl shadow-xl overflow-y-auto max-h-[60vh] sm:max-h-[480px] pb-2 z-50">
           {options.map((opt) => {
             const blockLimitReached = isDisabled(opt.value);
             const proLocked = isProLocked(opt.value);
@@ -132,7 +145,7 @@ export default function AddSectionButton({ addBlock, canAddBlock }) {
                       py-0.5
                       whitespace-nowrap
                       border
-                      rounded-xl
+                      rounded-md
         ${
           BLOCK_PILL_STYLES[opt.label] ||
           "bg-white/5 text-white-400 border-white/20"

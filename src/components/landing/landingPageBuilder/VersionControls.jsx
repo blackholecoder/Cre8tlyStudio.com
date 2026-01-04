@@ -12,11 +12,11 @@ export default function VersionControls({
   const applyDisabled = !selectedVersion || selectedVersion === appliedVersion;
 
   return (
-    <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner pb-12">
+    <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-lg sm:rounded-xl  p-3 sm:p-5 mb-10 shadow-inner pb-6 sm:pb-12">
       {/* Dropdown */}
-      <div className="relative w-full mb-6">
+      <div className="relative w-full mb-4 sm:mb-6">
         <select
-          className="w-full bg-gray-800 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 
+          className="w-full bg-gray-800 text-white px-3 py-2 pr-9 sm:px-4 sm:pr-10 rounded-lg border border-gray-600 
             focus:ring-2 focus:ring-green appearance-none"
           value={selectedVersion}
           onChange={handleLoadVersion}

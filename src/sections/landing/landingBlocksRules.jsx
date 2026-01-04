@@ -13,6 +13,7 @@ export const BLOCK_LIMITS = {
   mini_offer: 20,
   button_url: 10,
   profile_card: 1,
+  scroll_arrow: 5,
 };
 
 export const PRO_ONLY_BLOCKS = [
@@ -22,4 +23,5 @@ export const PRO_ONLY_BLOCKS = [
   "countdown",
   "secure_checkout",
   "mini_offer",
+  "scroll_arrow",
 ];

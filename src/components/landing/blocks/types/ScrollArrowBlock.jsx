@@ -63,7 +63,7 @@ export default function ScrollArrowBlock({
               style={{
                 display: "block",
                 marginTop: i === 0 ? 0 : "-10px",
-                animationDelay: `${i * styleConfig.stagger}s`,
+                animationDelay: `${i * (block.stagger ?? styleConfig.stagger)}s`,
                 animationDuration: `${block.animation_speed || 1.2}s`,
               }}
             >
@@ -183,6 +183,32 @@ export default function ScrollArrowBlock({
 
         <div className="text-xs text-gray-400 mt-1">
           {block.animation_speed || 1.2}s
+        </div>
+      </div>
+
+      {/* Stagger */}
+      <div className="mt-6">
+        <label
+          className="text-sm font-semibold"
+          style={{ color: getLabelContrast(bgTheme) }}
+        >
+          Arrow Stagger
+        </label>
+
+        <input
+          type="range"
+          min="0"
+          max="0.5"
+          step="0.05"
+          value={block.stagger ?? styleConfig.stagger}
+          onChange={(e) =>
+            updateBlock(index, "stagger", Number(e.target.value))
+          }
+          className="w-full mt-2"
+        />
+
+        <div className="text-xs text-gray-400 mt-1">
+          {block.stagger ?? styleConfig.stagger}s delay
         </div>
       </div>
 

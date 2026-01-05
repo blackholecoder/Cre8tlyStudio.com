@@ -1792,12 +1792,13 @@ function renderPreviewBlock(block, index, context) {
       const arrowStyle = block.arrow_style || "single";
 
       const styleMap = {
-        single: { count: 1, stagger: 0 },
-        double: { count: 2, stagger: 0.15 },
-        triple: { count: 3, stagger: 0.18 },
+        single: 1,
+        double: 2,
+        triple: 3,
       };
 
-      const { count, stagger } = styleMap[arrowStyle] || styleMap.single;
+      const count = styleMap[arrowStyle] || 1;
+      const stagger = block.stagger || 0;
 
       return (
         <div
@@ -1838,13 +1839,12 @@ function renderPreviewBlock(block, index, context) {
                 height="100%"
                 style={{
                   display: "block",
-                  marginTop: i === 0 ? 0 : "-10px", // 🔑 matches editor
+                  marginTop: i === 0 ? 0 : "-10px",
                   animationDelay: `${i * stagger}s`,
                   animationDuration: `${block.animation_speed || 1.2}s`,
                 }}
                 aria-hidden="true"
               >
-                {/* pointer only */}
                 <path d="M19 12l-7 7-7-7" />
               </svg>
             ))}

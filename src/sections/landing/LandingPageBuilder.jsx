@@ -667,6 +667,7 @@ export default function LandingPageBuilder() {
       newBlock.animation_type = "bounce"; // bounce | float | pulse
       newBlock.animation_speed = 1.2;
       newBlock.arrow_style = "single";
+      newBlock.stagger = 0.15; // seconds
     }
 
     setLanding((prev) => ({

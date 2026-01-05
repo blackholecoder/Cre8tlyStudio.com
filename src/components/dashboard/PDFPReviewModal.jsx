@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { X, Download, ZoomIn, ZoomOut } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import DownloadLockWarningModal from "../modals/DownloadLockWarningModal";
+import axiosInstance from "../../api/axios";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
@@ -25,6 +26,9 @@ export default function PDFPreviewModal({
   const [error, setError] = useState(null);
   const [showUpgradeNotice, setShowUpgradeNotice] = useState(false);
   const [showDownloadWarning, setShowDownloadWarning] = useState(false);
+  const [loadedOnce, setLoadedOnce] = useState(false);
+
+  const pageWidth = useMemo(() => Math.min(window.innerWidth - 40, 900), []);
 
   const memoizedFile = useMemo(() => {
     if (!fileUrl) return null;
@@ -38,15 +42,23 @@ export default function PDFPreviewModal({
 
   useEffect(() => {
     if (!fileUrl) return;
+
     let timeout;
     let retries = 0;
+
     const checkPDF = async () => {
+      if (pdfReady) return;
+
       try {
-        const res = await fetch(memoizedFile.url, { method: "HEAD" });
-        const type = res.headers.get("content-type");
-        if (res.ok && type?.includes("pdf")) {
+        const res = await axiosInstance.head(memoizedFile.url);
+        const type = res.headers["content-type"];
+
+        if (type?.includes("pdf")) {
           setPdfReady(true);
-        } else if (retries < 10) {
+          return;
+        }
+
+        if (retries < 10) {
           retries++;
           timeout = setTimeout(checkPDF, 1500);
         } else {
@@ -61,9 +73,10 @@ export default function PDFPreviewModal({
         }
       }
     };
+
     checkPDF();
     return () => clearTimeout(timeout);
-  }, [fileUrl]);
+  }, [fileUrl, memoizedFile.url, pdfReady]);
 
   const handleDownload = async () => {
     const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
@@ -125,10 +138,11 @@ export default function PDFPreviewModal({
     setDownloading(false);
     setNumPages(null);
     setScale(1.2);
-  }, [fileUrl, onClose]);
+  }, [fileUrl]);
 
   useEffect(() => {
-    const handleResize = () => setScale(window.innerWidth < 640 ? 0.8 : 1.2);
+    const handleResize = () =>
+      setScale((s) => (window.innerWidth < 640 ? Math.min(s, 0.8) : s));
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
@@ -247,7 +261,10 @@ export default function PDFPreviewModal({
           {pdfReady && !error && (
             <Document
               file={memoizedFile}
-              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+              onLoadSuccess={({ numPages }) => {
+                setNumPages(numPages);
+                setLoadedOnce(true);
+              }}
               onLoadError={(err) => {
                 console.error("PDF load error:", err);
                 setError("Failed to load PDF file.");
@@ -263,7 +280,7 @@ export default function PDFPreviewModal({
                     renderTextLayer={false}
                     renderAnnotationLayer={false}
                     className="mb-4"
-                    width={Math.min(window.innerWidth - 40, 900)}
+                    width={pageWidth}
                   />
                 ))}
               </div>

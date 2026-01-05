@@ -1,14 +1,26 @@
 // AuthContext.jsx
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useRef } from "react";
 import axiosInstance from "../api/axios";
 import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  const refreshInFlightRef = useRef(false);
+  const refreshPromiseRef = useRef(null);
+
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  function isTokenExpired(token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  }
 
   function enrichUser(u) {
     if (!u) return null;
@@ -79,30 +91,41 @@ export function AuthProvider({ children }) {
 
   // 🔹 Refresh Access Token
   async function refreshAccessToken() {
+    if (refreshInFlightRef.current) {
+      return refreshPromiseRef.current;
+    }
+
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) return null;
 
-    try {
-      const res = await axiosInstance.post("/auth/refresh", {
-        token: refreshToken,
-      });
-      const data = res.data;
+    refreshInFlightRef.current = true;
 
-      setAccessToken(data.accessToken);
-      localStorage.setItem("accessToken", data.accessToken);
+    refreshPromiseRef.current = (async () => {
+      try {
+        const res = await axiosInstance.post("/auth/refresh", {
+          token: refreshToken,
+        });
 
-      if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
+        const data = res.data;
+
+        setAccessToken(data.accessToken);
+        localStorage.setItem("accessToken", data.accessToken);
+
+        if (data.refreshToken) {
+          localStorage.setItem("refreshToken", data.refreshToken);
+        }
+
+        return data.accessToken;
+      } catch (err) {
+        console.error("Refresh failed:", err);
+        return null;
+      } finally {
+        refreshInFlightRef.current = false;
+        refreshPromiseRef.current = null;
       }
+    })();
 
-      return data.accessToken;
-    } catch (err) {
-      console.error("Refresh failed:", err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        logout();
-      }
-      return null;
-    }
+    return refreshPromiseRef.current;
   }
 
   function logout() {
@@ -117,8 +140,13 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const timer = setTimeout(() => refreshAccessToken(), 1500);
-    return () => clearTimeout(timer);
+    const token = localStorage.getItem("accessToken");
+    const refresh = localStorage.getItem("refreshToken");
+
+    if (refresh && (!token || isTokenExpired(token))) {
+      const timer = setTimeout(() => refreshAccessToken(), 1500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   useEffect(() => {
@@ -132,7 +160,7 @@ export function AuthProvider({ children }) {
         if (storedAccess) setAccessToken(storedAccess);
 
         // ✅ Only try refreshing if we have a refresh token but no access token
-        if (!storedAccess && storedRefresh) {
+        if ((!storedAccess || isTokenExpired(storedAccess)) && storedRefresh) {
           const token = await refreshAccessToken();
           if (token) {
             const res = await axiosInstance.get("/auth/me", {
@@ -152,18 +180,47 @@ export function AuthProvider({ children }) {
     restoreUser();
   }, []);
 
+  useEffect(() => {
+    const onVisibilityChange = async () => {
+      if (document.visibilityState === "visible") {
+        const token = localStorage.getItem("accessToken");
+        const refresh = localStorage.getItem("refreshToken");
+
+        if ((!token || isTokenExpired(token)) && refresh) {
+          await refreshAccessToken();
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
   async function refreshUser() {
+    let token = accessToken;
+
+    // 1️⃣ Refresh if missing or expired
+    if (!token || isTokenExpired(token)) {
+      token = await refreshAccessToken();
+      if (!token) {
+        console.warn("Unable to refresh access token");
+        return null;
+      }
+    }
+
     try {
+      // 2️⃣ Fetch user with a valid token
       const res = await axiosInstance.get("/auth/me", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       const enriched = enrichUser(res.data);
       setUser(enriched);
       localStorage.setItem("user", JSON.stringify(enriched));
       return enriched;
     } catch (err) {
       console.error("Failed to refresh user data:", err);
-      toast.error("Failed to refresh user data");
       return null;
     }
   }

@@ -27,6 +27,7 @@ export default function PDFPreviewModal({
   const [showUpgradeNotice, setShowUpgradeNotice] = useState(false);
   const [showDownloadWarning, setShowDownloadWarning] = useState(false);
   const [loadedOnce, setLoadedOnce] = useState(false);
+  const isMagnet = sourceType === "magnet";
 
   const pageWidth = useMemo(() => Math.min(window.innerWidth - 40, 900), []);
 
@@ -170,7 +171,13 @@ export default function PDFPreviewModal({
             <ZoomOut size={20} />
           </button>
           <button
-            onClick={() => setShowDownloadWarning(true)}
+            onClick={() => {
+              if (isMagnet) {
+                setShowDownloadWarning(true);
+              } else {
+                handleDownload();
+              }
+            }}
             disabled={downloading}
             className={`p-2 rounded-lg transition text-white ${
               downloading
@@ -316,14 +323,16 @@ export default function PDFPreviewModal({
           </div>
         </div>
       )}
-      <DownloadLockWarningModal
-        open={showDownloadWarning}
-        onCancel={() => setShowDownloadWarning(false)}
-        onConfirm={async () => {
-          setShowDownloadWarning(false);
-          await handleDownload();
-        }}
-      />
+      {isMagnet && (
+        <DownloadLockWarningModal
+          open={showDownloadWarning}
+          onCancel={() => setShowDownloadWarning(false)}
+          onConfirm={async () => {
+            setShowDownloadWarning(false);
+            await handleDownload();
+          }}
+        />
+      )}
     </div>
   );
 }

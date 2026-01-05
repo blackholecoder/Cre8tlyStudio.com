@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
+import axiosInstance from "../../api/axios";
 
-export default function BookPartsModal({ bookId, accessToken, onClose }) {
+export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -9,22 +10,17 @@ export default function BookPartsModal({ bookId, accessToken, onClose }) {
   useEffect(() => {
     async function fetchParts() {
       try {
-        const res = await fetch(
-          `https://cre8tlystudio.com/api/books/${bookId}/parts`,
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-        const data = await res.json();
-        setParts(data);
+        const res = await axiosInstance.get(`/books/${bookId}/parts`);
+        setParts(res.data);
       } catch (err) {
         console.error("❌ Failed to load book parts:", err);
       } finally {
         setLoading(false);
       }
     }
+
     fetchParts();
-  }, [bookId, accessToken]);
+  }, [bookId]);
 
   return (
     <>
@@ -43,10 +39,10 @@ export default function BookPartsModal({ bookId, accessToken, onClose }) {
               {parts.map((p) => (
                 <li
                   key={p.id}
-                  className="flex justify-between items-center border-b border-gray-700 pb-3"
+                  className="flex items-center justify-between border-b border-gray-700 pb-3"
                 >
-                  <div>
-                    <p className="text-white font-semibold">
+                  <div className="min-w-0 pr-6">
+                    <p className="text-white font-semibold break-words leading-snug">
                       Part {p.part_number}: {p.title || "Untitled"}
                     </p>
                     <p className="text-white">Total pages: {p.pages}</p>
@@ -55,18 +51,30 @@ export default function BookPartsModal({ bookId, accessToken, onClose }) {
                     </p>
                   </div>
 
-                  <button
-                    onClick={() =>
-                      setPreviewUrl({
-                        url: p.file_url,
-                        title: p.title,
-                        partNumber: p.part_number,
-                      })
-                    }
-                    className="px-3 py-1 bg-gradient-to-r from-[#00E07A] to-[#6A5ACD] rounded text-sm text-black font-semibold hover:opacity-90 transition"
-                  >
-                    Open PDF
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        setPreviewUrl({
+                          url: p.file_url,
+                          title: p.title,
+                          partNumber: p.part_number,
+                        })
+                      }
+                      className="px-3 py-1 bg-royalPurple rounded text-sm text-white font-semibold hover:opacity-90 transition"
+                    >
+                      Open PDF
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onEditChapter(bookId, p.part_number);
+                      }}
+                      className="px-3 py-1 bg-gray-900 border border-gray-700 rounded text-sm text-white hover:bg-gray-700 transition"
+                    >
+                      Edit Chapter
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

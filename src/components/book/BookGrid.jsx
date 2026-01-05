@@ -20,7 +20,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [activeBookId, setActiveBookId] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const { accessToken, user, refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const steps = [
     {
@@ -258,7 +258,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
       {showPartsModal && (
         <BookPartsModal
           bookId={activeBookId}
-          accessToken={accessToken}
+          onEditChapter={onAddPrompt}
           onClose={() => setShowPartsModal(false)}
         />
       )}

@@ -232,7 +232,7 @@ export default function BookPromptForm({
         prompt: text,
         pages,
         link,
-        cover,
+        coverImage: cover,
         bookName,
         authorName,
         bookType,

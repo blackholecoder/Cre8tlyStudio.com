@@ -11,6 +11,14 @@ export default function UnsplashImagePicker({ onSelect }) {
 
   const loaderRef = useRef(null);
 
+  useEffect(() => {
+    if (query.trim() === "") {
+      setImages([]);
+      setPage(1);
+      setHasMore(false);
+    }
+  }, [query]);
+
   async function searchUnsplash(newPage = 1, append = false) {
     if (!query.trim()) return;
     setLoading(true);
@@ -66,18 +74,39 @@ export default function UnsplashImagePicker({ onSelect }) {
   return (
     <div className="space-y-4 bg-[#111] p-4 rounded-lg border border-gray-800">
       {/* 🔍 Search Bar */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search Unsplash images (e.g. fitness, coffee, nature)"
-          className="flex-1 bg-gray-900 text-white p-2 rounded-lg border border-gray-700"
+          className="
+          w-full
+          bg-gray-900
+          text-white
+          p-3
+          rounded-lg
+          border
+          border-gray-700
+  "
         />
         <button
           type="button"
           onClick={handleSearch}
           disabled={loading}
-          className="bg-green text-black font-bold px-4 py-2 rounded-lg transition hover:bg-green-400"
+          className="
+          w-full
+          sm:w-auto
+          bg-green
+          text-black
+          font-bold
+          px-4
+          py-3
+          rounded-lg
+          transition
+          hover:bg-green-400
+          disabled:opacity-60
+          disabled:cursor-not-allowed
+  "
         >
           {loading ? "Searching..." : "Search"}
         </button>
@@ -85,8 +114,15 @@ export default function UnsplashImagePicker({ onSelect }) {
 
       {/* 🖼️ Scrollable Grid */}
       <div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-y-auto relative"
-        style={{ maxHeight: "400px" }}
+        className="grid
+    grid-cols-2
+    sm:grid-cols-3
+    md:grid-cols-4
+    gap-3
+    overflow-y-auto
+    relative
+    max-h-[45vh]
+    sm:max-h-[400px]"
       >
         {images.map((img) => (
           <div
@@ -97,7 +133,8 @@ export default function UnsplashImagePicker({ onSelect }) {
             <img
               src={img.urls.small}
               alt={img.alt_description}
-              className="rounded-lg w-full h-40 object-cover group-hover:opacity-75 transition"
+              className="rounded-lg w-full h-32
+    sm:h-40 object-cover group-hover:opacity-75 transition"
             />
             <span className="absolute bottom-1 left-1 text-xs bg-black/60 px-1 rounded text-white">
               {img.user.name}

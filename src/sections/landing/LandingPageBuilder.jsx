@@ -421,10 +421,7 @@ export default function LandingPageBuilder() {
 
     // ⭐ Verified Reviews Block
     if (type === "verified_reviews") {
-      newBlock.title = "Verified Buyer Reviews";
-      newBlock.text_color = "#FFFFFF";
-      newBlock.bg_color = "rgba(0,0,0,0.3)";
-      newBlock.alignment = "center";
+      newBlock.enabled = true;
       newBlock.collapsed = false;
     }
 

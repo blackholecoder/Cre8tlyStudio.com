@@ -646,87 +646,57 @@ function renderPreviewBlock(block, index, context) {
         <div
           key={index}
           style={{
-            background: block.bg_color || "rgba(0,0,0,0.3)",
-            color: block.text_color || "#FFFFFF",
-            textAlign: block.alignment || "center",
-            padding: "40px",
-            borderRadius: "20px",
-            marginTop: "40px",
+            marginTop: "48px",
+            padding: "28px",
+            borderRadius: "16px",
+            border: "1px dashed rgba(255,255,255,0.25)",
+            background: "rgba(15,23,42,0.6)",
+            textAlign: "center",
           }}
         >
-          {/* Stars */}
           <div
             style={{
-              marginBottom: "12px",
-              fontSize: "1.6rem",
+              fontSize: "1.4rem",
               color: "#facc15",
+              marginBottom: "10px",
             }}
           >
-            ⭐⭐⭐⭐⭐
+            ★★★★★
           </div>
 
-          {/* Title */}
-          <h2
+          <h3
             style={{
-              fontSize: "1.8rem",
-              fontWeight: 700,
-              marginBottom: "30px",
+              fontSize: "1.25rem",
+              fontWeight: 600,
+              color: "#fff",
+              marginBottom: "6px",
             }}
           >
-            {block.title || "Verified Reviews"}
-          </h2>
+            Verified Buyer Reviews
+          </h3>
 
-          {/* Review Card */}
+          <p
+            style={{
+              fontSize: "0.85rem",
+              opacity: 0.7,
+              color: "#fff",
+              maxWidth: "420px",
+              margin: "0 auto",
+            }}
+          >
+            Real reviews from verified customers will appear here on your live
+            page.
+          </p>
+
           <div
             style={{
-              background: "rgba(0,0,0,0.35)",
-              borderRadius: "16px",
-              padding: "26px",
-              maxWidth: "720px",
-              margin: "0 auto",
-              textAlign: "left",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+              marginTop: "16px",
+              fontSize: "0.75rem",
+              color: "#fff",
+              opacity: 0.5,
             }}
           >
-            {/* Name + Rating Row */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "14px",
-              }}
-            >
-              <span
-                style={{
-                  color: "#7bed9f",
-                  fontWeight: 600,
-                  fontSize: "1rem",
-                }}
-              >
-                Brian Sheps
-              </span>
-
-              <span style={{ color: "#facc15", fontSize: "1.1rem" }}>
-                ⭐⭐⭐⭐⭐
-              </span>
-            </div>
-
-            {/* Review Text */}
-            <p style={{ fontSize: "1rem", lineHeight: 1.6 }}>
-              Amazing guide. I will be purchasing again real soon!
-            </p>
-
-            {/* Meta */}
-            <p
-              style={{
-                marginTop: "14px",
-                fontSize: "0.85rem",
-                opacity: 0.75,
-              }}
-            >
-              Verified Buyer · Sample Preview
-            </p>
+            Preview only · Live data not shown in editor
           </div>
         </div>
       );

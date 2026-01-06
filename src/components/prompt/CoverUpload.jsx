@@ -14,34 +14,33 @@ export default function CoverUpload({ setCover }) {
   const isLocked = !user?.pro_covers;
 
   // ✅ Handle local upload
- const handleCoverUpload = (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleCoverUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  // 🔒 Limit file size (example: 10 MB max — 1 GB is way too large for base64)
-  const maxSizeMB = 10;
-  if (file.size > maxSizeMB * 1024 * 1024) {
-    toast.error(`File too large. Maximum ${maxSizeMB} MB allowed.`);
-    return;
-  }
+    // 🔒 Limit file size (example: 10 MB max — 1 GB is way too large for base64)
+    const maxSizeMB = 10;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast.error(`File too large. Maximum ${maxSizeMB} MB allowed.`);
+      return;
+    }
 
-  const reader = new FileReader();
+    const reader = new FileReader();
 
-  reader.onloadend = () => {
-    const base64 = reader.result;
+    reader.onloadend = () => {
+      const base64 = reader.result;
 
-    // ✅ Set base64 string (data:image/...;base64,...)
-    setCover(base64);
-    setPreview(base64);
+      // ✅ Set base64 string (data:image/...;base64,...)
+      setCover(base64);
+      setPreview(base64);
 
-    // Clear Unsplash credit if the user uploads manually
-    setCredit(null);
+      // Clear Unsplash credit if the user uploads manually
+      setCredit(null);
+    };
+
+    // Trigger file reading
+    reader.readAsDataURL(file);
   };
-
-  // Trigger file reading
-  reader.readAsDataURL(file);
-};
-
 
   const handleUnlock = () => navigate("/plans");
 
@@ -54,6 +53,19 @@ export default function CoverUpload({ setCover }) {
       profile: img.user.links.html,
     });
     toast.success("Cover image selected!");
+  };
+
+  const handleRemoveCover = () => {
+    setCover(null);
+    setPreview(null);
+    setCredit(null);
+
+    // also reset file input so the same file can be re selected
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    toast.info("Cover image removed");
   };
 
   return (
@@ -73,18 +85,18 @@ export default function CoverUpload({ setCover }) {
       )}
 
       {/* Title Row */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
         <label className="block text-gray-300 font-semibold text-lg tracking-wide">
           Upload or Choose a Cover{" "}
           <span className="text-sm text-gray-500 ml-1">(Max 667 × 1000)</span>
         </label>
 
         <span
-          className={`bg-gradient-to-r from-[#a98aff] via-[#d2b6ff] to-[#8e66ff]
-                     text-black font-semibold text-xs px-3 py-1 rounded-full
-                     shadow-[0_0_10px_rgba(168,130,255,0.6)]
-                     border border-[#d2b6ff]/60 uppercase tracking-wider
-                     ${isLocked ? "opacity-60" : ""}`}
+          className={`self-start bg-gradient-to-r from-[#a98aff] via-[#d2b6ff] to-[#8e66ff]
+             text-black font-semibold text-xs px-3 py-1 rounded-full
+             shadow-[0_0_10px_rgba(168,130,255,0.6)]
+             border border-[#d2b6ff]/60 uppercase tracking-wider
+             ${isLocked ? "opacity-60" : ""}`}
         >
           PRO
         </span>
@@ -104,12 +116,13 @@ export default function CoverUpload({ setCover }) {
         type="button"
         onClick={() => !isLocked && fileInputRef.current.click()}
         disabled={isLocked}
-        className={`px-5 py-2 rounded-md font-semibold text-sm shadow-md transition cursor-pointer flex items-center gap-2 
-          ${
-            isLocked
-              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-green text-black hover:bg-green"
-          }`}
+        className={`w-full sm:w-auto px-5 py-3 rounded-md font-semibold text-sm shadow-md transition 
+    flex items-center justify-center gap-2
+    ${
+      isLocked
+        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+        : "bg-green text-black hover:bg-green"
+    }`}
       >
         <ImageIcon size={16} /> Choose File
       </button>
@@ -117,7 +130,9 @@ export default function CoverUpload({ setCover }) {
       {/* ✅ Unsplash picker injected here */}
       {!isLocked && (
         <div className="mt-4">
-          <UnsplashImagePicker onSelect={handleUnsplashSelect} />
+          <div className="flex flex-col gap-3">
+            <UnsplashImagePicker onSelect={handleUnsplashSelect} />
+          </div>
         </div>
       )}
 
@@ -132,6 +147,29 @@ export default function CoverUpload({ setCover }) {
           <p className="text-xs text-gray-500 mt-1">
             This cover will appear before your first page.
           </p>
+
+          <button
+            type="button"
+            onClick={handleRemoveCover}
+            className="
+    mt-3
+    w-full
+    sm:w-auto
+    text-sm
+    font-semibold
+    text-red-400
+    border
+    border-red-400/30
+    px-4
+    py-2
+    rounded-lg
+    hover:bg-red-500/10
+    hover:text-red-300
+    transition
+  "
+          >
+            Remove cover image
+          </button>
 
           {credit && (
             <p className="text-[10px] text-gray-400 mt-1 italic">

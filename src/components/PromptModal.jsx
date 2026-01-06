@@ -61,7 +61,7 @@ export default function PromptModal({
       setCover(null);
       setProgress(0);
       setShowPreview(false);
-      setPhase("questions"); 
+      setPhase("questions");
       setFontName(null);
       setFontFile(null);
     } else {
@@ -75,23 +75,23 @@ export default function PromptModal({
   async function handleSubmit(e, contentType) {
     e.preventDefault();
 
+    // 🧩 1️⃣ Refresh latest user data
+    const freshUser = await refreshUser();
 
-// 🧩 1️⃣ Refresh latest user data
-  const freshUser = await refreshUser();
+    // 🧩 2️⃣ Block if trial expired
+    if (freshUser?.isFreeTier && freshUser?.trialExpired) {
+      toast.error("⛔ Your 7-day free trial has expired. Upgrade to continue.");
+      navigate("/plans");
+      return;
+    }
 
-// 🧩 2️⃣ Block if trial expired
-  if (freshUser?.isFreeTier && freshUser?.trialExpired) {
-    toast.error("⛔ Your 7-day free trial has expired. Upgrade to continue.");
-    navigate("/plans");
-    return;
-  }
-
-   // 🧩 3️⃣ Prevent more than 5 pages for free users
-  if (freshUser?.isFreeTier && pages > 5) {
-    toast.warn("Free tier limited to 5 pages maximum. Please upgrade to unlock more.");
-    return;
-  }
-
+    // 🧩 3️⃣ Prevent more than 5 pages for free users
+    if (freshUser?.isFreeTier && pages > 5) {
+      toast.warn(
+        "Free tier limited to 5 pages maximum. Please upgrade to unlock more."
+      );
+      return;
+    }
 
     setLoading(true);
     setProgress(0);
@@ -278,10 +278,91 @@ export default function PromptModal({
       >
         <DialogBackdrop className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-900 p-8 shadow-2xl border border-gray-700">
-            <DialogTitle className="text-2xl font-bold text-white mb-6 text-center">
-              ✨ Create Your Digital Asset
-            </DialogTitle>
+          <DialogPanel
+            className="
+            relative
+            w-full
+            max-w-3xl
+            max-h-[90vh]
+            sm:max-h-[85vh]
+            overflow-y-auto
+            rounded-2xl
+            bg-gray-900
+            p-4
+            sm:p-8
+            shadow-2xl
+            border
+            border-gray-700"
+          >
+            {/* ---------- Modal Header ---------- */}
+            <div className="relative mb-6">
+              {/* Mobile header */}
+              {/* Mobile header */}
+              <div className="sm:hidden">
+                {/* Top row: back + close */}
+                <div className="flex items-center justify-between mb-2">
+                  {phase !== "questions" ? (
+                    <button
+                      type="button"
+                      onClick={() => setPhase("questions")}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </button>
+                  ) : (
+                    <div /> // keeps spacing balanced when no back button
+                  )}
+
+                  <button
+                    onClick={!loading ? handleClose : undefined}
+                    disabled={loading}
+                    className={`text-white text-xl transition ${
+                      loading
+                        ? "opacity-30 cursor-not-allowed"
+                        : "hover:text-red-400"
+                    }`}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Title row */}
+                <h2 className="text-2xl font-bold text-white text-center">
+                  ✨ Create Your Digital Asset
+                </h2>
+              </div>
+
+              {/* Desktop header */}
+              <div className="hidden sm:flex items-center justify-center">
+                {phase !== "questions" && (
+                  <button
+                    type="button"
+                    onClick={() => setPhase("questions")}
+                    className="absolute left-0 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md"
+                  >
+                    <ArrowLeft size={16} />
+                    <span>Back</span>
+                  </button>
+                )}
+
+                <h2 className="text-2xl font-bold text-white">
+                  ✨ Create Your Digital Asset
+                </h2>
+
+                <button
+                  onClick={!loading ? handleClose : undefined}
+                  disabled={loading}
+                  className={`absolute right-0 text-white text-xl transition ${
+                    loading
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:text-red-400"
+                  }`}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
 
             {/* ---------- Form Wrapper ---------- */}
             <div className="relative">
@@ -383,28 +464,6 @@ export default function PromptModal({
                 </div>
               )}
             </div>
-
-            {/* Close button (disabled while loading) */}
-            {phase !== "questions" && (
-              <button
-                type="button"
-                onClick={() => setPhase("questions")}
-                className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md transition-all hover:bg-green/90 hover:text-white active:scale-95 z-20"
-              >
-                <ArrowLeft size={16} />
-                <span>Back</span>
-              </button>
-            )}
-
-            <button
-              onClick={!loading ? handleClose : undefined}
-              className={`absolute top-4 right-4 text-white text-xl transition ${
-                loading ? "opacity-30 cursor-not-allowed" : "hover:text-red-400"
-              }`}
-              disabled={loading}
-            >
-              ✕
-            </button>
           </DialogPanel>
         </div>
       </Dialog>

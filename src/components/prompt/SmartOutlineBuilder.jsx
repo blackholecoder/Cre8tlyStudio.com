@@ -53,61 +53,155 @@ export default function SmartPromptBuilder({ onPromptReady }) {
   };
 
   return (
-    <div className="bg-gray-900/60 p-6 rounded-xl border border-gray-700 space-y-4">
-      <h2 className="text-xl font-bold text-white mb-2">
-        Smart Prompt Builder
-      </h2>
-      <p className="text-gray-400 text-sm mb-4">
-        Answer a few quick questions so we can craft a personalized lead magnet
-        prompt for you.
-      </p>
-      <div>
-        <label className="block text-gray-300 mb-1">Who is this for?</label>
-        <input
-          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
-          placeholder="Example: entrepreneurs, creators, small business owners"
-          value={audience}
-          onChange={(e) => setAudience(e.target.value)}
-        />
+    <div
+      className="bg-gray-900/60 p-4
+  sm:p-6 rounded-xl border border-gray-700"
+    >
+      {/* 🔽 Internal scroll container */}
+      <div
+        className="max-h-[75vh]
+        sm:max-h-[60vh]
+        overflow-y-auto
+        pr-1
+        sm:pr-2
+        space-y-5"
+      >
+        <h2 className="text-xl font-bold text-white">Smart Prompt Builder</h2>
+
+        <p className="text-gray-400 text-sm">
+          Answer a few quick questions so we can craft a personalized lead
+          magnet prompt for you.
+        </p>
+
+        {/* Audience */}
+        <div>
+          <label className="block text-gray-300 mb-1">Who is this for?</label>
+          <textarea
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
+            className="
+              w-full
+              min-h-[110px]
+              sm:min-h-[80px]
+              resize-y
+              overflow-y-auto
+              p-3
+              sm:p-3
+              rounded
+              bg-gray-800
+              text-white
+              border
+              border-gray-600
+              leading-relaxed
+            "
+            placeholder="Example: entrepreneurs, creators, small business owners"
+          />
+        </div>
+
+        {/* Pain */}
+        <div>
+          <label className="block text-gray-300 mb-1">
+            What problem are they facing?
+          </label>
+          <textarea
+            value={pain}
+            onChange={(e) => setPain(e.target.value)}
+            className="
+              w-full
+              min-h-[110px]
+              sm:min-h-[80px]
+              resize-y
+              overflow-y-auto
+              p-3
+              sm:p-3
+              rounded
+              bg-gray-800
+              text-white
+              border
+              border-gray-600
+              leading-relaxed
+            "
+            placeholder="Example: struggling to grow an email list or convert leads"
+          />
+        </div>
+
+        {/* Promise */}
+        <div>
+          <label className="block text-gray-300 mb-1">
+            What transformation or result do they want?
+          </label>
+          <textarea
+            value={promise}
+            onChange={(e) => setPromise(e.target.value)}
+            className="
+             w-full
+              min-h-[110px]
+              sm:min-h-[80px]
+              resize-y
+              overflow-y-auto
+              p-3
+              sm:p-3
+              rounded
+              bg-gray-800
+              text-white
+              border
+              border-gray-600
+              leading-relaxed
+            "
+            placeholder="Example: consistently attract qualified leads every week"
+          />
+        </div>
+
+        {/* Offer */}
+        <div>
+          <label className="block text-gray-300 mb-1">
+            What’s your offer or next step? (optional)
+          </label>
+          <textarea
+            value={offer}
+            onChange={(e) => setOffer(e.target.value)}
+            className="
+              w-full
+              min-h-[110px]
+              sm:min-h-[80px]
+              resize-y
+              overflow-y-auto
+              p-3
+              sm:p-3
+              rounded
+              bg-gray-800
+              text-white
+              border
+              border-gray-600
+              leading-relaxed
+            "
+            placeholder="Example: join my course, book a free strategy call"
+          />
+        </div>
       </div>
-      <div>
-        <label className="block text-gray-300 mb-1">
-          What problem are they facing?
-        </label>
-        <input
-          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
-          placeholder="Example: struggling to grow an email list or convert leads"
-          value={pain}
-          onChange={(e) => setPain(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="block text-gray-300 mb-1">
-          What transformation or result do they want?
-        </label>
-        <input
-          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
-          placeholder="Example: consistently attract qualified leads every week"
-          value={promise}
-          onChange={(e) => setPromise(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="block text-gray-300 mb-1">
-          What’s your offer or next step? (optional)
-        </label>
-        <input
-          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
-          placeholder="Example: join my course, book a free strategy call"
-          value={offer}
-          onChange={(e) => setOffer(e.target.value)}
-        />
-      </div>
-      <div className="flex justify-between items-center mt-6 space-x-3">
+
+      {/* 🔽 Sticky action bar */}
+      <div
+        className="flex
+        flex-col
+        sm:flex-row
+        gap-3
+        mt-6"
+      >
         <button
           onClick={handleGeneratePrompt}
           disabled={loading}
-          className="flex-1 px-6 py-2 bg-green text-black font-semibold rounded hover:bg-green-500 transition"
+          className="w-full
+          sm:flex-1
+          px-6
+          py-4
+          sm:py-3
+          bg-green
+          text-black
+          font-semibold
+          rounded
+          hover:bg-green-500
+          transition"
         >
           {loading ? "Generating..." : "Generate"}
         </button>
@@ -116,7 +210,17 @@ export default function SmartPromptBuilder({ onPromptReady }) {
           <button
             onClick={() => onPromptReady("")}
             disabled={loading}
-            className="flex-1 px-6 py-2 border border-gray-600 text-gray-300 rounded hover:bg-gray-800 transition"
+            className="w-full
+            sm:flex-1
+            px-6
+            py-4
+            sm:py-3
+            bg-gray-700
+            text-white
+            font-semibold
+            rounded
+            hover:bg-green-500
+            transition"
           >
             Skip
           </button>

@@ -56,6 +56,37 @@ export default function ColorThemeChooser({
     setBgTheme(gradient);
   };
 
+  useEffect(() => {
+    if (!bgTheme) return;
+
+    // SOLID COLOR
+    if (bgTheme.startsWith("#")) {
+      setCustomSolid(bgTheme);
+      setUseCustomGradient(false);
+      return;
+    }
+
+    // GRADIENT
+    if (bgTheme.startsWith("linear-gradient")) {
+      setUseCustomGradient(true);
+
+      const match = bgTheme.match(
+        /linear-gradient\(([^,]+),\s*([^,]+),\s*([^)]+)\)/
+      );
+
+      if (match) {
+        const [, dir, start, end] = match;
+        setGradDir(dir.trim());
+        setGradStart(start.trim());
+        setGradEnd(end.trim());
+      }
+    }
+  }, [bgTheme]);
+
+  const isCustomSolidActive =
+    bgTheme?.toLowerCase() === customSolid.toLowerCase() &&
+    isValidHex(customSolid);
+
   return (
     <div className="bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner">
       {/* Header */}
@@ -140,7 +171,15 @@ export default function ColorThemeChooser({
                 Custom Solid Color
               </p>
 
-              <div className="flex items-center gap-3 max-w-[520px]">
+              <div
+                className={`flex items-center gap-3 max-w-[520px] rounded-lg p-2 transition-all
+                ${
+                  isCustomSolidActive
+                    ? "ring-2 ring-green-500/70 border border-green-400"
+                    : ""
+                }
+  `}
+              >
                 {/* Color picker */}
                 <input
                   type="color"
@@ -183,7 +222,7 @@ export default function ColorThemeChooser({
                 <button
                   type="button"
                   onClick={applyCustomSolid}
-                  disabled={!isValidHex(customSolid)}
+                  disabled={!isValidHex(customSolid) || isCustomSolidActive}
                   className={`px-4 py-2 border rounded text-sm
           ${
             isValidHex(customSolid)
@@ -192,7 +231,7 @@ export default function ColorThemeChooser({
           }
         `}
                 >
-                  Apply
+                  {isCustomSolidActive ? "Active" : "Apply"}
                 </button>
               </div>
             </div>

@@ -509,6 +509,7 @@ export default function MiniOfferBlock({
                       updateField("cover_url", "");
                       updateField("image_url", "");
                       updateField("use_pdf_cover", false);
+                      updateField("page_count", null);
                       setCoverLoading(false);
                       return;
                     }
@@ -527,6 +528,7 @@ export default function MiniOfferBlock({
                     updateField("pdf_name", selectedPdf.title || "PDF");
                     updateField("product_source", "internal");
                     updateField("use_pdf_cover", true);
+                    updateField("page_count", selectedPdf.page_count || null);
 
                     setCoverLoading(true);
 
@@ -560,6 +562,11 @@ export default function MiniOfferBlock({
                     <span className="text-white font-semibold">
                       {block.pdf_name || "PDF"}
                     </span>
+                    {block.page_count && (
+                      <span className="ml-2 opacity-80">
+                        • {block.page_count} pages
+                      </span>
+                    )}
                   </p>
                 )}
 

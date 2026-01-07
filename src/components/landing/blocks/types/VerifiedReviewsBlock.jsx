@@ -20,7 +20,8 @@ export default function VerifiedReviewsBlock({ block, index, updateBlock }) {
       {/* Info */}
       <div className="mt-4 p-3 rounded bg-black/40 text-xs text-gray-400">
         This section automatically displays verified customer reviews. Styling
-        and layout are managed by the system.
+        and layout are managed by the system. This will not show in preview
+        panel.
       </div>
     </div>
   );

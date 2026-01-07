@@ -242,20 +242,35 @@ export default function ScrollArrowBlock({
       {/* Size */}
       <div className="mt-6">
         <label
-          className="text-sm font-semibold"
+          className="text-sm font-semibold flex justify-between items-center"
           style={{ color: getLabelContrast(bgTheme) }}
         >
-          Arrow Size
+          <span>Arrow Size</span>
+          <span className="text-xs opacity-80">{block.size || 36}%</span>
         </label>
 
-        <input
-          type="range"
-          min="16"
-          max="96"
-          value={block.size || 36}
-          onChange={(e) => updateBlock(index, "size", Number(e.target.value))}
-          className="w-full mt-2"
-        />
+        <div className="flex items-center gap-3 mt-2">
+          {/* Slider */}
+          <input
+            type="range"
+            min="10"
+            max="150"
+            step="1"
+            value={block.size || 36}
+            onChange={(e) => updateBlock(index, "size", Number(e.target.value))}
+            className="flex-1"
+          />
+
+          {/* Exact numeric input */}
+          <input
+            type="number"
+            min="10"
+            max="150"
+            value={block.size || 36}
+            onChange={(e) => updateBlock(index, "size", Number(e.target.value))}
+            className="w-20 bg-[#0F172A] border border-gray-700 rounded-md px-2 py-1 text-sm text-white"
+          />
+        </div>
       </div>
     </div>
   );

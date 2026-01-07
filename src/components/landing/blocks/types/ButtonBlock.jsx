@@ -27,6 +27,9 @@ export default function ButtonBlock({
     block.shadow_offset_y ?? 8
   }px ${block.shadow_blur ?? 20}px rgba(0,0,0,${shadowOpacity})`;
 
+  const isValidHex = (value) =>
+    /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(value);
+
   return (
     <div className="rounded-xl p-6 mt-3 shadow-inner bg-[#0F172A]/60 border border-gray-700 transition-all duration-300 space-y-4">
       {/* Button Text */}
@@ -131,16 +134,32 @@ export default function ButtonBlock({
           <label className="text-sm font-semibold text-gray-300">
             Stroke Color
           </label>
-          <input
-            type="color"
-            value={block.stroke_color || "#000000"}
-            onChange={(e) => updateBlock(index, "stroke_color", e.target.value)}
-            className="w-10 h-10 rounded cursor-pointer"
-          />
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              value={block.stroke_color || "#000000"}
+              onChange={(e) =>
+                updateBlock(index, "stroke_color", e.target.value)
+              }
+              className="w-10 h-10 rounded cursor-pointer"
+            />
+
+            <input
+              type="text"
+              value={block.stroke_color || "#000000"}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (isValidHex(val)) {
+                  updateBlock(index, "stroke_color", val);
+                }
+              }}
+              placeholder="#000000"
+              className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Shadow */}
       {/* Shadow */}
       <div className="space-y-3">
         <p className="text-sm font-semibold text-gray-300">Shadow</p>
@@ -217,13 +236,27 @@ export default function ButtonBlock({
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <label className="text-xs text-gray-400">Shadow Color</label>
+
           <input
             type="color"
             value={block.shadow_color || "#000000"}
             onChange={(e) => updateBlock(index, "shadow_color", e.target.value)}
             className="w-10 h-10 rounded cursor-pointer"
+          />
+
+          <input
+            type="text"
+            value={block.shadow_color || "#000000"}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (isValidHex(val)) {
+                updateBlock(index, "shadow_color", val);
+              }
+            }}
+            placeholder="#000000"
+            className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
           />
         </div>
       </div>
@@ -240,15 +273,29 @@ export default function ButtonBlock({
 
       {/* Solid Background */}
       {!block.use_gradient && (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <label className="text-sm font-semibold text-gray-300">
             Background Color
           </label>
+
           <input
             type="color"
             value={block.bg_color || "#22c55e"}
             onChange={(e) => updateBlock(index, "bg_color", e.target.value)}
             className="w-10 h-10 rounded cursor-pointer"
+          />
+
+          <input
+            type="text"
+            value={block.bg_color || "#22c55e"}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (isValidHex(val)) {
+                updateBlock(index, "bg_color", val);
+              }
+            }}
+            placeholder="#22c55e"
+            className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
           />
         </div>
       )}
@@ -260,28 +307,58 @@ export default function ButtonBlock({
             <label className="text-sm font-semibold text-gray-300">
               Gradient Start
             </label>
-            <input
-              type="color"
-              value={block.gradient_start || "#22c55e"}
-              onChange={(e) =>
-                updateBlock(index, "gradient_start", e.target.value)
-              }
-              className="w-10 h-10 rounded cursor-pointer"
-            />
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={block.gradient_start || "#22c55e"}
+                onChange={(e) =>
+                  updateBlock(index, "gradient_start", e.target.value)
+                }
+                className="w-10 h-10 rounded cursor-pointer"
+              />
+
+              <input
+                type="text"
+                value={block.gradient_start || "#22c55e"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (isValidHex(val)) {
+                    updateBlock(index, "gradient_start", val);
+                  }
+                }}
+                placeholder="#22c55e"
+                className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
             <label className="text-sm font-semibold text-gray-300">
               Gradient End
             </label>
-            <input
-              type="color"
-              value={block.gradient_end || "#3b82f6"}
-              onChange={(e) =>
-                updateBlock(index, "gradient_end", e.target.value)
-              }
-              className="w-10 h-10 rounded cursor-pointer"
-            />
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={block.gradient_end || "#3b82f6"}
+                onChange={(e) =>
+                  updateBlock(index, "gradient_end", e.target.value)
+                }
+                className="w-10 h-10 rounded cursor-pointer"
+              />
+
+              <input
+                type="text"
+                value={block.gradient_end || "#3b82f6"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (isValidHex(val)) {
+                    updateBlock(index, "gradient_end", val);
+                  }
+                }}
+                placeholder="#3b82f6"
+                className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
+              />
+            </div>
           </div>
 
           <label className="text-sm font-semibold text-gray-300">
@@ -308,12 +385,27 @@ export default function ButtonBlock({
         <label className="text-sm font-semibold text-gray-300">
           Text Color
         </label>
-        <input
-          type="color"
-          value={block.text_color || "#000000"}
-          onChange={(e) => updateBlock(index, "text_color", e.target.value)}
-          className="w-10 h-10 rounded cursor-pointer"
-        />
+        <div className="flex items-center gap-3">
+          <input
+            type="color"
+            value={block.text_color || "#000000"}
+            onChange={(e) => updateBlock(index, "text_color", e.target.value)}
+            className="w-10 h-10 rounded cursor-pointer"
+          />
+
+          <input
+            type="text"
+            value={block.text_color || "#000000"}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (isValidHex(val)) {
+                updateBlock(index, "text_color", val);
+              }
+            }}
+            placeholder="#000000"
+            className="w-24 px-2 py-1 bg-black border border-gray-600 rounded text-white text-xs uppercase"
+          />
+        </div>
       </div>
 
       {/* Preview */}

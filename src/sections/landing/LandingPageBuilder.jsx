@@ -493,6 +493,7 @@ export default function LandingPageBuilder() {
       newBlock.price = 10;
       newBlock.product_source = "internal";
       newBlock.pdf_url = "";
+      newBlock.page_count = null;
       newBlock.external_file_url = "";
       newBlock.external_file_name = "";
 

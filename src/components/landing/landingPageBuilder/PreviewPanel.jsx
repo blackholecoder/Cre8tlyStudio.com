@@ -641,66 +641,6 @@ function renderPreviewBlock(block, index, context) {
         </div>
       );
 
-    case "verified_reviews":
-      return (
-        <div
-          key={index}
-          style={{
-            marginTop: "48px",
-            padding: "28px",
-            borderRadius: "16px",
-            border: "1px dashed rgba(255,255,255,0.25)",
-            background: "rgba(15,23,42,0.6)",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "1.4rem",
-              color: "#facc15",
-              marginBottom: "10px",
-            }}
-          >
-            ★★★★★
-          </div>
-
-          <h3
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              color: "#fff",
-              marginBottom: "6px",
-            }}
-          >
-            Verified Buyer Reviews
-          </h3>
-
-          <p
-            style={{
-              fontSize: "0.85rem",
-              opacity: 0.7,
-              color: "#fff",
-              maxWidth: "420px",
-              margin: "0 auto",
-            }}
-          >
-            Real reviews from verified customers will appear here on your live
-            page.
-          </p>
-
-          <div
-            style={{
-              marginTop: "16px",
-              fontSize: "0.75rem",
-              color: "#fff",
-              opacity: 0.5,
-            }}
-          >
-            Preview only · Live data not shown in editor
-          </div>
-        </div>
-      );
-
     case "faq":
       return (
         <div

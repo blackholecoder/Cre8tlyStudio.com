@@ -3,7 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { MemoizedSortableBlock } from "../../../../sections/landing/SortableBlock";
 
 export function SortableContainerBlock({
@@ -16,10 +16,6 @@ export function SortableContainerBlock({
   pdfList,
   landing,
   openAIModal,
-  setNodeRef,
-  attributes,
-  listeners,
-  style,
 }) {
   // const DROPPABLE_ID = `container-${block.id}`;
   const DROPPABLE_ID = `container-body-${block.id}`;
@@ -28,6 +24,11 @@ export function SortableContainerBlock({
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: DROPPABLE_ID,
     disabled: isOverChild,
+  });
+
+  const { setNodeRef, listeners, attributes } = useDraggable({
+    id,
+    disabled: !block.collapsed, // 🔑 same rule as blocks
   });
 
   const updateChildBlock = (childIndex, key, value) => {
@@ -49,7 +50,6 @@ export function SortableContainerBlock({
   return (
     <div
       ref={setNodeRef}
-      style={style}
       className={`
       mb-4 sm:mb-6
       rounded-xl

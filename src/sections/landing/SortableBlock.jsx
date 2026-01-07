@@ -1,5 +1,3 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { adjustForLandingOverlay } from "./adjustForLandingOverlay";
@@ -26,6 +24,36 @@ import SingleOfferBlock from "../../components/landing/blocks/types/SingleOfferB
 import MiniOfferBlock from "../../components/landing/blocks/types/MiniOfferBlock";
 import ProfileCardBlock from "../../components/landing/blocks/types/ProfileCardBlock";
 import ScrollArrowBlock from "../../components/landing/blocks/types/ScrollArrowBlock";
+import { useDraggable } from "@dnd-kit/core";
+
+function DragHandle({ id, disabled }) {
+  if (!id) return null;
+
+  const { setNodeRef, listeners, attributes } = useDraggable({
+    id,
+    disabled,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className={`
+        absolute top-2 left-1/2 -translate-x-1/2
+        text-xs px-2 py-1 rounded
+        ${
+          disabled
+            ? "opacity-40 cursor-default bg-gray-700"
+            : "cursor-grab bg-gray-300 hover:bg-gray-400"
+        }
+      `}
+      title={disabled ? "Close block to move" : "Drag to reorder"}
+    >
+      ☰
+    </div>
+  );
+}
 
 function SortableBlock({
   id,
@@ -40,8 +68,8 @@ function SortableBlock({
   openAIModal,
   containerIndex,
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+  // const { attributes, listeners, setNodeRef, transform, transition } =
+  //   useSortable({ id });
 
   const updateField = (i, key, value) => {
     if (Number.isInteger(containerIndex) && updateChildBlock) {
@@ -49,11 +77,6 @@ function SortableBlock({
     } else {
       updateBlock(i, key, value);
     }
-  };
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
   };
 
   const getLabelContrast = (hex) => {
@@ -192,18 +215,12 @@ function SortableBlock({
         pdfList={pdfList}
         landing={landing}
         openAIModal={openAIModal}
-        setNodeRef={setNodeRef}
-        attributes={attributes}
-        listeners={listeners}
-        style={style}
       />
     );
   }
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={`mb-4 sm:mb-6
      bg-black/70 border rounded-lg sm:rounded-xl
       p-3 sm:p-5
@@ -217,15 +234,7 @@ function SortableBlock({
   `}
     >
       {/* 🧩 Drag Handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        title="Drag to reorder"
-        className="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 cursor-grab bg-gray-300 hover:bg-gray-400 
-                   text-xs px-1 py-0.5 rounded"
-      >
-        ☰
-      </div>
+      <DragHandle id={id} disabled={!block.collapsed} />
 
       {/* 🧩 Collapse / Expand Header */}
       <div

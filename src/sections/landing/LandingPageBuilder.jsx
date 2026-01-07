@@ -3,11 +3,12 @@ import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../admin/AuthContext";
 import { colorThemes, gradientThemes } from "../../constants";
-import { DndContext, closestCenter, pointerWithin } from "@dnd-kit/core";
 import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { MemoizedSortableBlock } from "./SortableBlock";
 import { Wand2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
@@ -63,11 +64,65 @@ export default function LandingPageBuilder() {
 
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 0, // 👈 this is the key
+      },
+    })
+  );
+
   // Ai
   const [aiContext, setAIContext] = useState(null);
 
   const openAIModal = (context) => {
     setAIContext(context);
+  };
+
+  const [dragState, setDragState] = useState({
+    activeId: null,
+    source: null,
+    dropTarget: null,
+  });
+
+  const handleDragStart = ({ active }) => {
+    const loc = findLocationById(landing.content_blocks, active.id);
+    if (!loc) return;
+
+    setDragState({
+      activeId: active.id,
+      source: {
+        parentId: loc.parentId,
+        index: loc.index,
+      },
+      dropTarget: null,
+    });
+  };
+
+  const handleDragEnd = () => {
+    if (!dragState.source || !dragState.dropTarget) {
+      setDragState({ activeId: null, source: null, dropTarget: null });
+      return;
+    }
+
+    setLanding((prev) => {
+      const blocks = prev.content_blocks;
+
+      const { removed, next } = removeAtLocation(blocks, dragState.source);
+
+      const updated = insertAtLocation(
+        next,
+        {
+          parentId: dragState.dropTarget.parentId,
+          index: dragState.dropTarget.index,
+        },
+        removed
+      );
+
+      return { ...prev, content_blocks: updated };
+    });
+
+    setDragState({ activeId: null, source: null, dropTarget: null });
   };
 
   const findLocationById = (blocks, id) => {
@@ -168,98 +223,6 @@ export default function LandingPageBuilder() {
     },
     [landing?.content_blocks, countBlocksByType]
   );
-
-  const handleDragEnd = ({ active, over }) => {
-    if (!over || active.id === over.id) return;
-
-    setLanding((prev) => {
-      const blocks = prev.content_blocks;
-
-      const activeLoc = findLocationById(blocks, active.id);
-      if (!activeLoc) return prev;
-
-      const overId = over.id;
-      const overLoc = findLocationById(blocks, overId);
-
-      let targetParentId = null;
-      let targetIndex = null;
-
-      // ─────────────────────────────
-      // CASE 0: DROPPED ON CONTAINER BODY
-      // ─────────────────────────────
-      if (typeof overId === "string" && overId.startsWith("container-body-")) {
-        const containerId = overId.replace("container-body-", "");
-        const container = blocks.find((b) => b.id === containerId);
-        if (!container) return prev;
-
-        // prevent container-in-container
-        if (activeLoc.block.type === "container") return prev;
-
-        targetParentId = containerId;
-        targetIndex = container.children?.length || 0;
-      }
-
-      // ─────────────────────────────
-      // CASE 1: DROPPED ON A BLOCK
-      // ─────────────────────────────
-      else if (overLoc) {
-        targetParentId = overLoc.parentId;
-        targetIndex = overLoc.index;
-
-        // prevent container nesting
-        if (activeLoc.block.type === "container" && overLoc.parentId !== null) {
-          targetParentId = null;
-          targetIndex = blocks.length;
-        }
-
-        // append-to-end when hovering last child
-        if (overLoc.parentId) {
-          const parent = blocks.find((b) => b.id === overLoc.parentId);
-          if (parent && overLoc.index === (parent.children?.length || 0) - 1) {
-            targetIndex = parent.children.length;
-          }
-        }
-
-        // 🔑 DOWNWARD ADJUSTMENT ONLY FOR ROOT
-        if (
-          activeLoc.parentId === null &&
-          overLoc.parentId === null &&
-          activeLoc.index < overLoc.index
-        ) {
-          targetIndex -= 1;
-        }
-      }
-
-      // no valid target
-      if (targetIndex === null) return prev;
-
-      // 🧩 remove AFTER target is resolved
-      const { removed, next } = removeAtLocation(blocks, activeLoc);
-
-      // clamp index (safety)
-      if (targetParentId !== null) {
-        const parent = next.find((b) => b.id === targetParentId);
-        if (parent) {
-          targetIndex = Math.max(
-            0,
-            Math.min(targetIndex, parent.children.length)
-          );
-        }
-      }
-
-      return {
-        ...prev,
-        content_blocks: insertAtLocation(
-          next,
-          {
-            parentId: targetParentId,
-            index: targetIndex,
-          },
-          removed
-        ),
-      };
-    });
-  };
 
   const updateBlock = React.useCallback((index, key, value) => {
     setLanding((prev) => {
@@ -1169,6 +1132,35 @@ export default function LandingPageBuilder() {
     }
   };
 
+  // function DraggableBlock({ id, collapsed, children }) {
+  //   const { setNodeRef, listeners, attributes } = useDraggable({
+  //     id,
+  //     disabled: !collapsed, // 🔑 THIS IS THE FIX
+  //   });
+
+  //   return (
+  //     <div
+  //       ref={setNodeRef}
+  //       {...attributes}
+  //       {...listeners}
+  //       className={collapsed ? "cursor-grab" : "cursor-default"}
+  //     >
+  //       {children}
+  //     </div>
+  //   );
+  // }
+
+  function DropZone({ onHover, active }) {
+    return (
+      <div
+        onMouseEnter={onHover}
+        className={`h-2 rounded transition-all ${
+          active ? "bg-blue" : "bg-transparent"
+        }`}
+      />
+    );
+  }
+
   // 🎨 Determine the selected background theme
   const selectedTheme =
     bgTheme?.includes("gradient") || bgTheme?.startsWith("#")
@@ -1266,18 +1258,33 @@ export default function LandingPageBuilder() {
             {!blocksHidden && (
               <div className="space-y-4 mb-12 w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
                 <DndContext
-                  collisionDetection={pointerWithin}
+                  sensors={sensors}
+                  onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                 >
-                  <SortableContext
-                    items={landing.content_blocks.map((b) => b.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {landing.content_blocks
-                      .filter((b) => b && b.type) // ✅ ignore empty / invalid blocks
-                      .map((block, index) => (
+                  {landing.content_blocks
+                    .filter((b) => b && b.type)
+                    .map((block, index) => (
+                      <React.Fragment key={block.id}>
+                        <DropZone
+                          active={
+                            dragState.activeId &&
+                            dragState.dropTarget?.index === index
+                          }
+                          onHover={() => {
+                            if (!dragState.activeId) return; // ✅ block hover when not dragging
+
+                            setDragState((s) => ({
+                              ...s,
+                              dropTarget: {
+                                parentId: null,
+                                index,
+                                position: "before",
+                              },
+                            }));
+                          }}
+                        />
                         <MemoizedSortableBlock
-                          key={block.id}
                           id={block.id}
                           block={block}
                           index={index}
@@ -1286,11 +1293,11 @@ export default function LandingPageBuilder() {
                           bgTheme={bgTheme}
                           pdfList={pdfList}
                           landing={landing}
-                          openAIModal={openAIModal} // 👈 ADD
+                          openAIModal={openAIModal}
                           offerContext={landing?.offer_context}
                         />
-                      ))}
-                  </SortableContext>
+                      </React.Fragment>
+                    ))}
                 </DndContext>
               </div>
             )}

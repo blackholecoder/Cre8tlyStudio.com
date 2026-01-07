@@ -67,10 +67,9 @@ function SortableBlock({
   updateChildBlock,
   openAIModal,
   containerIndex,
+  dragState,
+  setDragState,
 }) {
-  // const { attributes, listeners, setNodeRef, transform, transition } =
-  //   useSortable({ id });
-
   const updateField = (i, key, value) => {
     if (Number.isInteger(containerIndex) && updateChildBlock) {
       updateChildBlock(i, key, value);
@@ -215,6 +214,8 @@ function SortableBlock({
         pdfList={pdfList}
         landing={landing}
         openAIModal={openAIModal}
+        dragState={dragState}
+        setDragState={setDragState}
       />
     );
   }

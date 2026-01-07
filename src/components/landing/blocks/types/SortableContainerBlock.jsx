@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -16,6 +16,8 @@ export function SortableContainerBlock({
   pdfList,
   landing,
   openAIModal,
+  dragState,
+  setDragState,
 }) {
   // const DROPPABLE_ID = `container-${block.id}`;
   const DROPPABLE_ID = `container-body-${block.id}`;
@@ -43,9 +45,19 @@ export function SortableContainerBlock({
   };
 
   const updateChildField = (i, key, value) => {
-    console.log("CHILD UPDATE:", key, value);
     updateChildBlock(i, key, value);
   };
+
+  function DropZone({ active, onHover }) {
+    return (
+      <div
+        onMouseEnter={onHover}
+        className={`h-2 rounded transition-all ${
+          active ? "bg-blue" : "bg-transparent"
+        }`}
+      />
+    );
+  }
 
   return (
     <div
@@ -109,29 +121,69 @@ export function SortableContainerBlock({
             strategy={verticalListSortingStrategy}
           >
             {block.children?.map((child, childIndex) => (
-              <MemoizedSortableBlock
-                key={child.id}
-                id={child.id}
-                block={child}
-                index={childIndex}
-                updateChildBlock={updateChildBlock}
-                onHoverStart={() => setIsOverChild(true)}
-                onHoverEnd={() => setIsOverChild(false)}
-                containerIndex={index}
-                updateBlock={updateChildField}
-                removeBlock={(i) => {
-                  updateBlock(
-                    index,
-                    "children",
-                    block.children.filter((_, idx) => idx !== i)
-                  );
-                }}
-                bgTheme={bgTheme}
-                pdfList={pdfList}
-                landing={landing}
-                openAIModal={openAIModal}
-              />
+              <React.Fragment key={child.id}>
+                <DropZone
+                  active={
+                    dragState?.activeId &&
+                    dragState?.dropTarget?.parentId === block.id &&
+                    dragState?.dropTarget?.index === childIndex
+                  }
+                  onHover={() => {
+                    if (!dragState?.activeId) return;
+
+                    setDragState((s) => ({
+                      ...s,
+                      dropTarget: {
+                        parentId: block.id, // ✅ THIS is the containerId
+                        index: childIndex,
+                        position: "before",
+                      },
+                    }));
+                  }}
+                />
+                <MemoizedSortableBlock
+                  key={child.id}
+                  id={child.id}
+                  block={child}
+                  index={childIndex}
+                  updateChildBlock={updateChildBlock}
+                  onHoverStart={() => setIsOverChild(true)}
+                  onHoverEnd={() => setIsOverChild(false)}
+                  containerIndex={index}
+                  updateBlock={updateChildField}
+                  removeBlock={(i) => {
+                    updateBlock(
+                      index,
+                      "children",
+                      block.children.filter((_, idx) => idx !== i)
+                    );
+                  }}
+                  bgTheme={bgTheme}
+                  pdfList={pdfList}
+                  landing={landing}
+                  openAIModal={openAIModal}
+                />
+              </React.Fragment>
             ))}
+            <DropZone
+              active={
+                dragState?.activeId &&
+                dragState?.dropTarget?.parentId === block.id &&
+                dragState?.dropTarget?.index === block.children.length
+              }
+              onHover={() => {
+                if (!dragState?.activeId) return;
+
+                setDragState((s) => ({
+                  ...s,
+                  dropTarget: {
+                    parentId: block.id,
+                    index: block.children.length,
+                    position: "after",
+                  },
+                }));
+              }}
+            />
           </SortableContext>
 
           {block.children?.length === 0 && (

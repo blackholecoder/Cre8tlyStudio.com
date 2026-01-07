@@ -100,11 +100,28 @@ export default function LandingPageBuilder() {
   };
 
   const handleDragEnd = () => {
+    // 🔒 GUARD: prevent containers from going inside containers
+    const draggedLoc = findLocationById(
+      landing.content_blocks,
+      dragState.activeId
+    );
+    const draggedBlock = draggedLoc?.block;
+
+    if (
+      draggedBlock?.type === "container" &&
+      dragState.dropTarget?.parentId !== null
+    ) {
+      setDragState({ activeId: null, source: null, dropTarget: null });
+      return;
+    }
+
+    // 🚫 no valid move
     if (!dragState.source || !dragState.dropTarget) {
       setDragState({ activeId: null, source: null, dropTarget: null });
       return;
     }
 
+    // ✅ commit move
     setLanding((prev) => {
       const blocks = prev.content_blocks;
 
@@ -1132,24 +1149,6 @@ export default function LandingPageBuilder() {
     }
   };
 
-  // function DraggableBlock({ id, collapsed, children }) {
-  //   const { setNodeRef, listeners, attributes } = useDraggable({
-  //     id,
-  //     disabled: !collapsed, // 🔑 THIS IS THE FIX
-  //   });
-
-  //   return (
-  //     <div
-  //       ref={setNodeRef}
-  //       {...attributes}
-  //       {...listeners}
-  //       className={collapsed ? "cursor-grab" : "cursor-default"}
-  //     >
-  //       {children}
-  //     </div>
-  //   );
-  // }
-
   function DropZone({ onHover, active }) {
     return (
       <div
@@ -1269,6 +1268,7 @@ export default function LandingPageBuilder() {
                         <DropZone
                           active={
                             dragState.activeId &&
+                            dragState.dropTarget?.parentId === null &&
                             dragState.dropTarget?.index === index
                           }
                           onHover={() => {
@@ -1294,7 +1294,11 @@ export default function LandingPageBuilder() {
                           pdfList={pdfList}
                           landing={landing}
                           openAIModal={openAIModal}
+                          dragState={dragState}
+                          setDragState={setDragState}
                           offerContext={landing?.offer_context}
+                          onHoverStart={() => setIsOverChild(true)}
+                          onHoverEnd={() => setIsOverChild(false)}
                         />
                       </React.Fragment>
                     ))}

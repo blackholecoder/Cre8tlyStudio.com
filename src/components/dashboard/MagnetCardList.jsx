@@ -134,12 +134,23 @@ export default function MagnetCardList({
             </div>
 
             {/* Slot + Date */}
-            <div className="text-[11px] text-gray-400 flex justify-between mb-2">
-              <span>Slot #{m.slot_number}</span>
+            {/* Slot + Page Count + Date */}
+            <div className="flex items-center justify-between mt-3 text-[11px] text-gray-400">
+              <div className="flex items-center gap-3">
+                <span>Slot #{m.slot_number}</span>
+
+                {typeof m.page_count === "number" && (
+                  <span className="flex items-center gap-1 text-gray-300">
+                    📄 {m.page_count} page{m.page_count !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+
               <span>
                 {new Date(m.created_at).toLocaleDateString("en-US", {
                   month: "short",
                   day: "2-digit",
+                  year: "numeric",
                 })}
               </span>
             </div>

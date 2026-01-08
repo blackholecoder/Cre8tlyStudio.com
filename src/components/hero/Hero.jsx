@@ -29,10 +29,28 @@ export const Hero = () => {
         <div className="mt-14 flex justify-center">
           <button
             onClick={() => navigate("/plans")}
-            className="px-10 py-4 rounded-full bg-black text-white text-sm font-semibold
-              hover:bg-gray-900 transition-all duration-200"
+            className="
+    relative overflow-hidden
+    px-10 py-4 rounded-full
+    bg-black text-white text-sm font-semibold
+    hover:bg-gray-900 transition-all duration-200
+  "
           >
-            View Plans →
+            {/* Horizontal glide layer */}
+            <span
+              className="
+                pointer-events-none
+                absolute top-0 left-[-40%]
+                w-[180%] h-full
+                bg-gradient-to-r
+                from-transparent
+                via-white/25
+                to-transparent
+                animate-button-glide
+              "
+            />
+
+            <span className="relative z-10">View Plans →</span>
           </button>
         </div>
       </div>

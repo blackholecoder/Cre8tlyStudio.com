@@ -10,6 +10,7 @@ export default function BookPromptModal({
   partNumber = 1,
   accessToken,
   onSubmitted,
+  onCompleted,
   setShowGenerating,
   setProgress,
   initialBookData,
@@ -55,52 +56,51 @@ export default function BookPromptModal({
     }
   }, [isOpen]);
 
-
   useEffect(() => {
-  async function fetchDraft() {
-    if (!bookId) return;
+    async function fetchDraft() {
+      if (!bookId) return;
 
-    try {
-      // ✅ Use part-specific route after part 1
-      const endpoint =
-        partNumber > 1
-          ? `/books/${bookId}/part/${partNumber}/draft`
-          : `/books/draft/${bookId}`;
+      try {
+        // ✅ Use part-specific route after part 1
+        const endpoint =
+          partNumber > 1
+            ? `/books/${bookId}/part/${partNumber}/draft`
+            : `/books/draft/${bookId}`;
 
-      const res = await axiosInstance.get(endpoint, {
-        // headers: { Authorization: `Bearer ${accessToken}` },
-      });
+        const res = await axiosInstance.get(endpoint, {
+          // headers: { Authorization: `Bearer ${accessToken}` },
+        });
 
-      const draft = res.data;
+        const draft = res.data;
 
-      if (draft?.draft_text) {
-        setText(draft.draft_text);
-        if (draft.title) setTitle(draft.title);
-        if (draft.book_name) setBookName(draft.book_name);
-        if (draft.link) setLink(draft.link);
-        if (draft.author_name) setAuthorName(draft.author_name);
-        if (draft.book_type) setBookType(draft.book_type);
+        if (draft?.draft_text) {
+          setText(draft.draft_text);
+          if (draft.title) setTitle(draft.title);
+          if (draft.book_name) setBookName(draft.book_name);
+          if (draft.link) setLink(draft.link);
+          if (draft.author_name) setAuthorName(draft.author_name);
+          if (draft.book_type) setBookType(draft.book_type);
 
-        toast.info(
-          `Loaded last draft from ${new Date(
-            draft.last_saved_at || draft.updated_at || Date.now()
-          ).toLocaleString()}`
-        );
-      } else {
-        console.log("No draft found for this book or part.");
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        console.log("No saved draft yet.");
-      } else {
-        console.error("Failed to fetch draft:", err);
-        toast.error("Failed to fetch saved draft.");
+          toast.info(
+            `Loaded last draft from ${new Date(
+              draft.last_saved_at || draft.updated_at || Date.now()
+            ).toLocaleString()}`
+          );
+        } else {
+          console.log("No draft found for this book or part.");
+        }
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.log("No saved draft yet.");
+        } else {
+          console.error("Failed to fetch draft:", err);
+          toast.error("Failed to fetch saved draft.");
+        }
       }
     }
-  }
 
-  fetchDraft();
-}, [bookId, partNumber]);
+    fetchDraft();
+  }, [bookId, partNumber]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -138,7 +138,7 @@ export default function BookPromptModal({
         },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
-          timeout: 0, 
+          timeout: 0,
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
         }
@@ -147,24 +147,27 @@ export default function BookPromptModal({
       clearInterval(interval);
       setProgress(100);
       toast.success("📚 Book section generated successfully!");
-      setShowGenerating(false);
 
       // ✅ Wait a short moment so DB finishes writing the new book part
       await new Promise((r) => setTimeout(r, 1000));
 
-      // ✅ Trigger dashboard refresh + callback safely
-      window.dispatchEvent(new Event("refreshBooks"));
+      // ✅ notify parent the generation is complete
+      if (typeof onCompleted === "function") {
+        onCompleted();
+      }
+
+      // optional: still mark pending state
       if (typeof onSubmitted === "function") {
-        setTimeout(() => onSubmitted(bookId, text), 1000);
+        onSubmitted(bookId, text);
       }
     } catch (err) {
       clearInterval(interval);
       setProgress(0);
       setShowGenerating(false);
       if (err.code === "ECONNABORTED") {
-    toast.info("⏳ Your book is still generating — please wait");
-    return; // ✅ don’t mark as failed
-  }
+        toast.info("⏳ Your book is still generating — please wait");
+        return; // ✅ don’t mark as failed
+      }
       toast.error(
         err.response?.data?.message || "Book generation failed. Try again."
       );
@@ -222,7 +225,7 @@ export default function BookPromptModal({
           bookId={bookId}
           setBookId={() => {}}
           partLocked={partLocked}
-          partNumber={partNumber} 
+          partNumber={partNumber}
           onClose={onClose}
           setProgress={setProgress}
           fontName={fontName}

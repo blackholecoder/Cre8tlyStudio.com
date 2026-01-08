@@ -331,7 +331,13 @@ export default function MiniOfferBlock({
                           {(block.use_pdf_cover && block.cover_url) ||
                           block.image_url ? (
                             <div
-                              style={{ flex: "0 0 30%", background: "#000" }}
+                              style={{
+                                flex: "0 0 30%",
+                                background: "#000",
+                                borderTopLeftRadius: "16px",
+                                borderBottomLeftRadius: "16px",
+                                overflow: "hidden",
+                              }}
                             >
                               <img
                                 src={
@@ -344,6 +350,10 @@ export default function MiniOfferBlock({
                                   width: "100%",
                                   height: "100%",
                                   objectFit: "cover",
+                                  borderTopLeftRadius: "16px",
+                                  borderBottomLeftRadius: "16px",
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
                                 }}
                               />
                             </div>

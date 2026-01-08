@@ -378,6 +378,38 @@ input[type="color"]:focus {
     animation: shimmer 15s linear infinite;
   }
 
+  @keyframes button-glide {
+    0% {
+      transform: translateX(-60%);
+    }
+    50% {
+      transform: translateX(60%);
+    }
+    100% {
+      transform: translateX(-60%);
+    }
+  }
+
+  .animate-button-glide {
+    animation: button-glide 3.8s ease-in-out infinite;
+  }
+
+  @keyframes button-glide-bg {
+    0% {
+      background-position: -200% 0;
+    }
+    50% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .animate-button-glide-bg {
+    animation: button-glide-bg 8.9s ease-in-out infinite;
+  }
+
   @keyframes glimmer {
     0% {
       transform: translateX(-100%) rotate(25deg);

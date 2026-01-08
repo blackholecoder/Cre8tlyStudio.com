@@ -217,7 +217,7 @@ export default function SmartPromptPage() {
       </div>
       {/* CTA */}
       <section className="mt-40 px-6">
-        <motion.div
+        <div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -242,31 +242,39 @@ export default function SmartPromptPage() {
             minutes.
           </p>
 
-          <motion.button
+          <button
             type="button"
             onClick={() => navigateWithReferral("/plans")}
-            whileHover={{ scale: 1.07 }}
-            whileTap={{ scale: 0.95 }}
-            animate={{
-              boxShadow: [
-                "0 0 0 rgba(0,0,0,0)",
-                "0 0 30px rgba(34,197,94,0.45)",
-                "0 0 0 rgba(0,0,0,0)",
-              ],
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
             className="
-        inline-flex items-center justify-center gap-2
-        px-10 py-4
-        rounded-xl
-        bg-green
-        text-black
-        font-bold text-lg
-      "
+    relative overflow-hidden
+    inline-flex items-center justify-center gap-2
+    px-10 py-4
+    rounded-xl
+    bg-green
+    text-black
+    font-bold text-lg
+    transition-transform duration-200
+    hover:scale-[1.07]
+    active:scale-[0.95]
+  "
           >
-            Get started for free
-          </motion.button>
-        </motion.div>
+            {/* Horizontal glide shimmer */}
+            <span
+              className="
+      pointer-events-none
+      absolute top-0 left-[-40%]
+      w-[180%] h-full
+      bg-gradient-to-r
+      from-transparent
+      via-[rgba(240,255,245,0.55)]
+      to-transparent
+      animate-button-glide
+    "
+            />
+
+            <span className="relative z-10">Get started for free</span>
+          </button>
+        </div>
       </section>
     </main>
   );

@@ -88,9 +88,22 @@ const PlatformShowcase = () => {
         <div className="mt-16">
           <button
             onClick={() => navigateWithReferral("/smart-prompt")}
-            className="px-10 py-4 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-900 transition"
+            className="relative overflow-hidden px-10 py-4 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-900 transition"
           >
-            Explore the Platform →
+            {/* Horizontal glide layer */}
+            <span
+              className="
+              pointer-events-none
+              absolute top-0 left-[-40%]
+              w-[180%] h-full
+              bg-gradient-to-r
+              from-transparent
+              via-white/25
+              to-transparent
+              animate-button-glide
+            "
+            />
+            <span className="relative z-10">Explore the Platform →</span>
           </button>
         </div>
       </div>

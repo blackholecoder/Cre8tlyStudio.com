@@ -284,7 +284,7 @@ export default function LandingInfoPage() {
                   type="button"
                   onClick={() =>
                     window.open(
-                      "https://sleephealth.cre8tlystudio.com/",
+                      "https://theinspirecollective.cre8tlystudio.com/",
                       "_blank",
                       "noopener,noreferrer"
                     )

@@ -2,33 +2,33 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import {
-  Menu,
-  X,
-  BookOpen,
-  Settings,
-  LogOut,
-  SquareTerminal,
-  Package,
-  DollarSign,
-  Inbox,
-  BarChart2,
-  MessageSquare,
-  Bell,
-  MailSearch,
-  Landmark,
-  CircleQuestionMark,
-  LayoutTemplate,
-} from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
+import {
+  SIDEBAR_SECTIONS,
+  SidebarToggleIcon,
+} from "../../constants/sideBarSections";
+
+const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+
+  const SIDEBAR_EXPANDED_WIDTH = 260;
+  const SIDEBAR_COLLAPSED_WIDTH = 72;
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [communityCount, setCommunityCount] = useState(0);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
@@ -76,25 +76,67 @@ export default function DashboardLayout({ children }) {
     return () => clearInterval(interval);
   }, [user?.id]);
 
-  let menu = [
-    {
-      label: "Digital Products",
-      path: "/dashboard",
-      icon: <Package size={22} />,
-    },
-    { label: "Assistant", path: "/books", icon: <BookOpen size={22} /> },
-    {
-      label: "Prompt Memory",
-      path: "/prompts",
-      icon: <SquareTerminal size={22} />,
-    },
-  ];
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSE_KEY, String(isCollapsed));
+    } catch {
+      // ignore write failures
+    }
+  }, [isCollapsed]);
 
-  // ⭐ Add Community + Alerts right before logout
+  function hasAccess(item) {
+    if (item.access === "pro" && isFreeTier) return false;
+    if (item.access === "seller" && !user?.stripe_connect_account_id)
+      return false;
+    return true;
+  }
 
-  if (isFreeTier) {
-    menu = menu.filter(
-      (item) => item.label !== "Prompt Memory" && item.label !== "Assistant"
+  function renderSidebarItem(item) {
+    const active = location.pathname === item.path;
+    const Icon = item.icon;
+
+    return (
+      <button
+        key={item.key}
+        onClick={() => {
+          navigate(item.path);
+          if (window.innerWidth < 1024) setIsSidebarOpen(false);
+        }}
+        className={`w-full flex items-center rounded-lg transition
+  ${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3 text-left"}
+  ${
+    active
+      ? isCollapsed
+        ? "bg-green/20 text-green"
+        : "bg-green/10 text-green border border-green/30"
+      : "text-gray-300 hover:bg-gray-800/60"
+  }`}
+      >
+        <Icon size={20} />
+
+        {!isCollapsed && (
+          <div className="flex flex-col flex-1">
+            <span className="font-medium leading-tight">{item.label}</span>
+            <span className="text-xs text-gray-400">{item.description}</span>
+          </div>
+        )}
+
+        {item.badge === "unreadCount" && unreadCount > 0 && (
+          <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
+
+        {item.badge === "communityCount" && communityCount > 0 && (
+          <span className="ml-auto bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {communityCount > 9 ? "9+" : communityCount}
+          </span>
+        )}
+
+        {item.indicator === "brandConfigured" && user?.brand_identity_file && (
+          <span className="w-2 h-2 rounded-full bg-green animate-pulse" />
+        )}
+      </button>
     );
   }
 
@@ -102,325 +144,84 @@ export default function DashboardLayout({ children }) {
     <div className="dashboard flex bg-[#030712] text-white relative min-h-screen">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 w-[120px] h-full bg-gray-900/95 border-r border-gray-800 
-      flex flex-col transform transition-transform duration-300 z-[60]
-      ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed top-0 left-0 h-full overflow-hidden bg-gray-900/95 border-r border-gray-800 
+  flex flex-col transform transition-all duration-300 z-[60]
+  ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        style={{
+          width: isCollapsed
+            ? `${SIDEBAR_COLLAPSED_WIDTH}px`
+            : `${SIDEBAR_EXPANDED_WIDTH}px`,
+        }}
       >
         {/* TOP (fixed) */}
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex flex-col items-center justify-center py-2">
-              <div className="relative flex items-center justify-center w-16 h-16 mb-3 overflow-visible">
-                <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse"></div>
-                <AnimatedLogo className="relative z-10 w-16 h-16 animate-glow" />
-              </div>
-
-              <h2 className="logoText font-semibold text-white text-center leading-snug mt-1 normal-case ">
-                Cre8tly
-                <br />
-                Studio
-              </h2>
-            </div>
-
+        <div className="p-4 border-b border-gray-800">
+          <div
+            className={`flex items-center ${
+              isCollapsed ? "justify-center" : "justify-start gap-3"
+            }`}
+          >
+            {/* Menu toggle */}
             <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden text-gray-400 hover:text-white transition"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="w-9 h-9 flex items-center justify-center rounded-md 
+                 text-gray-400 hover:text-white hover:bg-gray-800 transition"
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <X size={22} />
+              <SidebarToggleIcon size={18} />
             </button>
+
+            {/* Logo (removed entirely when collapsed) */}
+            {!isCollapsed && (
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse" />
+                  <AnimatedLogo className="relative z-10 w-10 h-10 animate-glow" />
+                </div>
+
+                <div className="flex flex-col leading-tight">
+                  <span className="logoText font-semibold text-white">
+                    Cre8tly
+                  </span>
+                  <span className="logoText text-sm text-gray-300">Studio</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* MIDDLE (SCROLL AREA) */}
-        <nav className="flex-1 overflow-y-auto px-6 pb-6 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-          <div className="flex flex-col items-center gap-5 mt-2">
-            {menu.map((item) => {
-              const active = location.pathname === item.path;
-              const hasBrandFile =
-                user?.brand_identity_file && item.path === "/settings";
-
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => {
-                    navigate(item.path);
-                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                  }}
-                  className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-                >
-                  <div
-                    className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-                ${
-                  active
-                    ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                    : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-                }`}
-                  >
-                    {item.icon}
-
-                    {/* 🔔 Unread badge */}
-                    {item.path === "/notifications" && unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex items-center justify-center w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
-
-                    {/* 🟢 Community unread badge */}
-                    {item.path === "/community" && communityCount > 0 && (
-                      <span
-                        className="absolute -top-1 -right-1 flex items-center justify-center 
-                    w-[18px] h-[18px] text-[10px] bg-green-600 text-white font-bold 
-                    rounded-full shadow-md"
-                      >
-                        {communityCount > 9 ? "9+" : communityCount}
-                      </span>
-                    )}
-
-                    {/* 💚 Brand indicator */}
-                    {hasBrandFile && (
-                      <>
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full opacity-75 animate-ping" />
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full shadow-[0_0_6px_2px_rgba(34,197,94,0.8)]" />
-                      </>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-
-            {/* PRO FEATURES */}
-            {user?.pro_status === "active" && (
-              <button
-                onClick={() => {
-                  navigate("/landing-page-builder");
-                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-              >
-                <div
-                  className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-              ${
-                location.pathname === "/landing-page-builder"
-                  ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                  : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-              }`}
-                >
-                  <LayoutTemplate size={22} />
-                </div>
-              </button>
-            )}
-
-            {user?.pro_status === "active" && (
-              <button
-                onClick={() => {
-                  navigate("/leads");
-                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-              >
-                <div
-                  className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-              ${
-                location.pathname === "/leads"
-                  ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                  : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-              }`}
-                >
-                  <MailSearch size={22} />
-                </div>
-              </button>
-            )}
-
-            {user?.pro_status === "active" && (
-              <button
-                onClick={() => {
-                  navigate("/landing-analytics");
-                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-              >
-                <div
-                  className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-              ${
-                location.pathname === "/landing-analytics"
-                  ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                  : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-              }`}
-                >
-                  <BarChart2 size={22} />
-                </div>
-              </button>
-            )}
-
-            {user?.stripe_connect_account_id && (
-              <button
-                onClick={() => {
-                  navigate("/seller-dashboard");
-                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-              >
-                <div
-                  className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-              ${
-                location.pathname === "/seller-dashboard"
-                  ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                  : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-              }`}
-                >
-                  <Landmark size={22} />
-                </div>
-              </button>
-            )}
-            {/* COMMUNITY + ALERTS placed above logout */}
-            <button
-              onClick={() => {
-                navigate("/community");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-      ${
-        location.pathname === "/community"
-          ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-          : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-      }`}
-              >
-                <MessageSquare size={22} />
-
-                {communityCount > 0 && (
-                  <span
-                    className="absolute -top-1 -right-1 flex items-center justify-center 
-        w-[18px] h-[18px] text-[10px] bg-green-600 text-white font-bold rounded-full shadow-md"
-                  >
-                    {communityCount > 9 ? "9+" : communityCount}
-                  </span>
+        <nav
+          className={`flex-1 overflow-y-auto pb-6 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent ${
+            isCollapsed ? "px-2" : "px-6"
+          }`}
+        >
+          <div className="flex flex-col gap-5 mt-2">
+            {SIDEBAR_SECTIONS.map((section) => (
+              <div key={section.section}>
+                {!isCollapsed && (
+                  <p className="px-4 mb-2 text-xs uppercase tracking-wide text-gray-500">
+                    {section.section}
+                  </p>
                 )}
-              </div>
-            </button>
 
-            <button
-              onClick={() => {
-                navigate("/community-alerts");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-      ${
-        location.pathname === "/community-alerts"
-          ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-          : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-      }`}
-              >
-                <Bell size={22} />
+                <div className="flex flex-col gap-1">
+                  {section.items.filter(hasAccess).map(renderSidebarItem)}
+                </div>
               </div>
-            </button>
-
-            <button
-              onClick={() => {
-                navigate("/notifications");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-      ${
-        location.pathname === "/notifications"
-          ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-          : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-      }`}
-              >
-                <Inbox size={22} />
-
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-[18px] h-[18px] text-[10px] bg-red-600 text-white font-bold rounded-full shadow-md">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </div>
-            </button>
-
-            {/* SETTINGS (with glowing dot) */}
-            <button
-              onClick={() => {
-                navigate("/settings");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-            ${
-              location.pathname === "/settings"
-                ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-                : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-            }`}
-              >
-                <Settings size={22} />
-
-                {/* 💚 Glowing dot when brand_identity_file exists */}
-                {user?.brand_identity_file && (
-                  <>
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full opacity-75 animate-ping" />
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-green rounded-full shadow-[0_0_6px_2px_rgba(34,197,94,0.8)]" />
-                  </>
-                )}
-              </div>
-            </button>
-            <button
-              onClick={() => {
-                navigate("/plans");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-        ${
-          location.pathname === "/plans"
-            ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-            : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-        }`}
-              >
-                <DollarSign size={22} />
-              </div>
-            </button>
-            <button
-              onClick={() => {
-                navigate("/docs");
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className="flex flex-col items-center justify-center space-y-2 focus:outline-none"
-            >
-              <div
-                className={`relative flex items-center justify-center w-12 h-12 rounded-xl border transition-all 
-        ${
-          location.pathname === "/docs"
-            ? "bg-green/10 border-green text-green shadow-[0_0_12px_rgba(34,197,94,0.4)]"
-            : "bg-gray-800/50 border-gray-700 text-gray-300 hover:border-green hover:text-green"
-        }`}
-              >
-                <CircleQuestionMark size={22} />
-              </div>
-            </button>
+            ))}
           </div>
         </nav>
 
         {/* BOTTOM (fixed logout) */}
-        <div className="p-6">
+        <div className="p-4 border-t border-gray-800">
           <button
             onClick={logout}
-            className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl 
-            bg-red-600/20 border border-red-600/40 text-red-500 hover:text-white hover:bg-red-600/40 
-            hover:shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all"
-            title="Logout"
+            className={`w-full flex items-center rounded-lg transition ${
+              isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
+            } text-red-500 hover:bg-red-600/10`}
           >
-            <LogOut size={20} />
+            <LogOut size={18} />
+            {!isCollapsed && <span className="font-medium">Logout</span>}
           </button>
         </div>
       </aside>
@@ -442,7 +243,17 @@ export default function DashboardLayout({ children }) {
       </button>
 
       {/* Main content */}
-      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300 lg:ml-[120px] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <main
+        className="flex-1 min-h-screen overflow-y-auto transition-all duration-300"
+        style={{
+          marginLeft:
+            window.innerWidth >= 1280
+              ? isCollapsed
+                ? `${SIDEBAR_COLLAPSED_WIDTH}px`
+                : `${SIDEBAR_EXPANDED_WIDTH}px`
+              : "0px",
+        }}
+      >
         {children}
       </main>
     </div>

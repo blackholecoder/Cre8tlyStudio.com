@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -22,22 +22,28 @@ export default function FAQBlock({
   openAIModal,
   containerIndex,
 }) {
+  const didInitIds = React.useRef(false);
+
+  useEffect(() => {
+    if (didInitIds.current) return;
+    if (!block.items) return;
+
+    const needsIds = block.items.some((it) => !it.id);
+    if (!needsIds) {
+      didInitIds.current = true;
+      return;
+    }
+
+    const withIds = block.items.map((it) => ({
+      ...it,
+      id: it.id || crypto.randomUUID(),
+    }));
+
+    didInitIds.current = true;
+    updateBlock(index, "items", withIds);
+  }, []);
+
   // Sortable Item Wrapper (no listeners here anymore!)
-  function SortableFAQItem({ i, children }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: i });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <div ref={setNodeRef} style={style}>
-        {children({ attributes, listeners })}
-      </div>
-    );
-  }
 
   // Sensors
   const sensors = useSensors(
@@ -54,12 +60,34 @@ export default function FAQBlock({
     if (active.id !== over.id) {
       const items = block.items || [];
 
-      const oldIndex = active.id;
-      const newIndex = over.id;
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
 
       const reordered = arrayMove(items, oldIndex, newIndex);
       updateBlock(index, "items", reordered);
     }
+  }
+
+  function FAQDragHandle({ id }) {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-gray-400 mr-3 select-none text-xl"
+      >
+        ⋮⋮
+      </div>
+    );
   }
 
   return (
@@ -101,6 +129,7 @@ export default function FAQBlock({
       <input
         type="text"
         value={block.title || ""}
+        onPointerDown={(e) => e.stopPropagation()}
         onChange={(e) => updateBlock(index, "title", e.target.value)}
         className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
       />
@@ -246,84 +275,79 @@ export default function FAQBlock({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={(block.items || []).map((_, i) => i)}
+            items={(block.items || []).map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            {(block.items || []).map((item, i) => (
-              <SortableFAQItem key={i} i={i}>
-                {({ attributes, listeners }) => (
-                  <div className="bg-[#1f2937]/60 p-4 rounded-lg border border-gray-700">
-                    {/* Row: Drag Handle + Question */}
-                    <div className="flex items-center justify-between">
-                      {/* Drag Handle */}
-                      <div
-                        {...attributes}
-                        {...listeners}
-                        onClick={(e) => e.stopPropagation()}
-                        className="cursor-grab active:cursor-grabbing text-gray-400 mr-3 select-none text-xl"
-                      >
-                        ⋮⋮
-                      </div>
+            {(block.items || []).map((item) => (
+              <div
+                key={item.id}
+                className="bg-[#1f2937]/60 p-4 rounded-lg border border-gray-700"
+              >
+                {/* Row: Drag Handle + Question */}
+                <div className="flex items-center justify-between">
+                  {/* Drag Handle ONLY */}
+                  <FAQDragHandle id={item.id} />
 
-                      {/* Question Input */}
-                      <input
-                        type="text"
-                        value={item.q}
-                        onChange={(e) => {
-                          const updated = [...block.items];
-                          updated[i].q = e.target.value;
-                          updateBlock(index, "items", updated);
-                        }}
-                        className="w-full bg-black border border-gray-600 rounded text-white p-2"
-                      />
+                  {/* Question Input */}
+                  <input
+                    type="text"
+                    value={item.q}
+                    onChange={(e) => {
+                      const updated = block.items.map((it) =>
+                        it.id === item.id ? { ...it, q: e.target.value } : it
+                      );
+                      updateBlock(index, "items", updated);
+                    }}
+                    className="w-full bg-black border border-gray-600 rounded text-white p-2"
+                  />
 
-                      {/* Expand Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = [...block.items];
-                          updated[i].open = !updated[i].open;
-                          updateBlock(index, "items", updated);
-                        }}
-                        className="ml-3 text-gray-300 text-xl"
-                      >
-                        {item.open ? "−" : "+"}
-                      </button>
-                    </div>
+                  {/* Expand Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = block.items.map((it) =>
+                        it.id === item.id ? { ...it, open: !it.open } : it
+                      );
+                      updateBlock(index, "items", updated);
+                    }}
+                    className="ml-3 text-gray-300 text-xl"
+                  >
+                    {item.open ? "−" : "+"}
+                  </button>
+                </div>
 
-                    {/* Answer */}
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ${
-                        item.open ? "max-h-40 mt-3" : "max-h-0"
-                      }`}
-                    >
-                      <textarea
-                        value={item.a}
-                        onChange={(e) => {
-                          const updated = [...block.items];
-                          updated[i].a = e.target.value;
-                          updateBlock(index, "items", updated);
-                        }}
-                        className="w-full bg-black border border-gray-600 rounded text-white p-2 h-20"
-                      />
-                    </div>
+                {/* Answer */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    item.open ? "max-h-40 mt-3" : "max-h-0"
+                  }`}
+                >
+                  <textarea
+                    value={item.a}
+                    onChange={(e) => {
+                      const updated = block.items.map((it) =>
+                        it.id === item.id ? { ...it, a: e.target.value } : it
+                      );
+                      updateBlock(index, "items", updated);
+                    }}
+                    className="w-full bg-black border border-gray-600 rounded text-white p-2 h-20"
+                  />
+                </div>
 
-                    {/* Remove */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = block.items.filter(
-                          (_, idx) => idx !== i
-                        );
-                        updateBlock(index, "items", updated);
-                      }}
-                      className="text-red-400 text-xs mt-3 hover:underline"
-                    >
-                      Remove Question
-                    </button>
-                  </div>
-                )}
-              </SortableFAQItem>
+                {/* Remove */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = block.items.filter(
+                      (it) => it.id !== item.id
+                    );
+                    updateBlock(index, "items", updated);
+                  }}
+                  className="text-red-400 text-xs mt-3 hover:underline"
+                >
+                  Remove Question
+                </button>
+              </div>
             ))}
           </SortableContext>
         </DndContext>
@@ -335,7 +359,12 @@ export default function FAQBlock({
         onClick={() =>
           updateBlock(index, "items", [
             ...(block.items || []),
-            { q: "New Question", a: "Your answer...", open: false },
+            {
+              id: crypto.randomUUID(),
+              q: "New Question",
+              a: "Your answer...",
+              open: false,
+            },
           ])
         }
         className="mt-4 bg-green text-black rounded-lg px-4 py-2 text-sm font-semibold hover:bg-green/80"

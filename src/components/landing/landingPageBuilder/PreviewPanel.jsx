@@ -1075,6 +1075,9 @@ function renderPreviewBlock(block, index, context) {
               style={{
                 flex: "0 0 30%",
                 background: "#000",
+                borderTopLeftRadius: "20px",
+                borderBottomLeftRadius: "20px",
+                overflow: "hidden",
               }}
             >
               {imageToShow ? (
@@ -1086,6 +1089,10 @@ function renderPreviewBlock(block, index, context) {
                     height: "100%",
                     objectFit: "cover",
                     display: "block",
+                    borderTopLeftRadius: "20px",
+                    borderBottomLeftRadius: "20px",
+                    borderTopRightRadius: 0,
+                    borderBottomRightRadius: 0,
                   }}
                 />
               ) : (

@@ -365,9 +365,22 @@ const Nav = () => {
 
                 <button
                   onClick={() => navigateWithReferral("/plans")}
-                  className="px-5 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-900 transition"
+                  className="relative overflow-hidden px-5 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-900 transition"
                 >
-                  Get Started for Free →
+                  {/* Horizontal glide layer */}
+                  <span
+                    className="
+                    pointer-events-none
+                    absolute top-0 left-[-40%]
+                    w-[180%] h-full
+                    bg-gradient-to-r
+                    from-transparent
+                    via-white/25
+                    to-transparent
+                    animate-button-glide
+                    "
+                  />
+                  <span className="relative z-10">Get Started for Free →</span>
                 </button>
               </>
             ) : (

@@ -8,6 +8,10 @@ const faqs = [
     a: "ChatGPT is a general writing tool. Cre8tly Studio is a product building system. It uses your brand identity, past content, and preferences to create consistent, ready to publish digital assets that actually match how you speak.",
   },
   {
+    q: "Is your site safe to use?",
+    a: "Yes. Cre8tly Studio is built with security as a priority. We use encrypted connections, modern authentication methods including passwordless login and two factor authentication, and industry standard safeguards to protect user data.",
+  },
+  {
     q: "What is Cre8tly Studio?",
     a: "Cre8tly Studio is an all-in-one, AI powered platform that lets you create digital products, landing pages, PDFs, and sell them instantly from one place.\n\n And when we say all-in-one, we mean it. With Cre8tly Studio, you have all the tools you need to create, market, and sell professional digital products from the same dashboard — no messy integrations or prior tech skills required.",
   },
@@ -46,11 +50,6 @@ const faqs = [
   {
     q: "What is Author’s Assistant?",
     a: "Author’s Assistant is an AI powered writing companion designed to help authors refine, edit, and expand their own work. It remembers your story, tone, and progress to provide consistent, context aware suggestions.\n\nIt does not write books for you. Instead, it enhances clarity, flow, and structure while preserving your voice. Built for serious fiction and nonfiction authors who want a smarter way to polish and publish their work.",
-  },
-
-  {
-    q: "Does Author’s Assistant write my book for me?",
-    a: "No. Author’s Assistant does not write books for you. It works with what you write, refining and enhancing your text while preserving your voice.\n\nFor fiction, it helps improve flow, clarity, and cinematic pacing without changing your story. For nonfiction, it stays grounded in your material and does not invent characters, places, or events.\n\nAuthor’s Assistant is built for serious authors who want a smarter editing and refinement tool, not an auto-writing system.",
   },
 ];
 

@@ -18,6 +18,17 @@ export default function ProfileCardBlock({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  function canvasHasTransparency(ctx, width, height) {
+    const imageData = ctx.getImageData(0, 0, width, height).data;
+
+    for (let i = 3; i < imageData.length; i += 4) {
+      if (imageData[i] < 255) return true;
+    }
+    return false;
+  }
+
+  const previewBg = adjustForLandingOverlay(bgTheme);
+
   return (
     <div className="rounded-xl p-6 mt-3 border border-gray-700 bg-[#0F172A] transition-all">
       {/* Header */}
@@ -71,7 +82,13 @@ export default function ProfileCardBlock({
 
             {cropSrc && (
               <div className="mt-6">
-                <div className="relative w-full h-[260px] bg-black rounded-lg overflow-hidden">
+                <div
+                  className="relative w-full h-[260px] rounded-lg overflow-hidden"
+                  style={{
+                    background: previewBg,
+                    boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)",
+                  }}
+                >
                   <Cropper
                     image={cropSrc}
                     crop={crop}
@@ -109,36 +126,58 @@ export default function ProfileCardBlock({
 
                       const canvas = document.createElement("canvas");
                       const img = new Image();
+                      img.crossOrigin = "anonymous";
                       img.src = cropSrc;
 
                       await new Promise((r) => (img.onload = r));
 
                       const { width, height, x, y } = croppedAreaPixels;
-                      canvas.width = width;
-                      canvas.height = height;
+                      const PADDING_RATIO = 0.4;
+                      const padX = Math.round(width * PADDING_RATIO);
+                      const padY = Math.round(height * PADDING_RATIO);
+
+                      // ✅ Set padded canvas size ONCE
+                      canvas.width = width + padX * 2;
+                      canvas.height = height + padY * 2;
 
                       const ctx = canvas.getContext("2d");
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                      // ✅ Draw image centered with padding
                       ctx.drawImage(
                         img,
                         x,
                         y,
                         width,
                         height,
-                        0,
-                        0,
+                        padX,
+                        padY,
                         width,
                         height
                       );
 
-                      const blob = await new Promise((r) =>
-                        canvas.toBlob(r, "image/jpeg", 0.9)
+                      // 🔍 Detect transparency
+                      const hasAlpha = canvasHasTransparency(
+                        ctx,
+                        width,
+                        height
                       );
 
+                      // 🧠 Choose format intelligently
+                      const mimeType = hasAlpha ? "image/png" : "image/jpeg";
+                      const fileName = hasAlpha ? "profile.png" : "profile.jpg";
+                      const quality = hasAlpha ? undefined : 0.9;
+
+                      const blob = await new Promise((r) =>
+                        canvas.toBlob(r, mimeType, quality)
+                      );
+
+                      // Preview + upload
                       const preview = URL.createObjectURL(blob);
                       updateBlock(index, "image_url", preview);
 
                       const formData = new FormData();
-                      formData.append("image", blob, "profile.jpg");
+                      formData.append("image", blob, fileName);
                       formData.append("landingId", landing.id);
                       formData.append("blockId", block.id);
 
@@ -178,9 +217,7 @@ export default function ProfileCardBlock({
           </>
         ) : (
           <div className="text-center">
-            <img
-              src={block.image_url}
-              alt=""
+            <div
               className="mx-auto"
               style={{
                 width: `${block.image_size || 120}px`,
@@ -189,9 +226,21 @@ export default function ProfileCardBlock({
                 border: `${block.image_border_width || 1}px solid ${
                   block.image_border_color || "#e5e7eb"
                 }`,
-                objectFit: "cover",
+                overflow: "hidden",
+                background: "transparent",
               }}
-            />
+            >
+              <img
+                src={block.image_url}
+                alt=""
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+            </div>
 
             <button
               className="text-xs text-red-400 mt-3 hover:underline"

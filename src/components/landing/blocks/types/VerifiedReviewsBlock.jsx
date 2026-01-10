@@ -23,6 +23,42 @@ export default function VerifiedReviewsBlock({ block, index, updateBlock }) {
         and layout are managed by the system. This will not show in preview
         panel.
       </div>
+      <div className="mt-4">
+        <label className="text-sm font-semibold text-gray-300">
+          Reviews Text Color
+          <span className="block text-xs font-normal text-gray-400 mt-1">
+            Used only for the reviews section on the live page
+          </span>
+        </label>
+
+        <div className="flex items-center gap-2 mt-2">
+          <input
+            type="color"
+            value={block.reviews_text_color || "#000000"}
+            onChange={(e) =>
+              updateBlock(index, "reviews_text_color", e.target.value)
+            }
+            className="w-8 h-8 border border-gray-600 rounded cursor-pointer bg-transparent"
+          />
+
+          <input
+            type="text"
+            value={block.reviews_text_color || ""}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+                updateBlock(
+                  index,
+                  "reviews_text_color",
+                  val.startsWith("#") ? val : `#${val}`
+                );
+              }
+            }}
+            placeholder="#000000"
+            className="w-24 px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+          />
+        </div>
+      </div>
     </div>
   );
 }

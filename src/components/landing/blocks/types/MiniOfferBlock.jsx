@@ -265,6 +265,72 @@ export default function MiniOfferBlock({
         />
       </div>
 
+      {/* SECONDARY TEXT COLOR */}
+      <div className="flex items-center gap-3 mb-8">
+        <label className="text-sm font-semibold text-gray-300">
+          Secondary Text Color
+          <span className="block text-xs font-normal text-gray-400 mt-1">
+            Used on the offer preview page for Title and Sub-title text
+          </span>
+        </label>
+
+        <input
+          type="color"
+          value={safeHexColor(block.secondary_text_color, "#9ca3af")}
+          onChange={(e) => updateField("secondary_text_color", e.target.value)}
+          className="w-8 h-8 border border-gray-600 rounded cursor-pointer bg-transparent"
+        />
+
+        <input
+          type="text"
+          value={block.secondary_text_color || ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+              updateField(
+                "secondary_text_color",
+                val.startsWith("#") ? val : `#${val}`
+              );
+            }
+          }}
+          placeholder="#9ca3af"
+          className="w-24 px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+        />
+      </div>
+
+      {/* UTILITY TEXT COLOR */}
+      <div className="flex items-center gap-3 mb-8">
+        <label className="text-sm font-semibold text-gray-300">
+          Utility Text Color
+          <span className="block text-xs font-normal text-gray-400 mt-1">
+            Used on the offer preview page for links and navigation text
+          </span>
+        </label>
+
+        <input
+          type="color"
+          value={safeHexColor(block.utility_text_color, "#60a5fa")}
+          onChange={(e) => updateField("utility_text_color", e.target.value)}
+          className="w-8 h-8 border border-gray-600 rounded cursor-pointer bg-transparent"
+        />
+
+        <input
+          type="text"
+          value={block.utility_text_color || ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
+              updateField(
+                "utility_text_color",
+                val.startsWith("#") ? val : `#${val}`
+              );
+            }
+          }}
+          placeholder="#60a5fa"
+          className="w-24 px-2 py-1 text-xs bg-black text-white border border-gray-600 rounded"
+        />
+      </div>
+
       {/* OFFERS GRID */}
       <div
         style={{

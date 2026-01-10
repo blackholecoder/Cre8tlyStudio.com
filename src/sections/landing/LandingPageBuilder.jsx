@@ -403,6 +403,7 @@ export default function LandingPageBuilder() {
     if (type === "verified_reviews") {
       newBlock.enabled = true;
       newBlock.collapsed = false;
+      newBlock.reviews_text_color;
     }
 
     if (type === "faq") {
@@ -494,6 +495,8 @@ export default function LandingPageBuilder() {
       newBlock.bg_color = "rgba(0,0,0,0.4)";
       newBlock.use_gradient = false;
       newBlock.text_color = "#ffffff";
+      newBlock.secondary_text_color = "#ffffff";
+      newBlock.utility_text_color = "#ffffff";
       newBlock.card_width = 360;
       newBlock.card_height = "auto";
       newBlock.offer_page = {

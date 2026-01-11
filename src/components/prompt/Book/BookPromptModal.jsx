@@ -81,6 +81,7 @@ export default function BookPromptModal({
         {
           bookId,
           prompt: text,
+          sections,
           pages: pageCount,
           link,
           coverImage: cover,

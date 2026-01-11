@@ -150,6 +150,29 @@ export default function BookPromptForm({
 
         setCanEdit(Boolean(Number(res.data.can_edit)));
 
+        if (res.data?.sections_json) {
+          const parsedSections = Array.isArray(res.data.sections_json)
+            ? res.data.sections_json
+            : JSON.parse(res.data.sections_json);
+
+          const gptSections = parsedSections.filter((s) => s.source === "gpt");
+
+          if (gptSections.length) {
+            setIsAiGenerated(true);
+            setSections(gptSections);
+            setActiveSectionId(gptSections[0].id);
+            setText(gptSections[0].content || "");
+
+            if (res.data.book_name) setBookName(res.data.book_name);
+            if (res.data.link) setLink(res.data.link);
+            if (res.data.author_name) setDraftAuthor(res.data.author_name);
+            if (res.data.book_type) setBookType(res.data.book_type);
+
+            hasLoadedDraft.current = true;
+            return; // ⛔ STOP — GPT wins
+          }
+        }
+
         // -----------------------------
         // 🔥 1. Load DRAFT if available
         // -----------------------------
@@ -186,22 +209,6 @@ export default function BookPromptForm({
             setHasShownBanner(true);
           }
 
-          return; // stop here — drafts override GPT
-        }
-
-        // ----------------------------------------
-        // 🔥 2. Otherwise load GPT-generated text
-        // ----------------------------------------
-        if (res.data?.gpt_output) {
-          setText(res.data.gpt_output);
-          setIsAiGenerated(true);
-
-          if (res.data.book_name) setBookName(res.data.book_name);
-          if (res.data.link) setLink(res.data.link);
-          if (res.data.author_name) setDraftAuthor(res.data.author_name);
-          if (res.data.book_type) setBookType(res.data.book_type);
-
-          hasLoadedDraft.current = true;
           return;
         }
       } catch (err) {
@@ -363,6 +370,23 @@ export default function BookPromptForm({
   async function handleSubmit(e) {
     e.preventDefault();
 
+    setSections((prev) =>
+      prev.map((section) =>
+        section.id === activeSectionId ? { ...section, content: text } : section
+      )
+    );
+
+    const sectionsForSubmit = sections.map((section) =>
+      section.id === activeSectionId ? { ...section, content: text } : section
+    );
+
+    const combinedPrompt = sectionsForSubmit
+      .map(
+        (s, index) =>
+          `Section ${index + 1}: ${s.title || "Untitled"}\n${s.content || ""}`
+      )
+      .join("\n\n");
+
     try {
       setShowGenerating(true);
       setProgress(0);
@@ -383,7 +407,8 @@ export default function BookPromptForm({
 
       const payload = {
         bookId,
-        prompt: text,
+        prompt: combinedPrompt || text,
+        sections: sectionsForSubmit,
         pages: pageCount,
         link,
         coverImage: cover,
@@ -398,8 +423,6 @@ export default function BookPromptForm({
       };
 
       const res = await axiosInstance.post("/books/prompt", payload);
-
-      console.log("PAYLOAD", payload);
 
       clearInterval(interval);
       setProgress(100);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import CoverUpload from "../CoverUpload";
@@ -10,8 +10,8 @@ import { BookOpenCheck, Rocket, Replace } from "lucide-react";
 export default function BookPromptForm({
   text,
   setText,
-  pages,
-  setPages,
+  pageCount,
+  setPageCount,
   link,
   setLink,
   cover,
@@ -51,6 +51,50 @@ export default function BookPromptForm({
   const [showFindReplace, setShowFindReplace] = useState(false);
   const [findText, setFindText] = useState("");
   const [replaceText, setReplaceText] = useState("");
+
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const lastSavedRef = useRef("");
+  const hasLoadedDraft = useRef(false);
+
+  const [justSaved, setJustSaved] = useState(false);
+
+  // NEW AUTHOR PAGES REFACTOR
+  const [sections, setSections] = useState([
+    {
+      id: "section-1",
+      title: "Section 1",
+      content: "",
+    },
+  ]);
+
+  const [activeSectionId, setActiveSectionId] = useState("section-1");
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [sectionTitleDraft, setSectionTitleDraft] = useState("");
+
+  const activeSection = sections.find(
+    (section) => section.id === activeSectionId
+  );
+
+  const activeSectionWordCount = activeSection
+    ? getWordCount(activeSection.content)
+    : 0;
+
+  useEffect(() => {
+    // ONLY hydrate initial empty state
+    if (
+      sections.length === 1 &&
+      sections[0].id === "section-1" &&
+      !sections[0].content &&
+      text?.trim()
+    ) {
+      setSections((prev) => [
+        {
+          ...prev[0],
+          content: text,
+        },
+      ]);
+    }
+  }, [text]);
 
   async function handleFileUpload(e) {
     const file = e.target.files[0];
@@ -104,16 +148,28 @@ export default function BookPromptForm({
 
         const res = await axiosInstance.get(endpoint);
 
-        console.log("🔥 Draft/GPT response:", res.data);
-
         setCanEdit(Boolean(Number(res.data.can_edit)));
 
         // -----------------------------
         // 🔥 1. Load DRAFT if available
         // -----------------------------
         if (res.data?.draft_text) {
-          setText(res.data.draft_text);
           setIsAiGenerated(false);
+
+          if (res.data.sections_json) {
+            const parsedSections = Array.isArray(res.data.sections_json)
+              ? res.data.sections_json
+              : JSON.parse(res.data.sections_json);
+
+            if (parsedSections.length) {
+              setSections(parsedSections);
+              setActiveSectionId(parsedSections[0].id);
+              setText(parsedSections[0].content || "");
+            }
+            hasLoadedDraft.current = true;
+          } else {
+            setText(res.data.draft_text || "");
+          }
 
           if (res.data.book_name) setBookName(res.data.book_name);
           if (res.data.link) setLink(res.data.link);
@@ -145,12 +201,9 @@ export default function BookPromptForm({
           if (res.data.author_name) setDraftAuthor(res.data.author_name);
           if (res.data.book_type) setBookType(res.data.book_type);
 
-          console.log("Loaded GPT-generated text");
+          hasLoadedDraft.current = true;
           return;
         }
-
-        // Otherwise nothing found
-        console.log("No draft or GPT text found for this chapter.");
       } catch (err) {
         if (err.response?.status !== 404) {
           console.error("Failed to load draft:", err);
@@ -160,6 +213,106 @@ export default function BookPromptForm({
 
     loadDraft();
   }, [bookId, partNumber]);
+
+  useEffect(() => {
+    if (!bookId) return;
+    if (!sections.length) return;
+    if (saving) return;
+    if (!hasLoadedDraft.current) return;
+
+    const current = JSON.stringify(sections);
+
+    if (current === lastSavedRef.current) return;
+
+    const timeout = setTimeout(() => {
+      autoSaveDraft();
+      lastSavedRef.current = current;
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [sections]);
+
+  useEffect(() => {
+    if (!bookId) return;
+
+    const handler = () => {
+      const endpoint =
+        partNumber > 1
+          ? `/books/${bookId}/part/${partNumber}/draft`
+          : `/books/draft`;
+
+      navigator.sendBeacon(
+        endpoint,
+        JSON.stringify({
+          bookId,
+          sections,
+          bookName,
+          link,
+          author_name: draftAuthor || authorName,
+          book_type: bookType,
+          font_name: fontName,
+          font_file: fontFile,
+        })
+      );
+    };
+
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [
+    bookId,
+    partNumber,
+    sections,
+    bookName,
+    link,
+    draftAuthor,
+    authorName,
+    bookType,
+    fontName,
+    fontFile,
+  ]);
+
+  const [, forceTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      forceTick((n) => n + 1);
+    }, 60000); // every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  async function autoSaveDraft() {
+    try {
+      setSaving(true);
+
+      await axiosInstance.post(
+        partNumber > 1
+          ? `/books/${bookId}/part/${partNumber}/draft`
+          : `/books/draft`,
+        {
+          bookId,
+          draftText: text, // legacy compatibility
+          sections,
+          bookName,
+          link,
+          author_name: draftAuthor || authorName,
+          book_type: bookType,
+          font_name: fontName,
+          font_file: fontFile,
+        }
+      );
+
+      setLastSavedAt(new Date().toISOString());
+      setJustSaved(true);
+      setTimeout(() => {
+        setJustSaved(false);
+      }, 4000);
+    } catch (err) {
+      console.error("Auto-save failed", err);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleSaveDraft() {
     if (!text?.trim()) {
@@ -181,6 +334,7 @@ export default function BookPromptForm({
         {
           bookId,
           draftText: text,
+          sections,
           bookName,
           link,
           author_name: draftAuthor || authorName,
@@ -230,7 +384,7 @@ export default function BookPromptForm({
       const payload = {
         bookId,
         prompt: text,
-        pages,
+        pages: pageCount,
         link,
         coverImage: cover,
         bookName,
@@ -281,6 +435,22 @@ export default function BookPromptForm({
     return `${days} day${days !== 1 ? "s" : ""} ago`;
   }
 
+  function getSavedLabel(dateString) {
+    if (!dateString) return "";
+
+    const diffMs = Date.now() - new Date(dateString).getTime();
+    const minutes = Math.floor(diffMs / 60000);
+
+    // ⛔️ DO NOT return "just now" here
+    if (minutes < 1) return "";
+
+    if (minutes === 1) return "Saved 1 minute ago";
+    if (minutes < 60) return `Saved ${minutes} minutes ago`;
+
+    const hours = Math.floor(minutes / 60);
+    return `Saved ${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  }
+
   function handleFindReplace() {
     if (!findText.trim()) {
       toast.warn("Enter text to find");
@@ -293,6 +463,68 @@ export default function BookPromptForm({
     setText(updated);
     toast.success("Replaced!");
     setShowFindReplace(false);
+  }
+
+  function getWordCount(html = "") {
+    const text = html
+      .replace(/<[^>]*>/g, " ") // strip HTML
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return text ? text.split(" ").length : 0;
+  }
+
+  function handleDeleteSectionWithUndo(sectionId) {
+    const sectionToDelete = sections.find((s) => s.id === sectionId);
+    if (!sectionToDelete) return;
+
+    // remove immediately from UI
+    const remaining = sections.filter((s) => s.id !== sectionId);
+
+    setSections(remaining);
+
+    // switch active section safely
+    const nextActive = remaining[0];
+    if (nextActive) {
+      setActiveSectionId(nextActive.id);
+      setText(nextActive.content || "");
+    } else {
+      setActiveSectionId(null);
+      setText("");
+    }
+
+    // store for undo
+    setPendingDelete(sectionToDelete);
+
+    // show undo toast
+    toast(
+      (t) => (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-white">Section deleted</span>
+          <button
+            onClick={() => {
+              // restore section
+              setSections((prev) => [...prev, sectionToDelete]);
+              setActiveSectionId(sectionToDelete.id);
+              setText(sectionToDelete.content || "");
+              setPendingDelete(null);
+              toast.dismiss(t.id);
+            }}
+            className="text-sm px-2 py-1 rounded bg-green text-black font-medium"
+          >
+            Undo
+          </button>
+        </div>
+      ),
+      {
+        duration: 5000,
+      }
+    );
+
+    // finalize delete after timeout
+    setTimeout(() => {
+      setPendingDelete(null);
+    }, 5000);
   }
 
   return (
@@ -390,9 +622,178 @@ export default function BookPromptForm({
           </button>
         </div>
 
+        {/* ---------- Section Header ---------- */}
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-xs uppercase tracking-wide text-gray-500">
+            Section
+          </span>
+
+          <select
+            value={activeSectionId}
+            onChange={(e) => {
+              const nextId = e.target.value;
+
+              // save current section content immediately
+              setSections((prev) =>
+                prev.map((section) =>
+                  section.id === activeSectionId
+                    ? { ...section, content: text }
+                    : section
+                )
+              );
+
+              const nextSection = sections.find((s) => s.id === nextId);
+              if (!nextSection) return;
+
+              setActiveSectionId(nextId);
+              setText(nextSection.content || "");
+
+              // fire autosave AFTER state change
+              autoSaveDraft();
+            }}
+            className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white min-w-[220px]"
+          >
+            {sections.map((section) => (
+              <option key={section.id} value={section.id}>
+                {section.title || "Untitled Section"}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={() => {
+              const newId = `section-${sections.length + 1}`;
+              const newSection = {
+                id: newId,
+                title: `Section ${sections.length + 1}`,
+                content: "",
+              };
+
+              setSections((prev) => [...prev, newSection]);
+              setActiveSectionId(newId);
+              setText("");
+            }}
+            className="ml-auto px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-white"
+          >
+            + Add Section
+          </button>
+        </div>
+
+        {/* ---------- Section Title ---------- */}
+        {activeSection && (
+          <div className="mb-4">
+            {editingSectionId === activeSectionId ? (
+              <div className="max-w-md space-y-2">
+                <label className="text-xs text-gray-400">Rename section</label>
+
+                <input
+                  autoFocus
+                  value={sectionTitleDraft}
+                  onChange={(e) => setSectionTitleDraft(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                />
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingSectionId(null);
+                      setSectionTitleDraft("");
+                    }}
+                    className="px-3 py-1 text-sm bg-gray-700 rounded text-white"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSections((prev) =>
+                        prev.map((section) =>
+                          section.id === activeSectionId
+                            ? {
+                                ...section,
+                                title:
+                                  sectionTitleDraft.trim() || section.title,
+                              }
+                            : section
+                        )
+                      );
+                      setEditingSectionId(null);
+                    }}
+                    className="px-3 py-1 text-sm bg-green rounded text-black font-medium"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h2
+                    className="text-xl font-semibold text-white cursor-pointer hover:opacity-80"
+                    onClick={() => {
+                      setEditingSectionId(activeSectionId);
+                      setSectionTitleDraft(activeSection.title || "");
+                    }}
+                  >
+                    ✏️ {activeSection.title || "Untitled Section"}
+                  </h2>
+
+                  <div className="text-xs text-gray-400 mt-1">
+                    {activeSectionWordCount} words
+                  </div>
+                </div>
+
+                {sections.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSectionWithUndo(activeSectionId)}
+                    className="text-xs px-3 py-1 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 transition"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        <div className="flex items-center justify-between text-xs text-green mb-2">
+          <div className="h-4 text-xs text-green">
+            <span
+              className={`transition-opacity duration-300 ${
+                justSaved || lastSavedAt ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {justSaved
+                ? "Saved just now"
+                : lastSavedAt
+                  ? getSavedLabel(lastSavedAt)
+                  : ""}
+            </span>
+          </div>
+
+          {saving && <span className="text-gray-500 italic">Saving…</span>}
+        </div>
         <div className="border border-gray-700 rounded-xl">
           {!partLocked || canEdit ? (
-            <BookEditor content={text} setContent={setText} />
+            <BookEditor
+              content={text}
+              setContent={(html) => {
+                // 1️⃣ Keep existing behavior (temporary bridge)
+                setText(html);
+
+                // 2️⃣ Write into the active section
+                setSections((prev) =>
+                  prev.map((section) =>
+                    section.id === activeSectionId
+                      ? { ...section, content: html }
+                      : section
+                  )
+                );
+              }}
+            />
           ) : (
             <div className="p-4 bg-gray-800 text-gray-400 rounded-lg border border-gray-700">
               Chapter is locked.
@@ -419,8 +820,8 @@ export default function BookPromptForm({
                 type="number"
                 min="1"
                 max="10"
-                value={pages ?? ""}
-                onChange={(e) => setPages(Number(e.target.value))}
+                value={pageCount ?? ""}
+                onChange={(e) => setPageCount(Number(e.target.value))}
                 className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
               />
             </div>

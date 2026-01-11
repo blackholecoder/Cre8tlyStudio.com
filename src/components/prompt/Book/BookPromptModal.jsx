@@ -16,7 +16,7 @@ export default function BookPromptModal({
   initialBookData,
 }) {
   const [text, setText] = useState("");
-  const [pages, setPages] = useState(10);
+  const [pageCount, setPageCount] = useState(10);
   const [link, setLink] = useState("");
   const [cover, setCover] = useState(null);
   const [title, setTitle] = useState("");
@@ -47,7 +47,7 @@ export default function BookPromptModal({
   useEffect(() => {
     if (!isOpen) {
       setText("");
-      setPages(10);
+      setPageCount(10);
       setLink("");
       setCover(null);
       setTitle("");
@@ -55,52 +55,6 @@ export default function BookPromptModal({
       setProgress(0);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    async function fetchDraft() {
-      if (!bookId) return;
-
-      try {
-        // ✅ Use part-specific route after part 1
-        const endpoint =
-          partNumber > 1
-            ? `/books/${bookId}/part/${partNumber}/draft`
-            : `/books/draft/${bookId}`;
-
-        const res = await axiosInstance.get(endpoint, {
-          // headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        const draft = res.data;
-
-        if (draft?.draft_text) {
-          setText(draft.draft_text);
-          if (draft.title) setTitle(draft.title);
-          if (draft.book_name) setBookName(draft.book_name);
-          if (draft.link) setLink(draft.link);
-          if (draft.author_name) setAuthorName(draft.author_name);
-          if (draft.book_type) setBookType(draft.book_type);
-
-          toast.info(
-            `Loaded last draft from ${new Date(
-              draft.last_saved_at || draft.updated_at || Date.now()
-            ).toLocaleString()}`
-          );
-        } else {
-          console.log("No draft found for this book or part.");
-        }
-      } catch (err) {
-        if (err.response?.status === 404) {
-          console.log("No saved draft yet.");
-        } else {
-          console.error("Failed to fetch draft:", err);
-          toast.error("Failed to fetch saved draft.");
-        }
-      }
-    }
-
-    fetchDraft();
-  }, [bookId, partNumber]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -127,7 +81,7 @@ export default function BookPromptModal({
         {
           bookId,
           prompt: text,
-          pages,
+          pages: pageCount,
           link,
           coverImage: cover,
           title,
@@ -203,8 +157,8 @@ export default function BookPromptModal({
         <BookPromptForm
           text={text}
           setText={setText}
-          pages={pages}
-          setPages={setPages}
+          pageCount={pageCount}
+          setPageCount={setPageCount}
           link={link}
           setLink={setLink}
           cover={cover}

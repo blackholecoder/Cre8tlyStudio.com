@@ -6,6 +6,7 @@ import BookEditor from "../../book/BookEditor";
 import { useAuth } from "../../../admin/AuthContext";
 import FontSelector from "../FontSelector";
 import { BookOpenCheck, Rocket, Replace } from "lucide-react";
+import { Tooltip } from "../../tools/toolTip";
 
 export default function BookPromptForm({
   text,
@@ -30,12 +31,13 @@ export default function BookPromptForm({
   partNumber,
   onClose,
   setShowGenerating,
-  setProgress,
   fontName,
   setFontName,
   fontFile,
   setFontFile,
 }) {
+  const MAX_CHAPTER_WORDS = 3000;
+
   const [saving, setSaving] = useState(false);
   const [restored, setRestored] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState(null);
@@ -79,6 +81,11 @@ export default function BookPromptForm({
     ? getWordCount(activeSection.content)
     : 0;
 
+  const totalChapterWordCount = sections.reduce(
+    (sum, section) => sum + getWordCount(section.content),
+    0
+  );
+
   useEffect(() => {
     // ONLY hydrate initial empty state
     if (
@@ -104,34 +111,50 @@ export default function BookPromptForm({
 
     try {
       const ext = file.name.split(".").pop().toLowerCase();
+      let importedText = "";
 
       // ---- TXT FILE ----
       if (ext === "txt") {
-        const textContent = await file.text();
-        setText(textContent);
-        toast.success("Text imported!");
+        importedText = await file.text();
       }
 
       // ---- DOCX FILE ----
       else if (ext === "docx") {
         const mammoth = await import("mammoth");
-
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
-
-        setText(result.value || "");
-        toast.success("DOCX imported!");
+        importedText = result.value || "";
       }
 
       // ---- UNSUPPORTED ----
       else {
         toast.error("Unsupported file. Please upload .txt or .docx");
+        return;
       }
+
+      // 🔒 WORD LIMIT ENFORCEMENT
+      const wordCount = getWordCount(importedText);
+
+      if (wordCount > MAX_CHAPTER_WORDS) {
+        toast.error(
+          `This file contains ${wordCount.toLocaleString()} words. 
+The maximum allowed per chapter is ${MAX_CHAPTER_WORDS.toLocaleString()}. 
+Please split the file into multiple chapters.`
+        );
+        return;
+      }
+
+      // ✅ SAFE TO INSERT
+      setText(importedText);
+      toast.success(
+        `Imported ${wordCount.toLocaleString()} words successfully`
+      );
     } catch (err) {
       console.error("Upload failed:", err);
       toast.error("Failed to import file.");
     } finally {
       setUploading(false);
+      e.target.value = ""; // reset input so same file can be reselected
     }
   }
 
@@ -370,6 +393,19 @@ export default function BookPromptForm({
   async function handleSubmit(e) {
     e.preventDefault();
 
+    const adjustedTotalWordCount = sections.reduce((sum, section) => {
+      if (section.id === activeSectionId) {
+        return sum + getWordCount(text);
+      }
+      return sum + getWordCount(section.content);
+    }, 0);
+
+    if (adjustedTotalWordCount > MAX_CHAPTER_WORDS) {
+      toast.error(
+        `This chapter has ${adjustedTotalWordCount.toLocaleString()} words. The maximum allowed is ${MAX_CHAPTER_WORDS.toLocaleString()}. Please split this into another chapter.`
+      );
+      return;
+    }
     setSections((prev) =>
       prev.map((section) =>
         section.id === activeSectionId ? { ...section, content: text } : section
@@ -387,60 +423,34 @@ export default function BookPromptForm({
       )
       .join("\n\n");
 
+    const payload = {
+      bookId,
+      prompt: combinedPrompt || text,
+      sections: sectionsForSubmit,
+      pages: pageCount,
+      link,
+      coverImage: cover,
+      bookName,
+      authorName,
+      bookType,
+      title,
+      font_name: fontName,
+      font_file: fontFile,
+      partNumber,
+      isEditing: canEdit ? true : false,
+    };
+
     try {
       setShowGenerating(true);
-      setProgress(0);
       onClose();
 
-      // 🔹 Start fake progress simulation
-      let progressValue = 0;
-      const interval = setInterval(() => {
-        progressValue +=
-          progressValue < 60
-            ? Math.random() * 4.5
-            : progressValue < 85
-              ? Math.random() * 2.5
-              : Math.random() * 1.2;
-        if (progressValue >= 96) progressValue = 96;
-        setProgress(progressValue);
-      }, 200);
+      axiosInstance.post("/books/prompt", payload);
 
-      const payload = {
-        bookId,
-        prompt: combinedPrompt || text,
-        sections: sectionsForSubmit,
-        pages: pageCount,
-        link,
-        coverImage: cover,
-        bookName,
-        authorName,
-        bookType,
-        title,
-        font_name: fontName,
-        font_file: fontFile,
-        partNumber,
-        isEditing: canEdit ? true : false,
-      };
-
-      const res = await axiosInstance.post("/books/prompt", payload);
-
-      clearInterval(interval);
-      setProgress(100);
-      toast.success("Chapter generation successful! 🚀");
-
-      // ✅ Hide overlay after short delay
-      setTimeout(() => setShowGenerating(false), 1500);
-
+      toast.success("Your chapter is being generated ✨");
       localStorage.removeItem("bookDraftLocal");
-      console.log("Book generated:", res.data);
     } catch (err) {
-      if (err.code === "ECONNABORTED") {
-        console.warn("backend still processing...please wait");
-        toast.info("⏳ Your book is still generating — please wait");
-        return; // ✅ don’t mark as failed
-      }
-      console.error("Book generation failed:", err);
-      // toast.error("Failed to generate book");
+      console.error("Generation failed to start:", err);
+      toast.error("Failed to start generation");
       setShowGenerating(false);
     }
   }
@@ -563,384 +573,504 @@ export default function BookPromptForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ---------- Book Info ---------- */}
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Book Name
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. The Shining"
-            value={bookName}
-            onChange={(e) => setBookName(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            This is your book’s main title.
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Author Name
-          </label>
-          <input
-            type="text"
-            value={draftAuthor || authorName || ""}
-            readOnly
-            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600"
-          />
-        </div>
-
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Book Type
-          </label>
-          <input
-            type="text"
-            value={bookType}
-            readOnly
-            className="w-full px-4 py-3 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
-          />
-        </div>
-
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Chapter Title
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. The Black Widow"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green focus:outline-none"
-          />
-        </div>
-
-        {/* ---------- Editor ---------- */}
-        <div className="mb-4 flex items-center gap-4">
-          <input
-            type="file"
-            accept=".txt,.doc,.docx"
-            id="bookUpload"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <label
-            htmlFor="bookUpload"
-            className="cursor-pointer px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver"
+      <form onSubmit={handleSubmit}>
+        <div
+          className="
+          bg-gradient-to-b from-[#121212] to-[#0e0e0e]
+          border border-gray-700
+          rounded-2xl
+          shadow-2xl
+          px-8 py-8
+          space-y-6
+    "
+        >
+          {/* ---------- Book Info ---------- */}
+          <div
+            className="
+            rounded-xl
+            border border-gray-700
+            bg-black/40
+            px-6 py-6
+            space-y-5
+          "
           >
-            📤 Upload Text or DOCX
-          </label>
+            <div className="text-xs uppercase tracking-wide text-gray-400">
+              Book Details
+            </div>
+            <label className="flex items-center gap-1 text-silver mb-2 font-medium">
+              Book Name
+              <Tooltip text="You can change the book name anytime. It won’t affect your content or progress." />
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. The Shining"
+              value={bookName}
+              onChange={(e) => setBookName(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              This is your book’s main title.
+            </p>
 
-          {uploading && <span className="text-gray-400">Processing...</span>}
-          <button
-            type="button"
-            onClick={() => setShowFindReplace(true)}
-            className="px-5 py-3 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition text-silver flex items-center gap-2"
+            <div>
+              <label className="flex items-center gap-1 text-silver mb-2 font-medium">
+                Author Name
+                <span className="text-gray-400">🔒</span>
+                <Tooltip text="The author name is set when the book is first created and can’t be changed." />
+              </label>
+              <input
+                type="text"
+                value={draftAuthor || authorName || ""}
+                readOnly
+                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-1 text-silver mb-2 font-medium">
+                Book Type
+                <span className="text-gray-400">🔒</span>
+                <Tooltip text="Book type is chosen before setup and can’t be changed" />
+              </label>
+              <input
+                type="text"
+                value={
+                  bookType
+                    ? bookType.charAt(0).toUpperCase() + bookType.slice(1)
+                    : ""
+                }
+                readOnly
+                className="w-full px-4 py-3 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+              />
+            </div>
+
+            <div>
+              <label className="block text-silver mb-2 font-medium">
+                Chapter Title
+                <Tooltip text="Each section can have its own chapter title. This helps organize longer books." />
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. The Black Widow"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* ---------- Import & Tools ---------- */}
+          <div
+            className="
+            rounded-xl
+            border border-gray-700
+            bg-black/40
+            px-6 py-5
+            space-y-4
+          "
           >
-            <Replace size={18} />
-            Find & Replace
-          </button>
-        </div>
+            <div className="text-xs uppercase tracking-wide text-gray-400">
+              Import & Tools
+              <Tooltip text="Import text from a PDF, DOC, or TXT file. Nothing is published automatically. Use Find & Replace to refine content before finalizing your chapter." />
+            </div>
 
-        {/* ---------- Section Header ---------- */}
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-xs uppercase tracking-wide text-gray-500">
-            Section
-          </span>
+            <div className="flex items-center gap-4 flex-wrap">
+              <input
+                type="file"
+                accept=".txt,.doc,.docx"
+                id="bookUpload"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
 
-          <select
-            value={activeSectionId}
-            onChange={(e) => {
-              const nextId = e.target.value;
+              <label
+                htmlFor="bookUpload"
+                className="
+                cursor-pointer
+                px-5 py-3
+                bg-gray-800
+                border border-gray-600
+                rounded-lg
+                hover:bg-gray-700
+                transition
+                text-silver
+              "
+              >
+                📤 Upload Text or DOCX
+              </label>
 
-              // save current section content immediately
-              setSections((prev) =>
-                prev.map((section) =>
-                  section.id === activeSectionId
-                    ? { ...section, content: text }
-                    : section
-                )
-              );
+              {uploading && (
+                <span className="text-sm text-gray-400">Processing…</span>
+              )}
 
-              const nextSection = sections.find((s) => s.id === nextId);
-              if (!nextSection) return;
+              <button
+                type="button"
+                onClick={() => setShowFindReplace(true)}
+                className="
+                px-5 py-3
+                bg-gray-800
+                border border-gray-600
+                rounded-lg
+                hover:bg-gray-700
+                transition
+                text-silver
+                flex items-center gap-2
+              "
+              >
+                <Replace size={18} />
+                Find & Replace
+              </button>
+            </div>
+          </div>
 
-              setActiveSectionId(nextId);
-              setText(nextSection.content || "");
-
-              // fire autosave AFTER state change
-              autoSaveDraft();
-            }}
-            className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white min-w-[220px]"
+          {/* ---------- Section Header ---------- */}
+          <div
+            className="
+            rounded-xl
+            border border-gray-700
+            bg-black/40
+            px-6 py-5
+            space-y-4
+          "
           >
-            {sections.map((section) => (
-              <option key={section.id} value={section.id}>
-                {section.title || "Untitled Section"}
-              </option>
-            ))}
-          </select>
-
-          <button
-            type="button"
-            onClick={() => {
-              const newId = `section-${sections.length + 1}`;
-              const newSection = {
-                id: newId,
-                title: `Section ${sections.length + 1}`,
-                content: "",
-              };
-
-              setSections((prev) => [...prev, newSection]);
-              setActiveSectionId(newId);
-              setText("");
-            }}
-            className="ml-auto px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-white"
-          >
-            + Add Section
-          </button>
-        </div>
-
-        {/* ---------- Section Title ---------- */}
-        {activeSection && (
-          <div className="mb-4">
-            {editingSectionId === activeSectionId ? (
-              <div className="max-w-md space-y-2">
-                <label className="text-xs text-gray-400">Rename section</label>
-
-                <input
-                  autoFocus
-                  value={sectionTitleDraft}
-                  onChange={(e) => setSectionTitleDraft(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
-                />
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingSectionId(null);
-                      setSectionTitleDraft("");
-                    }}
-                    className="px-3 py-1 text-sm bg-gray-700 rounded text-white"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSections((prev) =>
-                        prev.map((section) =>
-                          section.id === activeSectionId
-                            ? {
-                                ...section,
-                                title:
-                                  sectionTitleDraft.trim() || section.title,
-                              }
-                            : section
-                        )
-                      );
-                      setEditingSectionId(null);
-                    }}
-                    className="px-3 py-1 text-sm bg-green rounded text-black font-medium"
-                  >
-                    Save
-                  </button>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex items-center gap-1 text-xs uppercase tracking-wide text-gray-500">
+                Section
+                <Tooltip text="Sections let you break your chapter into parts. Switching sections saves your work automatically. You can add, rename, or delete sections anytime. Each chapter can contain up to 3,000 total words across all sections. If you exceed the limit, split your content into another chapter or part." />
               </div>
-            ) : (
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h2
-                    className="text-xl font-semibold text-white cursor-pointer hover:opacity-80"
-                    onClick={() => {
-                      setEditingSectionId(activeSectionId);
-                      setSectionTitleDraft(activeSection.title || "");
-                    }}
-                  >
-                    ✏️ {activeSection.title || "Untitled Section"}
-                  </h2>
 
-                  <div className="text-xs text-gray-400 mt-1">
-                    {activeSectionWordCount} words
+              <select
+                value={activeSectionId}
+                onChange={(e) => {
+                  const nextId = e.target.value;
+
+                  // save current section content immediately
+                  setSections((prev) =>
+                    prev.map((section) =>
+                      section.id === activeSectionId
+                        ? { ...section, content: text }
+                        : section
+                    )
+                  );
+
+                  const nextSection = sections.find((s) => s.id === nextId);
+                  if (!nextSection) return;
+
+                  setActiveSectionId(nextId);
+                  setText(nextSection.content || "");
+
+                  // fire autosave AFTER state change
+                  autoSaveDraft();
+                }}
+                className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white w-full sm:w-auto sm:min-w-[220px]"
+              >
+                {sections.map((section) => (
+                  <option key={section.id} value={section.id}>
+                    {section.title || "Untitled Section"}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const newId = `section-${sections.length + 1}`;
+                  const newSection = {
+                    id: newId,
+                    title: `Section ${sections.length + 1}`,
+                    content: "",
+                  };
+
+                  setSections((prev) => [...prev, newSection]);
+                  setActiveSectionId(newId);
+                  setText("");
+                }}
+                className="
+                sm:ml-auto
+                w-full sm:w-auto
+                px-4 py-2
+                bg-gray-800 hover:bg-gray-700
+                rounded-lg
+                text-sm text-white
+              "
+              >
+                + Add Section
+              </button>
+            </div>
+
+            {/* ---------- Section Title ---------- */}
+            {activeSection && (
+              <div className="mb-4">
+                {editingSectionId === activeSectionId ? (
+                  <div className="max-w-md space-y-2">
+                    <label className="text-xs text-gray-400">
+                      Rename section
+                    </label>
+
+                    <input
+                      autoFocus
+                      value={sectionTitleDraft}
+                      onChange={(e) => setSectionTitleDraft(e.target.value)}
+                      className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                    />
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingSectionId(null);
+                          setSectionTitleDraft("");
+                        }}
+                        className="px-3 py-1 text-sm bg-gray-700 rounded text-white"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSections((prev) =>
+                            prev.map((section) =>
+                              section.id === activeSectionId
+                                ? {
+                                    ...section,
+                                    title:
+                                      sectionTitleDraft.trim() || section.title,
+                                  }
+                                : section
+                            )
+                          );
+                          setEditingSectionId(null);
+                        }}
+                        className="px-3 py-1 text-sm bg-green rounded text-black font-medium"
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h2
+                        className="text-xl font-semibold text-white cursor-pointer hover:opacity-80"
+                        onClick={() => {
+                          setEditingSectionId(activeSectionId);
+                          setSectionTitleDraft(activeSection.title || "");
+                        }}
+                      >
+                        ✏️ {activeSection.title || "Untitled Section"}
+                      </h2>
 
-                {sections.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteSectionWithUndo(activeSectionId)}
-                    className="text-xs px-3 py-1 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 transition"
-                  >
-                    Delete
-                  </button>
+                      <div className="mt-1 space-y-1">
+                        <div className="text-xs text-gray-400">
+                          Section, {activeSectionWordCount.toLocaleString()}{" "}
+                          words
+                        </div>
+
+                        <div
+                          className={`text-xs ${
+                            totalChapterWordCount > MAX_CHAPTER_WORDS
+                              ? "text-red-400"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          Chapter total,{" "}
+                          {totalChapterWordCount.toLocaleString()} /{" "}
+                          {MAX_CHAPTER_WORDS.toLocaleString()} words
+                        </div>
+                      </div>
+                    </div>
+
+                    {sections.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDeleteSectionWithUndo(activeSectionId)
+                        }
+                        className="text-xs px-3 py-1 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 transition"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             )}
           </div>
-        )}
-        <div className="flex items-center justify-between text-xs text-green mb-2">
-          <div className="h-4 text-xs text-green">
-            <span
-              className={`transition-opacity duration-300 ${
-                justSaved || lastSavedAt ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {justSaved
-                ? "Saved just now"
-                : lastSavedAt
-                  ? getSavedLabel(lastSavedAt)
-                  : ""}
-            </span>
+          <div className="flex items-center justify-between text-xs text-green mb-2">
+            <div className="h-4 text-xs text-green">
+              <span
+                className={`transition-opacity duration-300 ${
+                  justSaved || lastSavedAt ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {justSaved
+                  ? "Saved just now"
+                  : lastSavedAt
+                    ? getSavedLabel(lastSavedAt)
+                    : ""}
+              </span>
+            </div>
+
+            {saving && <span className="text-gray-500 italic">Saving…</span>}
           </div>
 
-          {saving && <span className="text-gray-500 italic">Saving…</span>}
-        </div>
-        <div className="border border-gray-700 rounded-xl">
-          {!partLocked || canEdit ? (
-            <BookEditor
-              content={text}
-              setContent={(html) => {
-                // 1️⃣ Keep existing behavior (temporary bridge)
-                setText(html);
+          <div className="border border-gray-700 bg-black/30 rounded-xl">
+            {totalChapterWordCount > MAX_CHAPTER_WORDS * 0.9 && (
+              <div className="mb-2 text-xs text-yellow-400">
+                You’re approaching the chapter word limit. Consider splitting
+                into a new chapter.
+              </div>
+            )}
+            {!partLocked || canEdit ? (
+              <BookEditor
+                content={text}
+                setContent={(html) => {
+                  // 1️⃣ Keep existing behavior (temporary bridge)
+                  setText(html);
 
-                // 2️⃣ Write into the active section
-                setSections((prev) =>
-                  prev.map((section) =>
-                    section.id === activeSectionId
-                      ? { ...section, content: html }
-                      : section
-                  )
-                );
-              }}
-            />
-          ) : (
-            <div className="p-4 bg-gray-800 text-gray-400 rounded-lg border border-gray-700">
-              Chapter is locked.
-            </div>
-          )}
-        </div>
-        <FontSelector
-          fontName={fontName}
-          setFontName={setFontName}
-          fontFile={fontFile}
-          setFontFile={setFontFile}
-        />
-        {/* ---------- Cover Upload ---------- */}
-        <CoverUpload cover={cover} setCover={setCover} />
-
-        {/* ---------- Other Fields ---------- */}
-        {bookType !== "non-fiction" && (
-          <div>
-            <label className="block text-silver mb-2 font-medium">
-              Number of Pages
-            </label>
-            <div className="relative w-full max-w-xs">
-              <input
-                type="number"
-                min="1"
-                max="10"
-                value={pageCount ?? ""}
-                onChange={(e) => setPageCount(Number(e.target.value))}
-                className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
+                  // 2️⃣ Write into the active section
+                  setSections((prev) =>
+                    prev.map((section) =>
+                      section.id === activeSectionId
+                        ? { ...section, content: html }
+                        : section
+                    )
+                  );
+                }}
               />
-            </div>
+            ) : (
+              <div className="p-4 bg-gray-800 text-gray-400 rounded-lg border border-gray-700">
+                Chapter is locked.
+              </div>
+            )}
           </div>
-        )}
-
-        <div>
-          <label className="block text-silver mb-2 font-medium">
-            Optional Website or Author Link
-          </label>
-          <input
-            type="url"
-            placeholder="https://yourwebsite.com"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+          <FontSelector
+            fontName={fontName}
+            setFontName={setFontName}
+            fontFile={fontFile}
+            setFontFile={setFontFile}
           />
-        </div>
+          {/* ---------- Cover Upload ---------- */}
+          <CoverUpload cover={cover} setCover={setCover} />
 
-        {/* ---------- Buttons ---------- */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          {!partLocked && (
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              disabled={saving}
-              className={`flex-1 px-6 py-3 rounded-xl bg-green text-black font-semibold text-lg shadow-lg transition ${
-                saving
-                  ? "opacity-70 cursor-not-allowed"
-                  : "hover:bg-green hover:text-black"
-              }`}
-            >
-              {saving ? "Saving..." : "Save Draft"}
-            </button>
-          )}
-
-          {!loading && (
-            <button
-              type="submit"
-              disabled={partLocked && !canEdit}
-              className="flex-1 px-6 py-3 rounded-xl bg-royalPurple text-white font-semibold text-lg shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2"
-            >
-              {isAiGenerated ? (
-                <>
-                  <BookOpenCheck size={18} className="text-white" />
-                  Commit Final Chapter
-                </>
-              ) : (
-                <>
-                  <Rocket size={18} className="text-white" />
-                  Generate Book PDF
-                </>
-              )}
-            </button>
-          )}
-          {showFindReplace && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-md">
-                <h2 className="text-xl text-white mb-4 font-semibold">
-                  Find & Replace
-                </h2>
-
-                <label className="text-silver text-sm">Find</label>
+          {/* ---------- Other Fields ---------- */}
+          {bookType !== "non-fiction" && (
+            <div>
+              <label className="block text-silver mb-2 font-medium">
+                Number of Pages
+              </label>
+              <div className="relative w-full max-w-xs">
                 <input
-                  type="text"
-                  value={findText}
-                  onChange={(e) => setFindText(e.target.value)}
-                  className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={pageCount ?? ""}
+                  onChange={(e) => setPageCount(Number(e.target.value))}
+                  className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg"
                 />
-
-                <label className="text-silver text-sm">Replace With</label>
-                <input
-                  type="text"
-                  value={replaceText}
-                  onChange={(e) => setReplaceText(e.target.value)}
-                  className="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600"
-                />
-
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => setShowFindReplace(false)}
-                    className="px-4 py-2 bg-gray-700 rounded-lg text-sm"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={handleFindReplace}
-                    className="px-4 py-2 bg-green text-black font-semibold rounded-lg text-sm"
-                  >
-                    Replace
-                  </button>
-                </div>
               </div>
             </div>
           )}
+
+          <div>
+            <label className="block text-silver mb-2 font-medium">
+              Optional Website or Author Link
+            </label>
+            <input
+              type="url"
+              placeholder="https://yourwebsite.com"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+            />
+          </div>
+
+          {/* ---------- Buttons ---------- */}
+          <div
+            className="
+            mt-8
+            pt-6
+            border-t border-gray-700
+            flex flex-col sm:flex-row gap-3
+          "
+          >
+            {!partLocked && (
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={saving}
+                className={`flex-1 px-6 py-3 rounded-xl bg-gray-700 text-white font-semibold text-lg shadow-lg transition ${
+                  saving
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-green hover:text-black"
+                }`}
+              >
+                {saving ? "Saving..." : "Save Draft"}
+              </button>
+            )}
+
+            {!loading && (
+              <button
+                type="submit"
+                disabled={partLocked && !canEdit}
+                className="flex-1 px-6 py-3 rounded-xl bg-bookBtnColor text-black font-semibold text-lg shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2"
+              >
+                {isAiGenerated ? (
+                  <>
+                    <BookOpenCheck size={18} className="text-black" />
+                    Commit Final Chapter
+                  </>
+                ) : (
+                  <>
+                    <Rocket size={18} className="text-black" />
+                    Generate Chapter
+                  </>
+                )}
+              </button>
+            )}
+            {showFindReplace && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-md">
+                  <h2 className="text-xl text-white mb-4 font-semibold">
+                    Find & Replace
+                  </h2>
+
+                  <label className="text-silver text-sm">Find</label>
+                  <input
+                    type="text"
+                    value={findText}
+                    onChange={(e) => setFindText(e.target.value)}
+                    className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+                  />
+
+                  <label className="text-silver text-sm">Replace With</label>
+                  <input
+                    type="text"
+                    value={replaceText}
+                    onChange={(e) => setReplaceText(e.target.value)}
+                    className="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600"
+                  />
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => setShowFindReplace(false)}
+                      className="px-4 py-2 bg-gray-700 rounded-lg text-sm"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={handleFindReplace}
+                      className="px-4 py-2 bg-green text-black font-semibold rounded-lg text-sm"
+                    >
+                      Replace
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </form>
     </>

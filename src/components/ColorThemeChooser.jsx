@@ -88,7 +88,7 @@ export default function ColorThemeChooser({
     isValidHex(customSolid);
 
   return (
-    <div className="bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner">
+    <div className="bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner">
       {/* Header */}
       <div
         onClick={() => setShowThemes((p) => !p)}

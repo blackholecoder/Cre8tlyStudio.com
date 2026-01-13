@@ -75,7 +75,7 @@ export default function Leads() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-10 text-white">
+    <div className="min-h-screen bg-[#0b0b0b] p-10 text-white">
       <div className="max-w-5xl mx-auto bg-black/70 rounded-2xl shadow-lg p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-silver flex items-center gap-3 normal-case">

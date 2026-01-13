@@ -5,7 +5,7 @@ export default function ToggleDownloadButton({
   setShowDownloadButton,
 }) {
   return (
-    <div className="mt-10 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
+    <div className="mt-10 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
       <div className="flex items-center justify-between">
         <label className="text-lg font-semibold text-silver tracking-wide">
           Show “Download Now” Button

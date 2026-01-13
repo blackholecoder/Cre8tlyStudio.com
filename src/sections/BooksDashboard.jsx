@@ -22,14 +22,13 @@ export default function BooksDashboard() {
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeBook, setActiveBook] = useState(null);
   const [showGenerating, setShowGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [showOutOfSlots, setShowOutOfSlots] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showNewBookModal, setShowNewBookModal] = useState(false);
   const [newBookData, setNewBookData] = useState(null);
 
   const navigate = useNavigate();
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 12;
 
   // ✅ Pagination
   const sortedBooks = [...books].sort(
@@ -130,7 +129,7 @@ export default function BooksDashboard() {
   // ✅ Render
   return (
     <DashboardLayout>
-      <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
+      <div className="bg-[#0b0b0b] min-h-full px-4 lg:px-8 py-6">
         <DashboardHeader
           type="book"
           items={books}
@@ -183,7 +182,6 @@ export default function BooksDashboard() {
             partNumber={activeBook.part_number}
             accessToken={accessToken}
             setShowGenerating={setShowGenerating}
-            setProgress={setProgress}
             onSubmitted={handlePromptSubmitted}
             onCompleted={() => {
               fetchBooks();
@@ -212,8 +210,8 @@ export default function BooksDashboard() {
 
         <GenerationOverlay
           visible={showGenerating}
-          progress={progress}
           type="book"
+          onClose={() => setShowGenerating(false)}
         />
       </div>
     </DashboardLayout>

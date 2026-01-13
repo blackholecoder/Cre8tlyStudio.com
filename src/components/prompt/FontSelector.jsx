@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { fontThemes as availableFonts } from "../../constants/index";
+import { Tooltip } from "../tools/toolTip";
 
 export default function FontSelector({
   fontName,
@@ -51,12 +52,15 @@ export default function FontSelector({
   };
 
   return (
-    <div className="w-full relative mt-4 bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
-      <h3 className="text-lg font-semibold text-silver pb-6">Font Style</h3>
+    <div className="w-full relative mt-4 bg-[#0b0b0b] border border-gray-700 rounded-xl p-5 shadow-inner">
+      <h3 className="flex items-center gap-1 text-lg font-semibold text-silver pb-6">
+        Font Style
+        <Tooltip text="Choose how your book text appears. You can change fonts anytime before exporting or publishing." />
+      </h3>
 
       {/* 🔹 Live Preview (always visible on top) */}
       <div
-        className="mb-4 p-4 rounded-xl border border-gray-700 bg-[#111827]/80 text-center"
+        className="mb-4 p-4 rounded-xl border border-gray-700 bg-[#141414] text-center"
         style={{
           fontFamily: loaded ? previewFont : "sans-serif",
           transition: "all 0.3s ease",
@@ -77,7 +81,7 @@ export default function FontSelector({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-[#111827]/80 border border-gray-700 text-gray-300 text-base rounded-lg p-2.5 focus:ring-green focus:border-green"
+        className="w-full flex items-center justify-between bg-[#141414] border border-gray-700 text-gray-300 text-base rounded-lg p-2.5 focus:ring-green focus:border-green"
         style={{ fontFamily: loaded ? selectedFont : "sans-serif" }}
       >
         <span>

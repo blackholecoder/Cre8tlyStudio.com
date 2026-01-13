@@ -9,14 +9,14 @@ export default function TextColorControls({ landing, setLanding }) {
   ];
 
   return (
-    <div className="relative z-[10] bg-[#0f1624]/80 rounded-xl p-6 shadow-inner border border-gray-700">
+    <div className="relative z-[10] bg-[#0b0b0b] rounded-xl p-6 shadow-inner border border-gray-700">
       <h3 className="text-silver text-lg font-semibold mb-4">Text Colors</h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
         {fields.map(({ key, label }) => (
           <div
             key={key}
-            className="flex flex-col items-center justify-center bg-[#1f2937] rounded-lg p-4 border border-gray-600 hover:border-[#F285C3] transition-all duration-200"
+            className="flex flex-col items-center justify-center bg-[#141414] rounded-lg p-4 border border-gray-600 hover:border-[#F285C3] transition-all duration-200"
           >
             <label className="text-sm font-semibold text-white mb-2">
               {label}

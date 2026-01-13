@@ -1807,7 +1807,7 @@ export default function PreviewPanel({
   return (
     <div
       className="mt-6 sm:mt-12
- bg-[#111827]/80 border border-gray-700 rounded-xl sm:rounded-2xl shadow-inner  p-3 sm:p-6 transition-all hover:border-silver/60"
+ bg-[#0b0b0b] border border-gray-700 rounded-xl sm:rounded-2xl shadow-inner  p-3 sm:p-6 transition-all hover:border-silver/60"
     >
       {/* Header toggle */}
       <div

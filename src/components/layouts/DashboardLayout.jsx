@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }) {
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
     const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth >= 1280);
+      setIsSidebarOpen(window.innerWidth >= 1024);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }) {
       ? isCollapsed
         ? "bg-green/20 text-green"
         : "bg-green/10 text-green border border-green/30"
-      : "text-gray-300 hover:bg-gray-800/60"
+      : "text-gray-300 hover:bg-[#0b0b0b]"
   }`}
       >
         <Icon size={20} />
@@ -141,10 +141,10 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="dashboard flex bg-[#030712] text-white relative min-h-screen">
+    <div className="dashboard flex bg-[#141414] text-white relative min-h-screen">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full overflow-hidden bg-gray-900/95 border-r border-gray-800 
+        className={`fixed top-0 left-0 h-full overflow-hidden bg-[#141414] border-r border-gray-800 
   flex flex-col transform transition-all duration-300 z-[60]
   ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         style={{
@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }) {
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="w-9 h-9 flex items-center justify-center rounded-md 
-                 text-gray-400 hover:text-white hover:bg-gray-800 transition"
+                 text-gray-400 hover:text-white hover:bg-[#0b0b0b] transition"
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <SidebarToggleIcon size={18} />
@@ -247,7 +247,7 @@ export default function DashboardLayout({ children }) {
         className="flex-1 min-h-screen overflow-y-auto transition-all duration-300"
         style={{
           marginLeft:
-            window.innerWidth >= 1280
+            window.innerWidth >= 1024
               ? isCollapsed
                 ? `${SIDEBAR_COLLAPSED_WIDTH}px`
                 : `${SIDEBAR_EXPANDED_WIDTH}px`

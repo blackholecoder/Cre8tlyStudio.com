@@ -25,7 +25,7 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl p-6 relative">
+        <div className="bg-[#0b0b0b] border border-gray-700 rounded-2xl w-full max-w-2xl p-6 relative">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
             📚 Book Parts
           </h2>

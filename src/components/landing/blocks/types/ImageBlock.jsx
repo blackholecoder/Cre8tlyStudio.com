@@ -225,6 +225,7 @@ export default function ImageBlock({
 
                   if (res.data.success) {
                     updateBlock(index, "image_url", res.data.url);
+                    updateBlock(index, "has_alpha", res.data.has_alpha);
                     toast.success("Image uploaded!");
                   } else {
                     toast.error("Upload failed");
@@ -242,17 +243,15 @@ export default function ImageBlock({
         ) : (
           <div>
             {(() => {
-              const isPng =
-                block.image_url &&
-                block.image_url.toLowerCase().match(/\.png(\?.*)?$/);
+              const hasAlpha = Boolean(block.has_alpha);
 
               return (
                 <div
                   style={{
-                    background: isPng
+                    background: hasAlpha
                       ? `repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 50% / 20px 20px`
                       : "transparent",
-                    padding: "10px",
+                    padding: hasAlpha ? "10px" : "0px",
                     borderRadius: `${block.radius || 0}px`,
                   }}
                 >

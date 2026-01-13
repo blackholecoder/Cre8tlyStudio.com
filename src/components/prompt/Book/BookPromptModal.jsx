@@ -12,7 +12,6 @@ export default function BookPromptModal({
   onSubmitted,
   onCompleted,
   setShowGenerating,
-  setProgress,
   initialBookData,
 }) {
   const [text, setText] = useState("");
@@ -52,7 +51,6 @@ export default function BookPromptModal({
       setCover(null);
       setTitle("");
       setAuthorName("");
-      setProgress(0);
     }
   }, [isOpen]);
 
@@ -65,46 +63,24 @@ export default function BookPromptModal({
 
     // ✅ Close modal *immediately* to prevent Tauri race
     onClose();
-
-    setLoading(true);
-    setProgress(0);
     setShowGenerating(true);
 
-    let interval;
     try {
-      interval = setInterval(() => {
-        setProgress((p) => (p < 90 ? p + Math.random() * 4 : p));
-      }, 400);
+      axiosInstance.post("/books/prompt", {
+        bookId,
+        prompt: text,
+        sections,
+        pages: pageCount,
+        link,
+        coverImage: cover,
+        title,
+        authorName,
+        bookName,
+        partNumber,
+        bookType,
+      });
 
-      const res = await axiosInstance.post(
-        "/books/prompt",
-        {
-          bookId,
-          prompt: text,
-          sections,
-          pages: pageCount,
-          link,
-          coverImage: cover,
-          title,
-          authorName,
-          bookName,
-          partNumber,
-          bookType,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          timeout: 0,
-          maxBodyLength: Infinity,
-          maxContentLength: Infinity,
-        }
-      );
-
-      clearInterval(interval);
-      setProgress(100);
       toast.success("📚 Book section generated successfully!");
-
-      // ✅ Wait a short moment so DB finishes writing the new book part
-      await new Promise((r) => setTimeout(r, 1000));
 
       // ✅ notify parent the generation is complete
       if (typeof onCompleted === "function") {
@@ -116,13 +92,7 @@ export default function BookPromptModal({
         onSubmitted(bookId, text);
       }
     } catch (err) {
-      clearInterval(interval);
-      setProgress(0);
       setShowGenerating(false);
-      if (err.code === "ECONNABORTED") {
-        toast.info("⏳ Your book is still generating — please wait");
-        return; // ✅ don’t mark as failed
-      }
       toast.error(
         err.response?.data?.message || "Book generation failed. Try again."
       );
@@ -138,7 +108,7 @@ export default function BookPromptModal({
   return (
     <div className="fixed inset-0 z-50 bg-[#0b0b0b] text-white flex flex-col overflow-hidden">
       {/* Header Bar */}
-      <div className="relative flex items-center justify-center px-6 py-5 border-b border-gray-700 bg-[#111]">
+      <div className="relative flex items-center justify-center px-6 py-5 border-b border-gray-700 bg-[#141414]">
         {/* Centered Title */}
         <h1 className="text-2xl font-semibold text-white text-center">
           📖 Build Your Novel — Part {partNumber}
@@ -182,7 +152,6 @@ export default function BookPromptModal({
           partLocked={partLocked}
           partNumber={partNumber}
           onClose={onClose}
-          setProgress={setProgress}
           fontName={fontName}
           setFontName={setFontName}
           fontFile={fontFile}

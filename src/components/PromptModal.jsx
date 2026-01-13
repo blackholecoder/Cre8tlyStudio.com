@@ -3,12 +3,10 @@ import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
-  DialogTitle,
   Transition,
 } from "@headlessui/react";
 import { toast } from "react-toastify";
 import { ArrowLeft } from "lucide-react";
-import axios from "axios";
 import PromptForm from "./prompt/PromptForm";
 import SmartOutlineBuilder from "./prompt/SmartOutlineBuilder";
 import BookPromptForm from "./prompt/Book/BookPromptForm";
@@ -20,11 +18,9 @@ export default function PromptModal({
   isOpen,
   onClose,
   magnetId,
-  accessToken,
   contentType,
   onSubmitted,
   setShowGenerating,
-  setProgress,
 }) {
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
@@ -59,7 +55,6 @@ export default function PromptModal({
       setLogoPreview(null);
       setLink("");
       setCover(null);
-      setProgress(0);
       setShowPreview(false);
       setPhase("questions");
       setFontName(null);
@@ -75,17 +70,17 @@ export default function PromptModal({
   async function handleSubmit(e, contentType) {
     e.preventDefault();
 
-    // 🧩 1️⃣ Refresh latest user data
+    // 1️⃣ Refresh latest user data
     const freshUser = await refreshUser();
 
-    // 🧩 2️⃣ Block if trial expired
+    // 2️⃣ Block if trial expired
     if (freshUser?.isFreeTier && freshUser?.trialExpired) {
       toast.error("⛔ Your 7-day free trial has expired. Upgrade to continue.");
       navigate("/plans");
       return;
     }
 
-    // 🧩 3️⃣ Prevent more than 5 pages for free users
+    // 3️⃣ Prevent more than 5 pages for free users
     if (freshUser?.isFreeTier && pages > 5) {
       toast.warn(
         "Free tier limited to 5 pages maximum. Please upgrade to unlock more."
@@ -93,172 +88,58 @@ export default function PromptModal({
       return;
     }
 
-    setLoading(true);
-    setProgress(0);
+    // 4️⃣ Show confirmation overlay and close editor
     setShowGenerating(true);
-    onClose(); // ✅ close modal right away
+    onClose();
 
-    let interval;
-    try {
-      let progressValue = 0;
-      interval = setInterval(() => {
-        // Smooth climb logic with slowdown near the end
-        progressValue +=
-          progressValue < 60
-            ? Math.random() * 4.5 // faster early
-            : progressValue < 85
-              ? Math.random() * 2.5 // steady middle
-              : Math.random() * 1.2; // slow near the end
+    // 5️⃣ Fire-and-forget generation
+    axiosInstance.post("/lead-magnets/prompt", {
+      magnetId,
+      prompt: text,
+      title,
+      font_name: fontName,
+      font_file: fontFile,
+      bgTheme,
+      pages,
+      logo,
+      link,
+      coverImage: cover,
+      cta,
+      contentType,
+    });
 
-        if (progressValue >= 96) progressValue = 96; // hold near finish
-        setProgress(progressValue);
-      }, 200);
+    toast.success("✨ Your lead magnet is being generated");
 
-      const res = await axiosInstance.post(
-        "/lead-magnets/prompt",
-        {
-          magnetId,
-          prompt: text,
-          title,
-          font_name: fontName,
-          font_file: fontFile,
-          bgTheme,
-          pages,
-          logo,
-          link,
-          coverImage: cover,
-          cta,
-          contentType,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          timeout: 180000, // ⏰ allow up to 3 minutes
-        }
-      );
-
-      clearInterval(interval);
-      setProgress(100);
-
-      toast.success("🎉 Your digital asset has been generated successfully!");
-      setShowGenerating(false);
-      onClose();
-
-      await new Promise((r) => setTimeout(r, 1000));
-
-      // ✅ Refresh magnet list
+    // 6️⃣ Optimistic dashboard refresh
+    if (typeof onSubmitted === "function") {
       setTimeout(() => {
-        if (typeof onSubmitted === "function") {
-          onSubmitted(magnetId, text, fontName);
-        }
-      }, 2000);
-    } catch (err) {
-      clearInterval(interval);
-      setProgress(0);
-      setLoading(false);
-      setShowGenerating(false);
-
-      console.error("❌ Prompt submission error:", err);
-
-      // 🧩 Distinguish between real failure and slow processing
-      if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
-        toast.info(
-          "⏳ Please wait — your document is still being created. It will appear shortly."
-        );
-      } else if (err.response) {
-        const { status, data } = err.response;
-
-        if (status === 413) {
-          toast.error(
-            data.message || "Your input is too long. Please shorten it."
-          );
-        } else if (status === 400) {
-          toast.error(data.message || "Missing required fields.");
-        } else if (status === 429) {
-          toast.error(
-            "Rate limit reached. Please wait a moment and try again."
-          );
-        } else if (
-          data.message?.includes("context_length_exceeded") ||
-          data.message?.includes("too large")
-        ) {
-          toast.error(
-            "⚠️ This document is too large. Try fewer pages or smaller content."
-          );
-        } else {
-          // 🧠 Instead of "server error", assume it’s just taking time
-          toast.info(
-            "📄 Your document is still generating — it will appear soon."
-          );
-        }
-      } else {
-        // 🌐 Network disconnection or backend still processing
-        toast.info(
-          "⚙️ Document generation still in progress. Please refresh your dashboard shortly."
-        );
-      }
-
-      // ✅ Still trigger dashboard refresh after short delay
-      onClose();
-      if (typeof onSubmitted === "function") {
-        setTimeout(() => onSubmitted(magnetId, text, fontName), 5000);
-      }
-    } finally {
-      setLoading(false);
+        onSubmitted(magnetId, text, fontName);
+      }, 1500);
     }
   }
 
   async function handleBookSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    setProgress(0);
+
     setShowGenerating(true);
     onClose();
 
-    let interval;
     try {
-      let progressValue = 0;
-      interval = setInterval(() => {
-        // Smooth climb logic with slowdown near the end
-        progressValue +=
-          progressValue < 60
-            ? Math.random() * 4.5 // faster early
-            : progressValue < 85
-              ? Math.random() * 2.5 // steady middle
-              : Math.random() * 1.2; // slow near the end
-
-        if (progressValue >= 96) progressValue = 96; // hold near finish
-        setProgress(progressValue);
-      }, 200);
-
-      const res = await axios.post(
-        "https://cre8tlystudio.com/api/books/prompt",
-        {
-          prompt: text,
-          pages,
-          logo,
-          link,
-          coverImage: cover,
-          font_name: fontName,
-          font_file: fontFile,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          timeout: 180000,
-        }
-      );
-
-      clearInterval(interval);
-      setProgress(100);
+      axiosInstance.post("/books/prompt", {
+        prompt: text,
+        pages,
+        logo,
+        link,
+        coverImage: cover,
+        font_name: fontName,
+        font_file: fontFile,
+      });
 
       toast.success("📚 Your book was generated successfully!");
-      await new Promise((r) => setTimeout(r, 800));
       setShowGenerating(false);
       onClose();
     } catch (err) {
       console.error("❌ Book generation error:", err);
-      clearInterval(interval);
-      setProgress(0);
-      setLoading(false);
       setShowGenerating(false);
       toast.error("Something went wrong while generating your book.");
     } finally {

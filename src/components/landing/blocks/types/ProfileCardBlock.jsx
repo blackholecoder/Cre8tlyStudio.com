@@ -125,6 +125,7 @@ export default function ProfileCardBlock({
                       if (!croppedAreaPixels) return; // 🔒 guard
 
                       const canvas = document.createElement("canvas");
+                      const ctx = canvas.getContext("2d");
                       const img = new Image();
                       img.crossOrigin = "anonymous";
                       img.src = cropSrc;
@@ -132,26 +133,19 @@ export default function ProfileCardBlock({
                       await new Promise((r) => (img.onload = r));
 
                       const { width, height, x, y } = croppedAreaPixels;
-                      const PADDING_RATIO = 0.4;
-                      const padX = Math.round(width * PADDING_RATIO);
-                      const padY = Math.round(height * PADDING_RATIO);
+                      canvas.width = width;
+                      canvas.height = height;
 
-                      // ✅ Set padded canvas size ONCE
-                      canvas.width = width + padX * 2;
-                      canvas.height = height + padY * 2;
+                      ctx.clearRect(0, 0, width, height);
 
-                      const ctx = canvas.getContext("2d");
-                      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                      // ✅ Draw image centered with padding
                       ctx.drawImage(
                         img,
                         x,
                         y,
                         width,
                         height,
-                        padX,
-                        padY,
+                        0,
+                        0,
                         width,
                         height
                       );

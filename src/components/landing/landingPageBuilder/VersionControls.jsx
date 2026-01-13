@@ -12,7 +12,7 @@ export default function VersionControls({
   const applyDisabled = !selectedVersion || selectedVersion === appliedVersion;
 
   return (
-    <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-lg sm:rounded-xl  p-3 sm:p-5 mb-10 shadow-inner pb-6 sm:pb-12">
+    <div className="w-full bg-[#0b0b0b] border border-gray-700 rounded-lg sm:rounded-xl  p-3 sm:p-5 mb-10 shadow-inner pb-6 sm:pb-12">
       {/* Dropdown */}
       <div className="relative w-full mb-4 sm:mb-6">
         <select

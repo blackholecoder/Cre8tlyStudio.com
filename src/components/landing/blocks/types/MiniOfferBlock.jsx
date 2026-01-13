@@ -14,6 +14,9 @@ export default function MiniOfferBlock({
   openAIModal,
   containerIndex,
 }) {
+  const productSource = block.product_source || "internal";
+  const hasProduct = Boolean(block.pdf_url) || Boolean(block.external_file_url);
+
   const [coverLoading, setCoverLoading] = React.useState(false);
 
   const availablePdfs = useMemo(
@@ -235,7 +238,6 @@ export default function MiniOfferBlock({
         </div>
       )}
 
-      {/* BODY TEXT COLOR */}
       {/* Main Text Color */}
       <div className="flex items-center gap-3 mb-8">
         <label className="text-sm font-semibold text-gray-300">
@@ -499,7 +501,7 @@ export default function MiniOfferBlock({
                                 background: block.button_color || "#22c55e",
                                 color: block.button_text_color || "#000000",
                                 fontSize: "0.8rem",
-                                opacity: hasDescription ? 1 : 0.6,
+                                opacity: hasProduct ? 1 : 0.6,
                               }}
                             >
                               {block.button_text || "Buy Now"}
@@ -532,13 +534,12 @@ export default function MiniOfferBlock({
                       )}
                     </div>
 
-                    {!block.use_pdf_cover && (
+                    {(block.image_url || block.cover_url) && (
                       <button
                         type="button"
                         className="absolute top-3 right-3 bg-black/70 text-red-400 text-xs px-3 py-1 rounded hover:bg-black"
                         onClick={() => {
                           if (block.use_pdf_cover) {
-                            updateField("cover_url", "");
                             updateField("use_pdf_cover", false);
                           } else {
                             updateField("image_url", "");
@@ -569,68 +570,162 @@ export default function MiniOfferBlock({
                   color: block.text_color || "#ffffff",
                 }}
               >
-                {/* PDF SELECT */}
-                <label className="text-sm font-semibold text-gray-300 mt-3 block">
-                  Select PDF
+                <label className="text-sm font-semibold text-gray-300 mt-6 block">
+                  Product Source
                 </label>
-                <select
-                  value={block.pdf_url || ""}
-                  onChange={async (e) => {
-                    const selectedUrl = e.target.value;
 
-                    // If cleared
-                    if (!selectedUrl) {
+                <select
+                  value={productSource}
+                  onChange={(e) => {
+                    const source = e.target.value;
+                    updateField("product_source", source);
+
+                    if (source === "internal") {
+                      updateField("external_file_url", "");
+                      updateField("external_file_name", "");
+                    }
+
+                    if (source === "external") {
                       updateField("pdf_url", "");
                       updateField("pdf_name", "");
                       updateField("cover_url", "");
-                      updateField("image_url", "");
                       updateField("use_pdf_cover", false);
-                      updateField("page_count", null);
-                      setCoverLoading(false);
-                      return;
-                    }
-
-                    const selectedPdf = availablePdfs.find(
-                      (p) => p.pdf_url === selectedUrl
-                    );
-
-                    if (!selectedPdf) {
-                      setCoverLoading(false);
-                      return;
-                    }
-
-                    // ✅ SINGLE source of truth
-                    updateField("pdf_url", selectedPdf.pdf_url);
-                    updateField("pdf_name", selectedPdf.title || "PDF");
-                    updateField("product_source", "internal");
-                    updateField("use_pdf_cover", true);
-                    updateField("page_count", selectedPdf.page_count || null);
-
-                    setCoverLoading(true);
-
-                    try {
-                      const res = await axiosInstance.get(
-                        `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedPdf.pdf_url)}`
-                      );
-
-                      if (res.data?.cover_image) {
-                        updateField("cover_url", res.data.cover_image);
-                      }
-                    } catch (err) {
-                      console.error("❌ Error loading PDF cover:", err);
-                    } finally {
-                      setCoverLoading(false);
                     }
                   }}
-                  className="w-full p-2 bg-black text-white border border-gray-600 rounded mt-1"
+                  className="w-full p-2 bg-black border border-gray-600 rounded text-white mt-1"
                 >
-                  <option value="">-- Select PDF --</option>
-                  {availablePdfs.map((p) => (
-                    <option key={p.id} value={p.pdf_url}>
-                      {p.title || "PDF"}
-                    </option>
-                  ))}
+                  <option value="internal">Cre8tly Studio PDF</option>
+                  <option value="external">Upload Existing Product</option>
                 </select>
+
+                {productSource === "external" && (
+                  <>
+                    <label className="text-sm font-semibold text-gray-300 mt-4 block">
+                      Upload Your Product
+                    </label>
+
+                    <input
+                      type="file"
+                      accept=".pdf,.zip"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        try {
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          formData.append("landingId", landing.id);
+                          formData.append("blockId", block.id);
+
+                          const res = await axiosInstance.post(
+                            "/landing/upload-product",
+                            formData,
+                            {
+                              headers: {
+                                "Content-Type": "multipart/form-data",
+                              },
+                            }
+                          );
+
+                          if (!res.data?.success) {
+                            toast.error("Upload failed");
+                            return;
+                          }
+
+                          updateField("external_file_url", res.data.url);
+                          updateField(
+                            "external_file_name",
+                            res.data.file_name || file.name
+                          );
+                          updateField("product_source", "external");
+
+                          toast.success("Product uploaded!");
+                          e.target.value = "";
+                        } catch (err) {
+                          toast.error("Upload failed");
+                        }
+                      }}
+                      className="w-full p-2 bg-black border border-gray-700 rounded text-white"
+                    />
+
+                    {block.external_file_url && (
+                      <p className="text-xs text-green mt-2">
+                        Uploaded: {block.external_file_name}
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {/* PDF SELECT */}
+                {productSource === "internal" && (
+                  <>
+                    <label className="text-sm font-semibold text-gray-300 mt-3 block">
+                      Select PDF
+                    </label>
+                    <select
+                      value={block.pdf_url || ""}
+                      onChange={async (e) => {
+                        const selectedUrl = e.target.value;
+
+                        // If cleared
+                        if (!selectedUrl) {
+                          updateField("pdf_url", "");
+                          updateField("pdf_name", "");
+                          updateField("cover_url", "");
+                          updateField("image_url", "");
+                          updateField("use_pdf_cover", false);
+                          updateField("page_count", null);
+                          setCoverLoading(false);
+                          return;
+                        }
+
+                        const selectedPdf = availablePdfs.find(
+                          (p) => p.pdf_url === selectedUrl
+                        );
+
+                        if (!selectedPdf) {
+                          setCoverLoading(false);
+                          return;
+                        }
+
+                        // ✅ SINGLE source of truth
+                        updateField("pdf_url", selectedPdf.pdf_url);
+                        updateField("pdf_name", selectedPdf.title || "PDF");
+                        updateField("product_source", "internal");
+                        updateField("use_pdf_cover", true);
+                        updateField("image_url", "");
+                        updateField(
+                          "page_count",
+                          selectedPdf.page_count || null
+                        );
+
+                        setCoverLoading(true);
+
+                        try {
+                          const res = await axiosInstance.get(
+                            `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedPdf.pdf_url)}`
+                          );
+
+                          if (res.data?.cover_image) {
+                            updateField("cover_url", res.data.cover_image);
+                          }
+                        } catch (err) {
+                          console.error("❌ Error loading PDF cover:", err);
+                        } finally {
+                          setCoverLoading(false);
+                        }
+                      }}
+                      className="w-full p-2 bg-black text-white border border-gray-600 rounded mt-1"
+                    >
+                      <option value="">-- Select PDF --</option>
+                      {availablePdfs.map((p) => (
+                        <option key={p.id} value={p.pdf_url}>
+                          {p.title || "PDF"}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
 
                 {block.pdf_url && (
                   <p className="text-xs text-gray-400 mt-1">
@@ -689,6 +784,20 @@ export default function MiniOfferBlock({
 
                 <p className="text-xs text-gray-400 mt-1 text-right">
                   {block.title?.length || 0}/60
+                </p>
+                <label className="text-sm font-semibold text-gray-300 mt-3 block">
+                  Product Name (Checkout)
+                </label>
+                <input
+                  type="text"
+                  value={block.product_name || ""}
+                  maxLength={80}
+                  onChange={(e) => updateField("product_name", e.target.value)}
+                  className="w-full p-2 bg-black text-white border border-gray-600 rounded mt-1"
+                  placeholder="What buyers will see on checkout"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  This appears on Stripe checkout and receipts
                 </p>
 
                 <MiniOfferAdvanced

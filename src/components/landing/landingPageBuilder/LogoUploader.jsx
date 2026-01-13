@@ -10,7 +10,7 @@ export default function LogoUploader({
   setShowLogoSection,
 }) {
   return (
-    <div className="mt-12 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+    <div className="mt-12 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
       {/* HEADER (toggle) */}
       <div
         className="flex items-center justify-between mb-5 cursor-pointer"

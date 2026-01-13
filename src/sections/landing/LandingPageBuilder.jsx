@@ -423,6 +423,9 @@ export default function LandingPageBuilder() {
       newBlock.full_width = false;
       newBlock.alignment = "center";
 
+      newBlock.radius = 0;
+      newBlock.width = 100;
+
       // ✅ Shadow controls
       newBlock.shadow = false;
       newBlock.shadow_color = "rgba(0,0,0,0.5)";
@@ -473,6 +476,7 @@ export default function LandingPageBuilder() {
       // ✅ COMMERCE (same as stripe_checkout)
       newBlock.price = 10;
       newBlock.product_source = "internal";
+      newBlock.product_name;
       newBlock.pdf_url = "";
       newBlock.page_count = null;
       newBlock.external_file_url = "";

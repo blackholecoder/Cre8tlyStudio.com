@@ -69,7 +69,7 @@ export default function CoverUpload({ setCover }) {
   };
 
   return (
-    <div className="relative mt-6 border border-gray-700 rounded-xl p-4 bg-gray-900/60 overflow-hidden">
+    <div className="relative mt-6 border border-gray-700 rounded-xl p-4 bg-[#0b0b0b] overflow-hidden">
       {/* 🔒 Locked overlay */}
       {isLocked && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-xl">
@@ -121,7 +121,7 @@ export default function CoverUpload({ setCover }) {
     ${
       isLocked
         ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-        : "bg-green text-black hover:bg-green"
+        : "bg-gray-700 text-white hover:bg-green hover:text-black"
     }`}
       >
         <ImageIcon size={16} /> Choose File

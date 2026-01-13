@@ -13,7 +13,7 @@ export default function PdfSelector({
   setCoverLoading,
 }) {
   return (
-    <div className="mt-1 bg-[#111827]/80 border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+    <div className="mt-1 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
       {/* Header */}
       <div
         onClick={() => setShowPdfSection(!showPdfSection)}

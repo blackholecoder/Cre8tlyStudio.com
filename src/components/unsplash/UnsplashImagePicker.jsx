@@ -72,7 +72,7 @@ export default function UnsplashImagePicker({ onSelect }) {
   }, [hasMore, loading, page, query]);
 
   return (
-    <div className="space-y-4 bg-[#111] p-4 rounded-lg border border-gray-800">
+    <div className="space-y-4 bg-[#0b0b0b] p-4 rounded-lg border border-gray-800">
       {/* 🔍 Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
@@ -81,12 +81,12 @@ export default function UnsplashImagePicker({ onSelect }) {
           placeholder="Search Unsplash images (e.g. fitness, coffee, nature)"
           className="
           w-full
-          bg-gray-900
+          bg-black
           text-white
           p-3
           rounded-lg
           border
-          border-gray-700
+          border-gray-900
   "
         />
         <button
@@ -96,8 +96,10 @@ export default function UnsplashImagePicker({ onSelect }) {
           className="
           w-full
           sm:w-auto
-          bg-green
-          text-black
+          bg-gray-700
+          text-white
+          hover:bg-green
+          hover:text-black
           font-bold
           px-4
           py-3

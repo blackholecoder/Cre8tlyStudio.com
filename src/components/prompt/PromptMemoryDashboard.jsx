@@ -36,7 +36,7 @@ export default function PromptMemoryDashboard() {
   }, [user, page]);
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-full">
+    <div className="p-6 bg-[#0b0b0b] min-h-full">
       {/* Header */}
       <div className="flex flex-col mb-8 mt-2">
         <h1 className="text-3xl font-bold text-white mb-2 design-text normal-case">

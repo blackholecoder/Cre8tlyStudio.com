@@ -14,6 +14,7 @@ import BookPartsModal from "./BookPartsModal";
 import OnboardingGuide from "../onboarding/OnboardingGuide";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
+import { Tooltip } from "../tools/toolTip";
 
 export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -64,7 +65,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
           <motion.div
             key={b.id}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="relative group bg-[#0a0a0a]/90 rounded-2xl p-4 border border-gray-800 hover:border-green hover:shadow-[0_0_15px_rgba(0,255,150,0.25)] transition-all"
+            className="relative group bg-[#0b0b0b] rounded-2xl p-4 border border-gray-800 hover:border-green hover:shadow-[0_0_15px_rgba(0,255,150,0.25)] transition-all"
           >
             {/* Glimmer Shine */}
             <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden">
@@ -96,9 +97,13 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                   style={{ width: `${Math.min((b.pages / 750) * 100, 100)}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                {b.pages || 0}/750 pages
-              </p>
+              <div className="flex items-center justify-center gap-1 mt-1">
+                <p className="text-xs text-gray-400">
+                  {b.pages || 0}/750 pages used
+                </p>
+
+                <Tooltip text="Pages are counted across the entire book. You can write, edit, and export PDFs freely until you reach 750 total pages. Downloads do not lock your book." />
+              </div>
             </div>
 
             {/* Status */}
@@ -179,7 +184,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
               {!b.prompt && (
                 <button
                   onClick={() => onAddPrompt(b.id, b.part_number)}
-                  className="w-full bg-green text-black rounded-lg py-2 text-sm font-semibold hover:bg-green transition-all"
+                  className="w-full bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold hover:bg-green hover:text-black transition-all"
                   title="Create Chapter"
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -227,7 +232,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
               {b.prompt && b.pages < 750 && (
                 <button
                   onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
-                  className="w-full bg-royalPurple text-white rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-bookBtnColor text-black rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
                   title="Continue Story"
                 >
                   <Rocket size={16} />

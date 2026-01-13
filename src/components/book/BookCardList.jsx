@@ -12,6 +12,7 @@ import {
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import { useAuth } from "../../admin/AuthContext";
+import { Tooltip } from "../tools/toolTip";
 
 export default function BookCardList({
   books = [],
@@ -63,9 +64,11 @@ export default function BookCardList({
                 style={{ width: `${Math.min((b.pages / 750) * 100, 100)}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {b.pages || 0}/750 pages
+            <p className="text-xs text-gray-400">
+              {b.pages || 0}/750 pages used
             </p>
+
+            <Tooltip text="Pages are counted across the entire book. You can write, edit, and export PDFs freely until you reach 750 total pages. Downloads do not lock your book." />
           </div>
 
           {/* ✅ Book Status Pills */}
@@ -147,7 +150,7 @@ export default function BookCardList({
             {!b.prompt && (
               <button
                 onClick={() => onAddPrompt(b.id, b.part_number)}
-                className="w-full bg-green text-black rounded-lg py-2 text-sm font-semibold hover:bg-green transition-all"
+                className="w-full bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold hover:bg-green hover:text-black transition-all"
               >
                 <div className="flex items-center justify-center gap-2">
                   <Plus size={16} />

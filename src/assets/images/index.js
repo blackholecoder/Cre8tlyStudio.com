@@ -38,7 +38,7 @@ import tools from "./tools.webp";
 import comingSoon from "./coming-soon.webp";
 
 // Authors Assistant
-import bookFeature from "./book-feature-prompt.webp";
+import bookFeature from "./book-feature-prompt-new-1.webp";
 import aiCopy from "./ai-copy-landing.webp";
 
 export {

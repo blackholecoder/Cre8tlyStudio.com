@@ -24,36 +24,6 @@ import SingleOfferBlock from "../../components/landing/blocks/types/SingleOfferB
 import MiniOfferBlock from "../../components/landing/blocks/types/MiniOfferBlock";
 import ProfileCardBlock from "../../components/landing/blocks/types/ProfileCardBlock";
 import ScrollArrowBlock from "../../components/landing/blocks/types/ScrollArrowBlock";
-import { useDraggable } from "@dnd-kit/core";
-
-function DragHandle({ id, disabled }) {
-  if (!id) return null;
-
-  const { setNodeRef, listeners, attributes } = useDraggable({
-    id,
-    disabled,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className={`
-        absolute top-2 left-1/2 -translate-x-1/2
-        text-xs px-2 py-1 rounded
-        ${
-          disabled
-            ? "opacity-40 cursor-default bg-gray-700"
-            : "cursor-grab bg-gray-300 hover:bg-gray-400"
-        }
-      `}
-      title={disabled ? "Close block to move" : "Drag to reorder"}
-    >
-      ☰
-    </div>
-  );
-}
 
 function SortableBlock({
   id,
@@ -61,14 +31,18 @@ function SortableBlock({
   index,
   updateBlock,
   removeBlock,
+  moveBlockUp,
+  moveBlockDown,
+  activeChild,
+  setActiveChild,
+  setActiveRoot,
+  activeRoot,
   bgTheme,
   pdfList,
   landing,
   updateChildBlock,
   openAIModal,
   containerIndex,
-  dragState,
-  setDragState,
 }) {
   const updateField = (i, key, value) => {
     if (Number.isInteger(containerIndex) && updateChildBlock) {
@@ -77,6 +51,10 @@ function SortableBlock({
       updateBlock(i, key, value);
     }
   };
+
+  const isActive =
+    (Number.isInteger(containerIndex) && activeChild?.childId === block.id) ||
+    (containerIndex == null && activeRoot?.blockId === block.id);
 
   const getLabelContrast = (hex) => {
     if (!hex) return "#1f2937"; // default dark gray
@@ -102,13 +80,13 @@ function SortableBlock({
       case "subheading":
       case "subsubheading":
       case "list_heading":
-        return block.text?.slice(0, 70) || "(empty heading)";
+        return block.text?.slice(0, 30) || "(empty heading)";
 
       case "paragraph":
-        return block.text?.slice(0, 70) || "(empty paragraph)";
+        return block.text?.slice(0, 30) || "(empty paragraph)";
 
       case "offer_banner":
-        return block.button_text?.slice(0, 70) || "(no button text)";
+        return block.button_text?.slice(0, 30) || "(no button text)";
 
       case "divider":
         return block.style === "space"
@@ -121,15 +99,15 @@ function SortableBlock({
           : "(no image)";
 
       case "profile_card":
-        return block.image_url
-          ? block.image_url.split("/").pop().slice(0, 30)
+        return block.tagline
+          ? block.tagline.split("/").pop().slice(0, 30)
           : "(no image)";
 
       case "social_links":
         return `${Object.values(block.links || {}).filter(Boolean).length} links`;
 
       case "video":
-        return block.url?.slice(0, 35) || "(no video URL)";
+        return block.url?.slice(0, 30) || "(no video URL)";
 
       case "faq":
         return `${block.items?.length || 0} questions`;
@@ -138,7 +116,7 @@ function SortableBlock({
         return `$${block.price || 10} • checkout`;
 
       case "calendly":
-        return block.calendly_url?.slice(0, 35) || "(no url)";
+        return block.calendly_url?.slice(0, 30) || "(no url)";
 
       case "verified_reviews":
         return block.title?.slice(0, 30) || "(reviews section)";
@@ -153,15 +131,15 @@ function SortableBlock({
         return block.text || "Button";
 
       case "single_offer":
-        return block.title ? block.title.slice(0, 50) : "Single Offer";
+        return block.title ? block.title.slice(0, 30) : "Single Offer";
 
       case "mini_offer":
-        return block.title ? block.title.slice(0, 50) : "Mini Offer";
+        return block.title ? block.title.slice(0, 30) : "Mini Offer";
 
       case "secure_checkout":
-        return block.title?.slice(0, 40) || "Secure Checkout";
+        return block.title?.slice(0, 30) || "Secure Checkout";
       case "audio_player":
-        return block.title?.slice(0, 35) || "Audio Player";
+        return block.title?.slice(0, 30) || "Audio Player";
 
       case "scroll_arrow":
         return `Arrow • ${block.color || "#FFFFFF"}`;
@@ -210,19 +188,41 @@ function SortableBlock({
         index={index}
         updateBlock={updateBlock}
         removeBlock={removeBlock}
+        moveBlockUp={moveBlockUp}
+        moveBlockDown={moveBlockDown}
+        activeChild={activeChild}
+        setActiveChild={setActiveChild}
         bgTheme={bgTheme}
         pdfList={pdfList}
         landing={landing}
         openAIModal={openAIModal}
-        dragState={dragState}
-        setDragState={setDragState}
       />
     );
   }
 
   return (
     <div
-      className={`mb-4 sm:mb-6
+      data-drop-id={index}
+      data-parent-id={null}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (Number.isInteger(containerIndex)) {
+          setActiveChild({
+            containerIndex,
+            childIndex: index,
+            childId: block.id,
+          });
+          setActiveRoot(null);
+        } else {
+          // 🧱 root block
+          setActiveRoot({
+            blockId: block.id,
+            blockIndex: index,
+          });
+          setActiveChild(null);
+        }
+      }}
+      className={`mb-4 ${isActive ? "ring-2 ring-green" : ""} sm:mb-6
      bg-black/70 border rounded-lg sm:rounded-xl
       p-3 sm:p-5
       relative shadow-inner
@@ -234,34 +234,10 @@ function SortableBlock({
     }
   `}
     >
-      {/* 🧩 Drag Handle */}
-      <DragHandle id={id} disabled={!block.collapsed} />
-
-      {/* 🧩 Collapse / Expand Header */}
-      <div
-        className="flex items-center justify-between cursor-pointer mb-2 sm:mb-3"
-        onClick={() => updateField(index, "collapsed", !block.collapsed)}
-      >
-        {/* LEFT */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <BlockValuePill
-              value={block.type}
-              disabled={block.enabled === false}
-            />
-            {block.enabled === false && (
-              <span className="text-[11px] text-gray-400 italic">disabled</span>
-            )}
-          </div>
-
-          <span className="text-xs text-gray-400 mt-0.5 leading-snug">
-            {getBlockLabel(block)}
-          </span>
-        </div>
-
-        {/* RIGHT */}
-        <div className="flex flex-wrap items-center gap-3 justify-end">
-          {/* PRIMARY: Enable block */}
+      <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
+        {/* ROW: Toggle + Block Name */}
+        <div className="flex items-center gap-2">
+          {/* ENABLE TOGGLE */}
           <button
             type="button"
             onClick={(e) => {
@@ -269,70 +245,88 @@ function SortableBlock({
               updateField(index, "enabled", block.enabled === false);
             }}
             className={`
-            relative inline-flex 
-            h-5 w-9 
-            items-center 
-            rounded-full 
-            transition-colors duration-200
-            ${block.enabled !== false ? "bg-green" : "bg-gray-600"}
-          `}
+        inline-flex
+        h-4
+        w-8
+        items-center
+        rounded-full
+        transition-colors
+        duration-200
+        shadow-md
+        ${block.enabled !== false ? "bg-green/80" : "bg-zinc-700"}
+      `}
           >
             <span
               className={`
-          h-4 w-4 
-          rounded-full 
-          bg-white 
-          transition-transform duration-200
+          h-3
+          w-3
+          rounded-full
+          bg-white
+          transition-transform
+          duration-200
           ${block.enabled !== false ? "translate-x-4" : "translate-x-1"}
         `}
             />
           </button>
 
-          {/* DIVIDER */}
-          <div className="h-4 w-px bg-white/10" />
+          {/* BLOCK TYPE */}
+          <BlockValuePill
+            value={block.type}
+            disabled={block.enabled === false}
+          />
 
-          {/* SECONDARY: Animate */}
+          {block.enabled === false && (
+            <span className="text-[11px] text-gray-400 italic">disabled</span>
+          )}
+        </div>
+
+        {/* SUB LABEL */}
+      </div>
+      {/* 🧩 Collapse / Expand Header */}
+      <div
+        className="flex items-center justify-end mb-2 sm:mb-3 cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation(); // 🔒 REQUIRED
+          updateField(index, "collapsed", !block.collapsed);
+        }}
+      >
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
           {animationsEnabled && (
-            <>
-              {/* DIVIDER */}
-              <div className="h-4 w-px bg-white/10" />
+            <div
+              className="flex items-center gap-2 shrink-0 opacity-80 hover:opacity-100 transition"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-[11px] text-gray-400">Animate</span>
 
-              {/* SECONDARY: Animate */}
-              <div
-                className="flex items-center gap-2 shrink-0 opacity-80 hover:opacity-100 transition"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="text-[11px] text-gray-400">Animate</span>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    updateField(index, "motion", {
-                      ...block.motion,
-                      disabled: !block.motion?.disabled,
-                    })
-                  }
-                  className={`
-          relative inline-flex 
-          h-4 w-7 
-          items-center 
-          rounded-full 
+              <button
+                type="button"
+                onClick={() =>
+                  updateField(index, "motion", {
+                    ...block.motion,
+                    disabled: !block.motion?.disabled,
+                  })
+                }
+                className={`
+          relative inline-flex
+          h-4 w-7
+          items-center
+          rounded-full
           transition-colors duration-200
           ${block.motion?.disabled ? "bg-zinc-700" : "bg-royalPurple"}
         `}
-                >
-                  <span
-                    className={`
-            h-3 w-3 
-            rounded-full 
-            bg-white 
+              >
+                <span
+                  className={`
+            h-3 w-3
+            rounded-full
+            bg-white
             transition-transform duration-200
             ${block.motion?.disabled ? "translate-x-1" : "translate-x-3"}
           `}
-                  />
-                </button>
-              </div>
-            </>
+                />
+              </button>
+            </div>
           )}
 
           {/* CHEVRON */}
@@ -344,6 +338,9 @@ function SortableBlock({
             ▼
           </span>
         </div>
+      </div>
+      <div className="text-xs text-gray-400 leading-snug mt-0.5 ml-[36px]">
+        {getBlockLabel(block)}
       </div>
 
       {/* 🪄 Editable Fields (Collapsible) */}
@@ -550,7 +547,10 @@ function SortableBlock({
         {/* 🗑 Remove Button (collapses with content) */}
         <button
           type="button"
-          onClick={() => removeBlock(index)}
+          onClick={(e) => {
+            e.stopPropagation();
+            removeBlock(index);
+          }}
           className="mt-4 flex items-center gap-2 text-red-400 hover:text-red-300 text-sm font-semibold transition-all"
         >
           <Trash2 size={16} className="opacity-80" />

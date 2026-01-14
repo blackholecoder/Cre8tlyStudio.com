@@ -3,12 +3,6 @@ import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../admin/AuthContext";
 import { colorThemes, gradientThemes } from "../../constants";
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
 import { MemoizedSortableBlock } from "./SortableBlock";
 import { Wand2 } from "lucide-react";
 import { normalizeVideoUrl } from "./NormalizeVideoUrl";
@@ -51,7 +45,9 @@ export default function LandingPageBuilder() {
   const [showPdfSection, setShowPdfSection] = useState(false);
   const [showPreviewSection, setShowPreviewSection] = useState(false);
   const [showDownloadButton, setShowDownloadButton] = useState(false);
-
+  const [activeChild, setActiveChild] = useState(null);
+  const [activeRoot, setActiveRoot] = useState(null);
+  const [showContainerPicker, setShowContainerPicker] = useState(false);
   const [showLogoSection, setShowLogoSection] = useState(false);
 
   const [versions, setVersions] = useState([]);
@@ -63,83 +59,168 @@ export default function LandingPageBuilder() {
   const [blocksHidden, setBlocksHidden] = useState(false);
 
   const [showDropdown, setShowDropdown] = useState(false);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 0, // 👈 this is the key
-      },
-    })
-  );
-
   // Ai
   const [aiContext, setAIContext] = useState(null);
+
+  const validActiveRoot =
+    activeRoot &&
+    landing.content_blocks[activeRoot.blockIndex]?.id === activeRoot.blockId;
 
   const openAIModal = (context) => {
     setAIContext(context);
   };
 
-  const [dragState, setDragState] = useState({
-    activeId: null,
-    source: null,
-    dropTarget: null,
-  });
-
-  const handleDragStart = ({ active }) => {
-    const loc = findLocationById(landing.content_blocks, active.id);
-    if (!loc) return;
-
-    setDragState({
-      activeId: active.id,
-      source: {
-        parentId: loc.parentId,
-        index: loc.index,
-      },
-      dropTarget: null,
-    });
-  };
-
-  const handleDragEnd = () => {
-    // 🔒 GUARD: prevent containers from going inside containers
-    const draggedLoc = findLocationById(
-      landing.content_blocks,
-      dragState.activeId
-    );
-    const draggedBlock = draggedLoc?.block;
-
-    if (
-      draggedBlock?.type === "container" &&
-      dragState.dropTarget?.parentId !== null
-    ) {
-      setDragState({ activeId: null, source: null, dropTarget: null });
-      return;
-    }
-
-    // 🚫 no valid move
-    if (!dragState.source || !dragState.dropTarget) {
-      setDragState({ activeId: null, source: null, dropTarget: null });
-      return;
-    }
-
-    // ✅ commit move
+  const moveBlockUp = (blockId) => {
     setLanding((prev) => {
       const blocks = prev.content_blocks;
+      const loc = findLocationById(blocks, blockId);
+      if (!loc) return prev;
 
-      const { removed, next } = removeAtLocation(blocks, dragState.source);
+      const targetIndex = loc.index - 1;
+      if (targetIndex < 0) return prev;
+
+      const { removed, next } = removeAtLocation(blocks, loc);
 
       const updated = insertAtLocation(
         next,
         {
-          parentId: dragState.dropTarget.parentId,
-          index: dragState.dropTarget.index,
+          parentId: loc.parentId,
+          index: targetIndex,
         },
         removed
       );
 
       return { ...prev, content_blocks: updated };
     });
+  };
 
-    setDragState({ activeId: null, source: null, dropTarget: null });
+  const moveBlockDown = (blockId) => {
+    setLanding((prev) => {
+      const blocks = prev.content_blocks;
+      const loc = findLocationById(blocks, blockId);
+      if (!loc) return prev;
+
+      const siblings =
+        loc.parentId === null
+          ? blocks
+          : blocks.find((b) => b.id === loc.parentId)?.children || [];
+
+      const targetIndex = loc.index + 1;
+      if (targetIndex >= siblings.length) return prev;
+
+      const { removed, next } = removeAtLocation(blocks, loc);
+
+      const updated = insertAtLocation(
+        next,
+        {
+          parentId: loc.parentId,
+          index: targetIndex,
+        },
+        removed
+      );
+
+      return { ...prev, content_blocks: updated };
+    });
+  };
+
+  const moveChildUp = (containerIndex, childId) => {
+    setLanding((prev) => {
+      const blocks = [...prev.content_blocks];
+      const container = blocks[containerIndex];
+      if (!container?.children) return prev;
+
+      const idx = container.children.findIndex((c) => c.id === childId);
+      if (idx <= 0) return prev; // already at top
+
+      const children = [...container.children];
+      const [item] = children.splice(idx, 1);
+      children.splice(idx - 1, 0, item);
+
+      blocks[containerIndex] = {
+        ...container,
+        children,
+      };
+
+      return { ...prev, content_blocks: blocks };
+    });
+  };
+  const moveChildDown = (containerIndex, childId) => {
+    setLanding((prev) => {
+      const blocks = [...prev.content_blocks];
+      const container = blocks[containerIndex];
+      if (!container?.children) return prev;
+
+      const idx = container.children.findIndex((c) => c.id === childId);
+      if (idx === -1 || idx >= container.children.length - 1) return prev;
+
+      const children = [...container.children];
+      const [item] = children.splice(idx, 1);
+      children.splice(idx + 1, 0, item);
+
+      blocks[containerIndex] = {
+        ...container,
+        children,
+      };
+
+      return { ...prev, content_blocks: blocks };
+    });
+  };
+
+  const removeFromContainer = (containerIndex, childId) => {
+    setLanding((prev) => {
+      const blocks = [...prev.content_blocks];
+      const container = blocks[containerIndex];
+
+      if (!container || !Array.isArray(container.children)) return prev;
+
+      const childIndex = container.children.findIndex((c) => c.id === childId);
+      if (childIndex === -1) return prev;
+
+      const child = container.children[childIndex];
+
+      // remove from container
+      const newChildren = container.children.filter((_, i) => i !== childIndex);
+
+      blocks[containerIndex] = {
+        ...container,
+        children: newChildren,
+      };
+
+      // insert after container in root
+      blocks.splice(containerIndex + 1, 0, child);
+
+      return {
+        ...prev,
+        content_blocks: blocks,
+      };
+    });
+  };
+  const moveRootIntoContainer = (rootIndex, containerIndex) => {
+    setLanding((prev) => {
+      const blocks = [...prev.content_blocks];
+      const block = blocks[rootIndex];
+      const container = blocks[containerIndex];
+
+      if (!block || !container || container.type !== "container") {
+        return prev;
+      }
+
+      // remove root block
+      blocks.splice(rootIndex, 1);
+
+      // add to container
+      const children = [...(container.children || []), block];
+
+      blocks[containerIndex] = {
+        ...container,
+        children,
+      };
+
+      return {
+        ...prev,
+        content_blocks: blocks,
+      };
+    });
   };
 
   const findLocationById = (blocks, id) => {
@@ -1156,17 +1237,6 @@ export default function LandingPageBuilder() {
     }
   };
 
-  function DropZone({ onHover, active }) {
-    return (
-      <div
-        onMouseEnter={onHover}
-        className={`h-2 rounded transition-all ${
-          active ? "bg-blue" : "bg-transparent"
-        }`}
-      />
-    );
-  }
-
   // 🎨 Determine the selected background theme
   const selectedTheme =
     bgTheme?.includes("gradient") || bgTheme?.startsWith("#")
@@ -1263,53 +1333,33 @@ export default function LandingPageBuilder() {
             {/* DndContext */}
             {!blocksHidden && (
               <div className="space-y-4 mb-12 w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
-                <DndContext
-                  sensors={sensors}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                >
-                  {landing.content_blocks
-                    .filter((b) => b && b.type)
-                    .map((block, index) => (
-                      <React.Fragment key={block.id}>
-                        <DropZone
-                          active={
-                            dragState.activeId &&
-                            dragState.dropTarget?.parentId === null &&
-                            dragState.dropTarget?.index === index
-                          }
-                          onHover={() => {
-                            if (!dragState.activeId) return; // ✅ block hover when not dragging
-
-                            setDragState((s) => ({
-                              ...s,
-                              dropTarget: {
-                                parentId: null,
-                                index,
-                                position: "before",
-                              },
-                            }));
-                          }}
-                        />
-                        <MemoizedSortableBlock
-                          id={block.id}
-                          block={block}
-                          index={index}
-                          updateBlock={updateBlock}
-                          removeBlock={removeBlock}
-                          bgTheme={bgTheme}
-                          pdfList={pdfList}
-                          landing={landing}
-                          openAIModal={openAIModal}
-                          dragState={dragState}
-                          setDragState={setDragState}
-                          offerContext={landing?.offer_context}
-                          onHoverStart={() => setIsOverChild(true)}
-                          onHoverEnd={() => setIsOverChild(false)}
-                        />
-                      </React.Fragment>
-                    ))}
-                </DndContext>
+                {landing.content_blocks
+                  .filter((b) => b && b.type)
+                  .map((block, index) => (
+                    <React.Fragment key={block.id}>
+                      <MemoizedSortableBlock
+                        id={block.id}
+                        block={block}
+                        index={index}
+                        updateBlock={updateBlock}
+                        removeBlock={removeBlock}
+                        moveBlockUp={moveBlockUp}
+                        moveBlockDown={moveBlockDown}
+                        moveChildUp={moveChildUp}
+                        moveChildDown={moveChildDown}
+                        activeChild={activeChild}
+                        setActiveChild={setActiveChild}
+                        setActiveRoot={setActiveRoot} // ✅ ADD THIS
+                        activeRoot={activeRoot}
+                        removeFromContainer={removeFromContainer}
+                        bgTheme={bgTheme}
+                        pdfList={pdfList}
+                        landing={landing}
+                        openAIModal={openAIModal}
+                        offerContext={landing?.offer_context}
+                      />
+                    </React.Fragment>
+                  ))}
               </div>
             )}
           </div>
@@ -1469,6 +1519,103 @@ export default function LandingPageBuilder() {
           }}
           onClose={() => setAIContext(null)}
         />
+      )}
+      {activeChild && (
+        <div
+          className="
+      fixed bottom-4 left-1/2 -translate-x-1/2 z-50
+      flex gap-4 bg-green/90 px-4 py-3 rounded-full
+      shadow-xl
+    "
+        >
+          <button
+            type="button"
+            onClick={() =>
+              moveChildUp(activeChild.containerIndex, activeChild.childId)
+            }
+            className="text-black text-xl px-3"
+          >
+            ↑
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              moveChildDown(activeChild.containerIndex, activeChild.childId)
+            }
+            className="text-black text-xl px-3"
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              removeFromContainer(
+                activeChild.containerIndex,
+                activeChild.childId
+              );
+              setActiveChild(null);
+            }}
+            className="text-black text-sm px-3"
+          >
+            Remove
+          </button>
+        </div>
+      )}
+      {validActiveRoot && (
+        <div
+          className="
+      fixed bottom-4 left-1/2 -translate-x-1/2 z-50
+      flex gap-3 bg-green/90 px-4 py-3 rounded-full
+      shadow-xl
+    "
+        >
+          <button
+            type="button"
+            onClick={() => setShowContainerPicker(true)}
+            className="text-black text-sm px-3"
+          >
+            Move into section
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveRoot(null)}
+            className="text-black text-sm px-3"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+      {showContainerPicker && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+          <div className="bg-[#0f1624] rounded-xl p-5 w-80">
+            <h3 className="text-white font-semibold mb-3">Move into section</h3>
+
+            {landing.content_blocks
+              .filter((b) => b.type === "container")
+              .map((container, i) => (
+                <button
+                  key={container.id}
+                  onClick={() => {
+                    setShowContainerPicker(false);
+                    moveRootIntoContainer(activeRoot.blockIndex, i);
+                    setActiveRoot(null);
+                  }}
+                  className="w-full text-left px-3 py-2 rounded hover:bg-white/10 text-white text-sm"
+                >
+                  {container.title || "Untitled Section"}
+                </button>
+              ))}
+
+            <button
+              onClick={() => setShowContainerPicker(false)}
+              className="mt-3 text-sm text-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

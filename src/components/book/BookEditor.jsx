@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   AlignLeft,
   AlignCenter,
@@ -22,8 +22,20 @@ import Color from "@tiptap/extension-color";
 import "highlight.js/styles/github-dark.css";
 import { Tooltip } from "../tools/toolTip";
 
+function debounce(fn, delay) {
+  let timeout;
+  const debounced = (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+  debounced.cancel = () => clearTimeout(timeout);
+  return debounced;
+}
+
 export default function BookEditor({ content, setContent }) {
   const editorRef = useRef(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState(null);
   const [theme, setTheme] = useState("dark"); // "dark" | "light"
 
   const isDark = theme === "dark";
@@ -39,15 +51,32 @@ export default function BookEditor({ content, setContent }) {
   const toolbarBtn =
     "h-9 flex items-center gap-2 px-3 rounded-md text-sm leading-none";
 
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce(({ editor }) => {
+        setIsSaving(true);
+        setContent(editor.getHTML());
+        setTimeout(() => setIsSaving(false), 500);
+      }, 300),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedUpdate.cancel();
+    };
+  }, [debouncedUpdate]);
+
   const editor = useEditor({
     autofocus: "end",
     extensions: [
       TextStyle,
       Color,
+      Blockquote,
       ListItem, // must come first
       BulletList.configure({ keepMarks: true, keepAttributes: true }),
       OrderedList.configure({ keepMarks: true, keepAttributes: true }),
-      Blockquote,
+
       StarterKit.configure({
         history: true,
         bulletList: false, // disable StarterKit’s built-in ones
@@ -58,7 +87,7 @@ export default function BookEditor({ content, setContent }) {
       Highlight,
       Link.configure({ openOnClick: false }),
       TextAlign.configure({
-        types: ["heading", "paragraph", "listItem", "blockquote"],
+        types: ["heading", "paragraph", "listItem"],
       }),
       Placeholder.configure({ placeholder: "Start writing your book..." }),
     ],
@@ -67,15 +96,15 @@ export default function BookEditor({ content, setContent }) {
         class: "focus:outline-none prose prose-lg max-w-none leading-relaxed",
       },
     },
-    content,
-    onUpdate: ({ editor }) => setContent(editor.getHTML()),
+    // content,
+    // onUpdate: ({ editor }) => setContent(editor.getHTML()),
+    onUpdate: debouncedUpdate,
   });
 
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content || "", false);
-    }
-  }, [content, editor]);
+    if (!editor) return;
+    editor.commands.setContent(content || "", false);
+  }, [editor]);
 
   if (editor) window.__EDITOR = editor;
 
@@ -83,7 +112,7 @@ export default function BookEditor({ content, setContent }) {
     if (editor) {
       editor.commands.focus("end");
     }
-  }, [content, editor]);
+  }, [editor]);
 
   useEffect(() => {
     editorRef.current = editor;
@@ -103,8 +132,26 @@ export default function BookEditor({ content, setContent }) {
   `}
       >
         {/* 🔒 Save Text indicator */}
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <span className="uppercase tracking-wide">Save Text</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-400 uppercase tracking-wide">
+            Draft
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              setContent(editor.getHTML());
+              setSavedAt(Date.now());
+            }}
+            className="px-3 py-1 text-xs rounded bg-green text-black"
+          >
+            Save
+          </button>
+
+          {savedAt && (
+            <span className="text-xs text-gray-400">Saved just now</span>
+          )}
+
           <Tooltip text='Text wrapped in quotes "like this" or brackets [like this] will be preserved and never rewritten by AI.' />
         </div>
 

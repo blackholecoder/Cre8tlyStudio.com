@@ -13,6 +13,7 @@ import BookPromptForm from "./prompt/Book/BookPromptForm";
 import { useAuth } from "../admin/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
+import { normalizeLink } from "../helpers/normalizeLink";
 
 export default function PromptModal({
   isOpen,
@@ -92,6 +93,8 @@ export default function PromptModal({
     setShowGenerating(true);
     onClose();
 
+    const normalizedLink = normalizeLink(link);
+
     // 5️⃣ Fire-and-forget generation
     axiosInstance.post("/lead-magnets/prompt", {
       magnetId,
@@ -102,7 +105,7 @@ export default function PromptModal({
       bgTheme,
       pages,
       logo,
-      link,
+      link: normalizedLink,
       coverImage: cover,
       cta,
       contentType,

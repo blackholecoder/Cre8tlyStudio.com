@@ -8,6 +8,13 @@ export default function TextColorControls({ landing, setLanding }) {
     { key: "font_color_p", label: "Paragraph" },
   ];
 
+  const updateColor = (key, value) => {
+    setLanding({
+      ...landing,
+      [key]: value.toUpperCase(),
+    });
+  };
+
   return (
     <div className="relative z-[10] bg-[#0b0b0b] rounded-xl p-6 shadow-inner border border-gray-700">
       <h3 className="text-silver text-lg font-semibold mb-4">Text Colors</h3>
@@ -22,16 +29,26 @@ export default function TextColorControls({ landing, setLanding }) {
               {label}
             </label>
 
+            {/* Color picker */}
             <input
               type="color"
               value={landing[key] || "#FFFFFF"}
-              onChange={(e) =>
-                setLanding({ ...landing, [key]: e.target.value })
-              }
+              onChange={(e) => updateColor(key, e.target.value)}
               className="w-14 h-14 p-0 rounded-lg cursor-pointer border border-gray-400 hover:scale-105 transition-transform"
             />
 
-            <span className="text-xs text-gray-300 mt-2 tracking-wider">
+            {/* Hex input */}
+            <input
+              type="text"
+              value={landing[key] || "#FFFFFF"}
+              onChange={(e) => updateColor(key, e.target.value)}
+              className="mt-3 w-full px-2 py-1 text-xs text-center uppercase
+                bg-black border border-gray-600 rounded text-white
+                focus:outline-none focus:ring-1 focus:ring-[#F285C3]"
+              placeholder="#FFFFFF"
+            />
+
+            <span className="text-xs text-gray-400 mt-2 tracking-wider">
               {landing[key] || "#FFFFFF"}
             </span>
           </div>

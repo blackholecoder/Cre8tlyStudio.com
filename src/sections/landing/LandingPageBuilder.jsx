@@ -195,25 +195,56 @@ export default function LandingPageBuilder() {
       };
     });
   };
+  // const moveRootIntoContainer = (rootIndex, containerIndex) => {
+  //   setLanding((prev) => {
+  //     const blocks = [...prev.content_blocks];
+  //     const block = blocks[rootIndex];
+  //     const container = blocks[containerIndex];
+
+  //     if (!block || !container || container.type !== "container") {
+  //       return prev;
+  //     }
+
+  //     // remove root block
+  //     blocks.splice(rootIndex, 1);
+
+  //     // add to container
+  //     const children = [...(container.children || []), block];
+
+  //     blocks[containerIndex] = {
+  //       ...container,
+  //       children,
+  //     };
+
+  //     return {
+  //       ...prev,
+  //       content_blocks: blocks,
+  //     };
+  //   });
+  // };
   const moveRootIntoContainer = (rootIndex, containerIndex) => {
     setLanding((prev) => {
       const blocks = [...prev.content_blocks];
       const block = blocks[rootIndex];
-      const container = blocks[containerIndex];
 
-      if (!block || !container || container.type !== "container") {
+      if (!block) return prev;
+
+      // Remove the block first
+      blocks.splice(rootIndex, 1);
+
+      // 🔑 Adjust container index if it was after the removed block
+      const adjustedContainerIndex =
+        rootIndex < containerIndex ? containerIndex - 1 : containerIndex;
+
+      const container = blocks[adjustedContainerIndex];
+
+      if (!container || container.type !== "container") {
         return prev;
       }
 
-      // remove root block
-      blocks.splice(rootIndex, 1);
-
-      // add to container
-      const children = [...(container.children || []), block];
-
-      blocks[containerIndex] = {
+      blocks[adjustedContainerIndex] = {
         ...container,
-        children,
+        children: [...(container.children || []), block],
       };
 
       return {

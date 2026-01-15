@@ -46,6 +46,9 @@ export default {
         metalBlack: "#030303",
         bookBrown: "#36241c",
         bookBtnColor: "#b8c0ff",
+        mediaBlue: "#a2d2ff",
+        brightPurple: "#9381ff",
+        newAgeOrange: "#f9c784",
       },
       screens: {
         wide: "1440px",

@@ -5,6 +5,7 @@ import QRCode from "react-qr-code";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { Img } from "react-image";
+import Cropper from "react-easy-crop";
 
 export default function DashboardSettings() {
   const { user, setUser, refreshUser } = useAuth();
@@ -21,6 +22,11 @@ export default function DashboardSettings() {
   const [secret, setSecret] = useState(null);
   const [twofaCode, setTwofaCode] = useState("");
   const [verifying, setVerifying] = useState(false);
+
+  const [cropSrc, setCropSrc] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const fileInputRef = useRef(null);
 
@@ -195,6 +201,14 @@ export default function DashboardSettings() {
     }
   };
 
+  function canvasHasTransparency(ctx, width, height) {
+    const imageData = ctx.getImageData(0, 0, width, height).data;
+    for (let i = 3; i < imageData.length; i += 4) {
+      if (imageData[i] < 255) return true;
+    }
+    return false;
+  }
+
   useEffect(() => {
     if (location.search.includes("connected=true")) {
       refreshUser(); // Refreshes /auth/me data from backend
@@ -324,13 +338,13 @@ export default function DashboardSettings() {
   };
 
   const handleUploadAvatar = async () => {
-    if (!file) return toast.warning("Select an image first");
+    if (!file) return toast.warning("Crop and select an image first");
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        setUploading(true);
+    try {
+      setUploading(true);
 
+      const reader = new FileReader();
+      reader.onloadend = async () => {
         const res = await axiosInstance.post("/upload-data/upload-avatar", {
           userId: user.id,
           profileImage: reader.result,
@@ -339,26 +353,25 @@ export default function DashboardSettings() {
         if (res.data.profileImage) {
           const updated = {
             ...user,
-            profile_image_url: res.data.profileImage,
             profile_image: res.data.profileImage,
+            profile_image_url: res.data.profileImage,
           };
 
-          localStorage.setItem("user", JSON.stringify(updated));
-          // update UI + local storage
           setUser(updated);
 
+          localStorage.setItem("user", JSON.stringify(updated));
+          URL.revokeObjectURL(cropSrc);
           toast.success("Profile image updated!");
           setFile(null);
         }
-      } catch (err) {
-        console.error(err);
-        toast.error("Upload failed");
-      } finally {
-        setUploading(false);
-      }
-    };
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const getUserPlan = () => {
@@ -636,11 +649,108 @@ export default function DashboardSettings() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => {
+                  const f = e.target.files[0];
+                  if (!f) return;
+                  setCropSrc(URL.createObjectURL(f));
+                }}
                 className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 
                    file:rounded-lg file:border-0 file:text-sm file:bg-white 
                    file:font-semibold hover:file:opacity-90"
               />
+              {cropSrc && (
+                <div className="mt-6">
+                  <div className="relative w-full h-[260px] rounded-lg overflow-hidden bg-black/40">
+                    <Cropper
+                      image={cropSrc}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      cropShape="round"
+                      showGrid={false}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={(_, pixels) =>
+                        setCroppedAreaPixels(pixels)
+                      }
+                    />
+                  </div>
+
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.01}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-full mt-4"
+                  />
+
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      disabled={uploading}
+                      className="px-4 py-2 bg-green text-black rounded font-semibold"
+                      onClick={async () => {
+                        if (!croppedAreaPixels) return;
+
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+                        const img = new Image();
+                        img.crossOrigin = "anonymous";
+                        img.src = cropSrc;
+                        await new Promise((r) => (img.onload = r));
+
+                        const { width, height, x, y } = croppedAreaPixels;
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(
+                          img,
+                          x,
+                          y,
+                          width,
+                          height,
+                          0,
+                          0,
+                          width,
+                          height
+                        );
+
+                        const hasAlpha = canvasHasTransparency(
+                          ctx,
+                          width,
+                          height
+                        );
+                        const mimeType = hasAlpha ? "image/png" : "image/jpeg";
+                        const quality = hasAlpha ? undefined : 0.9;
+                        const fileName = hasAlpha ? "avatar.png" : "avatar.jpg";
+
+                        const blob = await new Promise((r) =>
+                          canvas.toBlob(r, mimeType, quality)
+                        );
+
+                        setFile(blob);
+                        setCropSrc(null);
+                        setCrop({ x: 0, y: 0 });
+                        setZoom(1);
+                      }}
+                    >
+                      Use Image
+                    </button>
+
+                    <button
+                      className="px-4 py-2 bg-gray-700 text-white rounded"
+                      onClick={() => {
+                        URL.revokeObjectURL(cropSrc);
+                        setCropSrc(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <button
                 onClick={handleUploadAvatar}

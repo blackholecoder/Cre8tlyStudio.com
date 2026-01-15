@@ -352,14 +352,15 @@ export default function PromptForm({
           Optional Link or Call-to-Action
         </label>
         <input
-          type="url"
+          type="text"
           placeholder="https://yourwebsite.com"
           value={link}
           onChange={(e) => setLink(e.target.value)}
           className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
         />
         <p className="text-xs text-gray-400 mt-1">
-          This link will appear at the bottom of your PDF as a button.
+          This link will appear at the bottom of your PDF as a button and a QR
+          code. Websites and email addresses are supported.
         </p>
       </div>
 

@@ -782,30 +782,33 @@ export const BLOCK_PILL_STYLES = {
   "List Heading": "text-green border-green bg-green/10",
   Paragraph: "text-green border-green bg-green/10",
   FAQ: "text-green border-green bg-green/10",
+  Divider: "text-green border-green bg-green/10",
 
   // 🔵 Media
-  "Pro Image": "text-blue border-blue bg-blue/10",
-  Video: "text-blue border-blue bg-blue/10",
-  "Audio Player": "text-blue border-blue bg-blue/10",
-  "Single Offer": "text-blue border-blue bg-blue/10",
-  "Mini Offer": "text-blue border-blue bg-blue/10",
-  "Profile Card": "text-blue border-blue bg-blue/10",
-  "Scroll Arrow": "text-blue border-blue bg-blue/10",
+  "Pro Image": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  Video: "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  "Audio Player": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  "Single Offer": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  "Mini Offer": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  "Profile Card": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
+  "Scroll Arrow": "text-mediaBlue border-mediaBlue bg-mediaBlue/10",
 
   // 🟣 Conversion
-  "Offer Banner": "text-royalPurple border-royalPurple bg-royalPurple/10",
-  "Stripe Checkout": "text-royalPurple border-royalPurple bg-royalPurple/10",
-  "Secure Checkout": "text-royalPurple border-royalPurple bg-royalPurple/10",
-  "Verified Reviews": "text-royalPurple border-royalPurple bg-royalPurple/10",
-  "Button Url": "text-royalPurple border-royalPurple bg-royalPurple/10",
+  "Offer Banner": "text-brightPurple border-brightPurple bg-brightPurple/10",
+  "Stripe Checkout": "text-brightPurple border-brightPurple bg-brightPurple/10",
+  "Secure Checkout": "text-brightPurple border-brightPurple bg-brightPurple/10",
+  "Verified Reviews":
+    "text-brightPurple border-brightPurple bg-brightPurple/10",
+  "Button Url": "text-brightPurple border-brightPurple bg-brightPurple/10",
 
   // 🟠 Interaction
-  Calendly: "text-sherbert border-sherbert bg-sherbert/15",
-  "Countdown Timer": "text-sherbert border-sherbert bg-sherbert/15",
-  "Social Links Row": "text-sherbert border-sherbert bg-sherbert/15",
+  Calendly: "text-newAgeOrange border-newAgeOrange bg-newAgeOrange/15",
+  "Countdown Timer": "text-newAgeOrange border-newAgeOrange bg-newAgeOrange/15",
+  "Social Links Row":
+    "text-newAgeOrange border-newAgeOrange bg-newAgeOrange/15",
 
   // ⚪ Layout
-  Divider: "text-white-400 border-white/20 bg-white/5",
+
   "Section Container": "text-white-400 border-white/20 bg-white/5",
   "Referral Button": "text-white-400 border-white/20 bg-white/5",
 };

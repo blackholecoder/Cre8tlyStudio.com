@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, CircleQuestionMark } from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
 import {
   SIDEBAR_SECTIONS,
@@ -213,14 +213,42 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* BOTTOM (fixed logout) */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-gray-800 space-y-3">
+          <button
+            onClick={() => navigate("/docs")}
+            className={`w-full flex items-center rounded-lg transition ${
+              isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
+            } text-gray-300 hover:bg-gray-700/40`}
+          >
+            <CircleQuestionMark size={20} />
+            {!isCollapsed && <span className="font-medium">Documentation</span>}
+          </button>
+          {/* Profile Avatar */}
+          <div
+            className={`flex items-center ${
+              isCollapsed ? "justify-center" : "gap-3 px-2"
+            }`}
+          >
+            <img
+              src={user?.profile_image || "/default-avatar.png"}
+              alt="Profile"
+              className="w-9 h-9 rounded-full object-cover border border-gray-700"
+            />
+            {!isCollapsed && (
+              <span className="text-sm text-gray-300 truncate">
+                {user?.name || "Account"}
+              </span>
+            )}
+          </div>
+
+          {/* Logout */}
           <button
             onClick={logout}
             className={`w-full flex items-center rounded-lg transition ${
               isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
             } text-red-500 hover:bg-red-600/10`}
           >
-            <LogOut size={18} />
+            <LogOut size={20} />
             {!isCollapsed && <span className="font-medium">Logout</span>}
           </button>
         </div>

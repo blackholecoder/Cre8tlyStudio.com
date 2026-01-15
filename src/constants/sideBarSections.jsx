@@ -10,7 +10,6 @@ import {
   Bell,
   MailSearch,
   Landmark,
-  CircleQuestionMark,
   LayoutTemplate,
 } from "lucide-react";
 
@@ -21,7 +20,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "dashboard",
         label: "Digital Products",
-        description: "Create and manage PDFs and assets",
         path: "/dashboard",
         icon: Package,
         access: "all",
@@ -29,7 +27,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "assistant",
         label: "Assistant",
-        description: "Generate content with AI",
         path: "/books",
         icon: BookOpen,
         access: "pro",
@@ -37,7 +34,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "prompts",
         label: "Prompt Memory",
-        description: "Save and reuse prompts",
         path: "/prompts",
         icon: SquareTerminal,
         access: "pro",
@@ -52,7 +48,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "landing",
         label: "Landing Pages",
-        description: "Build high converting pages",
         path: "/landing-page-builder",
         icon: LayoutTemplate,
         access: "pro",
@@ -60,7 +55,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "leads",
         label: "Leads",
-        description: "Capture and manage email leads",
         path: "/leads",
         icon: MailSearch,
         access: "pro",
@@ -68,7 +62,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "analytics",
         label: "Analytics",
-        description: "Track views and conversions",
         path: "/landing-analytics",
         icon: BarChart2,
         access: "pro",
@@ -76,7 +69,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "seller",
         label: "Seller Dashboard",
-        description: "Sales, payouts, and performance",
         path: "/seller-dashboard",
         icon: Landmark,
         access: "seller",
@@ -90,7 +82,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "community",
         label: "Community",
-        description: "Connect with builders",
         path: "/community",
         icon: MessageSquare,
         badge: "communityCount",
@@ -98,14 +89,12 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "alerts",
         label: "Alerts",
-        description: "Community notifications",
         path: "/community-alerts",
         icon: Bell,
       },
       {
         key: "inbox",
         label: "Inbox",
-        description: "Messages and replies",
         path: "/notifications",
         icon: Inbox,
         badge: "unreadCount",
@@ -119,7 +108,6 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "settings",
         label: "Settings",
-        description: "Brand and preferences",
         path: "/settings",
         icon: Settings,
         indicator: "brandConfigured",
@@ -127,16 +115,8 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "plans",
         label: "Plans",
-        description: "Billing and upgrades",
         path: "/plans",
         icon: DollarSign,
-      },
-      {
-        key: "docs",
-        label: "Documentation",
-        description: "Guides and help articles",
-        path: "/docs",
-        icon: CircleQuestionMark,
       },
     ],
   },

@@ -174,10 +174,6 @@ select {
   background-image: none !important; /* removes default dropdown arrow */
 }
 
-select:not(.allow-bg-arrow) {
-  background-image: none !important;
-}
-
 /* 👇 Optional: Add a custom arrow with Tailwind color scheme */
 select::-ms-expand {
   display: none;

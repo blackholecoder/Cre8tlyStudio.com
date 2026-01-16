@@ -6,7 +6,6 @@ import { Tooltip } from "../tools/toolTip";
 export default function FontSelector({
   fontName,
   setFontName,
-  fontFile,
   setFontFile,
   isFreePlan = false,
 }) {

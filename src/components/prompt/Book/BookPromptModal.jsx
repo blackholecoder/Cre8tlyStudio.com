@@ -8,7 +8,6 @@ export default function BookPromptModal({
   onClose,
   bookId,
   partNumber = 1,
-  accessToken,
   onSubmitted,
   onCompleted,
   setShowGenerating,

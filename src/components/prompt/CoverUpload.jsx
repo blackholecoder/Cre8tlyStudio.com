@@ -92,11 +92,19 @@ export default function CoverUpload({ setCover }) {
         </label>
 
         <span
-          className={`self-start bg-gradient-to-r from-[#a98aff] via-[#d2b6ff] to-[#8e66ff]
-             text-black font-semibold text-xs px-3 py-1 rounded-full
-             shadow-[0_0_10px_rgba(168,130,255,0.6)]
-             border border-[#d2b6ff]/60 uppercase tracking-wider
-             ${isLocked ? "opacity-60" : ""}`}
+          className={`
+  self-start
+  bg-[#0f0f0f]
+  text-gray-400
+  text-[11px]
+  px-3 py-1
+  rounded-full
+  border border-[#7c3aed]/60
+  tracking-wide
+  uppercase
+  shadow-[inset_0_0_0_1px_rgba(124,58,237,0.15)]
+  ${isLocked ? "opacity-50" : ""}
+`}
         >
           PRO
         </span>

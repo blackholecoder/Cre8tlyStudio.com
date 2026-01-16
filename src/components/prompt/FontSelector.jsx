@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Type } from "lucide-react";
 import { fontThemes as availableFonts } from "../../constants/index";
 import { Tooltip } from "../tools/toolTip";
 
@@ -53,7 +53,8 @@ export default function FontSelector({
 
   return (
     <div className="w-full relative mt-4 bg-[#0b0b0b] border border-gray-700 rounded-xl p-5 shadow-inner">
-      <h3 className="flex items-center gap-1 text-lg font-semibold text-silver pb-6">
+      <h3 className="flex items-center gap-2 text-lg font-semibold text-silver pb-6">
+        <Type size={18} className="text-gray-400" />
         Font Style
         <Tooltip text="Choose how your book text appears. You can change fonts anytime before exporting or publishing." />
       </h3>

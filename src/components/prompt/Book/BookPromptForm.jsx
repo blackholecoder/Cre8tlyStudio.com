@@ -5,8 +5,16 @@ import CoverUpload from "../CoverUpload";
 import BookEditor from "../../book/BookEditor";
 import { useAuth } from "../../../admin/AuthContext";
 import FontSelector from "../FontSelector";
-import { BookOpenCheck, Rocket, Replace } from "lucide-react";
+import {
+  BookOpenCheck,
+  Rocket,
+  Replace,
+  UploadCloud,
+  Lock,
+  LinkIcon,
+} from "lucide-react";
 import { Tooltip } from "../../tools/toolTip";
+import SectionSelector from "../../../helpers/SectionSelector";
 
 export default function BookPromptForm({
   text,
@@ -560,6 +568,8 @@ Please split the file into multiple chapters.`
     }, 5000);
   }
 
+  const showArrow = sections.length > 1;
+
   return (
     <>
       {restored && (
@@ -615,7 +625,7 @@ Please split the file into multiple chapters.`
             <div>
               <label className="flex items-center gap-1 text-silver mb-2 font-medium">
                 Author Name
-                <span className="text-gray-400">🔒</span>
+                <Lock size={14} className="text-gray-500" />
                 <Tooltip text="The author name is set when the book is first created and can’t be changed." />
               </label>
               <input
@@ -629,7 +639,7 @@ Please split the file into multiple chapters.`
             <div>
               <label className="flex items-center gap-1 text-silver mb-2 font-medium">
                 Book Type
-                <span className="text-gray-400">🔒</span>
+                <Lock size={14} className="text-gray-500" />
                 <Tooltip text="Book type is chosen before setup and can’t be changed" />
               </label>
               <input
@@ -694,9 +704,11 @@ Please split the file into multiple chapters.`
                 hover:bg-gray-700
                 transition
                 text-silver
-              "
+                flex items-center gap-2
+  "
               >
-                📤 Upload Text or DOCX
+                <UploadCloud size={18} />
+                Upload File
               </label>
 
               {uploading && (
@@ -739,7 +751,7 @@ Please split the file into multiple chapters.`
                 <Tooltip text="Sections let you break your chapter into parts. Switching sections saves your work automatically. You can add, rename, or delete sections anytime. Each chapter can contain up to 3,000 total words across all sections. If you exceed the limit, split your content into another chapter or part." />
               </div>
 
-              <select
+              {/* <select
                 value={activeSectionId}
                 onChange={(e) => {
                   const nextId = e.target.value;
@@ -762,14 +774,46 @@ Please split the file into multiple chapters.`
                   // fire autosave AFTER state change
                   autoSaveDraft();
                 }}
-                className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white w-full sm:w-auto sm:min-w-[220px]"
+                className="
+                allow-bg-arrow
+    bg-gray-900
+    border border-gray-700
+    rounded-lg
+    px-4 py-2
+    pr-10
+    text-white
+    w-full sm:w-auto sm:min-w-[220px]
+    appearance-none
+    bg-no-repeat
+    bg-right
+  "
+                style={
+                  showArrow
+                    ? {
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23d1d5db'%3E%3Cpath d='M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z'/%3E%3C/svg%3E")`,
+                        backgroundPosition: "right 12px center",
+                        backgroundSize: "14px 14px",
+                      }
+                    : {
+                        backgroundImage: "none",
+                      }
+                }
               >
                 {sections.map((section) => (
                   <option key={section.id} value={section.id}>
                     {section.title || "Untitled Section"}
                   </option>
                 ))}
-              </select>
+              </select> */}
+              <SectionSelector
+                sections={sections}
+                activeSectionId={activeSectionId}
+                setActiveSectionId={setActiveSectionId}
+                text={text}
+                setText={setText}
+                setSections={setSections}
+                autoSaveDraft={autoSaveDraft}
+              />
 
               <button
                 type="button"
@@ -974,7 +1018,8 @@ Please split the file into multiple chapters.`
           )}
 
           <div>
-            <label className="block text-silver mb-2 font-medium">
+            <label className="flex items-center gap-2 text-silver mb-2 font-medium">
+              <LinkIcon size={16} className="text-gray-400" />
               Optional Website or Author Link
             </label>
             <input

@@ -34,7 +34,7 @@ function debounce(fn, delay) {
 
 export default function BookEditor({ content, setContent }) {
   const editorRef = useRef(null);
-  const lastHydratedContentRef = useRef(null);
+  const hasHydratedRef = useRef(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
@@ -98,20 +98,16 @@ export default function BookEditor({ content, setContent }) {
         class: "focus:outline-none prose prose-lg max-w-none leading-relaxed",
       },
     },
-    // content,
-    // onUpdate: ({ editor }) => setContent(editor.getHTML()),
     onUpdate: debouncedUpdate,
   });
 
   useEffect(() => {
     if (!editor) return;
     if (!content) return;
+    if (hasHydratedRef.current) return;
 
-    // prevent overwriting live typing or loops
-    if (content === lastHydratedContentRef.current) return;
-
-    editor.commands.setContent(content, false);
-    lastHydratedContentRef.current = content;
+    editor.commands.setContent(content);
+    hasHydratedRef.current = true;
   }, [editor, content]);
 
   if (editor) window.__EDITOR = editor;

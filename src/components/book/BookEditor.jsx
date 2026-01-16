@@ -34,6 +34,8 @@ function debounce(fn, delay) {
 
 export default function BookEditor({ content, setContent }) {
   const editorRef = useRef(null);
+  const lastHydratedContentRef = useRef(null);
+
   const [isSaving, setIsSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
   const [theme, setTheme] = useState("dark"); // "dark" | "light"
@@ -103,8 +105,14 @@ export default function BookEditor({ content, setContent }) {
 
   useEffect(() => {
     if (!editor) return;
-    editor.commands.setContent(content || "", false);
-  }, [editor]);
+    if (!content) return;
+
+    // prevent overwriting live typing or loops
+    if (content === lastHydratedContentRef.current) return;
+
+    editor.commands.setContent(content, false);
+    lastHydratedContentRef.current = content;
+  }, [editor, content]);
 
   if (editor) window.__EDITOR = editor;
 

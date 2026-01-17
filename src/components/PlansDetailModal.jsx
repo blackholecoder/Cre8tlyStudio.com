@@ -43,8 +43,10 @@ Business Basic gives you everything you need to launch, validate, and grow witho
       title: "Author’s Assistant",
       content: `
 Transform your writing with intelligent support, not automation.
-The Author’s Assistant is your creative co-writer, an AI partner that helps you plan your story structure, build rich scenes, and craft powerful chapters without losing your authentic voice. Generate up to 750 pages with built-in editing tools that perfect your tone, pacing, and style. Plus, enjoy unlimited custom cover uploads to bring your book to life with a professional finish.`,
+Author’s Assistant is a complete book creation and publishing system designed for serious writers. It helps you plan structure, develop chapters, revise with intention, and move deliberately from draft to finished work. Write and edit up to 750 pages with full control over revisions, section locking, and finalization. When your book is ready, combine all chapters into a single publishable EPUB, compatible with Kindle and major ebook platforms. Your voice stays intact, your thinking stays clear, and your work ends as a finished, authoritative book, not an endless draft.
+`,
     },
+
     business_builder_pack: {
       title: "Pro Business Builder Pack",
       content: `

@@ -289,13 +289,13 @@ const Nav = () => {
                       onClick={() => navigateWithReferral("/smart-prompt")}
                     />
 
-                    <MegaItem
+                    {/* <MegaItem
                       icon={Mail}
                       title="Email Marketing"
                       desc="Automated campaigns"
                       disabled
-                      // onClick={() => navigateWithReferral("/leads")}
-                    />
+                      onClick={() => navigateWithReferral("/leads")}
+                    /> */}
 
                     <MegaItem
                       icon={Workflow}
@@ -325,13 +325,13 @@ const Nav = () => {
                       onClick={() => navigateWithReferral("/analytics")}
                     />
 
-                    <MegaItem
+                    {/* <MegaItem
                       icon={Database}
                       title="CRM"
                       desc="Own your audience"
                       disabled
-                      // onClick={() => navigateWithReferral("/leads")}
-                    />
+                      onClick={() => navigateWithReferral("/leads")}
+                    /> */}
                   </div>
                 </div>
               </div>

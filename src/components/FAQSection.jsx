@@ -49,7 +49,7 @@ const faqs = [
   },
   {
     q: "What is Author’s Assistant?",
-    a: "Author’s Assistant is an AI powered writing companion designed to help authors refine, edit, and expand their own work. It remembers your story, tone, and progress to provide consistent, context aware suggestions.\n\nIt does not write books for you. Instead, it enhances clarity, flow, and structure while preserving your voice. Built for serious fiction and nonfiction authors who want a smarter way to polish and publish their work.",
+    a: "Author’s Assistant is a structured writing and publishing system designed to help authors plan, write, revise, and finish full-length books across fiction, nonfiction, and educational projects. It supports section-based writing, long-form context awareness, and intentional editing, while preserving your voice and creative control.\n\nIt does not write books for you. Instead, it helps you think clearly, refine your work, and move deliberately from draft to finalized manuscript. When your book is complete, you can lock your chapters and publish a single EPUB ready for Kindle and major ebook platforms. Built for serious creators who want to finish and publish real work, not generate disposable content.",
   },
 ];
 

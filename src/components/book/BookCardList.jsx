@@ -159,27 +159,6 @@ export default function BookCardList({
               </button>
             )}
 
-            {/* Preview */}
-            {b.has_part_1 === 0 && (b.is_draft === 1 || b.draft_text) && (
-              <button
-                onClick={() => onAddPrompt(b.id, b.part_number || 1)}
-                className="w-full bg-blue hover:bg-blue text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all"
-              >
-                <Rocket size={16} />
-                <span>Continue Draft</span>
-              </button>
-            )}
-
-            {b.can_edit === 1 && (
-              <button
-                onClick={() => onAddPrompt(b.id, b.part_number)}
-                className="w-full bg-gray-900 hover:bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-2 transition-all border border-gray-700"
-              >
-                <Pencil size={16} className="text-green" />
-                <span>Edit Chapter</span>
-              </button>
-            )}
-
             {/* View All Parts */}
             {b.pdf_url && (
               <button
@@ -194,12 +173,16 @@ export default function BookCardList({
             {/* Continue Story */}
             {b.prompt && b.pages < 750 && (
               <button
-                onClick={() => onGenerateNext(b.id, (b.part_number || 1) + 1)}
+                onClick={() =>
+                  b.pages >= 750
+                    ? openPartsModal(b.id)
+                    : onGenerateNext(b.id, (b.part_number || 1) + 1)
+                }
                 className="w-full bg-royalPurple text-white rounded-lg py-2 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
               >
                 <Rocket size={16} />
                 <span>
-                  {b.pages >= 740
+                  {b.pages >= 750
                     ? "Finish Book"
                     : `Continue Story (Part ${(b.part_number || 1) + 1})`}
                 </span>

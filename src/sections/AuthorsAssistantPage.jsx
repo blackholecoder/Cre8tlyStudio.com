@@ -5,6 +5,9 @@ import {
   PenTool,
   Download,
   Upload,
+  Lock,
+  Book,
+  CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { bookFeature } from "../assets/images";
@@ -29,16 +32,17 @@ export default function AuthorsAssistant() {
           </span>
 
           <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-semibold text-gray-900 leading-[1.1] tracking-tight">
-            Write, Edit, and Finish Books With Author’s Assistant
+            Write, Finalize, and Publish Books With Author’s Assistant
           </h1>
 
           <p className="mt-6 text-[17px] text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Create, organize, and finish full length books with an AI system
+            Create, organize, and complete full-length books with an AI system
             built for serious authors. Author’s Assistant structures your work
-            into sections, saves every draft, supports unlimited revisions, and
-            allows you to import your own material. It does not write books for
-            you. It strengthens your thinking, sharpens your writing, and helps
-            you complete meaningful work without compromising your voice.
+            into sections, preserves every revision, and gives you full control
+            over when your book is finalized and published. It does not write
+            books for you. It supports clear thinking, intentional editing, and
+            real completion, so you can produce finished, publishable work
+            without compromising your voice.
           </p>
         </div>
 
@@ -116,21 +120,40 @@ export default function AuthorsAssistant() {
           <Feature
             icon={Download}
             iconColor="text-blue bg-blue/10"
-            title="Export When You Are Ready"
-            text="Download your finished book as PDF or DOCX when publishing or sharing."
+            title="Export and Publish When You Are Ready"
+            text="Download individual chapters as PDFs during writing, then publish your completed book as a single EPUB when finished."
+          />
+
+          <Feature
+            icon={Lock}
+            iconColor="text-blue bg-blue/10"
+            title="Finalize and Lock Your Book"
+            text="Explicitly finalize your book when it is complete. Once finalized, chapters are locked to preserve a canonical version ready for publishing."
+          />
+          <Feature
+            icon={Book}
+            iconColor="text-blue bg-blue/10"
+            title="Publish a Complete EPUB Book"
+            text="Combine all finalized chapters into a single EPUB file, compatible with Kindle and major ebook platforms."
+          />
+          <Feature
+            icon={CheckCircle}
+            iconColor="text-blue bg-blue/10"
+            title="Structured Publishing Workflow"
+            text="Move from draft to finished book through a clear process: write, revise, finalize, and publish, without accidental changes or broken exports."
           />
         </div>
 
         {/* CTA */}
         <div className="mt-28 text-center border-t border-gray-200 pt-16">
           <h3 className="text-3xl font-extrabold text-gray-900">
-            Turn Your Ideas Into Published Work
+            Turn Finished Manuscripts Into Publishable Books
           </h3>
 
           <p className="mt-4 text-gray-600 max-w-xl mx-auto">
-            Author’s Assistant gives you the power of a full writing studio,
-            without the complexity. Start writing, refining, and publishing
-            today.
+            Author’s Assistant is more than a writing tool. It is a complete
+            book creation and publishing workflow, designed to help serious
+            authors finish what they start.
           </p>
 
           <div className="mt-8 flex justify-center gap-4">

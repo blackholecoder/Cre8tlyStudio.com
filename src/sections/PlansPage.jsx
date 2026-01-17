@@ -347,7 +347,7 @@ export default function PlansPage() {
           </div>
 
           {/* OPTIONAL REFERENCE (LIGHT) */}
-          <p className="text-xs text-gray-500 mb-8">
+          <p className="text-xs text-gray-300 mb-8">
             Prefer the best value? Save significantly with annual billing.
           </p>
 
@@ -389,9 +389,9 @@ export default function PlansPage() {
 
           {/* OUTCOME ANCHOR */}
           <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-            An AI-powered co-writer built to help you structure, write, and
-            finish a full-length book while preserving your unique voice and
-            storytelling style.
+            A structured writing and publishing system designed to help you
+            plan, write, finalize, and publish a full-length book, while
+            preserving your unique voice and intent.
           </p>
 
           {/* CORE CAPABILITIES */}
@@ -400,10 +400,10 @@ export default function PlansPage() {
               Write with confidence
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Generate chapters and sections instantly</li>
+              <li>✅ Generate chapters and structured sections</li>
               <li>✅ Rewrite, expand, or shorten any passage</li>
-              <li>✅ Save unlimited drafts and revisions</li>
-              <li>✅ Continue your story with full context memory</li>
+              <li>✅ Save unlimited revisions without losing progress</li>
+              <li>✅ Continue writing with full book-level context</li>
             </ul>
           </div>
 
@@ -412,9 +412,9 @@ export default function PlansPage() {
               Maintain continuity
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Up to 750 pages of guided writing</li>
-              <li>✅ Upload existing documents or drafts</li>
-              <li>✅ Live book preview and editing</li>
+              <li>✅ Up to 750 pages across a single book project</li>
+              <li>✅ Import existing drafts, notes, or research</li>
+              <li>✅ Edit chapters individually without breaking structure</li>
             </ul>
           </div>
 
@@ -423,9 +423,11 @@ export default function PlansPage() {
               Publish professionally
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Pro-level book covers</li>
-              <li>✅ Premium font selection</li>
-              <li>✅ One-click export (PDF and DOCX)</li>
+              <li>✅ Finalize and lock your completed book</li>
+              <li>✅ Combine all chapters into a single EPUB</li>
+              <li>
+                ✅ Publish EPUBs compatible with Kindle and major platforms
+              </li>
             </ul>
           </div>
 

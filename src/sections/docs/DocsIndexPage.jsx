@@ -76,6 +76,13 @@ export default function DocsIndexPage() {
         "Connect your own domain to Cre8tly, verify ownership, and host landing pages under your brand.",
       path: "/docs/custom-domain",
     },
+    {
+      id: "authors-assistant",
+      title: "Author’s Assistant",
+      description:
+        "Write, revise, finalize, and publish full-length books using a structured, section-based workflow built for serious authors.",
+      path: "/docs/authors-assistant",
+    },
   ];
 
   const filteredDocs = docs.filter(

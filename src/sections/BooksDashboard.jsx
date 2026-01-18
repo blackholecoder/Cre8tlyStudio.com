@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useBooks } from "../admin/BookContext.jsx";
-import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
 import LoadingState from "../components/dashboard/LoadingState.jsx";
 import EmptyState from "../components/dashboard/EmptyState.jsx";
 import PaginationControls from "../components/dashboard/PaginationControls.jsx";
@@ -15,6 +14,7 @@ import NewBookModal from "../components/book/NewBookModal.jsx";
 import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import BookGrid from "../components/book/BookGrid.jsx";
 import axiosInstance from "../api/axios.jsx";
+import BooksDashboardHeader from "../components/dashboard/BooksDashboardHeader.jsx";
 
 export default function BooksDashboard() {
   const { accessToken, authLoading } = useAuth();
@@ -130,11 +130,11 @@ export default function BooksDashboard() {
   return (
     <DashboardLayout>
       <div className="bg-[#0b0b0b] min-h-full px-4 lg:px-8 py-6">
-        <DashboardHeader
-          type="book"
-          items={books}
+        <BooksDashboardHeader
+          books={books}
           onCheckout={() => navigate("/plans")}
         />
+
         {/* Content */}
         {loading ? (
           <LoadingState label="Loading your books..." />

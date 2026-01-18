@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { toast } from "react-toastify";
 
 export default function NewBookModal({ onCreate, onClose }) {
   const [bookName, setBookName] = useState("");
@@ -9,18 +9,27 @@ export default function NewBookModal({ onCreate, onClose }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   function handleAddInfo() {
-  if (!bookName || !author || !bookType) {
-    toast.error("Please fill in all fields, including book type.");
-    return;
+    if (!bookName?.trim()) {
+      toast.error("Please enter a book name");
+      return;
+    }
+
+    if (!author?.trim()) {
+      toast.error("Please enter an author name");
+      return;
+    }
+
+    if (!bookType) {
+      toast.error("Please select a book type before continuing");
+      return;
+    }
+
+    setConfirmOpen(true);
   }
 
-  setConfirmOpen(true); // open confirmation
-}
-
-
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-[#111] p-6 rounded-xl w-[90%] max-w-md border border-gray-700 text-white space-y-4 shadow-lg">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-0">
+      <div className="bg-[#111] p-4 sm:p-6 rounded-xl w-full max-w-2xl border border-gray-700 text-white shadow-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold text-center">Set Up Your Book</h2>
 
         <div>
@@ -47,54 +56,108 @@ export default function NewBookModal({ onCreate, onClose }) {
 
         {/* 👇 New Book Type Section */}
         <div>
-          <label className="block text-silver mb-2">Select Book Type</label>
-          <div className="flex flex-col gap-2">
-            {["Fiction", "Non-Fiction", "Educational"].map((type) => (
-              <label
-                key={type}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="bookType"
-                  value={type.toLowerCase()}
-                  checked={bookType === type.toLowerCase()}
-                  onChange={(e) => setBookType(e.target.value)}
-                  className="accent-royalPurple"
-                />
-                <span className="capitalize">{type}</span>
-              </label>
-            ))}
+          <label className="block text-silver mb-3">Select Book Type</label>
+
+          <div className="flex flex-col gap-3">
+            {/* Fiction */}
+            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+              <input
+                type="radio"
+                name="bookType"
+                value="fiction"
+                checked={bookType === "fiction"}
+                onChange={(e) => setBookType(e.target.value)}
+                className="mt-1 accent-royalPurple"
+              />
+
+              <div>
+                <p className="text-silver font-medium">Fiction</p>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  For novels, short stories, and narrative driven work. This
+                  mode collaborates with you to develop characters, expand
+                  scenes, and shape a cinematic narrative arc. It may introduce
+                  supporting characters and story elements while staying aligned
+                  with your vision, tone, and story world.
+                </p>
+              </div>
+            </label>
+
+            {/* Non-Fiction */}
+            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+              <input
+                type="radio"
+                name="bookType"
+                value="non-fiction"
+                checked={bookType === "non-fiction"}
+                onChange={(e) => setBookType(e.target.value)}
+                className="mt-1 accent-royalPurple"
+              />
+
+              <div>
+                <p className="text-silver font-medium">Non-Fiction</p>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  For true stories, memoirs, and personal histories. Non Fiction
+                  mode does not invent or add details. It works strictly with
+                  your words, refining clarity, structure, pacing, and voice
+                  while keeping every fact, event, and meaning intact.
+                </p>
+              </div>
+            </label>
+
+            {/* Educational */}
+            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+              <input
+                type="radio"
+                name="bookType"
+                value="educational"
+                checked={bookType === "educational"}
+                onChange={(e) => setBookType(e.target.value)}
+                className="mt-1 accent-royalPurple"
+              />
+
+              <div>
+                <p className="text-silver font-medium">Educational</p>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  For guides, courses, workbooks, and instructional material.
+                  Educational mode acts as a strict editor, improving clarity
+                  and readability without adding, removing, or restructuring
+                  content. Your instructional logic and sequencing remain fully
+                  intact.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 pt-3">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition"
+            className="bg-gray-700 px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
           >
             Cancel
           </button>
           <button
             onClick={handleAddInfo}
             disabled={loading}
-            className="bg-royalPurple px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
+            className="bg-bookBtnColor px-4 py-2 rounded text-black font-semibold hover:opacity-90 transition"
           >
             {loading ? "Saving..." : "Continue"}
           </button>
         </div>
       </div>
       {confirmOpen && (
-  <div className="
+        <div
+          className="
       fixed inset-0 
       backdrop-blur-md 
       bg-black/60 
       flex items-center justify-center 
       z-[9999] 
       animate-fadeIn
-    ">
-    
-    <div className="
+    "
+        >
+          <div
+            className="
         bg-black/90 
         border border-white/10 
         shadow-[0_0_30px_rgba(0,0,0,0.6)] 
@@ -103,21 +166,21 @@ export default function NewBookModal({ onCreate, onClose }) {
         w-[90%] max-w-sm 
         text-center 
         animate-slideDown
-      ">
-      
-      <h3 className="text-xl font-semibold text-[#7bed9f] drop-shadow-sm">
-        Confirm Action
-      </h3>
+      "
+          >
+            <h3 className="text-xl font-semibold text-[#7bed9f] drop-shadow-sm">
+              Confirm Action
+            </h3>
 
-      <p className="text-gray-300 text-sm leading-relaxed mt-3">
-        You will <span className="text-white font-semibold">NOT</span> be able 
-        to change the book type or author name after continuing.
-      </p>
+            <p className="text-gray-300 text-sm leading-relaxed mt-3">
+              You will <span className="text-white font-semibold">NOT</span> be
+              able to change the book type or author name after continuing.
+            </p>
 
-      <div className="flex justify-center gap-4 pt-6">
-        <button
-          onClick={() => setConfirmOpen(false)}
-          className="
+            <div className="flex justify-center gap-4 pt-6">
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="
             px-4 py-2 
             rounded-lg 
             bg-gray-700 
@@ -125,20 +188,20 @@ export default function NewBookModal({ onCreate, onClose }) {
             hover:bg-gray-600 
             transition
           "
-        >
-          Cancel
-        </button>
+              >
+                Cancel
+              </button>
 
-        <button
-          onClick={() => {
-            setConfirmOpen(false);
-            onCreate({
-              bookName,
-              authorName: author,
-              bookType,
-            });
-          }}
-          className="
+              <button
+                onClick={() => {
+                  setConfirmOpen(false);
+                  onCreate({
+                    bookName,
+                    authorName: author,
+                    bookType,
+                  });
+                }}
+                className="
             px-5 py-2 
             rounded-lg 
             bg-[#7bed9f] 
@@ -148,15 +211,13 @@ export default function NewBookModal({ onCreate, onClose }) {
             transition 
             shadow-[0_0_12px_rgba(123,237,159,0.6)]
           "
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -144,7 +144,7 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
             </ul>
           )}
 
-          <div className="mt-6 border-t border-gray-700 pt-6">
+          <div className="mt-6 pt-6">
             <h3 className="text-white font-semibold text-lg mb-2">
               Book Status
             </h3>
@@ -174,7 +174,7 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
           {/* ✅ Publish EPUB Section */}
 
           {isComplete && (
-            <div className="mt-6 border-t border-gray-700 pt-6 flex flex-col items-center gap-3">
+            <div className="mt-6 pt-6 flex flex-col items-center gap-3">
               {publishError && (
                 <p className="text-red-400 text-sm text-center">
                   {publishError}
@@ -187,7 +187,7 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
                 className={`w-full py-3 rounded-xl font-semibold transition
         ${
           isPublishable
-            ? "bg-green hover:bg-green/80 text-black"
+            ? "bg-white hover:bg-green text-black"
             : "bg-gray-700 text-gray-400 cursor-not-allowed"
         }`}
               >

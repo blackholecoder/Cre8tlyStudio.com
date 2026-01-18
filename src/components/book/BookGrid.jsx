@@ -77,13 +77,6 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
               {/* Metadata: Part & Purchase Date */}
               <div className="flex items-center justify-between text-[11px] text-gray-400 mb-2">
                 <span>Part {b.part_number || 1}</span>
-                <span>
-                  {new Date(b.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
-                </span>
               </div>
 
               {/* Progress Bar */}
@@ -122,12 +115,12 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
-                      ></circle>
+                      />
                       <path
                         className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8v8H4z"
-                      ></path>
+                      />
                     </svg>
                     Generating…
                   </div>
@@ -135,9 +128,9 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                   <span className="bg-red-500 text-white px-3 py-[3px] rounded-full">
                     Failed
                   </span>
-                ) : b.pages >= 750 ? (
+                ) : b.is_complete === 1 ? (
                   <span className="bg-green text-black px-3 py-[3px] rounded-full">
-                    Completed
+                    Finalized
                   </span>
                 ) : b.pages > 0 ? (
                   <span className="bg-blue text-white px-3 py-[3px] rounded-full">
@@ -160,21 +153,30 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
               </div>
 
               {/* Created Timestamp */}
-              <div className="text-[11px] text-gray-400 text-center mt-2">
+              <div className="text-[11px] text-gray-400 text-center mt-2 flex items-center justify-center gap-1">
                 {b.created_at_prompt ? (
                   <>
-                    {new Date(b.created_at_prompt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}{" "}
-                    {new Date(b.created_at_prompt).toLocaleTimeString([], {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                    <span>
+                      {new Date(b.created_at_prompt).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        }
+                      )}{" "}
+                      {new Date(b.created_at_prompt).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+
+                    <Tooltip text="This is the date and time this chapter was generated. Purchase dates are shown in Settings." />
                   </>
                 ) : (
-                  <span className="italic text-gray-500">N/A</span>
+                  <span className="italic text-gray-500">
+                    Not generated yet
+                  </span>
                 )}
               </div>
 

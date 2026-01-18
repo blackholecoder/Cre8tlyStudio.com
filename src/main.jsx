@@ -67,6 +67,7 @@ import StripePayments from "./sections/StripePayments.jsx";
 import AuthorsAssistant from "./sections/AuthorsAssistantPage.jsx";
 import SettingsDomains from "./settings/SettingsDomains.jsx";
 import CustomDomainsDocs from "./sections/docs/CustomDomainsDocs.jsx";
+import AuthorsAssistantDocs from "./sections/docs/AuthorsAssistantDocs.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -541,6 +542,25 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/docs/authors-assistant"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <AuthorsAssistantDocs />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="/admin"
           element={

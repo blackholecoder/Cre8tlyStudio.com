@@ -253,8 +253,8 @@ export default function CommunityPost() {
 
   if (!post) return null;
 
-const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
-const isStudioPost = post.author === "Cre8tly Studio"; 
+  const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
+  const isStudioPost = post.author === "Cre8tly Studio";
 
   const timeAgo = (d) => {
     const date = new Date(d);
@@ -274,10 +274,26 @@ const isStudioPost = post.author === "Cre8tly Studio";
   }
 
   return (
-    <div className="w-full flex justify-center items-start min-h-screen px-6 py-20">
-      <div className="w-full max-w-4xl bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">
+    <div
+      className="w-full flex justify-center items-start min-h-screen px-6 py-20
+  bg-dashboard-bg-light dark:bg-dashboard-bg-dark"
+    >
+      <div
+        className="
+          w-full max-w-4xl
+          bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light dark:border-dashboard-border-dark
+          rounded-xl p-10
+          shadow-xl space-y-10
+        "
+      >
         {/* Breadcrumb */}
-        <div className="w-full mb-6 text-gray-400 text-sm flex items-center gap-2">
+        <div
+          className="
+  w-full mb-6 text-sm flex items-center gap-2
+  text-dashboard-muted-light dark:text-dashboard-muted-dark
+"
+        >
           <button
             onClick={() => navigate("/community")}
             className="flex items-center gap-1 text-green hover:text-green/80 transition"
@@ -297,13 +313,21 @@ const isStudioPost = post.author === "Cre8tly Studio";
 
           <span>/</span>
 
-          <span className="text-white font-medium">{post.title}</span>
+          <span className="text-dashboard-text-light dark:text-dashboard-text-dark font-medium">
+            {post.title}
+          </span>
         </div>
 
         {/* Main content */}
         <div className="w-full space-y-10">
           {/* Post Card */}
-          <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-8 shadow-lg">
+          <div
+            className="
+            bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light dark:border-dashboard-border-dark
+            rounded-xl p-8 shadow-lg
+          "
+          >
             <div className="flex items-center gap-4 mb-6">
               {isStudioPost ? (
                 <img
@@ -318,7 +342,11 @@ const isStudioPost = post.author === "Cre8tly Studio";
                     <div className="w-12 h-12 rounded-full bg-gray-700/40 animate-pulse" />
                   }
                   unloader={
-                    <div className="w-12 h-12 rounded-full bg-gray-800 border border-green-600 flex items-center justify-center text-xl font-bold text-green-400">
+                    <div
+                      className="w-12 h-12 rounded-full border flex items-center justify-center text-xl font-bold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                      border-dashboard-border-light dark:border-dashboard-border-dark
+                      text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                    >
                       {avatarInitial}
                     </div>
                   }
@@ -333,33 +361,57 @@ const isStudioPost = post.author === "Cre8tly Studio";
               )}
 
               <div>
-                <p className="text-white text-lg font-semibold flex items-center gap-2">
+                <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold flex items-center gap-2">
                   {isStudioPost ? "Cre8tly Studio" : post.author}
 
                   {(isStudioPost || isAdmin) && (
-                    <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">
-                      <ShieldCheck size={11} className="text-green" /> Official
+                    <span
+                      className="
+                      flex items-center gap-1
+                      text-dashboard-muted-light dark:text-dashboard-muted-dark
+                      text-[10px]
+                      px-2 py-0.5
+                      border border-dashboard-border-light dark:border-dashboard-border-dark
+                      rounded-full
+  "
+                    >
+                      <ShieldCheck
+                        size={11}
+                        className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                      />
                     </span>
                   )}
                 </p>
-                <p className="text-gray-500 text-sm">
+                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
                   {timeAgo(post.created_at)}
                 </p>
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold mb-4 text-gray-200">{post.title}</h1>
-            <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
+            <h1
+              className="text-2xl font-bold mb-4
+              text-dashboard-text-light dark:text-dashboard-text-dark"
+            >
+              {post.title}
+            </h1>
+            <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
               {post.body}
             </p>
           </div>
 
           {/* Comments */}
           <div>
-            <h2 className="text-xl font-semibold mb-5 text-white">Comments</h2>
+            <h2
+              className="text-xl font-semibold mb-5
+            text-dashboard-text-light dark:text-dashboard-text-dark"
+            >
+              Comments
+            </h2>
 
             {comments.length === 0 && (
-              <p className="text-gray-500 mb-6">No comments yet.</p>
+              <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark mb-6">
+                No comments yet.
+              </p>
             )}
 
             <div className="space-y-4 mb-10">
@@ -370,7 +422,11 @@ const isStudioPost = post.author === "Cre8tly Studio";
                 return (
                   <div
                     key={c.id}
-                    className="bg-gray-900/60 border border-gray-700 p-6 rounded-lg shadow-inner"
+                    className="
+                    bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                    border border-dashboard-border-light dark:border-dashboard-border-dark
+                    p-6 rounded-lg shadow-inner
+                  "
                   >
                     <div className="flex items-start gap-4">
                       {c.author_image ? (
@@ -380,7 +436,12 @@ const isStudioPost = post.author === "Cre8tly Studio";
                             <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
                           }
                           unloader={
-                            <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                            <div
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                            border-dashboard-border-light dark:border-dashboard-border-dark
+                            text-dashboard-muted-light dark:text-dashboard-muted-dark
+                            "
+                            >
                               {commentAvatar}
                             </div>
                           }
@@ -396,7 +457,7 @@ const isStudioPost = post.author === "Cre8tly Studio";
 
                       <div className="flex-1">
                         {editCommentId !== c.id && (
-                          <p className="text-gray-300 whitespace-pre-wrap">
+                          <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
                             {c.body}
                           </p>
                         )}
@@ -406,7 +467,14 @@ const isStudioPost = post.author === "Cre8tly Studio";
                             <textarea
                               value={editBody}
                               onChange={(e) => setEditBody(e.target.value)}
-                              className="w-full bg-gray-800 border border-gray-700 p-2 rounded text-gray-100 text-sm"
+                              className="
+                              w-full
+                              bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                              border border-dashboard-border-light dark:border-dashboard-border-dark
+                              p-2 rounded
+                              text-dashboard-text-light dark:text-dashboard-text-dark
+                              text-sm
+                            "
                               rows={3}
                             />
 
@@ -423,7 +491,14 @@ const isStudioPost = post.author === "Cre8tly Studio";
                                   setEditCommentId(null);
                                   setEditBody("");
                                 }}
-                                className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded hover:bg-gray-600"
+                                className="
+                                px-3 py-1
+                                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                                border border-dashboard-border-light dark:border-dashboard-border-dark
+                                text-xs rounded
+                                hover:opacity-80
+"
                               >
                                 Cancel
                               </button>
@@ -431,20 +506,32 @@ const isStudioPost = post.author === "Cre8tly Studio";
                           </div>
                         )}
 
-                        <div className="text-xs text-gray-500 mt-2 flex items-center gap-4">
+                        <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
                           <span>{c.author}</span>
                           {commentAdmin && (
-                            <span className="flex items-center gap-1 text-white text-xs px-2 py-0.5 border border-green rounded-full">
-                              <ShieldCheck size={12} className="text-green" />{" "}
-                              Official
+                            <span
+                              className="
+                              flex items-center gap-1
+                              text-dashboard-muted-light dark:text-dashboard-muted-dark
+                              text-xs
+                              px-2 py-0.5
+                              border border-dashboard-border-light dark:border-dashboard-border-dark
+                              rounded-full
+                              "
+                            >
+                              <ShieldCheck
+                                size={12}
+                                className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                              />
                             </span>
                           )}
                           • <span>{timeAgo(c.created_at)}</span>
                           <button
-                            onClick={() => toggleLike(c, null)}
                             className={`text-xs ${
-                              c.user_liked ? "text-red-600" : "text-gray-500"
-                            } hover:text-blue/90`}
+                              c.user_liked
+                                ? "text-red-600"
+                                : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                            } hover:opacity-80`}
                           >
                             <Heart
                               size={12}
@@ -487,7 +574,9 @@ const isStudioPost = post.author === "Cre8tly Studio";
                             {!openReplies[c.id] &&
                               (c.user_id === user.id ||
                                 user.role === "admin") && (
-                                <span className="text-gray-500 text-xs">•</span>
+                                <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-xs">
+                                  •
+                                </span>
                               )}
 
                             {/* Edit */}
@@ -499,7 +588,7 @@ const isStudioPost = post.author === "Cre8tly Studio";
                                     setEditCommentId(c.id);
                                     setEditBody(c.body);
                                   }}
-                                  className="text-xs text-gray-100 hover:text-gray-300"
+                                  className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
                                 >
                                   Edit
                                 </button>
@@ -511,7 +600,7 @@ const isStudioPost = post.author === "Cre8tly Studio";
                                 user.role === "admin") && (
                                 <button
                                   onClick={() => handleDelete(c.id)}
-                                  className="text-xs text-gray-200 hover:text-gray-300"
+                                  className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
                                 >
                                   Delete
                                 </button>

@@ -586,44 +586,64 @@ Please split the file into multiple chapters.`
       <form onSubmit={handleSubmit}>
         <div
           className="
-          bg-gradient-to-b from-[#121212] to-[#0e0e0e]
-          border border-gray-700
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
           rounded-2xl
           shadow-2xl
           px-8 py-8
           space-y-6
-    "
+        "
         >
           {/* ---------- Book Info ---------- */}
           <div
             className="
             rounded-xl
-            border border-gray-700
-            bg-black/40
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
             px-6 py-6
             space-y-5
           "
           >
-            <div className="text-xs uppercase tracking-wide text-gray-400">
+            <div
+              className="
+              text-xs uppercase tracking-wide
+              text-dashboard-text-muted-light
+              dark:text-dashboard-text-muted-dark
+            "
+            >
               Book Details
             </div>
-            <label className="flex items-center gap-1 text-silver mb-2 font-medium">
-              Book Name
-              <Tooltip text="You can change the book name anytime. It won’t affect your content or progress." />
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. The Shining"
-              value={bookName}
-              onChange={(e) => setBookName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              This is your book’s main title.
-            </p>
+            <div>
+              <label
+                className="flex items-center gap-1 mb-2 font-medium
+      text-dashboard-muted-light dark:text-dashboard-muted-dark"
+              >
+                Book Name
+                <Tooltip text="You can change the book name anytime. It won’t affect your content or progress." />
+              </label>
+
+              <input
+                type="text"
+                placeholder="e.g. The Shining"
+                value={bookName}
+                onChange={(e) => setBookName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg
+                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                text-dashboard-text-light dark:text-dashboard-text-dark
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                placeholder-dashboard-muted-light dark:placeholder-dashboard-muted-dark"
+              />
+            </div>
 
             <div>
-              <label className="flex items-center gap-1 text-silver mb-2 font-medium">
+              <label
+                className="flex items-center gap-1 text-dashboard-muted-light
+              dark:text-dashboard-muted-dark mb-2 font-medium"
+              >
                 Author Name
                 <Lock size={14} className="text-gray-500" />
                 <Tooltip text="The author name is set when the book is first created and can’t be changed." />
@@ -632,12 +652,22 @@ Please split the file into multiple chapters.`
                 type="text"
                 value={draftAuthor || authorName || ""}
                 readOnly
-                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+                className="w-full px-4 py-3 rounded-lg bg-dashboard-bg-light
+                dark:bg-dashboard-bg-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                placeholder-dashboard-muted-light
+                dark:placeholder-dashboard-muted-dark"
               />
             </div>
 
             <div>
-              <label className="flex items-center gap-1 text-silver mb-2 font-medium">
+              <label
+                className="flex items-center gap-1 text-dashboard-muted-light
+                dark:text-dashboard-muted-dark mb-2 font-medium"
+              >
                 Book Type
                 <Lock size={14} className="text-gray-500" />
                 <Tooltip text="Book type is chosen before setup and can’t be changed" />
@@ -650,12 +680,22 @@ Please split the file into multiple chapters.`
                     : ""
                 }
                 readOnly
-                className="w-full px-4 py-3 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
+                className="w-full px-4 py-3 rounded-lg bg-dashboard-bg-light
+                dark:bg-dashboard-bg-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                placeholder-dashboard-muted-light
+                dark:placeholder-dashboard-muted-dark"
               />
             </div>
 
             <div>
-              <label className="block text-silver mb-2 font-medium">
+              <label
+                className="block text-dashboard-muted-light
+              dark:text-dashboard-muted-dark mb-2 font-medium"
+              >
                 Chapter Title
                 <Tooltip text="Each section can have its own chapter title. This helps organize longer books." />
               </label>
@@ -664,7 +704,14 @@ Please split the file into multiple chapters.`
                 placeholder="e.g. The Black Widow"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green focus:outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-dashboard-bg-light
+                dark:bg-dashboard-bg-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                placeholder-dashboard-muted-light
+                dark:placeholder-dashboard-muted-dark"
               />
             </div>
           </div>
@@ -673,8 +720,10 @@ Please split the file into multiple chapters.`
           <div
             className="
             rounded-xl
-            border border-gray-700
-            bg-black/40
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
             px-6 py-5
             space-y-4
           "
@@ -698,12 +747,16 @@ Please split the file into multiple chapters.`
                 className="
                 cursor-pointer
                 px-5 py-3
-                bg-gray-800
-                border border-gray-600
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                hover:bg-dashboard-hover-light
+                dark:hover:bg-dashboard-hover-dark
                 rounded-lg
-                hover:bg-gray-700
                 transition
-                text-silver
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
                 flex items-center gap-2
   "
               >
@@ -719,15 +772,20 @@ Please split the file into multiple chapters.`
                 type="button"
                 onClick={() => setShowFindReplace(true)}
                 className="
+                cursor-pointer
                 px-5 py-3
-                bg-gray-800
-                border border-gray-600
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                hover:bg-dashboard-hover-light
+                dark:hover:bg-dashboard-hover-dark
                 rounded-lg
-                hover:bg-gray-700
                 transition
-                text-silver
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
                 flex items-center gap-2
-              "
+  "
               >
                 <Replace size={18} />
                 Find & Replace
@@ -739,8 +797,10 @@ Please split the file into multiple chapters.`
           <div
             className="
             rounded-xl
-            border border-gray-700
-            bg-black/40
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
             px-6 py-5
             space-y-4
           "
@@ -751,60 +811,6 @@ Please split the file into multiple chapters.`
                 <Tooltip text="Sections let you break your chapter into parts. Switching sections saves your work automatically. You can add, rename, or delete sections anytime. Each chapter can contain up to 3,000 total words across all sections. If you exceed the limit, split your content into another chapter or part." />
               </div>
 
-              {/* <select
-                value={activeSectionId}
-                onChange={(e) => {
-                  const nextId = e.target.value;
-
-                  // save current section content immediately
-                  setSections((prev) =>
-                    prev.map((section) =>
-                      section.id === activeSectionId
-                        ? { ...section, content: text }
-                        : section
-                    )
-                  );
-
-                  const nextSection = sections.find((s) => s.id === nextId);
-                  if (!nextSection) return;
-
-                  setActiveSectionId(nextId);
-                  setText(nextSection.content || "");
-
-                  // fire autosave AFTER state change
-                  autoSaveDraft();
-                }}
-                className="
-                allow-bg-arrow
-    bg-gray-900
-    border border-gray-700
-    rounded-lg
-    px-4 py-2
-    pr-10
-    text-white
-    w-full sm:w-auto sm:min-w-[220px]
-    appearance-none
-    bg-no-repeat
-    bg-right
-  "
-                style={
-                  showArrow
-                    ? {
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23d1d5db'%3E%3Cpath d='M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z'/%3E%3C/svg%3E")`,
-                        backgroundPosition: "right 12px center",
-                        backgroundSize: "14px 14px",
-                      }
-                    : {
-                        backgroundImage: "none",
-                      }
-                }
-              >
-                {sections.map((section) => (
-                  <option key={section.id} value={section.id}>
-                    {section.title || "Untitled Section"}
-                  </option>
-                ))}
-              </select> */}
               <SectionSelector
                 sections={sections}
                 activeSectionId={activeSectionId}
@@ -1001,7 +1007,10 @@ Please split the file into multiple chapters.`
           {/* ---------- Other Fields ---------- */}
           {bookType !== "non-fiction" && (
             <div>
-              <label className="block text-silver mb-2 font-medium">
+              <label
+                className="block text-dashboard-muted-light
+dark:text-dashboard-muted-dark mb-2 font-medium"
+              >
                 Number of Pages
               </label>
               <div className="relative w-full max-w-xs">
@@ -1018,7 +1027,10 @@ Please split the file into multiple chapters.`
           )}
 
           <div>
-            <label className="flex items-center gap-2 text-silver mb-2 font-medium">
+            <label
+              className="flex items-center gap-2 text-dashboard-muted-light
+            dark:text-dashboard-muted-dark mb-2 font-medium"
+            >
               <LinkIcon size={16} className="text-gray-400" />
               Optional Website or Author Link
             </label>
@@ -1081,7 +1093,12 @@ Please split the file into multiple chapters.`
                     Find & Replace
                   </h2>
 
-                  <label className="text-silver text-sm">Find</label>
+                  <label
+                    className="text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark text-sm"
+                  >
+                    Find
+                  </label>
                   <input
                     type="text"
                     value={findText}
@@ -1089,7 +1106,12 @@ Please split the file into multiple chapters.`
                     className="w-full px-4 py-2 mb-3 rounded-lg bg-gray-800 text-white border border-gray-600"
                   />
 
-                  <label className="text-silver text-sm">Replace With</label>
+                  <label
+                    className="text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark text-sm"
+                  >
+                    Replace With
+                  </label>
                   <input
                     type="text"
                     value={replaceText}

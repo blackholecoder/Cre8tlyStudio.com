@@ -38,9 +38,16 @@ export default function CommentThread({
         id={`comment-${comment.id}`}
         className={
           depth === 0
-            ? "bg-gray-900/60 border border-gray-700 p-3 rounded-lg"
+            ? `
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      p-3 rounded-lg
+    `
             : depth === 1
-              ? "border-l border-gray-700 pl-4"
+              ? `
+        border-l border-dashboard-border-light dark:border-dashboard-border-dark
+        pl-4
+      `
               : "pl-4"
         }
       >
@@ -80,20 +87,20 @@ export default function CommentThread({
               {/* Avatar */}
               {comment.author_role === "admin" ? (
                 <div className="w-8 h-8 rounded-full  flex items-center justify-center text-[10px] font-semibold text-green">
-                 <Img
-                  src={headerLogo}
-                  loader={
-                    <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
-                  }
-                  unloader={
-                    <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
-                      {comment.author?.charAt(0)?.toUpperCase() || "U"}
-                    </div>
-                  }
-                  decode={true}
-                  alt="User avatar"
-                  className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                />
+                  <Img
+                    src={headerLogo}
+                    loader={
+                      <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                    }
+                    unloader={
+                      <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                        {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                      </div>
+                    }
+                    decode={true}
+                    alt="User avatar"
+                    className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                  />
                 </div>
               ) : comment.author_image ? (
                 <Img
@@ -124,8 +131,21 @@ export default function CommentThread({
                     : comment.author}
                 </span>
                 {comment.author_role === "admin" && (
-                  <span className="flex items-center gap-1 text-white text-[10px] px-2 py-0.5 border border-green rounded-full">
-                    <ShieldCheck size={11} className="text-green" /> Official
+                  <span
+                    className="
+                    flex items-center gap-1
+                    text-dashboard-muted-light dark:text-dashboard-muted-dark
+                    text-[10px]
+                    px-2 py-0.5
+                    border border-dashboard-border-light dark:border-dashboard-border-dark
+                    rounded-full
+  "
+                  >
+                    <ShieldCheck
+                      size={11}
+                      className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                    />
+                    Official
                   </span>
                 )}
                 • {timeAgo(comment.created_at)}
@@ -133,12 +153,17 @@ export default function CommentThread({
             </div>
 
             {/* Comment Body */}
-            <p className="text-gray-300 text-sm whitespace-pre-wrap mb-2">
+            <p
+              className="
+            text-dashboard-text-light dark:text-dashboard-text-dark
+            text-sm whitespace-pre-wrap mb-2
+          "
+            >
               {comment.body}
             </p>
 
             {/* ❤️ Likes + Reply/Edit/Delete */}
-            <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
+            <div className="flex items-center gap-4 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1">
               <button
                 onClick={() => toggleLike(comment, comment.parent_id)}
                 className={`flex items-center gap-1 ${
@@ -169,13 +194,19 @@ export default function CommentThread({
                       setEditCommentId(comment.id);
                       setEditBody(comment.body);
                     }}
-                    className="text-gray-300 hover:text-gray-100"
+                    className="
+                    text-dashboard-muted-light dark:text-dashboard-muted-dark
+                    hover:opacity-80
+"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(comment.id, comment.parent_id)}
-                    className="text-gray-300 hover:text-gray-100"
+                    className="
+                    text-dashboard-muted-light dark:text-dashboard-muted-dark
+                    hover:opacity-80
+"
                   >
                     Delete
                   </button>

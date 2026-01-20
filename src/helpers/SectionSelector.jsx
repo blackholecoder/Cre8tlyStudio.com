@@ -55,9 +55,15 @@ export default function SectionSelector({
         onClick={() => setIsOpen((v) => !v)}
         className="
           w-full flex items-center justify-between
-          bg-gray-900 border border-gray-700
-          rounded-lg px-4 py-2
-          text-white text-sm
+          rounded-lg px-4 py-2 text-sm transition
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          hover:bg-dashboard-hover-light
+          dark:hover:bg-dashboard-hover-dark
         "
       >
         <span className="truncate">
@@ -76,28 +82,44 @@ export default function SectionSelector({
         <div
           className="
             absolute z-30 mt-2 w-full
-            bg-[#111] border border-gray-700
             rounded-lg shadow-lg
             max-h-[260px] overflow-y-auto
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
           "
         >
-          {sections.map((section) => (
-            <div
-              key={section.id}
-              onClick={() => handleSelect(section)}
-              className={`
-                px-4 py-2 cursor-pointer text-sm
-                transition
-                ${
-                  section.id === activeSectionId
-                    ? "bg-[#1f1f1f] text-white"
-                    : "text-gray-300 hover:bg-[#1f1f1f]"
-                }
-              `}
-            >
-              {section.title || "Untitled Section"}
-            </div>
-          ))}
+          {sections.map((section) => {
+            const isActive = section.id === activeSectionId;
+
+            return (
+              <div
+                key={section.id}
+                onClick={() => handleSelect(section)}
+                className={`
+                  px-4 py-2 cursor-pointer text-sm transition
+                  ${
+                    isActive
+                      ? `
+                        bg-dashboard-hover-light
+                        dark:bg-dashboard-hover-dark
+                        text-dashboard-text-light
+                        dark:text-dashboard-text-dark
+                      `
+                      : `
+                        text-dashboard-text-light/70
+                        dark:text-dashboard-text-dark/70
+                        hover:bg-dashboard-hover-light
+                        dark:hover:bg-dashboard-hover-dark
+                      `
+                  }
+                `}
+              >
+                {section.title || "Untitled Section"}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

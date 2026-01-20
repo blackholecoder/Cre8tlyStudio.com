@@ -28,8 +28,8 @@ export default function CommunityTopic() {
   };
 
   useEffect(() => {
-  load();
-}, [topicId]);
+    load();
+  }, [topicId]);
 
   useEffect(() => {
     // Always restore scrolling when this page mounts
@@ -50,7 +50,10 @@ export default function CommunityTopic() {
   return (
     <div className="pt-20 p-8 max-w-4xl mx-auto">
       {/* 🔙 Back + Breadcrumbs */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
+      <div
+        className="flex items-center gap-2 text-sm
+  text-dashboard-muted-light dark:text-dashboard-muted-dark mb-4"
+      >
         <button
           onClick={() => navigate("/community")}
           className="text-green hover:text-green/80 transition"
@@ -74,11 +77,21 @@ export default function CommunityTopic() {
 
       {/* Header + Create Button */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{topic.name}</h1>
+        <h1
+          className="text-3xl font-bold
+  text-dashboard-text-light dark:text-dashboard-text-dark"
+        >
+          {topic.name}
+        </h1>
 
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition"
+          className="
+  flex items-center gap-2 px-4 py-2
+  bg-bookBtnColor text-black
+  rounded-lg
+  hover:opacity-90 transition
+"
         >
           <Plus size={20} /> New Post
         </button>
@@ -96,15 +109,19 @@ export default function CommunityTopic() {
               key={post.id}
               onClick={async () => {
                 try {
-                  await axiosInstance.post(
-                    `/community/${topicId}/mark-viewed`
-                  );
+                  await axiosInstance.post(`/community/${topicId}/mark-viewed`);
                 } catch (err) {}
 
                 navigate(`/community/post/${post.id}`);
               }}
-              className="relative w-full text-left bg-gray-900/80 p-5 rounded-xl border border-gray-700
-                   hover:border-green hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] transition"
+              className="
+                relative w-full text-left
+                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                p-5 rounded-xl
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+                transition
+              "
             >
               {isNew && (
                 <span className="absolute top-3 right-3 bg-green text-black text-xs font-semibold px-2 py-1 rounded-full shadow-md">
@@ -112,8 +129,18 @@ export default function CommunityTopic() {
                 </span>
               )}
 
-              <h3 className="text-lg font-semibold">{post.title}</h3>
-              <p className="text-gray-400 text-sm mt-1">By {post.author}</p>
+              <h3
+                className="text-lg font-semibold
+              text-dashboard-text-light dark:text-dashboard-text-dark"
+              >
+                {post.title}
+              </h3>
+              <p
+                className="text-sm mt-1
+              text-dashboard-muted-light dark:text-dashboard-muted-dark"
+              >
+                By {post.author}
+              </p>
             </button>
           );
         })}

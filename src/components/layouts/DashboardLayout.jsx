@@ -8,15 +8,13 @@ import {
   SIDEBAR_SECTIONS,
   SidebarToggleIcon,
 } from "../../constants/sideBarSections";
-import { useTheme } from "../../admin/useTheme";
 
 const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user, logout, updateTheme } = useAuth();
 
   const SIDEBAR_EXPANDED_WIDTH = 260;
   const SIDEBAR_COLLAPSED_WIDTH = 72;
@@ -259,7 +257,9 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
             )}
           </div>
           <button
-            onClick={toggleTheme}
+            onClick={() =>
+              updateTheme(user?.theme === "dark" ? "light" : "dark")
+            }
             className={`
     w-full flex items-center rounded-lg transition
     ${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}
@@ -267,10 +267,11 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
     hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
   `}
           >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {user?.theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+
             {!isCollapsed && (
               <span className="font-medium">
-                {theme === "dark" ? "Light mode" : "Dark mode"}
+                {user?.theme === "dark" ? "Light mode" : "Dark mode"}
               </span>
             )}
           </button>

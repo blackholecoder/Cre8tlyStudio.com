@@ -24,13 +24,34 @@ export default function CreateCommentBox({ postId, onComment }) {
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 min-h-[100px]"
         placeholder="Write a comment..."
+        className="
+        w-full
+        min-h-[100px]
+        p-3
+        rounded-lg
+        bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+        text-dashboard-text-light dark:text-dashboard-text-dark
+        placeholder-dashboard-muted-light dark:placeholder-dashboard-muted-dark
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+        focus:outline-none
+        focus:ring-1
+        focus:ring-green
+      "
       />
 
       <button
         onClick={submit}
-        className="mt-4 bg-black/60 hover:bg-green hover:text-black py-2 px-5 rounded-lg transition"
+        className="
+        mt-4
+        px-5 py-2
+        rounded-lg
+        transition
+        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+        text-dashboard-text-light dark:text-dashboard-text-dark
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+        hover:bg-green hover:text-black
+      "
       >
         Comment
       </button>

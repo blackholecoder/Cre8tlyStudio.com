@@ -31,27 +31,45 @@ export default function BookCardList({
           <motion.div
             key={b.id}
             whileTap={{ scale: 0.98 }}
-            className="bg-[#0a0a0a]/90 rounded-xl border border-gray-800 p-4 shadow hover:shadow-[0_0_10px_rgba(0,255,150,0.15)] transition-all"
+            className="
+            relative group
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            rounded-xl p-4
+            transition-all
+          "
           >
             {/* Title */}
-            <h3 className="text-white text-sm font-semibold truncate mb-1">
+            <h3 className="text-dashboard-text-light dark:text-dashboard-text-dark text-sm font-semibold truncate mb-1">
               {b.book_name || "Untitled Book"}
             </h3>
 
             {/* Part + Date */}
-            <div className="text-[11px] text-gray-400 flex justify-between mb-2">
+            <div
+              className="text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark
+              flex justify-between mb-2"
+            >
               <span>Part {b.part_number || 1}</span>
             </div>
 
             {/* Progress */}
             <div className="flex flex-col items-center mb-3">
-              <div className="w-full bg-gray-800 rounded-full overflow-hidden h-2">
+              <div
+                className="w-full rounded-full h-2
+              bg-dashboard-border-light
+              dark:bg-dashboard-border-dark"
+              >
                 <div
                   className="bg-gradient-to-r from-green to-royalPurple h-2"
                   style={{ width: `${Math.min((b.pages / 750) * 100, 100)}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-400">
+              <p
+                className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark
+"
+              >
                 {b.pages || 0}/750 pages used
               </p>
 
@@ -108,12 +126,19 @@ export default function BookCardList({
               {b.prompt ? (
                 <CheckCircle size={18} className="text-headerGreen" />
               ) : (
-                <Timer size={18} className="text-gray-500" />
+                <Timer
+                  size={18}
+                  className="text-dashboard-muted-light dark:text-dashboard-muted-dark
+"
+                />
               )}
             </div>
 
             {/* Created Timestamp */}
-            <div className="text-[11px] text-gray-400 text-center mt-2 flex items-center justify-center gap-1">
+            <div
+              className="text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark
+              text-center mt-2 flex items-center justify-center gap-1"
+            >
               {b.created_at_prompt ? (
                 <>
                   <span>
@@ -131,7 +156,12 @@ export default function BookCardList({
                   <Tooltip text="This is the date and time this chapter was generated. Purchase dates are shown in Settings." />
                 </>
               ) : (
-                <span className="italic text-gray-500">Not generated yet</span>
+                <span
+                  className="italic text-dashboard-muted-light dark:text-dashboard-muted-dark
+"
+                >
+                  Not generated yet
+                </span>
               )}
             </div>
 
@@ -141,7 +171,16 @@ export default function BookCardList({
               {!b.prompt && (
                 <button
                   onClick={() => onAddPrompt(b.id, b.part_number)}
-                  className="w-full bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold hover:bg-green hover:text-black transition-all"
+                  className="
+                  w-full
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  rounded-lg py-2 text-sm font-semibold
+                  hover:bg-green hover:text-black
+                  transition-all
+                "
                 >
                   <div className="flex items-center justify-center gap-2">
                     <Plus size={16} />
@@ -154,7 +193,11 @@ export default function BookCardList({
               {b.pdf_url && (
                 <button
                   onClick={() => openPartsModal(b.id)}
-                  className="w-full bg-gray-700 hover:bg-gray-600 text-white rounded-lg py-2 text-sm flex items-center justify-center gap-2 transition"
+                  className="w-full bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  hover:opacity-90 rounded-lg py-2 text-sm flex items-center justify-center gap-2 transition"
                 >
                   <Layers size={16} />
                   <span>View All Parts</span>

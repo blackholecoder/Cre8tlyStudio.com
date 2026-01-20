@@ -105,25 +105,59 @@ export default function BookPromptModal({
 
   // ✅ Full-screen layout replaces modal
   return (
-    <div className="fixed inset-0 z-50 bg-[#0b0b0b] text-white flex flex-col overflow-hidden">
+    <div
+      className="
+        fixed inset-0 z-50
+        flex flex-col overflow-hidden
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+      "
+    >
       {/* Header Bar */}
-      <div className="relative flex items-center justify-center px-6 py-5 border-b border-gray-700 bg-[#141414]">
+      <div
+        className="
+    relative flex items-center justify-center
+    px-6 py-5
+    border-b border-dashboard-border-light
+    dark:border-dashboard-border-dark
+    bg-dashboard-sidebar-light
+    dark:bg-dashboard-sidebar-dark
+  "
+      >
         {/* Centered Title */}
-        <h1 className="text-2xl font-semibold text-white text-center">
+        <h1 className="text-2xl font-semibold text-center text-dashboard-text-light dark:text-dashboard-text-dark">
           📖 Build Your Novel — Part {partNumber}
         </h1>
 
         {/* Back Button */}
         <button
           onClick={onClose}
-          className="absolute left-6 md:left-36 text-silver hover:text-white transition text-lg"
+          className="
+            absolute left-6 md:left-36
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+            hover:text-dashboard-text-light
+            dark:hover:text-dashboard-text-dark
+            transition
+            text-lg
+          "
         >
           ← Back
         </button>
       </div>
 
       {/* Writing Area */}
-      <div className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full">
+      <div
+        className="
+        flex-1 overflow-y-auto
+        p-8
+        max-w-5xl mx-auto w-full
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+      "
+      >
         <BookPromptForm
           text={text}
           setText={setText}

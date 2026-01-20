@@ -29,17 +29,45 @@ export default function NewBookModal({ onCreate, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-0">
-      <div className="bg-[#111] p-4 sm:p-6 rounded-xl w-full max-w-2xl border border-gray-700 text-white shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-semibold text-center">Set Up Your Book</h2>
+      <div
+        className="
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        p-4 sm:p-6
+        rounded-xl
+        w-full max-w-2xl
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        shadow-lg
+        max-h-[90vh] overflow-y-auto
+      "
+      >
+        <h2 className="text-xl font-semibold text-center text-dashboard-text-light dark:text-dashboard-text-dark">
+          Set Up Your Book
+        </h2>
 
         <div>
-          <label className="block text-silver mb-1">Book Name</label>
+          <label className="block text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+            Book Name
+          </label>
           <input
             type="text"
             placeholder="e.g. The Burning City"
             value={bookName}
             onChange={(e) => setBookName(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800"
+            className="
+            w-full p-2 rounded
+            bg-dashboard-bg-light
+            dark:bg-dashboard-bg-dark
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            focus:outline-none
+            focus:ring-2 focus:ring-green
+          "
           />
         </div>
 
@@ -50,7 +78,17 @@ export default function NewBookModal({ onCreate, onClose }) {
             placeholder="e.g. Dean Koontz"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800"
+            className="
+            w-full p-2 rounded
+            bg-dashboard-bg-light
+            dark:bg-dashboard-bg-dark
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            focus:outline-none
+            focus:ring-2 focus:ring-green
+          "
           />
         </div>
 
@@ -60,7 +98,14 @@ export default function NewBookModal({ onCreate, onClose }) {
 
           <div className="flex flex-col gap-3">
             {/* Fiction */}
-            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+            <label
+              className="flex items-start gap-3 cursor-pointer rounded-lg p-3 border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              hover:opacity-90
+              transition"
+            >
               <input
                 type="radio"
                 name="bookType"
@@ -71,8 +116,10 @@ export default function NewBookModal({ onCreate, onClose }) {
               />
 
               <div>
-                <p className="text-silver font-medium">Fiction</p>
-                <p className="text-xs text-gray-400 leading-relaxed">
+                <p className="text-dashboard-text-light dark:text-dashboard-text-dark font-medium">
+                  Fiction
+                </p>
+                <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark leading-relaxed">
                   For novels, short stories, and narrative driven work. This
                   mode collaborates with you to develop characters, expand
                   scenes, and shape a cinematic narrative arc. It may introduce
@@ -83,7 +130,14 @@ export default function NewBookModal({ onCreate, onClose }) {
             </label>
 
             {/* Non-Fiction */}
-            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+            <label
+              className="flex items-start gap-3 cursor-pointer rounded-lg p-3 border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              hover:opacity-90
+              transition "
+            >
               <input
                 type="radio"
                 name="bookType"
@@ -94,8 +148,10 @@ export default function NewBookModal({ onCreate, onClose }) {
               />
 
               <div>
-                <p className="text-silver font-medium">Non-Fiction</p>
-                <p className="text-xs text-gray-400 leading-relaxed">
+                <p className="text-dashboard-text-light dark:text-dashboard-text-dark font-medium">
+                  Non-Fiction
+                </p>
+                <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark leading-relaxed">
                   For true stories, memoirs, and personal histories. Non Fiction
                   mode does not invent or add details. It works strictly with
                   your words, refining clarity, structure, pacing, and voice
@@ -105,7 +161,14 @@ export default function NewBookModal({ onCreate, onClose }) {
             </label>
 
             {/* Educational */}
-            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-800 bg-black/30 p-3 hover:bg-black/40 transition">
+            <label
+              className="flex items-start gap-3 cursor-pointer rounded-lg p-3 border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              hover:opacity-90
+              transition"
+            >
               <input
                 type="radio"
                 name="bookType"
@@ -116,8 +179,10 @@ export default function NewBookModal({ onCreate, onClose }) {
               />
 
               <div>
-                <p className="text-silver font-medium">Educational</p>
-                <p className="text-xs text-gray-400 leading-relaxed">
+                <p className="text-dashboard-text-light dark:text-dashboard-text-dark font-medium">
+                  Educational
+                </p>
+                <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark leading-relaxed">
                   For guides, courses, workbooks, and instructional material.
                   Educational mode acts as a strict editor, improving clarity
                   and readability without adding, removing, or restructuring
@@ -132,7 +197,11 @@ export default function NewBookModal({ onCreate, onClose }) {
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
           <button
             onClick={onClose}
-            className="bg-gray-700 px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
+            className=" px-4 py-2 rounded font-semibold transition bg-dashboard-hover-light
+            dark:bg-dashboard-hover-dark
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+            hover:opacity-90"
           >
             Cancel
           </button>
@@ -172,7 +241,7 @@ export default function NewBookModal({ onCreate, onClose }) {
               Confirm Action
             </h3>
 
-            <p className="text-gray-300 text-sm leading-relaxed mt-3">
+            <p className="text-dashboard-muted-light dark:text-gray-300 text-sm leading-relaxed mt-3">
               You will <span className="text-white font-semibold">NOT</span> be
               able to change the book type or author name after continuing.
             </p>

@@ -4,6 +4,13 @@ import axiosInstance from "../api/axios";
 
 const AuthContext = createContext();
 
+function applyTheme(theme) {
+  if (!theme) return;
+  document.documentElement.classList.remove("light", "dark");
+  document.documentElement.classList.add(theme);
+  localStorage.setItem("theme", theme);
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
@@ -19,6 +26,7 @@ export function AuthProvider({ children }) {
 
     return {
       ...u,
+      theme: u.theme || "dark",
       isFreeTier: u.has_free_magnet === 1 && u.magnet_slots === 1,
       trialExpired: expired,
     };
@@ -29,6 +37,7 @@ export function AuthProvider({ children }) {
     const enriched = enrichUser(userData);
     setUser(enriched);
     setAccessToken(token);
+    applyTheme(enriched.theme);
     localStorage.setItem("user", JSON.stringify(enriched));
     localStorage.setItem("accessToken", token);
     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
@@ -66,6 +75,7 @@ export function AuthProvider({ children }) {
 
       const enriched = enrichUser(meRes.data);
       setUser(enriched);
+      applyTheme(enriched.theme);
       await refreshUser();
       localStorage.setItem("user", JSON.stringify(enriched));
 
@@ -87,13 +97,34 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("refreshToken");
   }
 
+  async function updateTheme(theme) {
+    try {
+      applyTheme(theme);
+
+      await axiosInstance.post("/auth/theme", { theme });
+
+      setUser((prev) => {
+        if (!prev) return prev;
+        const updated = { ...prev, theme };
+        localStorage.setItem("user", JSON.stringify(updated));
+        return updated;
+      });
+    } catch (err) {
+      console.error("Failed to save theme:", err);
+    }
+  }
+
   useEffect(() => {
     async function restoreUser() {
       try {
         const storedUser = localStorage.getItem("user");
         const storedAccess = localStorage.getItem("accessToken");
 
-        if (storedUser) setUser(JSON.parse(storedUser));
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          setUser(parsed);
+          applyTheme(parsed.theme);
+        }
         if (storedAccess) setAccessToken(storedAccess);
 
         if (storedAccess) {
@@ -101,6 +132,7 @@ export function AuthProvider({ children }) {
           const enriched = enrichUser(res.data);
           setUser(enriched);
           localStorage.setItem("user", JSON.stringify(enriched));
+          applyTheme(enriched.theme);
         }
       } catch (err) {
         console.error("Failed to restore user:", err);
@@ -141,6 +173,7 @@ export function AuthProvider({ children }) {
         logout,
         refreshUser,
         saveAuth,
+        updateTheme,
       }}
     >
       {children}

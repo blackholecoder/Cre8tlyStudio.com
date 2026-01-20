@@ -62,7 +62,17 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
             <motion.div
               key={b.id}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="relative group bg-[#0b0b0b] rounded-2xl p-4 border border-gray-800 hover:border-green hover:shadow-[0_0_15px_rgba(0,255,150,0.25)] transition-all"
+              className="
+              relative group
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              rounded-2xl p-4
+              transition-all
+              hover:border-green
+              hover:shadow-[0_0_15px_rgba(0,255,150,0.25)]
+            "
             >
               {/* Glimmer Shine */}
               <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden">
@@ -70,18 +80,31 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
               </div>
 
               {/* Title */}
-              <h3 className="book-title text-white text-sm font-semibold truncate mb-2">
+              <h3
+                className="book-title text-dashboard-text-light
+dark:text-dashboard-text-dark text-sm font-semibold truncate mb-2"
+              >
                 {b.book_name || "Untitled Book"}
               </h3>
 
               {/* Metadata: Part & Purchase Date */}
-              <div className="flex items-center justify-between text-[11px] text-gray-400 mb-2">
+              <div
+                className="flex items-center justify-between text-[11px] text-dashboard-muted-light
+dark:text-dashboard-muted-dark
+ mb-2"
+              >
                 <span>Part {b.part_number || 1}</span>
               </div>
 
               {/* Progress Bar */}
               <div className="pages-progress flex flex-col items-center my-3">
-                <div className="w-full bg-gray-800 rounded-full overflow-hidden h-2">
+                <div
+                  className="
+                  w-full rounded-full h-2
+                  bg-dashboard-border-light
+                  dark:bg-dashboard-border-dark
+"
+                >
                   <div
                     className="bg-gradient-to-r from-green to-royalPurple h-2"
                     style={{
@@ -90,7 +113,11 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                   />
                 </div>
                 <div className="flex items-center justify-center gap-1 mt-1">
-                  <p className="text-xs text-gray-400">
+                  <p
+                    className="text-xs text-dashboard-muted-light
+dark:text-dashboard-muted-dark
+"
+                  >
                     {b.pages || 0}/750 pages used
                   </p>
 
@@ -125,7 +152,10 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                     Generating…
                   </div>
                 ) : b.status === "failed" ? (
-                  <span className="bg-red-500 text-white px-3 py-[3px] rounded-full">
+                  <span
+                    className="bg-red-500 text-dashboard-text-light
+dark:text-dashboard-text-dark px-3 py-[3px] rounded-full"
+                  >
                     Failed
                   </span>
                 ) : b.is_complete === 1 ? (
@@ -133,11 +163,22 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                     Finalized
                   </span>
                 ) : b.pages > 0 ? (
-                  <span className="bg-blue text-white px-3 py-[3px] rounded-full">
+                  <span
+                    className="bg-blue text-dashboard-text-light
+dark:text-dashboard-text-dark px-3 py-[3px] rounded-full"
+                  >
                     In Progress
                   </span>
                 ) : (
-                  <span className="bg-gray-600 text-white px-3 py-[3px] rounded-full">
+                  <span
+                    className="
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  px-3 py-[3px] rounded-full
+                "
+                  >
                     Idle
                   </span>
                 )}
@@ -148,12 +189,19 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                 {b.prompt ? (
                   <CheckCircle size={18} className="text-headerGreen" />
                 ) : (
-                  <Timer size={18} className="text-gray-500" />
+                  <Timer
+                    size={18}
+                    className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                  />
                 )}
               </div>
 
               {/* Created Timestamp */}
-              <div className="text-[11px] text-gray-400 text-center mt-2 flex items-center justify-center gap-1">
+              <div
+                className="text-[11px] text-dashboard-muted-light
+dark:text-dashboard-muted-dark
+ text-center mt-2 flex items-center justify-center gap-1"
+              >
                 {b.created_at_prompt ? (
                   <>
                     <span>
@@ -174,7 +222,7 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                     <Tooltip text="This is the date and time this chapter was generated. Purchase dates are shown in Settings." />
                   </>
                 ) : (
-                  <span className="italic text-gray-500">
+                  <span className="italic text-dashboard-muted-light dark:text-dashboard-muted-dark">
                     Not generated yet
                   </span>
                 )}
@@ -185,7 +233,17 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                 {!b.prompt && (
                   <button
                     onClick={() => onAddPrompt(b.id, b.part_number)}
-                    className="w-full bg-gray-700 text-white rounded-lg py-2 text-sm font-semibold hover:bg-green hover:text-black transition-all"
+                    className="
+                    w-full
+                    bg-dashboard-hover-light
+                    dark:bg-dashboard-hover-dark
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+                    rounded-lg py-2 text-sm font-semibold
+                    transition-all
+                    hover:bg-green
+                    hover:text-black
+                  "
                     title="Create Chapter"
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -199,7 +257,17 @@ export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
                   <>
                     <button
                       onClick={() => openPartsModal(b.id)}
-                      className="w-full bg-gray-700 hover:bg-gray-600 text-white rounded-lg py-2 text-sm flex items-center justify-center gap-2 transition"
+                      className="
+                      w-full
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                      text-dashboard-text-light
+                      dark:text-dashboard-text-dark
+                      rounded-lg py-2 text-sm
+                      flex items-center justify-center gap-2
+                      hover:opacity-90
+                      transition
+                    "
                       title="View All Parts"
                     >
                       <Layers size={16} />

@@ -51,23 +51,52 @@ export default function FontSelector({
   };
 
   return (
-    <div className="w-full relative mt-4 bg-[#0b0b0b] border border-gray-700 rounded-xl p-5 shadow-inner">
-      <h3 className="flex items-center gap-2 text-lg font-semibold text-silver pb-6">
-        <Type size={18} className="text-gray-400" />
+    <div
+      className="
+      w-full relative mt-4
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      rounded-xl
+      p-5
+      shadow-inner
+    "
+    >
+      <h3
+        className="
+        flex items-center gap-2 text-lg font-semibold pb-6
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+"
+      >
+        <Type
+          size={18}
+          className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+        />
         Font Style
         <Tooltip text="Choose how your book text appears. You can change fonts anytime before exporting or publishing." />
       </h3>
 
       {/* 🔹 Live Preview (always visible on top) */}
       <div
-        className="mb-4 p-4 rounded-xl border border-gray-700 bg-[#141414] text-center"
+        className="
+  mb-4 p-4 rounded-xl text-center
+  bg-dashboard-hover-light
+  dark:bg-dashboard-hover-dark
+  border border-dashboard-border-light
+  dark:border-dashboard-border-dark
+"
         style={{
           fontFamily: loaded ? previewFont : "sans-serif",
           transition: "all 0.3s ease",
         }}
       >
         <p
-          className="text-gray-200 font-medium"
+          className="
+          font-medium
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark"
           style={{
             fontSize: previewFont === "AdobeArabic" ? "24px" : "20px",
             lineHeight: previewFont === "AdobeArabic" ? "1.2" : "1.5",
@@ -81,7 +110,19 @@ export default function FontSelector({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-[#141414] border border-gray-700 text-gray-300 text-base rounded-lg p-2.5 focus:ring-green focus:border-green"
+        className="
+        w-full flex items-center justify-between
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        text-base rounded-lg p-2.5
+        hover:bg-dashboard-hover-light
+        dark:hover:bg-dashboard-hover-dark
+        transition
+        "
         style={{ fontFamily: loaded ? selectedFont : "sans-serif" }}
       >
         <span>
@@ -93,7 +134,20 @@ export default function FontSelector({
 
       {/* 🔹 Dropdown List */}
       {isOpen && (
-        <div className="absolute z-20 mt-2 w-full max-h-[260px] overflow-y-auto bg-[#111] border border-gray-700 rounded-lg shadow-lg scroll-smooth scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+        <div
+          className="
+          absolute z-20 mt-2 w-full max-h-[260px] overflow-y-auto
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          rounded-lg shadow-lg
+          scrollbar-thin
+          scrollbar-thumb-dashboard-border-light
+          dark:scrollbar-thumb-dashboard-border-dark
+          scrollbar-track-transparent
+        "
+        >
           {visibleFonts.map((f) => (
             <div
               key={f.name}
@@ -101,9 +155,13 @@ export default function FontSelector({
               onClick={() => !f.locked && handleFontSelect(f)}
               className={`px-4 py-2 transition-all duration-150 cursor-pointer ${
                 f.locked
-                  ? "text-gray-500 cursor-not-allowed"
-                  : "text-gray-300 hover:bg-[#1f1f1f]"
-              } ${selectedFont === f.name ? "bg-[#1f1f1f]" : ""}`}
+                  ? "text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed opacity-60 grayscale"
+                  : "text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+              } ${
+                selectedFont === f.name
+                  ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark"
+                  : ""
+              }`}
               style={{ fontFamily: f.name }}
             >
               {f.label}
@@ -118,7 +176,13 @@ export default function FontSelector({
         </p>
       )}
 
-      <p className="text-xs text-gray-400 mt-3 text-center">
+      <p
+        className="
+        text-xs mt-3 text-center
+        text-dashboard-muted-light
+        dark:text-dashboard-muted-dark
+      "
+      >
         Hover to preview, click to select.
       </p>
     </div>

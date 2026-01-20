@@ -140,7 +140,14 @@ export default function CustomerDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-[#0b0b0b] min-h-screen">
+      <div
+        className="
+    flex flex-col min-h-screen
+    px-4 lg:px-8 py-6
+    bg-dashboard-bg-light
+    dark:bg-dashboard-bg-dark
+  "
+      >
         {/* Header */}
         <DashboardHeader
           type="magnet"
@@ -150,48 +157,60 @@ export default function CustomerDashboard() {
         />
 
         {/* Content */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-screen text-white">
-            <div className="relative">
-              {/* Glowing pulse ring */}
-              <div className="absolute inset-0 rounded-full bg-blue-500/30 blur-2xl animate-ping"></div>
+        <div className="flex-1">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+              <div className="relative">
+                {/* Glowing pulse ring */}
+                <div className="absolute inset-0 rounded-full bg-blue/30 blur-2xl animate-ping"></div>
 
-              {/* Center spinner */}
-              <div className="w-16 h-16 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
+                {/* Center spinner */}
+                <div className="w-16 h-16 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
+              </div>
+
+              {/* Loading text */}
+              <p
+                className="mt-6 text-lg font-semibold tracking-wide animate-pulse
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+              >
+                Fetching your lead magnets...
+              </p>
+              <p
+                className="text-sm mt-2
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+              >
+                Please wait while we load your content from Cre8tly Studio.
+              </p>
             </div>
-
-            {/* Loading text */}
-            <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
-              Fetching your lead magnets...
-            </p>
-            <p className="text-sm text-gray-400 mt-2">
-              Please wait while we load your content from Cre8tly Studio.
-            </p>
-          </div>
-        ) : magnets.magnets?.length > 0 ? (
-          <>
-            <MagnetGrid
-              magnets={paginatedMagnets}
-              onAddPrompt={openPromptModal}
-              onOpenEditor={openEditor}
-              onDelete={handleDeleteMagnet}
-            />
-            <MagnetCardList
-              magnets={paginatedMagnets}
-              onAddPrompt={openPromptModal}
-              onOpenEditor={openEditor}
-              onDelete={handleDeleteMagnet}
-            />
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-            <SupportTab />
-          </>
-        ) : (
-          <EmptyState onCheckout={handleCheckout} type="magnet" />
-        )}
+          ) : magnets.magnets?.length > 0 ? (
+            <>
+              <MagnetGrid
+                magnets={paginatedMagnets}
+                onAddPrompt={openPromptModal}
+                onOpenEditor={openEditor}
+                onDelete={handleDeleteMagnet}
+              />
+              <MagnetCardList
+                magnets={paginatedMagnets}
+                onAddPrompt={openPromptModal}
+                onOpenEditor={openEditor}
+                onDelete={handleDeleteMagnet}
+              />
+            </>
+          ) : (
+            <EmptyState onCheckout={handleCheckout} type="magnet" />
+          )}
+        </div>
+        <div className="mt-auto pt-6">
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <SupportTab />
+        </div>
 
         {/* Modals */}
         {activeMagnet && (

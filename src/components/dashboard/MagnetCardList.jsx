@@ -96,7 +96,15 @@ export default function MagnetCardList({
           <motion.div
             key={m.id}
             whileTap={{ scale: 0.98 }}
-            className="bg-[#0a0a0a]/90 rounded-xl border border-gray-800 p-4 shadow hover:shadow-[0_0_10px_rgba(0,255,150,0.15)] transition-all"
+            className="
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          rounded-xl
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          p-4
+          transition-all
+        "
           >
             {/* Cover */}
             <div className="aspect-[4/3] rounded-lg overflow-hidden border border-gray-700 mb-3">
@@ -115,7 +123,13 @@ export default function MagnetCardList({
 
             {/* Title + Theme */}
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-white text-sm font-semibold truncate max-w-[70%]">
+              <h3
+                className="text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                text-sm
+                font-semibold
+                truncate max-w-[70%]"
+              >
                 {m.title || "Digital Asset"}
               </h3>
               {m.theme ? (
@@ -134,43 +148,74 @@ export default function MagnetCardList({
             </div>
 
             {/* Slot + Date */}
-            {/* Slot + Page Count + Date */}
-            <div className="flex items-center justify-between mt-3 text-[11px] text-gray-400">
+            <div
+              className="
+              flex items-center justify-between
+              mt-2
+              text-[11px]
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+            "
+            >
               <div className="flex items-center gap-3">
                 <span>Slot #{m.slot_number}</span>
 
                 {typeof m.page_count === "number" && (
-                  <span className="flex items-center gap-1 text-gray-300">
+                  <span className="flex items-center gap-1">
                     📄 {m.page_count} page{m.page_count !== 1 ? "s" : ""}
                   </span>
                 )}
               </div>
-
-              <span>
-                {new Date(m.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}
-              </span>
             </div>
 
             {/* Prompt status */}
-            <div className="flex justify-center items-center gap-2 mb-2">
-              {m.prompt ? (
-                <CheckCircle size={16} className="text-headerGreen" />
+            <div className="mt-3 text-xs font-semibold text-center">
+              {m.status === "completed" ? (
+                <span className="bg-dashboard-hover-light dark:bg-dashboard-bg-dark text-green border border-green px-3 py-[3px] rounded-full">
+                  Completed
+                </span>
+              ) : m.status === "failed" ? (
+                <span className="bg-red-500 text-white px-3 py-[3px] rounded-full">
+                  Failed
+                </span>
+              ) : m.status === "pending" ? (
+                <div className="flex items-center justify-center gap-2 text-yellow italic">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                  </svg>
+                  building...
+                </div>
               ) : (
-                <Timer size={16} className="text-gray-500" />
+                <span className="bg-dashboard-hover-light dark:bg-dashboard-bg-dark text-purple border border-dashboard-border-light dark:border-dashboard-border-dark px-4 py-[3px] rounded-full">
+                  Idle
+                </span>
               )}
-              <span className="text-xs text-gray-400">
-                {m.status === "completed"
-                  ? "Completed"
-                  : m.status === "pending"
-                    ? "Building..."
-                    : m.status === "failed"
-                      ? "Failed"
-                      : "Idle"}
-              </span>
+            </div>
+
+            <div className="mt-2 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark text-center">
+              {m.created_at_prompt ? (
+                <>
+                  {new Date(m.created_at_prompt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}{" "}
+                  {new Date(m.created_at_prompt).toLocaleTimeString([], {
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </>
+              ) : (
+                <span className="italic text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  N/A
+                </span>
+              )}
             </div>
 
             {/* Actions */}
@@ -224,13 +269,28 @@ export default function MagnetCardList({
                       onOpenEditor(m.id);
                     }}
                     disabled={isLocked || isFreePlan}
-                    className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all
-    ${
-      isLocked || isFreePlan
-        ? "bg-gray-700 text-gray-400 cursor-not-allowed opacity-70"
-        : "bg-gray-700 hover:bg-gray-600 text-white"
-    }
-  `}
+                    className={`w-full py-2 rounded-lg text-sm font-semibold
+                    flex items-center justify-center gap-2
+                    transition-all
+                ${
+                  isLocked || isFreePlan
+                    ? `
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                      text-dashboard-muted-light
+                      dark:text-dashboard-muted-dark
+                      cursor-not-allowed
+                      opacity-70
+                    `
+                    : `
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                      text-dashboard-text-light
+                      dark:text-dashboard-text-dark
+                      hover:opacity-90
+                    `
+                }
+              `}
                     title={
                       isFreePlan
                         ? "Upgrade to unlock editing"
@@ -254,9 +314,9 @@ export default function MagnetCardList({
 
                   <button
                     onClick={() => handleDeleteConfirm(m.id, onDelete)}
-                    className="w-full bg-red-600/70 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-gray-200 text-red-600 rounded-lg py-2 text-sm font-semibold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
                   >
-                    <Trash2 size={16} className="text-white" />
+                    <Trash2 size={16} className="text-red" />
                     <span>Delete</span>
                   </button>
                 </>

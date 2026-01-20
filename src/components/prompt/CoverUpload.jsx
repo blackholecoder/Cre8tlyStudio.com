@@ -69,7 +69,17 @@ export default function CoverUpload({ setCover }) {
   };
 
   return (
-    <div className="relative mt-6 border border-gray-700 rounded-xl p-4 bg-[#0b0b0b] overflow-hidden">
+    <div
+      className="
+  relative mt-6
+  border border-dashboard-border-light
+  dark:border-dashboard-border-dark
+  rounded-xl p-4
+  bg-dashboard-sidebar-light
+  dark:bg-dashboard-sidebar-dark
+  overflow-hidden
+"
+    >
       {/* 🔒 Locked overlay */}
       {isLocked && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-xl">
@@ -86,19 +96,32 @@ export default function CoverUpload({ setCover }) {
 
       {/* Title Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-        <label className="block text-gray-300 font-semibold text-lg tracking-wide">
+        <label
+          className="block font-semibold text-lg tracking-wide
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+        >
           Upload or Choose a Cover{" "}
-          <span className="text-sm text-gray-500 ml-1">(Max 667 × 1000)</span>
+          <span
+            className="text-sm ml-1
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
+            (Max 667 × 1000)
+          </span>
         </label>
 
         <span
           className={`
   self-start
-  bg-[#0f0f0f]
-  text-gray-400
+
   text-[11px]
   px-3 py-1
   rounded-full
+  bg-dashboard-hover-light
+dark:bg-dashboard-hover-dark
+text-dashboard-muted-light
+dark:text-dashboard-muted-dark
   border border-[#7c3aed]/60
   tracking-wide
   uppercase
@@ -128,8 +151,8 @@ export default function CoverUpload({ setCover }) {
     flex items-center justify-center gap-2
     ${
       isLocked
-        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-        : "bg-gray-700 text-white hover:bg-green hover:text-black"
+        ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed"
+        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-green hover:text-dashboard-bg-dark"
     }`}
       >
         <ImageIcon size={16} /> Choose File
@@ -152,7 +175,11 @@ export default function CoverUpload({ setCover }) {
             alt="Cover Preview"
             className="w-[225px] h-[320px] object-cover rounded-lg shadow-lg mx-auto"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p
+            className="text-xs mt-1
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
             This cover will appear before your first page.
           </p>
 
@@ -165,7 +192,7 @@ export default function CoverUpload({ setCover }) {
     sm:w-auto
     text-sm
     font-semibold
-    text-red-400
+    text-red-500
     border
     border-red-400/30
     px-4
@@ -180,13 +207,17 @@ export default function CoverUpload({ setCover }) {
           </button>
 
           {credit && (
-            <p className="text-[10px] text-gray-400 mt-1 italic">
+            <p
+              className="text-[10px] mt-1 italic
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+            >
               Photo by{" "}
               <a
                 href={credit.profile}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline text-green-400 hover:text-green-300"
+                className="underline text-blue hover:opacity-80"
               >
                 {credit.name}
               </a>{" "}
@@ -195,7 +226,7 @@ export default function CoverUpload({ setCover }) {
                 href="https://unsplash.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline text-green-400 hover:text-green-300"
+                className="underline text-blue hover:opacity-80"
               >
                 Unsplash
               </a>

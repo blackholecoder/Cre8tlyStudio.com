@@ -45,14 +45,34 @@ export default function Notifications() {
   return (
     <div className="w-full flex justify-center items-center min-h-[80vh] px-6 py-12">
       {/* 🔥 Background Container */}
-      <div className="w-full max-w-2xl bg-gray-900/40 border border-gray-800 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center normal-case">
+      <div
+        className="
+        w-full max-w-2xl rounded-2xl p-8 shadow-xl backdrop-blur-sm
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+  "
+      >
+        <h1
+          className="
+          text-2xl font-bold mb-6 text-center normal-case
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+  "
+        >
           Notifications 🔔
         </h1>
 
         <div className="space-y-4">
           {items.length === 0 && (
-            <p className="text-gray-400 text-center py-6">
+            <p
+              className="
+              text-center py-6
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+  "
+            >
               No notifications yet.
             </p>
           )}
@@ -61,35 +81,84 @@ export default function Notifications() {
             <button
               key={n.id}
               onClick={() => openNotification(n)}
-              className="w-full text-left bg-gray-900/70 border border-gray-700 p-4 rounded-lg hover:border-green transition"
+              className="
+              w-full text-left p-4 rounded-lg transition
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              hover:border-green
+"
             >
               <div className="flex items-center gap-3">
                 {n.actor_image ? (
                   <Img
                     src={n.actor_image}
                     loader={
-                      <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
+                      <div
+                        className="
+                        w-10 h-10 rounded-full object-cover transition-opacity duration-300
+                        border border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                      animate-pulse"
+                      />
                     }
                     unloader={
-                      <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                      <div
+                        className="
+                        w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
+                        bg-dashboard-sidebar-light
+                        dark:bg-dashboard-sidebar-dark
+                        border border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                        text-dashboard-text-light
+                        dark:text-dashboard-text-dark
+  "
+                      >
                         {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
                       </div>
                     }
                     decode={true}
                     alt="User avatar"
-                    className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                    className="
+                    w-10 h-10 rounded-full object-cover transition-opacity duration-300
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                  <div
+                    className="
+                    w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
+                    bg-dashboard-sidebar-light
+                    dark:bg-dashboard-sidebar-dark
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+  "
+                  >
                     {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 )}
 
                 <div>
-                  <p className="text-sm text-gray-300">
+                  <p
+                    className="
+                    text-sm
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+  "
+                  >
                     {n.actor_name ? (
                       <>
-                        <span className="font-semibold text-white">
+                        <span
+                          className="
+                          font-semibold
+                          text-dashboard-text-light
+                          dark:text-dashboard-text-dark
+  "
+                        >
                           {n.actor_name}
                         </span>{" "}
                         {n.message.replace("Someone", "").trim()}
@@ -99,7 +168,13 @@ export default function Notifications() {
                     )}
                   </p>
 
-                  <p className="text-[11px] text-gray-500 mt-1">
+                  <p
+                    className="
+                    text-[11px] mt-1
+                    text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+                  "
+                  >
                     {new Date(n.created_at).toLocaleString()}
                   </p>
                 </div>

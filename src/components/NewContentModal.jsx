@@ -43,9 +43,24 @@ export default function NewContentModal({ onCreate, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-[#111] p-6 rounded-xl w-[90%] max-w-md border border-gray-700 text-white space-y-6 shadow-lg">
-        <h2 className="text-xl font-semibold text-center">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div
+        className="
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      p-6 rounded-xl w-[90%] max-w-md
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+      space-y-6 shadow-lg
+    "
+      >
+        <h2
+          className="text-xl font-semibold text-center
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+        >
           Select Document Type
         </h2>
 
@@ -57,11 +72,13 @@ export default function NewContentModal({ onCreate, onClose }) {
             return (
               <label
                 key={type.value}
-                className={`flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition ${
-                  contentType === type.value
-                    ? "border-green bg-green/10"
-                    : "border-gray-700 hover:border-gray-500"
-                }`}
+                className={`flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition
+              ${
+                contentType === type.value
+                  ? "border-green bg-green/10"
+                  : "border-dashboard-border-light dark:border-dashboard-border-dark hover:border-green/60"
+              }
+            `}
               >
                 <input
                   type="radio"
@@ -80,7 +97,9 @@ export default function NewContentModal({ onCreate, onClose }) {
                       </span>
                     )}
                   </span>
-                  <p className="text-sm text-gray-400">{type.description}</p>
+                  <p className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    {type.description}
+                  </p>
                 </div>
               </label>
             );
@@ -88,7 +107,11 @@ export default function NewContentModal({ onCreate, onClose }) {
         </div>
 
         {isFreeTier && (
-          <p className="text-xs text-center text-gray-400 mt-2">
+          <p
+            className="text-xs text-center mt-2
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
             Upgrade your plan to unlock the{" "}
             <span className="text-green font-semibold">Learning Document</span>{" "}
             feature.
@@ -98,14 +121,26 @@ export default function NewContentModal({ onCreate, onClose }) {
         <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
-            className="bg-red-600 px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
+            className="
+          bg-red-600 hover:bg-red-700
+          px-4 py-2 rounded
+          text-white
+          font-semibold transition
+"
           >
             Cancel
           </button>
           <button
             onClick={handleContinue}
             disabled={loading}
-            className="bg-muteGrey px-4 py-2 rounded text-white font-semibold hover:opacity-90 transition"
+            className="
+          bg-dashboard-hover-light
+          dark:bg-dashboard-hover-dark
+          px-4 py-2 rounded
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          font-semibold hover:opacity-90 transition
+          "
           >
             {loading ? "Loading..." : "Continue"}
           </button>

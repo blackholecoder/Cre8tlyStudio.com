@@ -71,6 +71,8 @@ import AuthorsAssistantDocs from "./sections/docs/AuthorsAssistantDocs.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.classList.add(savedTheme);
 
   return (
     <AnimatePresence mode="sync">

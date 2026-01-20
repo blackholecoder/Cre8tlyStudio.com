@@ -50,11 +50,15 @@ export default function MagnetGrid({
     // Centered modal box
     const toastContent = document.createElement("div");
     toastContent.className =
-      "bg-[#0B0F19] border border-gray-700 rounded-xl p-6 text-center text-gray-100 shadow-xl";
+      "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark rounded-xl p-6 text-center text-dashboard-text-light dark:text-dashboard-text-dark shadow-xl";
     toastContent.style.width = "340px";
     toastContent.innerHTML = `
-    <p class="text-sm font-medium text-gray-100 mb-4">Are you sure you want to delete this magnet?</p>
-    <div class="flex justify-center gap-3">
+  <p class="text-sm font-medium mb-4
+     text-dashboard-text-light
+     dark:text-dashboard-text-dark">
+    Are you sure you want to delete this magnet?
+  </p>
+  <div class="flex justify-center gap-3">
       
       <button id="cancelDelete" class="px-4 py-2 bg-gray-700 text-gray-200 rounded-md text-xs font-semibold hover:bg-gray-600 transition">Cancel</button>
       <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-md text-xs font-semibold hover:bg-red-700 transition">Delete</button>
@@ -99,7 +103,17 @@ export default function MagnetGrid({
           <motion.div
             key={m.id}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="relative group bg-[#0a0a0a]/90 rounded-2xl p-4 border border-gray-800 hover:border-green hover:shadow-[0_0_15px_rgba(0,255,150,0.25)] transition-all"
+            className="
+            relative group
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            rounded-2xl p-4
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            hover:border-green
+            hover:shadow-[0_0_15px_rgba(0,255,150,0.25)]
+            transition-all
+            "
           >
             <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden">
               <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent rotate-[25deg] opacity-0 group-hover:opacity-100 animate-glimmer" />
@@ -112,7 +126,19 @@ export default function MagnetGrid({
             />
 
             {/* Cover / Preview */}
-            <div className="aspect-[4/3] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center overflow-hidden border border-gray-700 relative">
+            <div
+              className="
+              aspect-[4/3]
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              rounded-xl
+              flex items-center justify-center
+              overflow-hidden
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              relative
+              "
+            >
               {m.cover_image && m.cover_image.trim() !== "" ? (
                 <img
                   src={m.cover_image}
@@ -120,37 +146,28 @@ export default function MagnetGrid({
                   className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <span className="text-gray-400 text-xs italic">
+                <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-xs italic">
                   No Cover Selected
                 </span>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
             </div>
 
-            {/* Slot + Purchase date */}
             {/* Slot + Page Count + Date */}
-            <div className="flex items-center justify-between mt-3 text-[11px] text-gray-400">
+            <div className="flex items-center justify-between mt-3 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
               <div className="flex items-center gap-3">
                 <span>Slot #{m.slot_number}</span>
 
                 {typeof m.page_count === "number" && (
-                  <span className="flex items-center gap-1 text-gray-300">
+                  <span className="flex items-center gap-1 text-dashboard-text-light dark:text-dashboard-text-dark">
                     📄 {m.page_count} page{m.page_count !== 1 ? "s" : ""}
                   </span>
                 )}
               </div>
-
-              <span>
-                {new Date(m.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}
-              </span>
             </div>
 
             {/* Title */}
-            <h3 className="text-white text-sm font-semibold mt-2 truncate">
+            <h3 className="text-dashboard-text-light dark:text-dashboard-text-dark text-sm font-semibold mt-2 line-clamp-1">
               {m.title || "Digital Asset"}
             </h3>
 
@@ -168,7 +185,9 @@ export default function MagnetGrid({
                   {m.theme}
                 </span>
               ) : (
-                <span className="text-gray-500 italic text-[10px]">N/A</span>
+                <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark italic text-[10px]">
+                  N/A
+                </span>
               )}
               {m.prompt ? (
                 <CheckCircle size={16} className="text-headerGreen" />
@@ -180,7 +199,7 @@ export default function MagnetGrid({
             {/* Status */}
             <div className="mt-3 text-xs font-semibold text-center">
               {m.status === "completed" ? (
-                <span className="bg-black text-green border border-green px-3 py-[3px] rounded-full">
+                <span className="bg-dashboard-hover-light dark:bg-dashboard-bg-dark text-green border border-green px-3 py-[3px] rounded-full">
                   Completed
                 </span>
               ) : m.status === "failed" ? (
@@ -212,14 +231,14 @@ export default function MagnetGrid({
                   building...
                 </div>
               ) : (
-                <span className="bg-black text-purple border border-white px-4 py-[3px] rounded-full">
+                <span className="bg-dashboard-hover-light dark:bg-dashboard-bg-dark text-purple border border-dashboard-border-light dark:border-dashboard-border-dark px-4 py-[3px] rounded-full">
                   Idle
                 </span>
               )}
             </div>
 
             {/* Created prompt timestamp */}
-            <div className="mt-2 text-[11px] text-gray-400 text-center">
+            <div className="mt-2 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark text-center">
               {m.created_at_prompt ? (
                 <>
                   {new Date(m.created_at_prompt).toLocaleDateString("en-US", {
@@ -233,7 +252,9 @@ export default function MagnetGrid({
                   })}
                 </>
               ) : (
-                <span className="italic text-gray-500">N/A</span>
+                <span className="italic text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  N/A
+                </span>
               )}
             </div>
 
@@ -260,7 +281,16 @@ export default function MagnetGrid({
                   {/* View Button */}
                   <button
                     onClick={() => setPreviewUrl(m.pdf_url)}
-                    className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg py-2 text-sm transition-all"
+                    className="
+                    w-full
+                    bg-dashboard-hover-light
+                    dark:bg-dashboard-hover-dark
+                    hover:opacity-90
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+                    rounded-lg py-2 text-sm
+                    transition-all
+                    "
                     title="Preview PDF"
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -291,8 +321,8 @@ export default function MagnetGrid({
                     className={`w-full py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all
     ${
       isLocked || isFreePlan
-        ? "bg-gray-700 text-gray-400 cursor-not-allowed opacity-70"
-        : "bg-gray-700 hover:bg-gray-600 text-white"
+        ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed opacity-70"
+        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark hover:opacity-90 text-dashboard-text-light dark:text-dashboard-text-dark"
     }
   `}
                     title={
@@ -335,7 +365,7 @@ export default function MagnetGrid({
                     className={`hidden md:flex w-full font-semibold rounded-lg py-2 text-sm items-center justify-center gap-2 transition-all ${
                       isFreePlan
                         ? "bg-hotPink/70 text-gray-200 hover:bg-hotPink/70 cursor-pointer"
-                        : "bg-hotPink text-white hover:bg-hotPink/90"
+                        : "bg-mediaBlue dark:text-black hover:bg-mediaBlue/90"
                     }`}
                     title={
                       isFreePlan
@@ -351,9 +381,9 @@ export default function MagnetGrid({
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDeleteConfirm(m.id, onDelete)}
-                    className="w-full bg-red-600/70 text-white rounded-lg py-2 text-sm font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-gray-200 text-red-600 rounded-lg py-2 text-sm font-semibold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
                   >
-                    <Trash2 size={16} className="text-white" />
+                    <Trash2 size={16} className="text-red" />
                     <span>Delete</span>
                   </button>
                 </>

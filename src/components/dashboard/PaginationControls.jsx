@@ -1,4 +1,8 @@
-export default function PaginationControls({ currentPage, totalPages, onPageChange }) {
+export default function PaginationControls({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) {
   if (totalPages <= 1) return null;
 
   return (
@@ -6,17 +10,27 @@ export default function PaginationControls({ currentPage, totalPages, onPageChan
       <button
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
-        className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+        className="
+        px-4 py-2 rounded transition
+        bg-gray-200 text-black
+        dark:bg-gray-700 dark:text-white
+        disabled:opacity-50 disabled:cursor-not-allowed
+      "
       >
         Prev
       </button>
-      <span className="text-white">
+      <span className="text-black dark:text-white">
         Page {currentPage} of {totalPages}
       </span>
       <button
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
-        className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+        className="
+        px-4 py-2 rounded transition
+        bg-gray-200 text-black
+        dark:bg-gray-700 dark:text-white
+        disabled:opacity-50 disabled:cursor-not-allowed
+      "
       >
         Next
       </button>

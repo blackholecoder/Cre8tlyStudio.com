@@ -136,18 +136,50 @@ export default function Inbox() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#090b0f] text-white flex flex-col lg:flex-row">
+    <div
+      className="
+      w-full min-h-screen flex flex-col lg:flex-row
+      bg-dashboard-bg-light
+      dark:bg-dashboard-bg-dark
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+  "
+    >
       {/* 📥 Left Column — Message List */}
-      <div className="flex-1 lg:max-w-[380px] border-r border-gray-800 h-screen overflow-y-auto p-6">
-        <div className="border-b border-gray-800 pb-4 mb-6 flex items-center justify-between">
+      <div
+        className="
+        flex-1 lg:max-w-[380px] h-screen overflow-y-auto p-6
+        border-r border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+  "
+      >
+        <div
+          className="
+          border-b pb-4 mb-6 flex items-center justify-between
+          border-dashboard-border-light
+          dark:border-dashboard-border-dark
+  "
+        >
           <h1 className="text-xl font-bold design-text normal-case">Inbox</h1>
-          <Bell size={18} className="text-green" />
+          <Bell
+            size={18}
+            className="
+          text-dashboard-muted-light
+          dark:text-green
+  "
+          />
         </div>
 
         {loading ? (
-          <p className="text-gray-400 text-sm">Loading messages...</p>
+          <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
+            Loading messages...
+          </p>
         ) : messages.length === 0 ? (
-          <p className="text-gray-500 text-sm">No messages found.</p>
+          <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
+            No messages found.
+          </p>
         ) : (
           <ul className="space-y-3">
             {messages.map((m) => (
@@ -156,21 +188,37 @@ export default function Inbox() {
                 onClick={() => openMessage(m)}
                 className={`cursor-pointer p-4 rounded-lg border transition-all duration-200 ${
                   m.id === selected?.id
-                    ? "bg-[#111827]/80 border-green"
-                    : m.read_status
-                      ? "bg-[#0c0f18]/70 border-gray-800 hover:border-gray-700"
-                      : "bg-[#111827]/80 border-green/40 hover:border-green"
+                    ? `
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              border-dashboard-border-light
+              dark:border-dashboard-border-dark
+            `
+                    : !m.read_status
+                      ? `
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border-green
+              `
+                      : `
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border-dashboard-border-light
+                dark:border-dashboard-border-dark
+              `
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <h3
                     className={`font-semibold truncate ${
-                      m.read_status ? "text-gray-300" : "text-white"
+                      m.read_status
+                        ? "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                        : "text-dashboard-text-light dark:text-dashboard-text-dark"
                     }`}
                   >
                     {m.title}
                   </h3>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                     {new Date(m.created_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -179,7 +227,9 @@ export default function Inbox() {
                 </div>
                 <p
                   className={`text-xs truncate ${
-                    m.read_status ? "text-gray-500" : "text-gray-300"
+                    m.read_status
+                      ? "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                      : "text-dashboard-text-light dark:text-dashboard-text-dark"
                   }`}
                 >
                   {m.message}
@@ -196,10 +246,28 @@ export default function Inbox() {
       </div>
 
       {/* 📧 Right Column — Message Reader */}
-      <div className="flex-1 p-6 overflow-y-auto h-screen bg-[#0B0F19]">
+      <div
+        className="
+        flex-1 p-6 overflow-y-auto h-screen
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+  "
+      >
         {!selected ? (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-            <Mail size={40} className="mb-4 text-gray-600" />
+          <div
+            className="
+            flex flex-col items-center justify-center h-full text-center
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+          >
+            <Mail
+              size={40}
+              className="
+              mb-4
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+  "
+            />
             <p>Select a message to read</p>
           </div>
         ) : (
@@ -208,20 +276,51 @@ export default function Inbox() {
             <div className="flex justify-between items-center mb-6">
               <button
                 onClick={backToList}
-                className="flex items-center gap-2 text-sm text-gray-400 hover:text-white"
+                className="
+                flex items-center gap-2 text-sm
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+                hover:text-dashboard-text-light
+                dark:hover:text-dashboard-text-dark
+"
               >
                 <ArrowLeft size={16} /> Back to Inbox
               </button>
             </div>
 
             {/* Message Content */}
-            <div className="bg-[#111827]/60 border border-gray-800 rounded-2xl p-6 shadow-lg">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-800 pb-4 mb-4">
-                <h2 className="text-2xl font-bold text-white leading-tight">
+            <div
+              className="
+              rounded-2xl p-6 shadow-lg
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+  "
+            >
+              <div
+                className="
+                flex flex-col sm:flex-row sm:items-center sm:justify-between
+                border-b border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                pb-4 mb-4"
+              >
+                <h2
+                  className="text-2xl font-bold leading-tight
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+"
+                >
                   {selected.title}
                 </h2>
 
-                <div className="flex items-center gap-2 text-sm text-gray-400 mt-2 sm:mt-0">
+                <div
+                  className="
+                  flex items-center gap-2 text-sm mt-2 sm:mt-0
+                  text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+  "
+                >
                   <Calendar
                     size={14}
                     className="opacity-75 relative top-[1px]"
@@ -236,11 +335,25 @@ export default function Inbox() {
                 </div>
               </div>
 
-              <p className="text-gray-300 leading-relaxed whitespace-pre-line text-sm">
+              <p
+                className="
+                text-sm leading-relaxed whitespace-pre-line
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+  "
+              >
                 {selected.message}
               </p>
 
-              <div className="mt-6 border-t border-gray-800 pt-4 flex items-center justify-between text-xs text-gray-500">
+              <div
+                className="
+                mt-6 pt-4 flex items-center justify-between text-xs
+                border-t border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+  "
+              >
                 <p>
                   Sent by{" "}
                   <span className="text-green font-semibold">
@@ -253,7 +366,7 @@ export default function Inbox() {
                   disabled={deleting}
                   className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-md font-semibold transition-all ${
                     deleting
-                      ? "bg-red-900 text-gray-400 opacity-60 cursor-not-allowed"
+                      ? "bg-red-900 text-dashboard-muted-dark opacity-60 cursor-not-allowed"
                       : "bg-red-600 hover:bg-red-700 text-white"
                   }`}
                 >

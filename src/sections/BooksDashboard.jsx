@@ -129,40 +129,54 @@ export default function BooksDashboard() {
   // ✅ Render
   return (
     <DashboardLayout>
-      <div className="bg-[#0b0b0b] min-h-full px-4 lg:px-8 py-6">
+      <div
+        className="
+    flex flex-col min-h-screen
+    px-4 lg:px-8 py-6
+    bg-dashboard-bg-light
+    dark:bg-dashboard-bg-dark
+  "
+      >
         <BooksDashboardHeader
           books={books}
           onCheckout={() => navigate("/plans")}
         />
 
         {/* Content */}
-        {loading ? (
-          <LoadingState label="Loading your books..." />
-        ) : books.length === 0 ? (
-          <EmptyState onCheckout={() => navigate("/plans")} type="book" />
-        ) : (
-          <>
-            <BookGrid
-              books={paginatedBooks}
-              onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
-              onGenerateNext={(id, partNumber) => openBookModal(id, partNumber)}
-            />
+        <div className="flex-1">
+          {loading ? (
+            <LoadingState label="Loading your books..." />
+          ) : books.length === 0 ? (
+            <EmptyState onCheckout={() => navigate("/plans")} type="book" />
+          ) : (
+            <>
+              <BookGrid
+                books={paginatedBooks}
+                onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
+                onGenerateNext={(id, partNumber) =>
+                  openBookModal(id, partNumber)
+                }
+              />
 
-            <BookCardList
-              books={paginatedBooks}
-              onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
-              onGenerateNext={(id, partNumber) => openBookModal(id, partNumber)}
-            />
+              <BookCardList
+                books={paginatedBooks}
+                onAddPrompt={(id, partNumber) => openBookModal(id, partNumber)}
+                onGenerateNext={(id, partNumber) =>
+                  openBookModal(id, partNumber)
+                }
+              />
+            </>
+          )}
+        </div>
+        <div className="mt-auto pt-6">
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
 
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-
-            <SupportTab />
-          </>
-        )}
+          <SupportTab />
+        </div>
 
         {/* Modals */}
         {showNewBookModal && activeBook && (

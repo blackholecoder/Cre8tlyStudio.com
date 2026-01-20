@@ -799,13 +799,22 @@ input[type="color"]:focus {
   body,
   #root {
     min-height: 100%;
-    background: #0b0b0b;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    background-color: #0b0b0b !important;
-    color: #fff;
     overscroll-behavior: none;
     overflow-x: hidden;
+  }
+
+  /* Light mode */
+  html:not(.dark) #root {
+    background-color: #ffffff;
+    color: #0f172a; /* slate-900 */
+  }
+
+  /* Dark mode */
+  html.dark #root {
+    background-color: #0b0b0b;
+    color: #ffffff;
   }
 
   /* ✅ Extend the dark gradient far beyond the viewport to prevent white bounce */

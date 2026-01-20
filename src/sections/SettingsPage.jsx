@@ -28,6 +28,8 @@ export default function DashboardSettings() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
+  const hasBrandFile = Boolean(settings?.brand_identity_file);
+
   const fileInputRef = useRef(null);
 
   function bufferToBase64URL(buffer) {
@@ -456,23 +458,63 @@ export default function DashboardSettings() {
   const isFreeTier = user?.has_free_magnet === 1 && !user?.plan;
 
   return (
-    <div className="flex justify-center w-full min-h-screen bg-[#030712] text-white">
+    <div
+      className="
+      flex justify-center w-full min-h-screen
+      bg-dashboard-bg-light
+      dark:bg-dashboard-bg-dark
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+  "
+    >
       <div className="w-full max-w-[900px] p-5">
         {/* Header */}
-        <div className="mb-10 border-b border-gray-800 pb-6">
-          <h1 className="text-3xl font-bold text-white design-text normal-case">
+        <div
+          className="
+          mb-10 pb-6 border-b
+          border-dashboard-border-light
+          dark:border-dashboard-border-dark
+  "
+        >
+          <h1
+            className="
+            text-3xl font-bold design-text normal-case
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+  "
+          >
             Brand Settings
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p
+            className="
+            mt-2
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+          >
             Manage your brand tone and upload a reference file for AI
             generation.
           </p>
         </div>
 
-        <div className="bg-[#0B0F19] border border-gray-800 rounded-2xl p-8 mb-10 shadow-lg">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-2xl p-8 mb-10 shadow-lg"
+        >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Your Plan</h2>
-            <span className="text-sm text-gray-400">
+            <h2
+              className="text-xl font-semibold text-dashboard-text-light
+            dark:text-dashboard-text-dark
+"
+            >
+              Your Plan
+            </h2>
+            <span
+              className="text-sm text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+"
+            >
               {new Date().toLocaleDateString("en-US", {
                 month: "short",
                 day: "2-digit",
@@ -515,8 +557,15 @@ export default function DashboardSettings() {
                 return (
                   <div
                     key={idx}
-                    className="relative flex flex-col justify-between transition-all rounded-xl p-5 border shadow-inner
-          bg-[#111827]/80 hover:bg-[#1f2937]/80 border-gray-700 hover:border-gray-600 hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
+                    className="
+                    relative flex flex-col justify-between transition-all
+                    rounded-xl p-5 border shadow-inner
+                    bg-dashboard-sidebar-light
+                    dark:bg-dashboard-hover-dark
+                    border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]
+"
                   >
                     {/* Status Badge */}
                     <span
@@ -582,18 +631,30 @@ export default function DashboardSettings() {
                         </svg>
                       )}
 
-                      <h3 className="text-lg font-semibold text-white">
+                      <h3
+                        className="text-lg font-semibold text-dashboard-text-light
+                        dark:text-dashboard-text-dark
+"
+                      >
                         {plan.title}
                       </h3>
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-gray-400 leading-relaxed">
+                    <p
+                      className="text-sm text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+                      leading-relaxed"
+                    >
                       {plan.description}
                     </p>
 
                     {/* Billing Label */}
-                    <p className="text-xs mt-2 text-gray-500">
+                    <p
+                      className="text-xs mt-2 text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+"
+                    >
                       {plan.billing === "monthly" && "Billed Monthly"}
                       {plan.billing === "annual" && "Billed Annually"}
                       {plan.billing === "trial" &&
@@ -604,7 +665,9 @@ export default function DashboardSettings() {
                       <button
                         onClick={() => (window.location.href = "/plans")}
                         className="mt-4 px-5 py-2.5 bg-royalPurple 
-               text-white font-semibold rounded-lg shadow-md hover:opacity-90 transition"
+                      text-dashboard-text-light
+                        dark:text-dashboard-text-dark
+                        font-semibold rounded-lg shadow-md hover:opacity-90 transition"
                       >
                         Upgrade Plan
                       </button>
@@ -614,7 +677,11 @@ export default function DashboardSettings() {
               })}
             </div>
           ) : (
-            <p className="text-gray-400 text-sm text-center py-4">
+            <p
+              className="text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+              text-sm text-center py-4"
+            >
               No active plan detected. Please contact support if this seems
               incorrect.
             </p>
@@ -622,8 +689,17 @@ export default function DashboardSettings() {
         </div>
 
         {/* Avatar Upload */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg mt-8"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+          dark:text-dashboard-text-dark
+"
+          >
             Profile Avatar
           </h2>
 
@@ -631,12 +707,23 @@ export default function DashboardSettings() {
             <Img
               src={user?.profile_image}
               loader={
-                <div className="w-20 h-20 rounded-full bg-gray-700/40 animate-pulse border border-gray-700" />
+                <div
+                  className="
+                  w-20 h-20 rounded-full animate-pulse object-cover
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  transition-opacity duration-300
+"
+                />
               }
               unloader={
                 <img
                   src="/default-avatar.png"
-                  className="w-20 h-20 rounded-full object-cover border border-gray-700"
+                  className="
+                  w-20 h-20 rounded-full object-cover
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+"
                   alt="avatar"
                 />
               }
@@ -654,7 +741,8 @@ export default function DashboardSettings() {
                   if (!f) return;
                   setCropSrc(URL.createObjectURL(f));
                 }}
-                className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 
+                className="w-full text-sm text-dashboard-text-light
+              dark:text-dashboard-text-dark file:mr-3 file:py-2 file:px-4 
                    file:rounded-lg file:border-0 file:text-sm file:bg-white 
                    file:font-semibold hover:file:opacity-90"
               />
@@ -689,7 +777,7 @@ export default function DashboardSettings() {
                   <div className="flex gap-3 mt-4">
                     <button
                       disabled={uploading}
-                      className="px-4 py-2 bg-green text-black rounded font-semibold"
+                      className="px-4 py-2 bg-green text-dashboard-bg-dark rounded font-semibold"
                       onClick={async () => {
                         if (!croppedAreaPixels) return;
 
@@ -740,7 +828,13 @@ export default function DashboardSettings() {
                     </button>
 
                     <button
-                      className="px-4 py-2 bg-gray-700 text-white rounded"
+                      className="
+                      px-4 py-2 rounded
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                      text-dashboard-text-light
+                      dark:text-dashboard-text-dark
+"
                       onClick={() => {
                         URL.revokeObjectURL(cropSrc);
                         setCropSrc(null);
@@ -755,7 +849,7 @@ export default function DashboardSettings() {
               <button
                 onClick={handleUploadAvatar}
                 disabled={uploading}
-                className="mt-3 px-5 py-2 rounded-lg bg-green text-black font-semibold 
+                className="mt-3 px-5 py-2 rounded-lg bg-green text-dashboard-bg-dark font-semibold 
                    hover:opacity-90 disabled:opacity-50 transition"
               >
                 {uploading ? "Uploading..." : "Upload Avatar"}
@@ -765,11 +859,24 @@ export default function DashboardSettings() {
         </div>
 
         {/* 🔐 Two-Factor Authentication Section */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 space-y-4 shadow-lg mt-8"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+          dark:text-dashboard-text-dark
+"
+          >
             Two-Factor Authentication
           </h2>
-          <p className="text-sm text-gray-400">
+          <p
+            className="text-sm text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+"
+          >
             Add an extra layer of security to your Cre8tly Studio account.
           </p>
 
@@ -779,7 +886,11 @@ export default function DashboardSettings() {
                 <span className="text-green font-semibold">
                   ✅ 2FA is enabled
                 </span>
-                <p className="text-xs text-gray-500">
+                <p
+                  className="text-xs text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+"
+                >
                   Your account is protected with two-factor authentication.
                 </p>
               </div>
@@ -805,7 +916,13 @@ export default function DashboardSettings() {
                     toast.error("Server error disabling 2FA.");
                   }
                 }}
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                className="
+  px-5 py-2
+  bg-red-600 hover:bg-red-700
+  text-white
+  dark:text-dashboard-text-dark
+  rounded-lg font-semibold transition
+"
               >
                 Disable 2FA
               </button>
@@ -815,7 +932,7 @@ export default function DashboardSettings() {
               {!qr ? (
                 <button
                   onClick={handleEnable2FA}
-                  className="mt-2 px-6 py-2.5 bg-green text-black font-semibold rounded-lg hover:opacity-90 transition"
+                  className="mt-2 px-6 py-2.5 bg-green text-dashboard-bg-dark font-semibold rounded-lg hover:opacity-90 transition"
                 >
                   Enable 2FA
                 </button>
@@ -827,7 +944,11 @@ export default function DashboardSettings() {
                     bgColor="#0B0F19"
                     fgColor="#00ffae"
                   />
-                  <p className="text-xs text-gray-400 text-center">
+                  <p
+                    className="text-xs text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                    text-center"
+                  >
                     Scan this code with your Authenticator app, then enter the
                     6-digit code below.
                   </p>
@@ -836,7 +957,10 @@ export default function DashboardSettings() {
                     placeholder="Enter 6-digit code"
                     value={twofaCode}
                     onChange={(e) => setTwofaCode(e.target.value)}
-                    className="w-40 text-center py-2 px-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-green outline-none"
+                    className="w-40 text-center py-2 px-3 rounded-md bg-dashboard-hover-light dark:bg-dashboard-hover-dark border border-dashboard-border-light dark:border-dashboard-border-dark text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                    focus:ring-2 focus:ring-green outline-none placeholder-dashboard-muted-light
+  dark:placeholder-dashboard-muted-dark"
                   />
                   <button
                     onClick={handleVerify2FA}
@@ -844,7 +968,7 @@ export default function DashboardSettings() {
                     className={`px-5 py-2 rounded-lg font-semibold transition-all ${
                       verifying
                         ? "opacity-60 cursor-not-allowed bg-green-700"
-                        : "bg-green text-black hover:opacity-90"
+                        : "bg-green text-dashboard-bg-dark hover:opacity-90"
                     }`}
                   >
                     {verifying ? "Verifying..." : "Verify 2FA Code"}
@@ -855,11 +979,24 @@ export default function DashboardSettings() {
           )}
         </div>
 
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 space-y-4  shadow-lg mt-8"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+          dark:text-dashboard-text-dark
+"
+          >
             Passkey Authentication
           </h2>
-          <p className="text-sm text-gray-400">
+          <p
+            className="text-sm text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+"
+          >
             Securely sign in using Face ID, Touch ID, or your device’s security
             key.
           </p>
@@ -870,13 +1007,22 @@ export default function DashboardSettings() {
                 <span className="text-green font-semibold">
                   ✅ Passkey Registered
                 </span>
-                <p className="text-xs text-gray-500">
+                <p
+                  className="text-xs text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+"
+                >
                   You can now use “Sign in with Passkey” on the login screen.
                 </p>
               </div>
               <button
                 onClick={handleRemovePasskey}
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                className="
+                px-5 py-2
+                bg-red-600 hover:bg-red-700
+                text-white
+                rounded-lg font-semibold transition
+  "
               >
                 Remove Passkey
               </button>
@@ -884,18 +1030,32 @@ export default function DashboardSettings() {
           ) : (
             <button
               onClick={handleRegisterPasskey}
-              className="px-6 py-2.5 bg-blue text-white font-semibold rounded-lg hover:opacity-90 transition"
+              className="px-6 py-2.5 bg-blue text-dashboard-text-light
+            dark:text-dashboard-text-dark
+            font-semibold rounded-lg hover:opacity-90 transition"
             >
               Register Passkey
             </button>
           )}
         </div>
         {/* 💳 Stripe Seller Connection */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg mt-8"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+          dark:text-dashboard-text-dark
+"
+          >
             Seller Payouts (Stripe Connect)
           </h2>
-          <p className="text-sm text-gray-400 mb-4">
+          <p
+            className="text-sm text-dashboard-muted-light
+          dark:text-dashboard-muted-dark mb-4"
+          >
             Connect your Stripe Express account to receive payouts for sales you
             make through Cre8tly Studio.
           </p>
@@ -903,7 +1063,11 @@ export default function DashboardSettings() {
           {/* 🔍 Free trial users cannot access Stripe */}
           {isFreeTier ? (
             <div className="text-center py-8">
-              <p className="text-gray-400 mb-3 text-sm max-w-[420px] mx-auto">
+              <p
+                className="text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+              mb-3 text-sm max-w-[420px] mx-auto"
+              >
                 Selling products and connecting Stripe is a{" "}
                 <span className="text-green font-semibold">
                   premium feature
@@ -915,7 +1079,9 @@ export default function DashboardSettings() {
               <button
                 onClick={() => (window.location.href = "/plans")}
                 className="px-6 py-3 rounded-lg bg-royalPurple 
-        text-white font-semibold shadow-md hover:opacity-90 transition mx-auto"
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
+                font-semibold shadow-md hover:opacity-90 transition mx-auto"
               >
                 Upgrade to Unlock Selling
               </button>
@@ -929,7 +1095,11 @@ export default function DashboardSettings() {
                     <span className="text-green font-semibold">
                       ✅ Connected
                     </span>
-                    <p className="text-xs text-gray-500">
+                    <p
+                      className="text-xs text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+"
+                    >
                       Your Stripe account is active and ready for payouts.
                     </p>
                   </div>
@@ -941,7 +1111,12 @@ export default function DashboardSettings() {
                         "_blank"
                       )
                     }
-                    className="px-5 py-2 bg-blue hover:bg-blue/80 text-white rounded-lg font-semibold transition"
+                    className="
+                    px-5 py-2
+                    bg-blue hover:bg-blue/80
+                    text-white
+                    rounded-lg font-semibold transition
+"
                   >
                     Open Stripe Dashboard
                   </button>
@@ -953,7 +1128,11 @@ export default function DashboardSettings() {
                     <span className="text-yellow-400 font-semibold">
                       ⚠️ Pending Setup
                     </span>
-                    <p className="text-xs text-gray-500">
+                    <p
+                      className="text-xs text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+"
+                    >
                       Your Stripe account was created but not completed.
                     </p>
                   </div>
@@ -972,7 +1151,9 @@ export default function DashboardSettings() {
                         );
                       }
                     }}
-                    className="px-6 py-2.5 bg-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition"
+                    className="px-6 py-2.5 bg-amber-500 text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+                    font-semibold rounded-lg hover:opacity-90 transition"
                   >
                     Complete Setup
                   </button>
@@ -993,7 +1174,9 @@ export default function DashboardSettings() {
                       );
                     }
                   }}
-                  className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+                  className="px-6 py-2.5 bg-royalPurple text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  font-semibold rounded-lg hover:opacity-90 transition"
                 >
                   Connect with Stripe
                 </button>
@@ -1002,19 +1185,33 @@ export default function DashboardSettings() {
           )}
         </div>
 
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 relative overflow-hidden">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg mt-8 relative overflow-hidden"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+          dark:text-dashboard-text-dark
+"
+          >
             Custom Domains
           </h2>
 
-          <p className="text-sm text-gray-400 mb-4">
+          <p
+            className="text-sm text-dashboard-muted-light
+          dark:text-dashboard-muted-dark mb-4"
+          >
             Connect your own domain to host landing pages on your brand.
           </p>
 
           {canUseCustomDomains ? (
             <button
               onClick={() => navigate("/settings/domains")}
-              className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+              className="px-6 py-2.5 bg-royalPurple text-white
+            dark:text-dashboard-text-dark
+            font-semibold rounded-lg hover:opacity-90 transition"
             >
               Manage Custom Domains →
             </button>
@@ -1023,7 +1220,13 @@ export default function DashboardSettings() {
               {/* Locked overlay */}
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-center px-6">
                 <div className="mb-3 text-3xl">🔒</div>
-                <p className="text-sm text-gray-300 mb-4 max-w-[360px]">
+                <p
+                  className="
+                  text-sm mb-4 max-w-[360px]
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+  "
+                >
                   Custom Domains are available on the{" "}
                   <span className="text-green font-semibold">
                     Business Builder
@@ -1033,7 +1236,9 @@ export default function DashboardSettings() {
 
                 <button
                   onClick={() => navigate("/plans")}
-                  className="px-6 py-2.5 bg-royalPurple text-white font-semibold rounded-lg hover:opacity-90 transition"
+                  className="px-6 py-2.5 bg-royalPurple text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  font-semibold rounded-lg hover:opacity-90 transition"
                 >
                   Upgrade to Unlock
                 </button>
@@ -1043,28 +1248,42 @@ export default function DashboardSettings() {
         </div>
 
         {/* Active File */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8">
+        <div
+          className="bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8"
+        >
           {settings?.brand_identity_file ? (
             <>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-dashboard-text-light dark:text-dashboard-text-dark">
                   <span className="text-green-400 font-semibold">
                     Active Brand File
                   </span>
                 </p>
                 <button
+                  aria-label="Remove brand identity file"
                   onClick={handleRemove}
                   className="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold shadow-sm transition"
                 >
                   Remove
                 </button>
               </div>
-              <p className="text-xs text-gray-400 italic">
+              <p
+                className="text-xs text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+              italic"
+              >
                 Uploaded on: {new Date().toLocaleDateString()}
               </p>
             </>
           ) : (
-            <p className="text-gray-400 text-sm text-center">
+            <p
+              className="text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+              text-sm text-center"
+            >
               No brand identity uploaded yet.
             </p>
           )}
@@ -1072,14 +1291,27 @@ export default function DashboardSettings() {
 
         {/* Upload Section */}
 
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
-          <h2 className="text-lg font-semibold text-gray-200">
+        <div
+          className="bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark rounded-xl p-6 space-y-4 shadow-lg"
+        >
+          <h2
+            className="text-lg font-semibold text-dashboard-text-light
+            dark:text-dashboard-text-dark
+"
+          >
             Upload New Brand File
           </h2>
 
           {isFreeTier ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
-              <p className="text-gray-400 text-sm mb-4 max-w-[400px]">
+              <p
+                className="text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+                text-sm mb-4 max-w-[400px]"
+              >
                 🧩 Uploading a custom brand identity file is a{" "}
                 <span className="text-green font-semibold">paid feature</span>.
                 Upgrade to personalize your tone, voice, and branding for all
@@ -1087,53 +1319,100 @@ export default function DashboardSettings() {
               </p>
               <button
                 onClick={() => (window.location.href = "/plans")}
-                className="px-6 py-3 rounded-lg bg-royalPurple text-white font-semibold shadow-md hover:opacity-90 transition"
+                className="px-6 py-3 rounded-lg bg-royalPurple text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                font-semibold shadow-md hover:opacity-90 transition"
               >
                 Upgrade Now
               </button>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-400">
+              <p
+                className="text-sm text-dashboard-muted-light
+    dark:text-dashboard-muted-dark"
+              >
                 Accepted formats:{" "}
-                <span className="text-gray-300">.pdf, .docx, .doc, .txt</span>{" "}
+                <span className="text-gray-700 dark:text-dashboard-text-dark">
+                  .pdf, .docx, .doc, .txt
+                </span>{" "}
                 (max 5 MB)
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
                 <div className="flex-1 w-full">
+                  {/* 🔒 Hidden native file input */}
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept=".pdf,.docx,.doc,.txt"
                     onChange={(e) => setFile(e.target.files[0])}
-                    className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white hover:file:opacity-90"
+                    className="hidden"
                   />
-                  {file && (
-                    <p className="text-xs text-gray-400 italic mt-1">
-                      Selected:{" "}
-                      <span className="text-gray-200">{file.name}</span>
-                    </p>
-                  )}
+
+                  {/* ✅ Custom Choose File button */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={hasBrandFile}
+                    className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition
+                    ${
+                      hasBrandFile
+                        ? `
+                          bg-gray-200 text-gray-400 cursor-not-allowed
+                          dark:bg-dashboard-hover-dark dark:text-dashboard-muted-dark
+                        `
+                        : `
+                          bg-gray-200 text-gray-900 hover:opacity-90
+                          dark:bg-dashboard-hover-dark dark:text-dashboard-text-dark
+                        `
+                    }
+                  `}
+                  >
+                    Choose File
+                  </button>
+
+                  {/* Filename display */}
+                  <p
+                    className="mt-2 text-xs italic
+                    text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark"
+                  >
+                    {hasBrandFile ? (
+                      "A brand file is already uploaded. Remove it to upload a new one."
+                    ) : file ? (
+                      <>
+                        Selected:{" "}
+                        <span className="font-medium text-gray-700 dark:text-dashboard-text-dark">
+                          {file.name}
+                        </span>
+                      </>
+                    ) : (
+                      "No file selected"
+                    )}
+                  </p>
                 </div>
 
+                {/* Save button stays the same */}
                 <button
                   onClick={handleUpload}
-                  disabled={uploading}
-                  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all duration-300
-            ${
-              uploading
-                ? "opacity-60 cursor-not-allowed bg-gradient-to-r from-green/80 to-green/60"
-                : "bg-green hover:from-green-400 hover:green/70 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-            }
-            text-white shadow-[inset_0_0_6px_rgba(255,255,255,0.15)]`}
+                  disabled={!file || uploading || hasBrandFile}
+                  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all
+                  ${
+                    !file || uploading || hasBrandFile
+                      ? "opacity-60 cursor-not-allowed bg-green/60"
+                      : "bg-green hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                  }
+                  text-black
+                `}
                 >
-                  <span className="relative z-10 text-black">
-                    {uploading ? "Uploading..." : "Save Brand"}
-                  </span>
-                  {!uploading && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
-                  )}
+                  {!file
+                    ? "Select a File"
+                    : hasBrandFile
+                      ? "Brand Already Saved"
+                      : uploading
+                        ? "Uploading..."
+                        : "Save Brand"}
                 </button>
               </div>
             </>
@@ -1141,13 +1420,36 @@ export default function DashboardSettings() {
         </div>
 
         {/* CTA Settings */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg mt-8">
+        <div
+          className="
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          rounded-xl p-6 space-y-4 shadow-lg mt-8
+  "
+        >
           {/* CTA Settings */}
-          <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-            <h2 className="text-lg font-semibold text-gray-200">
+          <div
+            className="
+            bg-dashboard-hover-light
+            dark:bg-dashboard-hover-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            rounded-xl p-6 shadow-inner
+    "
+          >
+            <h2
+              className="text-lg font-semibold text-dashboard-text-light
+              dark:text-dashboard-text-dark
+"
+            >
               Default Closing Message / CTA
             </h2>
-            <p className="text-sm text-gray-400 mb-4">
+            <p
+              className="text-sm text-dashboard-muted-light
+              dark:text-dashboard-muted-dark mb-4"
+            >
               This message will appear at the end of your lead magnets or books.
               You can change it anytime.
             </p>
@@ -1161,13 +1463,24 @@ export default function DashboardSettings() {
                   setSettings((prev) => ({ ...prev, cta: e.target.value }))
                 }
                 rows={6}
-                className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+                className="
+                w-full px-4 py-3 rounded-lg
+                bg-dashboard-bg-light
+                dark:bg-dashboard-bg-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                placeholder-dashboard-muted-light
+                dark:placeholder-dashboard-muted-dark
+                focus:ring-2 focus:ring-green focus:outline-none
+"
               />
 
               <div className="flex justify-end">
                 <button
                   onClick={handleSaveCTA}
-                  className="px-6 py-2 rounded-lg bg-green text-black font-semibold hover:opacity-90 transition"
+                  className="px-6 py-2 rounded-lg bg-green text-dashboard-bg-dark font-semibold hover:opacity-90 transition"
                 >
                   Save CTA
                 </button>
@@ -1177,11 +1490,27 @@ export default function DashboardSettings() {
 
           {user?.has_book ? (
             <>
-              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8 text-center">
-                <h2 className="text-lg font-semibold text-gray-200 mb-2">
+              <div
+                className="
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                rounded-xl p-6 shadow-lg mt-8
+"
+              >
+                <h2
+                  className="text-lg font-semibold text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                mb-2"
+                >
                   Guided Tour
                 </h2>
-                <p className="text-sm text-gray-400 mb-4">
+                <p
+                  className="text-sm text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                  mb-4"
+                >
                   Replay the Book Builder onboarding walkthrough to revisit all
                   key features.
                 </p>
@@ -1207,16 +1536,39 @@ export default function DashboardSettings() {
                       toast.error("Could not reset tour. Please try again.");
                     }
                   }}
-                  className="px-5 py-2.5 rounded-lg bg-[#6a5acd] text-black font-semibold hover:opacity-90 transition"
+                  className="
+                  px-5 py-2.5 rounded-lg
+                  bg-bookBtnColor
+                  text-black
+                  font-semibold
+                  hover:opacity-90
+                  transition
+                "
                 >
                   Replay Book Tour
                 </button>
               </div>
-              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg mt-8">
-                <h2 className="text-lg font-semibold text-gray-200 mb-2">
+              <div
+                className="
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                rounded-xl p-6 shadow-lg mt-8
+"
+              >
+                <h2
+                  className="text-lg font-semibold text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  mb-2"
+                >
                   ISBN Assistance
                 </h2>
-                <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                <p
+                  className="text-sm text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                  mb-4 leading-relaxed"
+                >
                   Need an ISBN for your book? Cre8tly Studio can guide you
                   through the process. An ISBN (International Standard Book
                   Number) identifies your book worldwide and is required for
@@ -1229,7 +1581,7 @@ export default function DashboardSettings() {
                     onClick={() =>
                       window.open("https://www.myidentifiers.com/", "_blank")
                     }
-                    className="flex-1 bg-green text-black font-semibold py-2.5 rounded-lg shadow-md hover:opacity-90 transition text-center"
+                    className="flex-1 bg-green text-dashboard-bg-dark font-semibold py-2.5 rounded-lg shadow-md hover:opacity-90 transition text-center"
                   >
                     Get ISBN from Bowker
                   </button>
@@ -1240,13 +1592,17 @@ export default function DashboardSettings() {
                         "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!"
                       )
                     }
-                    className="flex-1 bg-gray-800 text-gray-300 font-semibold py-2.5 rounded-lg border border-gray-700 hover:border-green hover:text-green transition"
+                    className="flex-1 bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark font-semibold py-2.5 rounded-lg border border-dashboard-border-light dark:border-dashboard-border-dark hover:border-green hover:text-green transition"
                   >
                     Coming Soon: ISBN Concierge
                   </button>
                 </div>
 
-                <p className="text-xs text-gray-500 italic mt-3">
+                <p
+                  className="text-xs text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                  italic mt-3"
+                >
                   Available for Assistant Plan users. Stay tuned for automated
                   ISBN requests inside the dashboard.
                 </p>

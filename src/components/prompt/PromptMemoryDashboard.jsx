@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../admin/AuthContext.jsx";
 import api from "../../api/axios.jsx";
-import LoadingState from "../dashboard/LoadingState.jsx";
 import PromptMemoryTable from "../dashboard/PromptMemoryTable.jsx";
 
 export default function PromptMemoryDashboard() {
@@ -36,13 +35,28 @@ export default function PromptMemoryDashboard() {
   }, [user, page]);
 
   return (
-    <div className="p-6 bg-[#0b0b0b] min-h-full">
+    <div
+      className="
+    flex flex-col min-h-screen
+    p-6
+    bg-dashboard-bg-light
+    dark:bg-dashboard-bg-dark
+  "
+    >
       {/* Header */}
-      <div className="flex flex-col mb-8 mt-2">
-        <h1 className="text-3xl font-bold text-white mb-2 design-text normal-case">
+      <div className="flex flex-col mb-2 mt-2">
+        <h1
+          className="text-3xl font-bold mb-2 design-text normal-case
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+        >
           My Prompt Memory
         </h1>
-        <p className="text-gray-400 text-sm">
+        <p
+          className="text-sm
+        text-dashboard-muted-light
+        dark:text-dashboard-muted-dark"
+        >
           View all prompts you’ve generated with Cre8tly Studio.
         </p>
       </div>
@@ -51,49 +65,67 @@ export default function PromptMemoryDashboard() {
       <div className="flex gap-3 mb-8"></div>
 
       {/* Content */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 text-white">
-          <div className="relative">
-            {/* Glowing pulse ring */}
-            <div className="absolute inset-0 rounded-full bg-green-500/20 blur-2xl animate-ping"></div>
+      <div className="flex-1">
+        {loading ? (
+          <div
+            className="flex flex-col items-center justify-center py-24
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+          >
+            <div className="relative">
+              {/* Glowing pulse ring */}
+              <div className="absolute inset-0 rounded-full bg-green-500/20 blur-2xl animate-ping"></div>
 
-            {/* Center spinner */}
-            <div className="w-14 h-14 border-4 border-t-transparent border-green-400 rounded-full animate-spin"></div>
+              {/* Center spinner */}
+              <div className="w-14 h-14 border-4 border-t-transparent border-green-400 rounded-full animate-spin"></div>
+            </div>
           </div>
+        ) : !loading && prompts.length > 0 ? (
+          <PromptMemoryTable
+            prompts={prompts}
+            onReady={() => setTableReady(true)}
+          />
+        ) : null}
+      </div>
 
-          {/* Loading text */}
-          <p className="mt-6 text-lg font-semibold tracking-wide text-gray-300 animate-pulse">
-            Fetching your prompt memory...
-          </p>
-
-          <p className="text-sm text-gray-400 mt-2">
-            Loading your saved prompts from Cre8tly Studio.
-          </p>
-        </div>
-      ) : !loading && prompts.length > 0 ? (
-        <PromptMemoryTable
-          prompts={prompts}
-          onReady={() => setTableReady(true)}
-        />
-      ) : null}
       {tableReady && !loading && prompts.length > 0 && (
-        <div className="flex items-center justify-center gap-4 mt-6">
+        <div className="mt-auto pt-6 flex items-center justify-center gap-4">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+            className="
+        px-4 py-2 rounded transition
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        disabled:opacity-40 disabled:cursor-not-allowed
+      "
           >
             Previous
           </button>
 
-          <span className="text-white text-sm">
+          <span
+            className="
+        text-sm
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+      "
+          >
             Page {page} of {totalPages}
           </span>
 
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-40"
+            className="
+        px-4 py-2 rounded transition
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        disabled:opacity-40 disabled:cursor-not-allowed
+      "
           >
             Next
           </button>

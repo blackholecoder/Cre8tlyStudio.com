@@ -59,25 +59,45 @@ export default function DashboardHeader({
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
       {/* ---------- Left Section ---------- */}
       <div>
-        <h1 className="text-3xl font-bold text-white design-text normal-case">
+        <h1
+          className="text-3xl font-bold design-text normal-case
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+        >
           {title}
         </h1>
 
         {user && (
-          <div className="text-[14px] text-gray-400 mt-1 mb-2">
+          <div
+            className="text-[14px] mt-1 mb-2
+        text-dashboard-muted-light
+        dark:text-dashboard-muted-dark"
+          >
             Welcome,{" "}
-            <span className="text-white font-semibold tracking-wide">
+            <span
+              className="font-semibold tracking-wide
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark"
+            >
               {user?.name?.split(" ")[0] || "User"}
             </span>
           </div>
         )}
 
-        <p className="text-silver mt-1">
+        <p
+          className="mt-1
+      text-dashboard-muted-light
+      dark:text-dashboard-muted-dark"
+        >
           You currently have {availableSlots} slots remaining.
         </p>
 
         {isFreeTier && !trialExpired && (
-          <p className="text-yellow-400 text-sm mt-2">
+          <p
+            className="text-yellow-400 text-sm mt-2
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark"
+          >
             🆓 You’re on a Free Trial, 1 slot, up to 5 pages, expires in 7 days.
           </p>
         )}
@@ -91,7 +111,11 @@ export default function DashboardHeader({
               {trialExpired ? "Upgrade Plan" : "Upgrade Your Account"}
             </button>
 
-            <p className="text-xs text-gray-400 mt-2">
+            <p
+              className="text-xs mt-2
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+            >
               {trialExpired
                 ? "Your free trial has ended. Upgrade to unlock downloads, the Live Editor, the Design Canvas, and unlimited magnet creation."
                 : "You’ve used your free trial slot. Upgrade to unlock unlimited creation, downloads, Live Editor, and Design Canvas."}

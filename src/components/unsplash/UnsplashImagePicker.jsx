@@ -72,7 +72,17 @@ export default function UnsplashImagePicker({ onSelect }) {
   }, [hasMore, loading, page, query]);
 
   return (
-    <div className="space-y-4 bg-[#0b0b0b] p-4 rounded-lg border border-gray-800">
+    <div
+      className="
+  space-y-4
+  bg-dashboard-sidebar-light
+  dark:bg-dashboard-sidebar-dark
+  p-4
+  rounded-lg
+  border border-dashboard-border-light
+  dark:border-dashboard-border-dark
+"
+    >
       {/* 🔍 Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
@@ -81,13 +91,17 @@ export default function UnsplashImagePicker({ onSelect }) {
           placeholder="Search Unsplash images (e.g. fitness, coffee, nature)"
           className="
           w-full
-          bg-black
-          text-white
           p-3
           rounded-lg
-          border
-          border-gray-900
-  "
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          placeholder-dashboard-muted-light
+          dark:placeholder-dashboard-muted-dark
+          "
         />
         <button
           type="button"
@@ -96,19 +110,20 @@ export default function UnsplashImagePicker({ onSelect }) {
           className="
           w-full
           sm:w-auto
-          bg-gray-700
-          text-white
-          hover:bg-green
-          hover:text-black
-          font-bold
           px-4
           py-3
           rounded-lg
+          font-bold
+          bg-dashboard-hover-light
+          dark:bg-dashboard-hover-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          hover:bg-green
+          hover:text-dashboard-bg-dark
           transition
-          hover:bg-green-400
           disabled:opacity-60
           disabled:cursor-not-allowed
-  "
+          "
         >
           {loading ? "Searching..." : "Search"}
         </button>
@@ -138,7 +153,16 @@ export default function UnsplashImagePicker({ onSelect }) {
               className="rounded-lg w-full h-32
     sm:h-40 object-cover group-hover:opacity-75 transition"
             />
-            <span className="absolute bottom-1 left-1 text-xs bg-black/60 px-1 rounded text-white">
+            <span
+              className="
+              absolute bottom-1 left-1
+              text-xs
+              px-1
+              rounded
+              bg-dashboard-bg-dark/70
+              text-dashboard-text-dark
+            "
+            >
               {img.user.name}
             </span>
           </div>
@@ -152,7 +176,17 @@ export default function UnsplashImagePicker({ onSelect }) {
         {/* 🌀 Spinner (smooth & centered at bottom) */}
         {loading && (
           <div className="col-span-full flex justify-center py-4">
-            <div className="w-6 h-6 border-2 border-gray-400 border-t-green rounded-full animate-spin"></div>
+            <div
+              className="
+              w-6 h-6
+              border-2
+              border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              border-t-green
+              rounded-full
+              animate-spin
+            "
+            />
           </div>
         )}
       </div>

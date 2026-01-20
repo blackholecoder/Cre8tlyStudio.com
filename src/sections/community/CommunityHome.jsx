@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import AnimatedLogo from "../../components/animation/AnimatedLogo";
+import { headerLogo } from "../../assets/images";
 
 export default function CommunityHome() {
   const [topics, setTopics] = useState([]);
@@ -50,15 +50,44 @@ export default function CommunityHome() {
   }, []);
 
   return (
-    <div className="w-full flex justify-center items-start min-h-screen px-6 py-20">
-      <div className="bg-gray-900/40 border border-gray-800 rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10">
+    <div
+      className="
+      w-full flex justify-center items-start min-h-screen px-6 py-20
+    bg-dashboard-bg-light
+    dark:bg-dashboard-bg-dark
+  "
+    >
+      <div
+        className="
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10
+  "
+      >
         {/* Logo */}
         <div className="flex items-center justify-center text-center">
-          <AnimatedLogo />
+          <img
+            src={headerLogo}
+            alt="Cre8tly"
+            width={100}
+            height={100}
+            className="
+    block
+    select-none
+  "
+          />
         </div>
 
         {/* Page Title */}
-        <h1 className="text-3xl font-bold mb-4 pb-8 text-center normal-case">
+        <h1
+          className="
+          text-3xl font-bold mb-4 pb-8 text-center normal-case
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+  "
+        >
           Cre8tly Community 💬
         </h1>
 
@@ -69,8 +98,15 @@ export default function CommunityHome() {
               <button
                 key={t.id}
                 onClick={() => navigate(`/community/topic/${t.id}`)}
-                className="relative bg-gray-900/80 p-6 rounded-xl border border-gray-700 hover:border-green 
-                       hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] transition-all text-left"
+                className="
+                relative p-6 rounded-xl transition-all text-left
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                hover:border-green
+                hover:shadow-[0_0_12px_rgba(34,197,94,0.3)]
+"
               >
                 {/* NEW BADGE */}
                 {t.has_new && (
@@ -79,8 +115,24 @@ export default function CommunityHome() {
                   </span>
                 )}
 
-                <h2 className="text-xl font-semibold mb-2">{t.name}</h2>
-                <p className="text-gray-400 text-sm">{t.description}</p>
+                <h2
+                  className="
+                  text-xl font-semibold mb-2
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+  "
+                >
+                  {t.name}
+                </h2>
+                <p
+                  className="
+                 text-sm
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+  "
+                >
+                  {t.description}
+                </p>
               </button>
             ))}
           </div>

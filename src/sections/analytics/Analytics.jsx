@@ -7,7 +7,7 @@ import { BarChart2 } from "lucide-react";
 export default function LandingAnalytics() {
   const { user } = useAuth();
   const [landingPageId, setLandingPageId] = useState(null);
-  const [range, setRange] = useState("week");
+  const [range, setRange] = useState("7");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,8 +42,6 @@ export default function LandingAnalytics() {
         `https://cre8tlystudio.com/api/landing-analytics/summary/${landingPageId}?days=${selectedRange}`
       );
 
-      console.log("📬 API response:", res.data);
-
       if (res.data && res.data.success) {
         setData({
           views: res.data.views || [],
@@ -62,7 +60,7 @@ export default function LandingAnalytics() {
   }
 
   const metrics = [
-    { key: "views", color: "#ffffff", label: "Views" },
+    { key: "views", color: "#1f2937", label: "Views" },
     { key: "clicks", color: "#7bed9f", label: "Clicks" },
     { key: "downloads", color: "#670fe7", label: "Downloads" },
   ];
@@ -102,13 +100,30 @@ export default function LandingAnalytics() {
   })();
 
   return (
-    <div className="w-full min-h-screen text-white px-4 py-8 pt-24">
+    <div
+      className="w-full min-h-screen px-4 py-8 pt-24
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+      bg-dashboard-bg-light
+      dark:bg-dashboard-bg-dark"
+    >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-xl font-semibold normal-case">Views</h1>
-            <BarChart2 size={22} className="text-white mt-[1px] sm:mt-0" />
+            <h1
+              className="text-xl font-semibold normal-case
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark"
+            >
+              Views
+            </h1>
+            <BarChart2
+              size={22}
+              className="mt-[1px] sm:mt-0
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark"
+            />
           </div>
           <div className="flex gap-2">
             {["7", "14", "30", "90"].map((r) => (
@@ -117,8 +132,8 @@ export default function LandingAnalytics() {
                 onClick={() => setRange(r)}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                   range === r
-                    ? "bg-gray-700 text-white"
-                    : "bg-[#111111] text-gray-400 border border-[#2A2F3A]"
+                    ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark"
+                    : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-muted-light dark:text-dashboard-muted-dark border border-dashboard-border-light dark:border-dashboard-border-dark"
                 }`}
               >
                 {r} days
@@ -133,12 +148,26 @@ export default function LandingAnalytics() {
             {metrics.map((m) => (
               <div
                 key={m.key}
-                className="flex flex-col items-center justify-center bg-[#0a0a0a] rounded-xl p-3 sm:p-4 shadow-md border border-[#2A2F3A]"
+                className="flex flex-col items-center justify-center rounded-xl p-3 sm:p-4 shadow-md
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark"
               >
-                <p className="text-sm text-gray-400">{m.label}</p>
                 <p
-                  className="text-2xl font-semibold"
-                  style={{ color: m.color }}
+                  className="text-sm
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark"
+                >
+                  {m.label}
+                </p>
+                <p
+                  className={`text-2xl font-semibold ${
+                    m.key === "views"
+                      ? "text-dashboard-metric-light dark:text-dashboard-metric-dark dark:drop-shadow-[0_0_10px_rgba(229,240,255,0.35)]"
+                      : ""
+                  }`}
+                  style={m.key !== "views" ? { color: m.color } : undefined}
                 >
                   {data[m.key]?.reduce((acc, v) => acc + v.total, 0) || 0}
                 </p>
@@ -149,11 +178,25 @@ export default function LandingAnalytics() {
 
         {/* Total Views */}
         {data && (
-          <div className="bg-[#0a0a0a] rounded-2xl py-8 text-center mb-6 border border-[#2A2F3A]">
-            <p className="text-gray-400 text-sm uppercase tracking-wide mb-1">
+          <div
+            className="rounded-2xl py-8 text-center mb-6
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark"
+          >
+            <p
+              className="text-sm uppercase tracking-wide mb-1
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+            >
               Total Views
             </p>
-            <h2 className="text-5xl font-bold mb-1">
+            <h2
+              className="text-5xl font-bold mb-1
+              text-dashboard-metric-light
+              dark:text-dashboard-metric-dark"
+            >
               {Intl.NumberFormat("en-US", { notation: "compact" }).format(
                 data.views?.reduce((acc, v) => acc + v.total, 0) || 0
               )}
@@ -161,7 +204,11 @@ export default function LandingAnalytics() {
 
             {/* Show date range (start to end) */}
             {chartData.length > 0 && (
-              <p className="text-gray-500 text-sm mt-1">
+              <p
+                className="text-sm mt-1
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark"
+              >
                 {new Date(chartData[0].date).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -179,9 +226,19 @@ export default function LandingAnalytics() {
         )}
 
         {/* Chart */}
-        <div className="bg-[#0a0a0a] rounded-2xl border border-[#2A2F3A] p-4 h-[400px] shadow-inner mb-8">
+        <div
+          className="rounded-2xl p-4 h-[400px] shadow-inner mb-8
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark"
+        >
           {loading ? (
-            <p className="text-center text-gray-500 mt-20">
+            <p
+              className="text-center mt-20
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+            >
               Loading analytics...
             </p>
           ) : data ? (
@@ -191,15 +248,15 @@ export default function LandingAnalytics() {
               colors={
                 ({ id }) =>
                   id === "Views"
-                    ? "#ffffff" // bright green
+                    ? "#1f2937"
                     : id === "Clicks"
-                      ? "#7bed9f" // mint green
+                      ? "#7bed9f"
                       : "#670fe7" // pink
               }
               indexBy="date"
               margin={{ top: 20, right: 20, bottom: 40, left: 50 }}
               padding={0.25}
-              borderRadius={4}
+              borderRadius={[4, 4, 0, 0]}
               axisTop={null}
               axisRight={null}
               axisLeft={{
@@ -245,17 +302,35 @@ export default function LandingAnalytics() {
                 },
               }}
               tooltip={({ id, value, indexValue, color }) => (
-                <div className="px-3 py-2 bg-[#111] border border-gray-700 rounded-lg">
+                <div
+                  className="px-3 py-2 rounded-lg
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark"
+                >
                   <p className="text-sm font-medium" style={{ color }}>
                     {id}: {value}
                   </p>
-                  <p className="text-xs text-gray-400">{indexValue}</p>
+                  <p
+                    className="text-xs
+                  text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark"
+                  >
+                    {indexValue}
+                  </p>
                 </div>
               )}
               groupMode="grouped"
             />
           ) : (
-            <p className="text-center text-gray-500">No analytics data yet</p>
+            <p
+              className="text-center
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark"
+            >
+              No analytics data yet
+            </p>
           )}
         </div>
       </div>

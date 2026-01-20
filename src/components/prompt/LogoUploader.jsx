@@ -41,37 +41,96 @@ export default function LogoUploader({ logoPreview, setLogo, setLogoPreview }) {
   };
 
   return (
-    <div>
-      <label className="block text-silver mb-2 font-medium">
-        Brand Logo (Max 512×512 – 2 MB)
-      </label>
+    <div
+      className="
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      rounded-xl
+      p-4
+      space-y-4
+    "
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <label
+          className="text-sm font-semibold
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark"
+        >
+          Brand Logo
+        </label>
 
+        <span
+          className="text-xs
+        text-dashboard-muted-light
+        dark:text-dashboard-muted-dark"
+        >
+          Max 512×512 · 2 MB
+        </span>
+      </div>
+
+      {/* Upload input */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/png, image/jpeg, image/webp"
         onChange={handleLogoUpload}
-        className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4
-                   file:rounded-full file:border-0 file:font-semibold
-                   file:bg-royalPurple file:text-white hover:file:opacity-80"
+        className="
+        block w-full text-sm
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        file:mr-4
+        file:py-2
+        file:px-4
+        file:rounded-lg
+        file:border-0
+        file:font-semibold
+        file:bg-bookBtnColor
+        file:text-black
+        hover:file:opacity-90
+        transition
+      "
       />
 
+      {/* Preview */}
       {logoPreview && (
-        <div className="mt-4 flex flex-col items-center space-y-3">
+        <div className="pt-2 flex justify-center">
           <div className="relative">
             <img
               src={logoPreview}
               alt="Logo preview"
-              className="w-20 h-20 object-contain border border-gray-700 rounded-md"
+              className="
+              w-20
+              h-20
+              object-contain
+              rounded-md
+              border
+              border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              
+            "
             />
-            {/* Inline remove button on image corner */}
+
+            {/* Remove button */}
             <button
               onClick={handleRemoveLogo}
               type="button"
-              className="absolute -top-2 -right-2 bg-gray-900 rounded-full p-1 hover:bg-gray-800"
-              title="Remove"
+              title="Remove logo"
+              className="
+              absolute
+              -top-2
+              -right-2
+              rounded-full
+              p-1
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              hover:opacity-90
+              transition
+            "
             >
-              <XCircle size={16} className="text-red-400 hover:text-red-300" />
+              <XCircle size={16} className="text-red-400" />
             </button>
           </div>
         </div>

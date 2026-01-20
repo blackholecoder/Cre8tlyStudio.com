@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import { Menu, LogOut, CircleQuestionMark } from "lucide-react";
+import { Menu, LogOut, CircleQuestionMark, Sun, Moon } from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
 import {
   SIDEBAR_SECTIONS,
   SidebarToggleIcon,
 } from "../../constants/sideBarSections";
+import { useTheme } from "../../admin/useTheme";
 
 const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
 
@@ -15,6 +16,7 @@ export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const SIDEBAR_EXPANDED_WIDTH = 260;
   const SIDEBAR_COLLAPSED_WIDTH = 72;
@@ -109,7 +111,7 @@ export default function DashboardLayout({ children }) {
       ? isCollapsed
         ? "bg-green/20 text-green"
         : "bg-green/10 text-green border border-green/30"
-      : "text-gray-300 hover:bg-[#0b0b0b]"
+      : "text-dashboard-muted-light dark:text-dashboard-muted-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
   }`}
       >
         <Icon size={20} />
@@ -117,7 +119,9 @@ export default function DashboardLayout({ children }) {
         {!isCollapsed && (
           <div className="flex flex-col flex-1">
             <span className="font-medium leading-tight">{item.label}</span>
-            <span className="text-xs text-gray-400">{item.description}</span>
+            <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              {item.description}
+            </span>
           </div>
         )}
 
@@ -141,12 +145,20 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="dashboard flex bg-[#141414] text-white relative min-h-screen">
+    <div
+      className="dashboard flex relative min-h-screen
+  bg-dashboard-bg-light
+  dark:bg-dashboard-bg-dark
+  text-dashboard-text-light
+  dark:text-dashboard-text-dark"
+    >
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full overflow-hidden bg-[#141414] border-r border-gray-800 
-  flex flex-col transform transition-all duration-300 z-[60]
-  ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed top-0 left-0 h-full overflow-hidden
+        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+        border-r border-dashboard-border-light dark:border-dashboard-border-dark
+        flex flex-col transform transition-all duration-300 z-[60]
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         style={{
           width: isCollapsed
             ? `${SIDEBAR_COLLAPSED_WIDTH}px`
@@ -154,7 +166,7 @@ export default function DashboardLayout({ children }) {
         }}
       >
         {/* TOP (fixed) */}
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
           <div
             className={`flex items-center ${
               isCollapsed ? "justify-center" : "justify-start gap-3"
@@ -163,8 +175,9 @@ export default function DashboardLayout({ children }) {
             {/* Menu toggle */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-9 h-9 flex items-center justify-center rounded-md 
-                 text-gray-400 hover:text-white hover:bg-[#0b0b0b] transition"
+              className="w-9 h-9 flex items-center justify-center rounded-md transition
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <SidebarToggleIcon size={18} />
@@ -179,10 +192,12 @@ export default function DashboardLayout({ children }) {
                 </div>
 
                 <div className="flex flex-col leading-tight">
-                  <span className="logoText font-semibold text-white">
+                  <span className="logoText font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
                     Cre8tly
                   </span>
-                  <span className="logoText text-sm text-gray-300">Studio</span>
+                  <span className="logoText text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    Studio
+                  </span>
                 </div>
               </div>
             )}
@@ -199,7 +214,10 @@ export default function DashboardLayout({ children }) {
             {SIDEBAR_SECTIONS.map((section) => (
               <div key={section.section}>
                 {!isCollapsed && (
-                  <p className="px-4 mb-2 text-xs uppercase tracking-wide text-gray-500">
+                  <p
+                    className="px-4 mb-2 text-xs uppercase tracking-wide
+text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                  >
                     {section.section}
                   </p>
                 )}
@@ -213,12 +231,12 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* BOTTOM (fixed logout) */}
-        <div className="p-4 border-t border-gray-800 space-y-3">
+        <div className="p-4 border-t border-dashboard-border-light dark:border-dashboard-border-dark space-y-3">
           <button
             onClick={() => navigate("/docs")}
             className={`w-full flex items-center rounded-lg transition ${
               isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
-            } text-gray-300 hover:bg-gray-700/40`}
+            } text-dashboard-muted-light dark:text-dashboard-muted-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark`}
           >
             <CircleQuestionMark size={20} />
             {!isCollapsed && <span className="font-medium">Documentation</span>}
@@ -232,14 +250,30 @@ export default function DashboardLayout({ children }) {
             <img
               src={user?.profile_image || "/default-avatar.png"}
               alt="Profile"
-              className="w-9 h-9 rounded-full object-cover border border-gray-700"
+              className="w-9 h-9 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
             />
             {!isCollapsed && (
-              <span className="text-sm text-gray-300 truncate">
+              <span className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark truncate">
                 {user?.name || "Account"}
               </span>
             )}
           </div>
+          <button
+            onClick={toggleTheme}
+            className={`
+    w-full flex items-center rounded-lg transition
+    ${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}
+    text-dashboard-muted-light dark:text-dashboard-muted-dark
+    hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+  `}
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {!isCollapsed && (
+              <span className="font-medium">
+                {theme === "dark" ? "Light mode" : "Dark mode"}
+              </span>
+            )}
+          </button>
 
           {/* Logout */}
           <button
@@ -265,7 +299,7 @@ export default function DashboardLayout({ children }) {
       {/* Toggle button (mobile) */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 right-4 bg-gray-800/80 p-2 rounded-lg text-gray-200 hover:text-white z-50 transition"
+        className="lg:hidden fixed top-4 right-4 p-2 rounded-lg -50 transition bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-muted-light dark:text-dashboard-muted-dark"
       >
         <Menu size={22} />
       </button>

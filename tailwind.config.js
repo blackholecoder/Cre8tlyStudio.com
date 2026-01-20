@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     fontSize: {
@@ -49,6 +50,36 @@ export default {
         mediaBlue: "#a2d2ff",
         brightPurple: "#9381ff",
         newAgeOrange: "#f9c784",
+        dashboard: {
+          bg: {
+            light: "#f6f7f9",
+            dark: "#141414",
+          },
+          sidebar: {
+            light: "#ffffff",
+            dark: "#141414",
+          },
+          hover: {
+            light: "#f1f5f9",
+            dark: "#0b0b0b",
+          },
+          border: {
+            light: "#e5e7eb",
+            dark: "#1f2937",
+          },
+          text: {
+            light: "#111827",
+            dark: "#ffffff",
+          },
+          muted: {
+            light: "#6b7280",
+            dark: "#9ca3af",
+          },
+          metric: {
+            light: "#111827", // slate-900
+            dark: "#E5F0FF", // soft bright blue-white
+          },
+        },
       },
       screens: {
         wide: "1440px",

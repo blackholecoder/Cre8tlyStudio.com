@@ -75,10 +75,24 @@ export default function Leads() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b] p-10 text-white">
-      <div className="max-w-5xl mx-auto bg-black/70 rounded-2xl shadow-lg p-8">
+    <div
+      className="min-h-screen p-10
+      bg-dashboard-bg-light
+      dark:bg-dashboard-bg-dark
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark"
+    >
+      <div
+        className="max-w-5xl mx-auto rounded-2xl shadow-lg p-8
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark"
+      >
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-silver flex items-center gap-3 normal-case">
+          <h1
+            className="text-3xl font-bold flex items-center gap-3 normal-case
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark"
+          >
             Leads <Mail className="text-green" />
           </h1>
           <button
@@ -94,7 +108,13 @@ export default function Leads() {
           <select
             value={selectedLanding}
             onChange={(e) => setSelectedLanding(e.target.value)}
-            className="bg-[#0F172A] text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green outline-none"
+            className="rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark"
           >
             <option value="all">All PDFs</option>
             {pdfOptions.map((opt, i) => (
@@ -106,27 +126,49 @@ export default function Leads() {
         </div>
 
         {loading ? (
-          <p className="text-gray-400">Loading leads...</p>
+          <p
+            className="text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
+            Loading leads...
+          </p>
         ) : filtered.length ? (
           <>
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               {filtered.map((lead) => (
                 <div
                   key={lead.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#1E293B]/70 border border-gray-700 rounded-xl p-4 hover:border-green transition-all duration-300"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between rounded-xl p-4 transition-all duration-300
+                bg-dashboard-hover-light
+                dark:bg-dashboard-hover-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                hover:border-green"
                 >
                   <div>
-                    <p className="text-white font-medium flex items-center gap-2">
+                    <p
+                      className="font-medium flex items-center gap-2
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark"
+                    >
                       <Mail size={16} className="text-green" /> {lead.email}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                    <p
+                      className="text-xs mt-1 flex items-center gap-2
+                    text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark"
+                    >
                       <Calendar size={14} />{" "}
                       {new Date(lead.created_at).toLocaleString()}
                     </p>
                   </div>
 
                   <div className="text-right mt-3 sm:mt-0">
-                    <p className="text-sm text-silver font-semibold flex items-center justify-end gap-2">
+                    <p
+                      className="text-sm font-semibold flex items-center justify-end gap-2
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark"
+                    >
                       <FileText size={14} />{" "}
                       {lead.title || lead.landing_title || "Untitled PDF"}
                     </p>
@@ -154,24 +196,41 @@ export default function Leads() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                className="px-3 py-1 bg-gray-800 text-white rounded disabled:opacity-50"
+                className="px-3 py-1 rounded disabled:opacity-50
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark"
               >
                 Prev
               </button>
-              <span className="text-gray-400">
+              <span
+                className="text-dashboard-muted-light
+              dark:text-dashboard-muted-dark"
+              >
                 Page {page} of {totalPages || 1}
               </span>
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((prev) => prev + 1)}
-                className="px-3 py-1 bg-gray-800 text-white rounded disabled:opacity-50"
+                className="px-3 py-1 rounded disabled:opacity-50
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark"
               >
                 Next
               </button>
             </div>
           </>
         ) : (
-          <p className="text-gray-500 italic text-center">No leads found.</p>
+          <p
+            className="italic text-center
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
+            No leads found.
+          </p>
         )}
       </div>
     </div>

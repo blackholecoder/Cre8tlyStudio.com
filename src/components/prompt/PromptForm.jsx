@@ -43,6 +43,8 @@ export default function PromptForm({
   const [tooLong, setTooLong] = useState(false);
   const [error, setError] = useState("");
 
+  const MAX_CHARS = 300;
+
   useEffect(() => {
     if (user?.cta && (!cta || cta.trim() === "")) {
       setCta(user.cta);
@@ -122,7 +124,26 @@ export default function PromptForm({
                 if (value === "") setPages("");
                 else setPages(Math.min(25, Math.max(1, Number(value))));
               }}
-              className="w-full py-3 pr-20 pl-4 rounded-lg bg-gray-800 text-white border border-gray-600 text-lg appearance-none"
+              className="
+              w-full
+              py-3
+              pr-20
+              pl-4
+              rounded-lg
+              bg-dashboard-bg-light
+              dark:bg-dashboard-bg-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
+              text-lg
+              appearance-none
+              placeholder-dashboard-muted-light
+              dark:placeholder-dashboard-muted-dark
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green
+              "
             />
 
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">
@@ -131,7 +152,19 @@ export default function PromptForm({
                 onClick={() =>
                   setPages((prev) => Math.max(1, Number(prev || 1) - 1))
                 }
-                className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
+                className="
+                px-2
+                py-1
+                rounded-md
+                bg-dashboard-hover-light
+                dark:bg-dashboard-hover-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                text-lg
+                font-bold
+                hover:opacity-90
+                transition
+                "
               >
                 ◀
               </button>
@@ -153,7 +186,19 @@ export default function PromptForm({
                     return next;
                   });
                 }}
-                className="px-2 py-1 rounded-md bg-gray-700 text-white text-lg font-bold hover:bg-gray-600 transition"
+                className="
+                px-2
+                py-1
+                rounded-md
+                bg-dashboard-hover-light
+                dark:bg-dashboard-hover-dark
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                text-lg
+                font-bold
+                hover:opacity-90
+                transition
+                "
               >
                 ▶
               </button>
@@ -205,12 +250,13 @@ export default function PromptForm({
             theme="snow"
             value={text}
             onChange={(value) => {
-              if (!isFreePlan) {
-                setText(value);
-                if (error) setError("");
+              if (isFreePlan && value.length > MAX_CHARS) {
+                setError("Upgrade to continue writing");
+                return;
               }
+              setText(value);
             }}
-            readOnly={isFreePlan} // ✅ disables editing
+            readOnly={false}
             modules={{ toolbar: false }}
             placeholder="Write your prompt..."
             className="h-[250px]"
@@ -258,7 +304,6 @@ export default function PromptForm({
       <CoverUpload cover={cover} setCover={setCover} />
 
       {/* Logo Upload */}
-      {/* Logo Upload (only for paid users) */}
       {!isFreePlan ? (
         <LogoUploader
           logoPreview={logoPreview}
@@ -266,8 +311,25 @@ export default function PromptForm({
           setLogoPreview={setLogoPreview}
         />
       ) : (
-        <div className="p-4 rounded-xl border border-gray-700 bg-[#111827]/80 text-center mt-6">
-          <p className="text-gray-400 text-sm">
+        <div
+          className="
+          p-4
+          mt-6
+          rounded-xl
+          text-center
+          bg-dashboard-hover-light
+          dark:bg-dashboard-hover-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+        "
+        >
+          <p
+            className="
+            text-sm
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+          "
+          >
             🔒 Logo upload is available on paid plans.
           </p>
           <button
@@ -284,6 +346,7 @@ export default function PromptForm({
         bgTheme={bgTheme}
         setBgTheme={setBgTheme}
         includeGradients={false}
+        isPro={!!user?.pro_status}
       />
 
       {/* Theme Selector */}
@@ -308,7 +371,27 @@ export default function PromptForm({
               if (selected === "saved") setCta(user.cta);
               else if (selected === "custom") setCta("");
             }}
-            className="w-full appearance-none px-4 py-2 bg-[#1E293B] border border-gray-600 rounded-lg text-silver text-sm focus:ring-2 focus:ring-green focus:outline-none hover:border-silver transition"
+            className="
+            w-full
+            appearance-none
+            px-4
+            py-2
+            rounded-lg
+            text-sm
+            bg-dashboard-bg-light
+            dark:bg-dashboard-bg-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+            placeholder-dashboard-muted-light
+            dark:placeholder-dashboard-muted-dark
+            focus:ring-2
+            focus:ring-green
+            focus:outline-none
+            hover:border-green
+            transition
+            "
           >
             <option value="">Choose CTA</option>
             <option value="saved">Use My Saved CTA</option>
@@ -318,7 +401,17 @@ export default function PromptForm({
           {/* 👇 Custom chevron icon */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-silver pointer-events-none"
+            className="
+            absolute
+            right-3
+            top-1/2
+            -translate-y-1/2
+            h-4
+            w-4
+            pointer-events-none
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+            "
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -338,17 +431,48 @@ export default function PromptForm({
           value={cta}
           onChange={(e) => setCta(e.target.value)}
           rows={5}
-          className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500 focus:ring-2 focus:ring-green focus:outline-none"
+          className="
+          w-full
+          px-4
+          py-3
+          rounded-lg
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          placeholder-dashboard-muted-light
+          dark:placeholder-dashboard-muted-dark
+          focus:ring-2
+          focus:ring-green
+          focus:outline-none
+          "
         />
 
-        <p className="text-xs text-gray-400 mt-1">
+        <p
+          className="
+          text-xs
+          mt-1
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+          "
+        >
           This message will appear at the end of your lead magnet.
         </p>
       </div>
 
       {/* Optional Link */}
       <div>
-        <label className="block text-silver mb-2 font-medium">
+        <label
+          className="
+          block
+          mb-2
+          font-medium
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          "
+        >
           Optional Link or Call-to-Action
         </label>
         <input
@@ -356,16 +480,43 @@ export default function PromptForm({
           placeholder="https://yourwebsite.com"
           value={link}
           onChange={(e) => setLink(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-500"
+          className="
+          w-full
+          px-4
+          py-2
+          rounded-lg
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          placeholder-dashboard-muted-light
+          dark:placeholder-dashboard-muted-dark
+          "
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p
+          className="
+          text-xs
+          mt-1
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+          "
+        >
           This link will appear at the bottom of your PDF as a button and a QR
           code. Websites and email addresses are supported.
         </p>
       </div>
 
       {disabled && (
-        <p className="text-center text-red-600 text-sm mb-3">
+        <p
+          className="
+          text-center
+          text-sm
+          mb-3
+          text-red-500
+          "
+        >
           Your trial has expired — please upgrade to continue generating.
         </p>
       )}
@@ -382,11 +533,9 @@ export default function PromptForm({
             }
           }}
           className={`w-full px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
-            disabled
-              ? "bg-gray-600 cursor-not-allowed text-gray-300"
-              : !text.trim() || text === "<p><br></p>" || tooLong
-                ? "bg-gray-600 cursor-not-allowed text-gray-300"
-                : "bg-green font-semibold text-black hover:opacity-90"
+            disabled || !text.trim() || text === "<p><br></p>" || tooLong
+              ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed"
+              : "bg-green text-dashboard-bg-dark hover:opacity-90"
           }`}
         >
           {disabled

@@ -19,18 +19,42 @@ export default function BooksDashboardHeader({ books = [], onCheckout }) {
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
         {/* Left */}
         <div>
-          <h1 className="text-3xl font-bold text-white normal-case">
+          <h1
+            className="
+            text-3xl font-bold normal-case
+            text-dashboard-text-light
+            dark:text-dashboard-text-dark
+"
+          >
             My Books
           </h1>
 
-          <div className="text-sm text-gray-400 mt-1">
+          <div
+            className="
+            text-sm mt-1
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+          "
+          >
             Welcome,{" "}
-            <span className="text-white font-semibold">
+            <span
+              className="
+              font-semibold
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
+            "
+            >
               {user?.name?.split(" ")[0] || "Author"}
             </span>
           </div>
 
-          <p className="text-silver mt-2">
+          <p
+            className="
+            mt-2
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+          "
+          >
             You currently have {availableSlots} book slots remaining.
           </p>
         </div>
@@ -39,9 +63,18 @@ export default function BooksDashboardHeader({ books = [], onCheckout }) {
         <div className="flex items-start gap-3">
           <Link
             to="/docs/authors-assistant"
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-800 bg-black/40 px-3 py-2 text-xs text-green hover:bg-black/60 transition"
+            className="
+            inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            bg-dashboard-hover-light
+            dark:bg-dashboard-hover-dark
+            text-black
+            dark:text-green
+            hover:opacity-90
+          "
           >
-            <FileEdit className="w-4 h-4" />
+            <FileEdit className="w-4 h-4 text-black dark:text-green" />
             Docs
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>

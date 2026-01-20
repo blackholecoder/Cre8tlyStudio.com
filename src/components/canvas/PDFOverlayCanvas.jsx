@@ -43,137 +43,129 @@ export default function PDFOverlayCanvas({
 
   const pageKey = `cre8tly_canvas_shapes_page_${window.currentPDFPage ?? 0}`;
 
+  function ImageShape({
+    shape,
+    setShapes,
+    setSelectedIds,
+    setPanelOpen,
+    isDuplicating,
+  }) {
+    const [img, status] = useImage(shape.src, "anonymous");
+    // const isSelected = selectedIds?.includes(shape.id);
 
+    useEffect(() => {
+      console.log("🖼 Loading image:", shape.id, status);
+    }, [status, shape.id]);
 
+    if (!shape?.src || status !== "loaded" || !img) return null;
 
-function ImageShape({
-  shape,
-  setShapes,
-  setSelectedIds, 
-  setPanelOpen,
-  isDuplicating,
-}) {
-  const [img, status] = useImage(shape.src, "anonymous");
-  // const isSelected = selectedIds?.includes(shape.id);
+    // ✅ Compute shadow offset from angle + distance
+    const shadowOffsetX =
+      shape.shadowOffset && shape.shadowAngle !== undefined
+        ? Math.cos((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
+        : 0;
 
-  useEffect(() => {
-    console.log("🖼 Loading image:", shape.id, status);
-  }, [status, shape.id]);
+    const shadowOffsetY =
+      shape.shadowOffset && shape.shadowAngle !== undefined
+        ? Math.sin((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
+        : 0;
 
-  if (!shape?.src || status !== "loaded" || !img) return null;
+    return (
+      <Group
+        key={shape.id}
+        id={String(shape.id)}
+        x={shape.x ?? 0}
+        y={shape.y ?? 0}
+        draggable
+        rotation={shape.rotation ?? 0}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          const isShift = e.evt.shiftKey;
+          setPanelOpen(true);
+          setSelectedIds((prev) =>
+            isShift
+              ? prev.includes(shape.id)
+                ? prev.filter((id) => id !== shape.id)
+                : [...prev, shape.id]
+              : [shape.id]
+          );
+        }}
+        onDragStart={(e) => {
+          if (isDuplicating?.current) return;
+          e.cancelBubble = true;
+          e.target.moveToTop();
+        }}
+        onDragEnd={(e) => {
+          const node = e.target;
+          const { x, y } = node.position();
+          setShapes((prev) =>
+            prev.map((s) => (s.id === shape.id ? { ...s, x, y } : s))
+          );
+        }}
+        onTransformEnd={(e) => {
+          const node = e.target;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
 
-  // ✅ Compute shadow offset from angle + distance
-  const shadowOffsetX =
-    shape.shadowOffset && shape.shadowAngle !== undefined
-      ? Math.cos((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
-      : 0;
+          const newWidth = Math.max(20, (shape.width ?? 200) * scaleX);
+          const newHeight = Math.max(20, (shape.height ?? 200) * scaleY);
 
-  const shadowOffsetY =
-    shape.shadowOffset && shape.shadowAngle !== undefined
-      ? Math.sin((shape.shadowAngle * Math.PI) / 180) * shape.shadowOffset
-      : 0;
+          setShapes((prev) =>
+            prev.map((s) =>
+              s.id === shape.id
+                ? {
+                    ...s,
+                    x: node.x(),
+                    y: node.y(),
+                    width: newWidth,
+                    height: newHeight,
+                  }
+                : s
+            )
+          );
 
-  return (
-    <Group
-      key={shape.id}
-      id={String(shape.id)}
-      x={shape.x ?? 0}
-      y={shape.y ?? 0}
-      draggable
-      rotation={shape.rotation ?? 0}
-      onClick={(e) => {
-        e.cancelBubble = true;
-        const isShift = e.evt.shiftKey;
-        setPanelOpen(true);
-        setSelectedIds((prev) =>
-          isShift
-            ? prev.includes(shape.id)
-              ? prev.filter((id) => id !== shape.id)
-              : [...prev, shape.id]
-            : [shape.id]
-        );
-      }}
-      onDragStart={(e) => {
-        if (isDuplicating?.current) return;
-        e.cancelBubble = true;
-        e.target.moveToTop();
-      }}
-      onDragEnd={(e) => {
-        const node = e.target;
-        const { x, y } = node.position();
-        setShapes((prev) =>
-          prev.map((s) => (s.id === shape.id ? { ...s, x, y } : s))
-        );
-      }}
-      onTransformEnd={(e) => {
-        const node = e.target;
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
-
-        const newWidth = Math.max(20, (shape.width ?? 200) * scaleX);
-        const newHeight = Math.max(20, (shape.height ?? 200) * scaleY);
-
-        setShapes((prev) =>
-          prev.map((s) =>
-            s.id === shape.id
-              ? {
-                  ...s,
-                  x: node.x(),
-                  y: node.y(),
-                  width: newWidth,
-                  height: newHeight,
-                }
-              : s
-          )
-        );
-
-        node.scaleX(1);
-        node.scaleY(1);
-      }}
-    >
-      {/* 🖼️ Actual image */}
-      <KonvaImage
-        image={img}
-        width={shape.width ?? img.width ?? 200}
-        height={shape.height ?? img.height ?? 200}
-        opacity={shape.opacity ?? 1}
-        cornerRadius={shape.cornerRadius ?? 0}
-        shadowEnabled={true}
-        shadowColor={shape.shadowColor ?? "transparent"}
-        shadowBlur={(shape.shadowRadius ?? 0) * 1.5}
-        shadowOpacity={shape.shadowOpacity ?? 0.5}
-        shadowOffsetX={shadowOffsetX}
-        shadowOffsetY={shadowOffsetY}
-        filters={shape.tint ? [Konva.Filters.RGBA] : []}
-        red={shape.tint ? parseInt(shape.tint.slice(1, 3), 16) : 255}
-        green={shape.tint ? parseInt(shape.tint.slice(3, 5), 16) : 255}
-        blue={shape.tint ? parseInt(shape.tint.slice(5, 7), 16) : 255}
-        alpha={1}
-      />
-
-      {/* 🟩 Real stroke only (no selection highlight) */}
-      {shape.strokeWidth > 0 && (
-        <Rect
+          node.scaleX(1);
+          node.scaleY(1);
+        }}
+      >
+        {/* 🖼️ Actual image */}
+        <KonvaImage
+          image={img}
           width={shape.width ?? img.width ?? 200}
           height={shape.height ?? img.height ?? 200}
-          stroke={
-      shape.strokeWidth > 0
-        ? shape.stroke || "#000000" // ✅ fallback to black if no color chosen
-        : "transparent"
-    }
-          strokeWidth={shape.strokeWidth ?? 0}
+          opacity={shape.opacity ?? 1}
           cornerRadius={shape.cornerRadius ?? 0}
-          listening={false}
+          shadowEnabled={true}
+          shadowColor={shape.shadowColor ?? "transparent"}
+          shadowBlur={(shape.shadowRadius ?? 0) * 1.5}
+          shadowOpacity={shape.shadowOpacity ?? 0.5}
+          shadowOffsetX={shadowOffsetX}
+          shadowOffsetY={shadowOffsetY}
+          filters={shape.tint ? [Konva.Filters.RGBA] : []}
+          red={shape.tint ? parseInt(shape.tint.slice(1, 3), 16) : 255}
+          green={shape.tint ? parseInt(shape.tint.slice(3, 5), 16) : 255}
+          blue={shape.tint ? parseInt(shape.tint.slice(5, 7), 16) : 255}
+          alpha={1}
         />
-      )}
-    </Group>
-  );
-}
 
-
-
-
-
+        {/* 🟩 Real stroke only (no selection highlight) */}
+        {shape.strokeWidth > 0 && (
+          <Rect
+            width={shape.width ?? img.width ?? 200}
+            height={shape.height ?? img.height ?? 200}
+            stroke={
+              shape.strokeWidth > 0
+                ? shape.stroke || "#000000" // ✅ fallback to black if no color chosen
+                : "transparent"
+            }
+            strokeWidth={shape.strokeWidth ?? 0}
+            cornerRadius={shape.cornerRadius ?? 0}
+            listening={false}
+          />
+        )}
+      </Group>
+    );
+  }
 
   useEffect(() => {
     const el = containerRef.current;
@@ -295,34 +287,33 @@ function ImageShape({
   //   tr.getLayer()?.batchDraw();
   // }, [selectedIds, shapes]);
 
-useEffect(() => {
-  const tr = trRef.current;
-  const stage = stageRef.current?.getStage();
-  if (!tr || !stage) return;
+  useEffect(() => {
+    const tr = trRef.current;
+    const stage = stageRef.current?.getStage();
+    if (!tr || !stage) return;
 
-  requestAnimationFrame(() => {
-    // find selected shape nodes
-    const nodes = selectedIds
-      .map((id) => stage.findOne(`#${id}`))
-      .filter(Boolean);
+    requestAnimationFrame(() => {
+      // find selected shape nodes
+      const nodes = selectedIds
+        .map((id) => stage.findOne(`#${id}`))
+        .filter(Boolean);
 
-    // 🧠 log safely
-    console.log("Transformer nodes:", nodes.map(n => n.id()));
+      // 🧠 log safely
+      console.log(
+        "Transformer nodes:",
+        nodes.map((n) => n.id())
+      );
 
-    if (nodes.length > 0) {
-      tr.nodes(nodes);
-      tr.moveToTop(); // keep on top of all shapes
-    } else {
-      tr.nodes([]);
-    }
+      if (nodes.length > 0) {
+        tr.nodes(nodes);
+        tr.moveToTop(); // keep on top of all shapes
+      } else {
+        tr.nodes([]);
+      }
 
-    tr.getLayer()?.batchDraw();
-  });
-}, [selectedIds, shapes]);
-
-
-
-
+      tr.getLayer()?.batchDraw();
+    });
+  }, [selectedIds, shapes]);
 
   useEffect(() => {
     localStorage.setItem("cre8tly_canvas_shapes", JSON.stringify(shapes));
@@ -333,10 +324,15 @@ useEffect(() => {
       // 👇 ignore clicks on the canvas toolbar
       if (e.target.closest(".canvas-toolbar")) return;
 
-      if (!containerRef.current?.contains(e.target)) {
-        setSelectedIds([]);
-        setPanelOpen(false);
+      if (
+        containerRef.current?.contains(e.target) ||
+        e.target.closest(".properties-panel")
+      ) {
+        return; // 👈 click was inside canvas OR panel
       }
+
+      setSelectedIds([]);
+      setPanelOpen(false);
     };
     // use capture so this runs before other handlers
     document.addEventListener("mousedown", handleOutsideClick);
@@ -364,10 +360,14 @@ useEffect(() => {
 
   const handleMouseDown = (e) => {
     const clickedShape = e.target;
-if (clickedShape && clickedShape.getClassName && clickedShape.getClassName() !== "Stage") {
-  // user clicked on a shape, let Konva handle its own drag/transform
-  return;
-}
+    if (
+      clickedShape &&
+      clickedShape.getClassName &&
+      clickedShape.getClassName() !== "Stage"
+    ) {
+      // user clicked on a shape, let Konva handle its own drag/transform
+      return;
+    }
 
     e.evt.preventDefault();
     // 🔒 If the DOM target is the toolbar, ignore (prevents accidental clears)
@@ -622,7 +622,6 @@ if (clickedShape && clickedShape.getClassName && clickedShape.getClassName() !==
       return;
     }
 
-
     // 🅰️ Finalize Text Shape (dragged out text box)
     if (previewShape && previewShape.type === "text") {
       isDrawing.current = false;
@@ -770,7 +769,6 @@ if (clickedShape && clickedShape.getClassName && clickedShape.getClassName() !==
       className="absolute inset-0 pointer-events-auto"
       style={{ zIndex: 50 }}
     >
-
       {stageSize.width > 0 && (
         <Stage
           ref={stageRef}
@@ -788,11 +786,15 @@ if (clickedShape && clickedShape.getClassName && clickedShape.getClassName() !==
         >
           <Layer>
             {shapes.map((shape) => {
-
               console.groupCollapsed("🧩 Rendering shapes batch");
-console.table(shapes.map(s => ({ id: s.id, type: s.type, src: s.src?.slice(0, 60) })));
-console.groupEnd();
-
+              console.table(
+                shapes.map((s) => ({
+                  id: s.id,
+                  type: s.type,
+                  src: s.src?.slice(0, 60),
+                }))
+              );
+              console.groupEnd();
 
               const intensity = (shape.shadowIntensity ?? 50) / 100; // 0–1 range
               const adjusted = Math.pow(intensity, 1.5);
@@ -1494,20 +1496,17 @@ console.groupEnd();
                   );
 
                 case "image":
-  return (
-    <ImageShape
-      key={shape.id}
-      shape={shape}
-      setShapes={setShapes}
-      setSelectedIds={setSelectedIds}
-      setPanelOpen={setPanelOpen}
-       selectedIds={selectedIds}
-      isDuplicating={isDuplicating}
-    />
-  );
-
-
-
+                  return (
+                    <ImageShape
+                      key={shape.id}
+                      shape={shape}
+                      setShapes={setShapes}
+                      setSelectedIds={setSelectedIds}
+                      setPanelOpen={setPanelOpen}
+                      selectedIds={selectedIds}
+                      isDuplicating={isDuplicating}
+                    />
+                  );
 
                 case "path":
                   return (

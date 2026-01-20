@@ -128,7 +128,7 @@ export default function SellerDashboard() {
   if (!user?.stripe_connect_account_id) {
     return (
       <DashboardLayout>
-        <div className="flex flex-col items-center justify-center min-h-screen text-gray-300">
+        <div className="flex flex-col items-center justify-center min-h-screen text-dashboard-text-light dark:text-dashboard-text-dark">
           <h1 className="text-2xl font-bold mb-3">
             No Stripe Account Connected
           </h1>
@@ -152,28 +152,65 @@ export default function SellerDashboard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="p-8 text-white"
+      className="
+      p-8
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+      bg-dashboard-bg-light
+      dark:bg-dashboard-bg-dark
+  "
     >
       <div className="flex items-center gap-3 mb-6">
         <h1 className="text-3xl font-bold normal-case">Seller Dashboard</h1>
-        <Landmark size={22} className="text-green" />
+        <Landmark
+          size={22}
+          className="
+        text-dashboard-muted-light
+        dark:text-green
+  "
+        />
       </div>
       {/* 💰 Balance Overview */}
       {balance ? (
         <div className="grid md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
-            <h3 className="text-gray-400 text-sm mb-1">Available Balance</h3>
+          <div
+            className="bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg"
+          >
+            <h3
+              className="text-dashboard-muted-light
+            dark:text-dashboard-muted-dark text-sm mb-1"
+            >
+              Available Balance
+            </h3>
             <p className="text-2xl font-bold text-green">
               ${(balance.available / 100 || 0).toFixed(2)}
             </p>
           </div>
-          <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
-            <h3 className="text-gray-400 text-sm mb-1">Pending Balance</h3>
+          <div
+            className="bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg"
+          >
+            <h3
+              className="text-dashboard-muted-light
+            dark:text-dashboard-muted-dark text-sm mb-1"
+            >
+              Pending Balance
+            </h3>
             <p className="text-2xl font-bold text-yellow-400">
               ${(balance.pending / 100 || 0).toFixed(2)}
             </p>
           </div>
-          <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg flex items-center justify-center">
+          <div
+            className="bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg flex items-center justify-center"
+          >
             <button
               onClick={handleOpenStripeDashboard}
               className="px-6 py-2 bg-green text-black font-semibold rounded-lg hover:opacity-90 transition"
@@ -183,23 +220,34 @@ export default function SellerDashboard() {
           </div>
         </div>
       ) : (
-        <p className="text-gray-400 mb-6">
+        <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark mb-6">
           No balance data found for this account.
         </p>
       )}
 
       {/* 📅 Payout History */}
-      <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg">
-        <h2 className="text-xl font-semibold text-white mb-4">
+      <div
+        className="bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg"
+      >
+        <h2 className="text-xl font-semibold text-dashboard-text-light dark:text-dashboard-text-dark mb-4">
           Recent Payouts
         </h2>
         {payouts.length > 0 ? (
           <>
             {/* ✅ Desktop table */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full text-sm text-left text-gray-300">
+              <table
+                className="min-w-full text-sm text-left text-dashboard-text-light
+                dark:text-dashboard-text-dark"
+              >
                 <thead>
-                  <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
+                  <tr
+                    className="border-b border-gray-700 text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark uppercase text-xs"
+                  >
                     <th className="py-2 px-3">Date</th>
                     <th className="py-2 px-3">Amount</th>
                     <th className="py-2 px-3">Status</th>
@@ -210,7 +258,8 @@ export default function SellerDashboard() {
                   {payouts.map((p) => (
                     <tr
                       key={p.id}
-                      className="border-b border-gray-800 hover:bg-gray-800/30"
+                      className="border-b border-gray-800 hover:bg-dashboard-hover-light
+                      dark:hover:bg-dashboard-hover-dark"
                     >
                       <td className="py-2 px-3">
                         {new Date(p.created * 1000).toLocaleDateString()}
@@ -243,24 +292,34 @@ export default function SellerDashboard() {
               {payouts.map((p) => (
                 <div
                   key={p.id}
-                  className="bg-[#0B0F19] border border-gray-800 rounded-xl p-4 shadow-md"
+                  className="bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                rounded-xl p-4 shadow-md"
                 >
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">Date</span>
+                    <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Date
+                    </span>
                     <span>
                       {new Date(p.created * 1000).toLocaleDateString()}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">Amount</span>
+                    <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Amount
+                    </span>
                     <span className="font-semibold">
                       ${(p.amount / 100).toFixed(2)}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">Status</span>
+                    <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Status
+                    </span>
                     <span
                       className={`text-xs px-2 py-1 rounded ${
                         p.status === "paid"
@@ -273,7 +332,9 @@ export default function SellerDashboard() {
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Arrival</span>
+                    <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Arrival
+                    </span>
                     <span>
                       {new Date(p.arrival_date * 1000).toLocaleDateString()}
                     </span>
@@ -283,21 +344,34 @@ export default function SellerDashboard() {
             </div>
           </>
         ) : (
-          <p className="text-gray-500 text-sm">
+          <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
             No payouts have been made yet.
           </p>
         )}
       </div>
-      <div className="bg-[#0B0F19] border border-gray-800 rounded-xl p-6 shadow-lg mt-10">
-        <h2 className="text-xl font-semibold text-white mb-4">Recent Sales</h2>
+      <div
+        className="bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark rounded-xl p-6 shadow-lg mt-10"
+      >
+        <h2 className="text-xl font-semibold text-dashboard-text-light dark:text-dashboard-text-dark mb-4">
+          Recent Sales
+        </h2>
 
         {sales.length > 0 ? (
           <>
             {/* ✅ Desktop table */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full text-sm text-left text-gray-300">
+              <table
+                className="min-w-full text-sm text-left text-dashboard-text-light
+                dark:text-dashboard-text-dark"
+              >
                 <thead>
-                  <tr className="border-b border-gray-700 text-gray-400 uppercase text-xs">
+                  <tr
+                    className="border-b border-gray-700 text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark uppercase text-xs"
+                  >
                     <th className="py-2 px-3">Product</th>
                     <th className="py-2 px-3">Buyer Email</th>
                     <th className="py-2 px-3">Date</th>
@@ -308,7 +382,7 @@ export default function SellerDashboard() {
                   {sales.map((s) => (
                     <tr
                       key={s.id}
-                      className="border-b border-gray-800 hover:bg-gray-800/30"
+                      className="border-b border-gray-800 hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                     >
                       <td className="py-2 px-3 font-semibold">
                         {s.product_name}
@@ -340,30 +414,39 @@ export default function SellerDashboard() {
               {sales.map((s) => (
                 <div
                   key={s.id}
-                  className="bg-[#0B0F19] border border-gray-800 rounded-xl p-4 shadow-md"
+                  className="bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark rounded-xl p-4 shadow-md"
                 >
                   <div className="mb-2">
-                    <p className="text-xs text-gray-400 mb-1">Product</p>
-                    <p className="text-sm font-semibold text-white">
+                    <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+                      Product
+                    </p>
+                    <p className="text-sm font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
                       {s.product_name}
                     </p>
                   </div>
 
                   <div className="mb-2">
-                    <p className="text-xs text-gray-400 mb-1">Buyer</p>
-                    <p className="text-sm text-gray-300 break-all">
+                    <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+                      Buyer
+                    </p>
+                    <p className="text-sm text-dashboard-text-light dark:text-dashboard-text-dark break-all">
                       {s.buyer_email}
                     </p>
                   </div>
 
                   <div className="mb-3">
-                    <p className="text-xs text-gray-400 mb-1">Date</p>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+                      Date
+                    </p>
+                    <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
                       {new Date(s.delivered_at).toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-800">
+                  <div className="flex justify-between items-center pt-2 border-t border-dashboard-border-light dark:border-dashboard-border-dark">
                     <span className="text-xs text-gray-400">Thank You</span>
 
                     {s.thank_you_sent ? (
@@ -385,7 +468,9 @@ export default function SellerDashboard() {
             </div>
           </>
         ) : (
-          <p className="text-gray-500 text-sm">No sales yet.</p>
+          <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
+            No sales yet.
+          </p>
         )}
       </div>
       {sales.length > 0 && (
@@ -396,15 +481,15 @@ export default function SellerDashboard() {
             disabled={page === 1}
             className={`px-4 py-2 rounded-lg ${
               page === 1
-                ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
-                : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed"
+                : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
             }`}
           >
             Prev
           </button>
 
           {/* Page status */}
-          <span className="text-gray-300 text-sm">
+          <span className="text-dashboard-text-light dark:text-dashboard-text-dark text-sm">
             Page {page} of {pages}
           </span>
 
@@ -414,8 +499,8 @@ export default function SellerDashboard() {
             disabled={page === pages}
             className={`px-4 py-2 rounded-lg ${
               page === pages
-                ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
-                : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-muted-light dark:text-dashboard-muted-dark cursor-not-allowed"
+                : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
             }`}
           >
             Next

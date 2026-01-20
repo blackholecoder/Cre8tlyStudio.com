@@ -171,16 +171,18 @@ export default function PromptModal({
             sm:max-h-[85vh]
             overflow-y-auto
             rounded-2xl
-            bg-gray-900
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
             p-4
             sm:p-8
             shadow-2xl
             border
-            border-gray-700"
+            border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            "
           >
             {/* ---------- Modal Header ---------- */}
             <div className="relative mb-6">
-              {/* Mobile header */}
               {/* Mobile header */}
               <div className="sm:hidden">
                 {/* Top row: back + close */}
@@ -189,7 +191,14 @@ export default function PromptModal({
                     <button
                       type="button"
                       onClick={() => setPhase("questions")}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md"
+                      className="
+                      flex items-center gap-2
+                      px-4 py-2
+                      text-sm font-semibold
+                      bg-green
+                      text-dashboard-bg-dark
+                      rounded-lg shadow-md
+"
                     >
                       <ArrowLeft size={16} />
                       <span>Back</span>
@@ -201,7 +210,7 @@ export default function PromptModal({
                   <button
                     onClick={!loading ? handleClose : undefined}
                     disabled={loading}
-                    className={`text-white text-xl transition ${
+                    className={`text-dashboard-text-light dark:text-dashboard-text-dark text-xl transition ${
                       loading
                         ? "opacity-30 cursor-not-allowed"
                         : "hover:text-red-400"
@@ -212,7 +221,11 @@ export default function PromptModal({
                 </div>
 
                 {/* Title row */}
-                <h2 className="text-2xl font-bold text-white text-center">
+                <h2
+                  className="text-2xl font-bold text-center
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark"
+                >
                   ✨ Create Your Digital Asset
                 </h2>
               </div>
@@ -223,21 +236,25 @@ export default function PromptModal({
                   <button
                     type="button"
                     onClick={() => setPhase("questions")}
-                    className="absolute left-0 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-green text-black rounded-lg shadow-md"
+                    className="absolute left-0 flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-gray-300 text-black rounded-lg shadow-md"
                   >
                     <ArrowLeft size={16} />
                     <span>Back</span>
                   </button>
                 )}
 
-                <h2 className="text-2xl font-bold text-white">
+                <h2
+                  className="text-2xl font-bold
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark"
+                >
                   ✨ Create Your Digital Asset
                 </h2>
 
                 <button
                   onClick={!loading ? handleClose : undefined}
                   disabled={loading}
-                  className={`absolute right-0 text-white text-xl transition ${
+                  className={`absolute right-0 text-dashboard-text-light dark:text-dashboard-text-dark text-xl transition ${
                     loading
                       ? "opacity-30 cursor-not-allowed"
                       : "hover:text-red-400"
@@ -250,7 +267,6 @@ export default function PromptModal({
 
             {/* ---------- Form Wrapper ---------- */}
             <div className="relative">
-              {/* ---------- STEP 0: Choose Creation Type ---------- */}
               {/* ---------- STEP 1: Smart Prompt Builder ---------- */}
               {phase === "questions" && (
                 <SmartOutlineBuilder
@@ -314,7 +330,13 @@ export default function PromptModal({
                     <button
                       type="button"
                       onClick={() => setPhase("selection")}
-                      className="text-sm text-gray-400 underline hover:text-gray-200 transition"
+                      className="
+                      text-sm underline transition
+                      text-dashboard-muted-light
+                      dark:text-dashboard-muted-dark
+                      hover:text-dashboard-text-light
+                      dark:hover:text-dashboard-text-dark
+                      "
                     >
                       ← Back to Selection
                     </button>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { colorThemes, gradientThemes } from "../constants";
+import { getReadableTextColor } from "../helpers/getReadableTextColor";
 
 export default function ColorThemeChooser({
   bgTheme,
@@ -7,6 +8,8 @@ export default function ColorThemeChooser({
   includeGradients = true,
   isPro = false,
 }) {
+  console.log("ColorThemeChooser props → isPro:", isPro);
+
   const [showThemes, setShowThemes] = useState(() => {
     const saved = localStorage.getItem("showThemes");
     return saved === "true";
@@ -88,17 +91,32 @@ export default function ColorThemeChooser({
     isValidHex(customSolid);
 
   return (
-    <div className="bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner">
+    <div
+      className="
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      rounded-2xl
+      shadow-inner
+    "
+    >
       {/* Header */}
       <div
         onClick={() => setShowThemes((p) => !p)}
         className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
       >
-        <h3 className="text-lg font-semibold text-silver">Background Theme</h3>
+        <h3
+          className="text-lg font-semibold
+text-dashboard-text-light
+dark:text-dashboard-text-dark"
+        >
+          Background Theme
+        </h3>
         <span
-          className={`text-gray-400 transition-transform ${
-            showThemes ? "rotate-180" : ""
-          }`}
+          className={`transition-transform
+text-dashboard-muted-light
+dark:text-dashboard-muted-dark ${showThemes ? "rotate-180" : ""}`}
         >
           ▼
         </span>
@@ -113,7 +131,11 @@ export default function ColorThemeChooser({
         <div className="px-6 pb-6 space-y-6">
           {/* Live Preview */}
           <div
-            className="h-14 rounded-lg border border-gray-700"
+            className="
+  h-14 rounded-lg
+  border border-dashboard-border-light
+  dark:border-dashboard-border-dark
+"
             style={{
               background: bgTheme || "linear-gradient(to right, #000, #333)",
             }}
@@ -121,7 +143,13 @@ export default function ColorThemeChooser({
 
           {/* Presets */}
           <div
-            className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 overflow-y-auto border border-gray-800 rounded-lg p-2"
+            className="
+            grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3
+            overflow-y-auto
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            rounded-lg p-2
+"
             style={{ maxHeight: "240px" }}
           >
             {allThemes.map((item) => {
@@ -137,14 +165,20 @@ export default function ColorThemeChooser({
                   className={`relative h-12 rounded-lg border transition-all
         ${
           bgTheme === item.preview
-            ? "border-green-400 ring-2 ring-green-500/60"
-            : "border-gray-700 hover:border-green-300"
+            ? "border-green ring-2 ring-green/50"
+            : "border-dashboard-border-light dark:border-dashboard-border-dark hover:border-green/60"
         }
         ${locked ? "opacity-50 cursor-not-allowed" : ""}
       `}
                   style={{ background: item.preview }}
                 >
-                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold uppercase text-black/80">
+                  <span
+                    className={`
+                    absolute inset-0 flex items-center justify-center
+                    text-[10px] font-semibold uppercase
+                    ${getReadableTextColor(item.preview)}
+                  `}
+                  >
                     {item.label}
                   </span>
 
@@ -167,18 +201,28 @@ export default function ColorThemeChooser({
           {/* Solid Color Picker */}
           {isPro && (
             <div>
-              <p className="text-sm font-semibold text-gray-300 mb-2">
+              <p
+                className="text-sm font-semibold mb-3 text-center
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark"
+              >
                 Custom Solid Color
               </p>
 
               <div
-                className={`flex items-center gap-3 max-w-[520px] rounded-lg p-2 transition-all
+                className={`mx-auto
+                flex flex-col sm:flex-row items-center justify-center
+                gap-3
+                max-w-[520px]
+                rounded-lg
+                p-3
+                transition-all
                 ${
                   isCustomSolidActive
                     ? "ring-2 ring-green-500/70 border border-green-400"
                     : ""
                 }
-  `}
+              `}
               >
                 {/* Color picker */}
                 <input
@@ -191,7 +235,8 @@ export default function ColorThemeChooser({
                   aspect-square
                   rounded-full
                   border
-                  border-gray-600
+                  border-dashboard-border-light
+                  dark:border-dashboard-border-dark
                   cursor-pointer
                   appearance-none
                   p-0
@@ -209,11 +254,15 @@ export default function ColorThemeChooser({
                   max-w-[420px]
                   px-4
                   py-2.5
-                  bg-black
-                  border
-                  border-gray-700
                   rounded-lg
-                  text-white
+                  bg-dashboard-bg-light
+                  dark:bg-dashboard-bg-dark
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  placeholder-dashboard-muted-light
+                  dark:placeholder-dashboard-muted-dark
                   text-sm
                   uppercase
                 "
@@ -226,8 +275,8 @@ export default function ColorThemeChooser({
                   className={`px-4 py-2 border rounded text-sm
           ${
             isValidHex(customSolid)
-              ? "bg-gray-800 border-gray-700 text-green hover:border-green"
-              : "bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed"
+              ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark border border-dashboard-border-light dark:border-dashboard-border-dark text-green hover:border-green"
+              : "text-dashboard-muted-light dark:text-dashboard-muted-dark opacity-60 cursor-not-allowed"
           }
         `}
                 >
@@ -240,7 +289,11 @@ export default function ColorThemeChooser({
           {/* Gradient Picker */}
           {includeGradients && isPro && (
             <div>
-              <p className="text-sm font-semibold text-gray-300 mb-2">
+              <p
+                className="text-sm font-semibold mb-2
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark"
+              >
                 Custom Gradient
               </p>
 
@@ -257,7 +310,8 @@ export default function ColorThemeChooser({
                     aspect-square
                     rounded-full
                     border
-                    border-gray-600
+                    border-dashboard-border-light
+                  dark:border-dashboard-border-dark
                     cursor-pointer
                     appearance-none
                     p-0
@@ -273,11 +327,15 @@ export default function ColorThemeChooser({
                     max-w-[240px]
                     px-4
                     py-2.5
-                    bg-black
-                    border
-                    border-gray-700
                     rounded-lg
-                    text-white
+                   bg-dashboard-bg-light
+                  dark:bg-dashboard-bg-dark
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                  placeholder-dashboard-muted-light
+                  dark:placeholder-dashboard-muted-dark
                     text-sm
                     uppercase
                   "
@@ -312,11 +370,15 @@ export default function ColorThemeChooser({
                     max-w-[240px]
                     px-4
                     py-2.5
-                    bg-black
-                    border
-                    border-gray-700
-                    rounded-lg
-                    text-white
+                    bg-dashboard-bg-light
+                    dark:bg-dashboard-bg-dark
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+                    placeholder-dashboard-muted-light
+                    dark:placeholder-dashboard-muted-dark
+                    rounded-lg         
                     text-sm
                     uppercase
                   "
@@ -332,11 +394,14 @@ export default function ColorThemeChooser({
                 w-full
                 max-w-[520px]
                 p-2.5
-                bg-black
-                border
-                border-gray-700
+              bg-dashboard-bg-light
+              dark:bg-dashboard-bg-dark
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
                 rounded-lg
-                text-white
+
               "
               >
                 <option value="90deg">Left → Right</option>
@@ -352,8 +417,8 @@ export default function ColorThemeChooser({
                 className={`mt-3 w-full px-4 py-2 border rounded
         ${
           isValidHex(gradStart) && isValidHex(gradEnd)
-            ? "bg-gray-800 border-gray-700 hover:border-green text-green"
-            : "bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed"
+            ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark border border-dashboard-border-light dark:border-dashboard-border-dark text-green hover:border-green"
+            : "text-dashboard-muted-light dark:text-dashboard-muted-dark opacity-60 cursor-not-allowed"
         }
       `}
               >
@@ -362,7 +427,11 @@ export default function ColorThemeChooser({
             </div>
           )}
 
-          <p className="text-xs text-gray-400 text-center">
+          <p
+            className="text-xs text-center
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark"
+          >
             Presets or custom colors all save the same way.
           </p>
         </div>

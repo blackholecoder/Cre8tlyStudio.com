@@ -1,12 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
-import LoadingOverlay from "./LoadingOverlay.jsx";
 
 export default function PrivateRoute({ children, role }) {
   const { user, authLoading } = useAuth();
 
   if (authLoading) {
-    return <LoadingOverlay />;
+    return null;
   }
 
   if (!user) {

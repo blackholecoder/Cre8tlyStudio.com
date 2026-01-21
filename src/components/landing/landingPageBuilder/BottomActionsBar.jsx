@@ -8,7 +8,14 @@ export default function BottomActionsBar({
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-16 pt-8 border-t border-gray-700">
+    <div
+      className="
+      flex flex-col sm:flex-row sm:items-center sm:justify-between
+      mt-16 pt-8
+      border-t
+      border-dashboard-border-light dark:border-dashboard-border-dark
+    "
+    >
       {/* Left: Save buttons */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
         <button
@@ -22,7 +29,17 @@ export default function BottomActionsBar({
         <button
           type="button"
           onClick={handleSaveTemplate}
-          className="bg-blue text-white px-6 py-3 rounded-lg shadow hover:bg-green transition"
+          className="
+          bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+          text-dashboard-text-light dark:text-dashboard-text-dark
+          px-6 py-3
+          rounded-lg
+          shadow
+          border
+          border-dashboard-border-light dark:border-dashboard-border-dark
+          hover:bg-dashboard-bg-light dark:hover:bg-dashboard-bg-dark
+          transition
+        "
         >
           Save Version
         </button>
@@ -49,10 +66,21 @@ export default function BottomActionsBar({
       transition-all
       ${
         landing.username
-          ? "bg-green/10 text-green border-green/30 hover:bg-green/20 hover:text-white"
-          : "bg-gray-800 text-gray-400 border-gray-700 cursor-not-allowed"
+          ? `
+                bg-green/10
+                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                border-green/30
+                hover:bg-green/20
+                hover:text-blue
+              `
+          : `
+                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                border-dashboard-border-light dark:border-dashboard-border-dark
+                cursor-not-allowed
+              `
       }
-    `}
+        `}
           onClick={(e) => {
             if (!landing.username) e.preventDefault();
           }}
@@ -62,7 +90,13 @@ export default function BottomActionsBar({
         </a>
 
         {/* Copy URL */}
-        <p className="text-xs text-gray-500 flex items-center gap-2">
+        <p
+          className="
+          text-xs
+          text-dashboard-muted-light dark:text-dashboard-muted-dark
+          flex items-center gap-2
+        "
+        >
           Copy Live URL:
           {landing.username ? (
             <button
@@ -81,7 +115,9 @@ export default function BottomActionsBar({
                 : `https://${landing.username}.cre8tlystudio.com`}
             </button>
           ) : (
-            <span className="text-gray-400">Not set</span>
+            <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              Not set
+            </span>
           )}
         </p>
       </div>

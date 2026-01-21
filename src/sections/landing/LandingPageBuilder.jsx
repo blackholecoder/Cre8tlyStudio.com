@@ -1085,20 +1085,51 @@ export default function LandingPageBuilder() {
 
   if (loading)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      <div
+        className="
+      flex flex-col items-center justify-center min-h-screen
+      bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+      text-dashboard-text-light dark:text-dashboard-text-dark
+    "
+      >
         <div className="relative">
-          {/* Glowing pulse ring */}
-          <div className="absolute inset-0 rounded-full bg-blue/30 blur-2xl animate-ping"></div>
+          {/* Subtle pulse ring */}
+          <div
+            className="
+          absolute inset-0 rounded-full
+          bg-dashboard-muted-light/20 dark:bg-dashboard-muted-dark/20
+          blur-2xl animate-ping
+        "
+          ></div>
 
-          {/* Center spinner */}
-          <div className="w-16 h-16 border-4 border-t-transparent border-green rounded-full animate-spin"></div>
+          {/* Spinner */}
+          <div
+            className="
+          w-16 h-16
+          border-4
+          border-dashboard-border-light dark:border-dashboard-border-dark
+          border-t-green
+          rounded-full
+          animate-spin
+        "
+          ></div>
         </div>
 
-        {/* Loading text */}
-        <p className="mt-6 text-lg font-semibold tracking-wide text-silver animate-pulse">
+        <p
+          className="
+        mt-6 text-lg font-semibold tracking-wide animate-pulse
+        text-dashboard-text-light dark:text-dashboard-text-dark
+      "
+        >
           Building your page...
         </p>
-        <p className="text-sm text-gray-400 mt-2">
+
+        <p
+          className="
+        text-sm mt-2
+        text-dashboard-muted-light dark:text-dashboard-muted-dark
+      "
+        >
           Cre8tly Studio is fetching your latest content blocks.
         </p>
       </div>
@@ -1276,10 +1307,33 @@ export default function LandingPageBuilder() {
           ?.preview || "linear-gradient(to bottom, #ffffff, #F285C3)";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-900 p-1 sm:p-6 md:p-10 overflow-y-scroll">
-      <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-2xl shadow-lg p-3 sm:p-8">
-        <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
-          <Wand2 className="w-6 h-6 text-green" />
+    <div
+      className="
+    min-h-screen
+    p-1 sm:p-6 md:p-10
+    overflow-y-scroll
+    bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+    text-dashboard-text-light dark:text-dashboard-text-dark
+  "
+    >
+      <div
+        className="
+    max-w-4xl mx-auto
+    rounded-2xl
+    p-3 sm:p-8
+    shadow-lg
+    bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+    border border-dashboard-border-light dark:border-dashboard-border-dark
+  "
+      >
+        <h1
+          className="
+    text-2xl font-extrabold text-center mb-8
+    flex items-center justify-center gap-3
+    text-dashboard-text-light dark:text-dashboard-text-dark
+  "
+        >
+          <Wand2 className="w-6 h-6 text-dashboard-accent-light dark:text-dashboard-accent-dark" />
           Landing Page Builder
         </h1>
         {/* Version Controls */}
@@ -1298,7 +1352,13 @@ export default function LandingPageBuilder() {
               handleDeleteVersion={handleDeleteVersion}
             />
 
-            <h1 className="text-2xl font-extrabold text-center mb-8 text-silver flex items-center justify-center gap-3">
+            <h1
+              className="
+              text-2xl font-extrabold text-center mb-8
+              text-dashboard-text-light dark:text-dashboard-text-dark
+              flex items-center justify-center gap-3
+            "
+            >
               Page Builder
             </h1>
 
@@ -1312,7 +1372,14 @@ export default function LandingPageBuilder() {
                 setLanding={setLanding}
               />
             ) : (
-              <div className="relative mb-4 rounded-lg border border-gray-700 bg-black/30 min-h-[160px]">
+              <div
+                className="
+                relative mb-4 rounded-lg
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                min-h-[160px]
+              "
+              >
                 {/* Blurred preview */}
                 <div className="pointer-events-none blur-sm opacity-60">
                   <AnimationSettingsPanel
@@ -1322,9 +1389,17 @@ export default function LandingPageBuilder() {
                 </div>
 
                 {/* Lock overlay */}
-                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/70 py-8">
+                <div
+                  className="
+                    absolute inset-0
+                    flex items-center justify-center
+                    rounded-lg
+                    bg-dashboard-bg-light/80 dark:bg-dashboard-bg-dark/80
+                    py-8
+                  "
+                >
                   <div className="max-w-sm text-center px-6">
-                    <div className="text-lg font-semibold text-white mb-2">
+                    <div className="text-lg font-semibold mb-2 text-dashboard-text-light dark:text-dashboard-text-dark">
                       Animation Settings
                     </div>
                     <p className="text-sm text-gray-300 mb-4">
@@ -1345,8 +1420,16 @@ export default function LandingPageBuilder() {
 
             {/* 🔽 Collapse / Expand All Blocks */}
             <div
-              className="cursor-pointer bg-black/80 text-white px-4 py-3 rounded-lg border border-gray-600 mb-4 flex justify-between items-center"
               onClick={() => setBlocksHidden(!blocksHidden)}
+              className="
+              cursor-pointer
+              px-4 py-3 mb-4
+              rounded-lg
+              flex justify-between items-center
+              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              text-dashboard-text-light dark:text-dashboard-text-dark
+            "
             >
               <span className="font-semibold">
                 {blocksHidden ? "Open All Blocks" : "Hide All Blocks"}
@@ -1363,7 +1446,14 @@ export default function LandingPageBuilder() {
 
             {/* DndContext */}
             {!blocksHidden && (
-              <div className="space-y-4 mb-12 w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 shadow-inner">
+              <div
+                className="
+                space-y-4 mb-12 w-full
+                rounded-xl p-5 shadow-inner
+                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+              "
+              >
                 {landing.content_blocks
                   .filter((b) => b && b.type)
                   .map((block, index) => (
@@ -1396,7 +1486,13 @@ export default function LandingPageBuilder() {
           </div>
 
           {/* 🧾 PDF Attachment */}
-          <div className="w-full bg-[#0f1624]/80 border border-gray-700 rounded-xl p-5 mb-10 shadow-inner pb-12">
+          <div
+            className="
+            w-full rounded-xl p-5 mb-10 pb-12 shadow-inner
+            bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+            border border-dashboard-border-light dark:border-dashboard-border-dark
+          "
+          >
             <PdfSelector
               pdfList={pdfList}
               landing={landing}
@@ -1422,13 +1518,18 @@ export default function LandingPageBuilder() {
               setShowLogoSection={setShowLogoSection}
             />
           ) : (
-            <div className="mt-6 p-4 rounded-xl border border-gray-700 bg-black/60 text-center">
-              <p className="text-sm text-gray-300 font-medium">
+            <div
+              className="
+              mt-6 p-4 rounded-xl text-center
+              bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+            "
+            >
+              <p className="text-sm font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
                 Custom branding is a{" "}
-                <span className="text-purple-400 font-semibold">Pro</span>{" "}
-                feature
+                <span className="text-green font-semibold">Pro</span> feature
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs mt-1 text-dashboard-muted-light dark:text-dashboard-muted-dark">
                 Upgrade to Pro to upload and display your brand logo.
               </p>
               <a

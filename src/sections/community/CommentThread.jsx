@@ -124,30 +124,31 @@ export default function CommentThread({
               )}
 
               {/* Author + Meta */}
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="font-semibold text-gray-200">
-                  {comment.author_role === "admin"
-                    ? "Cre8tly Studio"
-                    : comment.author}
-                </span>
-                {comment.author_role === "admin" && (
-                  <span
-                    className="
-                    flex items-center gap-1
-                    text-dashboard-muted-light dark:text-dashboard-muted-dark
-                    text-[10px]
-                    px-2 py-0.5
-                    border border-dashboard-border-light dark:border-dashboard-border-dark
-                    rounded-full
-  "
-                  >
-                    <ShieldCheck
-                      size={11}
-                      className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                    />
-                    Official
+              <div className="flex items-center gap-[2px] text-xs text-gray-500">
+                <div className="flex items-center gap-0">
+                  <span className="font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
+                    {comment.author_role === "admin"
+                      ? "Cre8tly Studio"
+                      : comment.author}
                   </span>
-                )}
+
+                  {comment.author_role === "admin" && (
+                    <span
+                      className="
+                      flex items-center 
+                      text-dashboard-muted-light dark:text-dashboard-muted-dark
+                      text-[10px]
+                      p-1
+                      rounded-full
+                    "
+                    >
+                      <ShieldCheck
+                        size={11}
+                        className="text-dashboard-muted-light dark:text-green"
+                      />
+                    </span>
+                  )}
+                </div>
                 • {timeAgo(comment.created_at)}
               </div>
             </div>
@@ -182,7 +183,9 @@ export default function CommentThread({
 
               <button
                 onClick={() => setActiveReplyBox(comment.id)}
-                className="text-green hover:text-green/90"
+                className="text-dashboard-text-light dark:text-dashboard-text-dark
+                hover:opacity-80
+"
               >
                 Reply
               </button>
@@ -244,7 +247,9 @@ export default function CommentThread({
       {replyTotal > 0 && (
         <button
           onClick={() => toggleReplyVisibility(comment.id)}
-          className="text-xs text-green hover:text-green/80 mt-2 ml-1"
+          className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark
+            hover:opacity-80
+            mt-2 ml-1"
         >
           {openReplies[comment.id]
             ? "Hide replies"

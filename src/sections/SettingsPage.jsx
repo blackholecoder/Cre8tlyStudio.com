@@ -6,6 +6,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { Img } from "react-image";
 import Cropper from "react-easy-crop";
+import { defaultImage } from "../assets/images";
+import UpgradeRequiredModal from "../components/modals/UpgradeRequiredModal";
 
 export default function DashboardSettings() {
   const { user, setUser, refreshUser } = useAuth();
@@ -27,10 +29,20 @@ export default function DashboardSettings() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const hasBrandFile = Boolean(settings?.brand_identity_file);
 
   const fileInputRef = useRef(null);
+
+  const isCommunityOnly =
+    user?.is_member === 1 && !user?.plan && !user?.free_trial_expires_at;
+
+  function handleLockedClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowUpgradeModal(true);
+  }
 
   function bufferToBase64URL(buffer) {
     let bytes;
@@ -718,7 +730,7 @@ export default function DashboardSettings() {
               }
               unloader={
                 <img
-                  src="/default-avatar.png"
+                  src={defaultImage}
                   className="
                   w-20 h-20 rounded-full object-cover
                   border border-dashboard-border-light
@@ -917,12 +929,12 @@ export default function DashboardSettings() {
                   }
                 }}
                 className="
-  px-5 py-2
-  bg-red-600 hover:bg-red-700
-  text-white
-  dark:text-dashboard-text-dark
-  rounded-lg font-semibold transition
-"
+                px-5 py-2
+                bg-red-600 hover:bg-red-700
+                text-white
+                dark:text-dashboard-text-dark
+                rounded-lg font-semibold transition
+              "
               >
                 Disable 2FA
               </button>
@@ -1030,7 +1042,7 @@ export default function DashboardSettings() {
           ) : (
             <button
               onClick={handleRegisterPasskey}
-              className="px-6 py-2.5 bg-blue text-dashboard-text-light
+              className="px-6 py-2.5 bg-blue text-white
             dark:text-dashboard-text-dark
             font-semibold rounded-lg hover:opacity-90 transition"
             >
@@ -1039,6 +1051,7 @@ export default function DashboardSettings() {
           )}
         </div>
         {/* 💳 Stripe Seller Connection */}
+
         <div
           className="bg-dashboard-sidebar-light
         dark:bg-dashboard-sidebar-dark
@@ -1160,8 +1173,16 @@ export default function DashboardSettings() {
                 </div>
               ) : (
                 // Stripe Start Setup
+
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    if (isCommunityOnly) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowUpgradeModal(true);
+                      return;
+                    }
+
                     try {
                       const { data } = await axiosInstance.post(
                         "/seller/create-account-link"
@@ -1174,9 +1195,16 @@ export default function DashboardSettings() {
                       );
                     }
                   }}
-                  className="px-6 py-2.5 bg-royalPurple text-dashboard-text-light
-                  dark:text-dashboard-text-dark
-                  font-semibold rounded-lg hover:opacity-90 transition"
+                  className={`
+                    px-6 py-2.5 font-semibold rounded-lg transition
+                    ${
+                      isCommunityOnly
+                        ? "bg-gray-400 cursor-not-allowed opacity-60"
+                        : "bg-royalPurple hover:opacity-90"
+                    }
+                    text-dashboard-text-light
+                    dark:text-dashboard-text-dark
+                  `}
                 >
                   Connect with Stripe
                 </button>
@@ -1219,15 +1247,14 @@ export default function DashboardSettings() {
             <>
               {/* Locked overlay */}
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-center px-6">
-                <div className="mb-3 text-3xl">🔒</div>
                 <p
                   className="
                   text-sm mb-4 max-w-[360px]
-                  text-dashboard-text-light
+                  text-dashboard-text-dark
                   dark:text-dashboard-text-dark
   "
                 >
-                  Custom Domains are available on the{" "}
+                  available on the{" "}
                   <span className="text-green font-semibold">
                     Business Builder
                   </span>{" "}
@@ -1236,7 +1263,7 @@ export default function DashboardSettings() {
 
                 <button
                   onClick={() => navigate("/plans")}
-                  className="px-6 py-2.5 bg-royalPurple text-dashboard-text-light
+                  className="px-6 py-2.5 bg-royalPurple text-dashboard-text-dark
                   dark:text-dashboard-text-dark
                   font-semibold rounded-lg hover:opacity-90 transition"
                 >
@@ -1346,7 +1373,16 @@ export default function DashboardSettings() {
                     ref={fileInputRef}
                     type="file"
                     accept=".pdf,.docx,.doc,.txt"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onClick={(e) => {
+                      if (isCommunityOnly) {
+                        e.preventDefault();
+                        setShowUpgradeModal(true);
+                      }
+                    }}
+                    onChange={(e) => {
+                      if (isCommunityOnly) return;
+                      setFile(e.target.files[0]);
+                    }}
                     className="hidden"
                   />
 
@@ -1459,12 +1495,18 @@ export default function DashboardSettings() {
               <textarea
                 placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
                 value={settings?.cta || ""}
-                onChange={(e) =>
-                  setSettings((prev) => ({ ...prev, cta: e.target.value }))
-                }
+                onClick={(e) => {
+                  if (isCommunityOnly) {
+                    e.preventDefault();
+                    setShowUpgradeModal(true);
+                  }
+                }}
+                onChange={(e) => {
+                  if (isCommunityOnly) return;
+                  setSettings((prev) => ({ ...prev, cta: e.target.value }));
+                }}
                 rows={6}
-                className="
-                w-full px-4 py-3 rounded-lg
+                className={`w-full px-4 py-3 rounded-lg
                 bg-dashboard-bg-light
                 dark:bg-dashboard-bg-dark
                 border border-dashboard-border-light
@@ -1474,15 +1516,29 @@ export default function DashboardSettings() {
                 placeholder-dashboard-muted-light
                 dark:placeholder-dashboard-muted-dark
                 focus:ring-2 focus:ring-green focus:outline-none
-"
+                ${isCommunityOnly ? "opacity-60 cursor-not-allowed" : ""}
+              `}
               />
 
               <div className="flex justify-end">
                 <button
-                  onClick={handleSaveCTA}
-                  className="px-6 py-2 rounded-lg bg-green text-dashboard-bg-dark font-semibold hover:opacity-90 transition"
+                  type="button"
+                  onClick={() => {
+                    if (isCommunityOnly) {
+                      setShowUpgradeModal(true);
+                      return;
+                    }
+                    handleSaveCTA();
+                  }}
+                  className={`px-6 py-2 rounded-lg font-semibold transition
+                    ${
+                      isCommunityOnly
+                        ? "opacity-60 cursor-not-allowed bg-green/60"
+                        : "bg-green hover:opacity-90"
+                    }
+                  `}
                 >
-                  Save CTA
+                  {isCommunityOnly ? "Upgrade Required" : "Save CTA"}
                 </button>
               </div>
             </div>
@@ -1611,6 +1667,10 @@ export default function DashboardSettings() {
           ) : null}
         </div>
       </div>
+      <UpgradeRequiredModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 }

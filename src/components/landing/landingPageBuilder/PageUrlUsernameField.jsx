@@ -17,7 +17,13 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
 
   return (
     <div className="w-full pb-10">
-      <label className="block font-semibold mb-1 text-silver">
+      <label
+        className="
+        block font-semibold mb-1
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+      "
+      >
         Page Url Username
       </label>
 
@@ -51,38 +57,45 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
           hasCustomDomain ? "Custom domain connected" : "e.g. cre8tlydesigns"
         }
         className={`
-          w-75
-          border
-          rounded-lg
-          px-4
-          py-2
-          !border-gray-700
-          !text-white
-          placeholder-white/30
-          ${
-            hasCustomDomain
-              ? "bg-gray-800/60 cursor-not-allowed opacity-60"
-              : "!bg-bioModal"
-          }
-        `}
+        w-75
+        rounded-lg px-4 py-2
+        border
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        placeholder-dashboard-muted-light
+        dark:placeholder-dashboard-muted-dark
+        border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        ${
+          hasCustomDomain
+            ? "bg-dashboard-disabled-light dark:bg-dashboard-disabled-dark cursor-not-allowed opacity-60"
+            : "bg-dashboard-bg-light dark:bg-dashboard-bg-dark"
+        }
+      `}
       />
 
-      <p className="text-xs text-gray-200 mt-1 mb-10">
+      <p
+        className="
+        text-xs mt-1 mb-10
+        text-dashboard-muted-light
+        dark:text-dashboard-muted-dark
+      "
+      >
         {hasCustomDomain ? (
           <>
             Your page is live at{" "}
-            <span className="block text-green break-all">
+            <span className="block text-blue break-all">
               https://{primaryDomain}
             </span>
             <br />
-            <span className="block text-gray-400 mt-1">
+            <span className="block mt-1 text-dashboard-muted-light dark:text-dashboard-muted-dark">
               Subdomain is disabled while a custom domain is active.
             </span>
           </>
         ) : (
           <>
             This will be used for your page URL{" "}
-            <span className="block text-green break-all">
+            <span className="block text-dashboard-muted-light dark:text-dashboard-muted-dark break-all">
               {landing.username
                 ? `https://${landing.username}.cre8tlystudio.com`
                 : "https://yourname.cre8tlystudio.com"}

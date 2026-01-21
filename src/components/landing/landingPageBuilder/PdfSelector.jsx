@@ -13,19 +13,34 @@ export default function PdfSelector({
   setCoverLoading,
 }) {
   return (
-    <div className="mt-1 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+    <div
+      className="
+      mt-1
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      rounded-2xl
+      shadow-inner
+      p-6
+      transition-all
+      hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark
+    "
+    >
       {/* Header */}
       <div
         onClick={() => setShowPdfSection(!showPdfSection)}
         className="flex items-center justify-between px-6 py-5 cursor-pointer select-none"
       >
-        <h3 className="text-lg font-semibold text-silver tracking-wide">
+        <h3
+          className="text-lg font-semibold tracking-wide
+        text-dashboard-text-light dark:text-dashboard-text-dark"
+        >
           Choose PDF to Offer
         </h3>
         <span
-          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-            showPdfSection ? "rotate-180" : "rotate-0"
-          }`}
+          className={`text-dashboard-muted-light dark:text-dashboard-muted-dark
+  text-sm transform transition-transform duration-300 ${
+    showPdfSection ? "rotate-180" : "rotate-0"
+  }`}
         >
           ▼
         </span>
@@ -38,7 +53,10 @@ export default function PdfSelector({
         }`}
       >
         <div className="px-6 pb-6">
-          <span className="text-xs text-gray-400 italic block mb-5">
+          <span
+            className="text-xs italic block mb-5
+          text-dashboard-muted-light dark:text-dashboard-muted-dark"
+          >
             Only completed PDFs are shown.
             <br />
             If Stripe Button is enabled, this image will be the cover.
@@ -80,7 +98,15 @@ export default function PdfSelector({
                   setCoverLoading(false);
                 }
               }}
-              className="w-full border border-gray-600 bg-[#0F172A] text-gray-200 rounded-lg px-4 py-3 appearance-none cursor-pointer"
+              className="
+              w-full
+              rounded-lg
+              px-4 py-3
+              appearance-none cursor-pointer
+              bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              text-dashboard-text-light dark:text-dashboard-text-dark
+            "
             >
               <option value="">-- Select a Completed PDF --</option>
               {pdfList
@@ -94,7 +120,12 @@ export default function PdfSelector({
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+              className="
+              absolute right-4 top-1/2 -translate-y-1/2
+              h-5 w-5
+              pointer-events-none
+              text-dashboard-muted-light dark:text-dashboard-muted-dark
+            "
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -110,33 +141,75 @@ export default function PdfSelector({
 
           {/* PDF Cover Preview */}
           <div
-            className="mt-6 text-center bg-[#1f2937]/60 border border-gray-700 rounded-xl p-5 shadow-inner relative flex flex-col items-center justify-center overflow-hidden transition-all duration-300"
+            className="
+            mt-6
+            text-center
+            rounded-xl
+            p-5
+            shadow-inner
+            relative
+            flex flex-col items-center justify-center
+            overflow-hidden
+            transition-all duration-300
+            bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+            border border-dashboard-border-light dark:border-dashboard-border-dark
+          "
             style={{ height: "340px" }}
           >
             {coverLoading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#111827]/70 backdrop-blur-sm">
+              <div
+                className="
+                absolute inset-0
+                flex flex-col items-center justify-center
+                bg-dashboard-bg-light/80 dark:bg-dashboard-bg-dark/80
+                backdrop-blur-sm
+              "
+              >
                 {/* Spinner */}
-                <div className="w-12 h-12 border-4 border-gray-500 border-t-green rounded-full animate-spin"></div>
+                <div
+                  className="
+                  w-12 h-12
+                  border-4
+                  border-dashboard-border-light dark:border-dashboard-border-dark
+                  border-t-green
+                  rounded-full
+                  animate-spin
+                "
+                ></div>
+
                 <p className="text-gray-400 text-sm mt-3">
                   Loading cover preview...
                 </p>
               </div>
             ) : coverPreview ? (
               <div className="flex flex-col items-center justify-center w-full h-full">
-                <p className="text-sm text-gray-300 mb-3 font-semibold tracking-wide">
+                <p
+                  className="text-sm font-semibold 
+                  text-dashboard-text-light dark:text-dashboard-text-dark mb-3 tracking-wide"
+                >
                   PDF Cover Preview
                 </p>
                 <img
                   src={coverPreview}
                   alt="PDF Cover"
-                  className="h-48 object-contain rounded-lg shadow-md border border-gray-600 mx-auto"
+                  className="
+                  h-48 object-contain rounded-lg shadow-md
+                  border border-dashboard-border-light dark:border-dashboard-border-dark
+                  mx-auto
+                "
                 />
-                <p className="text-xs text-gray-500 mt-3">
+                <p
+                  className="text-xs mt-3
+                text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                >
                   This cover will appear on your landing page.
                 </p>
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">
+              <p
+                className="text-sm italic
+                text-dashboard-muted-light dark:text-dashboard-muted-dark"
+              >
                 No PDF cover selected yet.
               </p>
             )}
@@ -153,7 +226,8 @@ export default function PdfSelector({
                 setCoverPreview("");
                 setCoverLoading(false);
               }}
-              className="mt-4 text-sm text-red-400 hover:text-red-300 underline"
+              className="mt-4 text-sm underline
+              text-red-500 hover:text-red-400"
             >
               Remove PDF
             </button>

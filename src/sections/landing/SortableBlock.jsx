@@ -222,17 +222,21 @@ function SortableBlock({
           setActiveChild(null);
         }
       }}
-      className={`mb-4 ${isActive ? "ring-2 ring-green" : ""} sm:mb-6
-     bg-black/70 border rounded-lg sm:rounded-xl
+      className={`
+      mb-4 sm:mb-6
+      rounded-lg sm:rounded-xl
       p-3 sm:p-5
       relative shadow-inner
-      text-white transition-all duration-300
-    ${
-      block.enabled !== false
-        ? "border-gray-600 hover:border-gray-400"
-        : "border-gray-700 opacity-50 grayscale"
-    }
-  `}
+      transition-all duration-300
+      bg-dashboard-bg-light/70 dark:bg-dashboard-bg-dark/70
+      border
+      ${
+        block.enabled !== false
+          ? "border-dashboard-border-light dark:border-dashboard-border-dark hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark"
+          : "border-dashboard-border-light dark:border-dashboard-border-dark opacity-50 grayscale"
+      }
+      ${isActive ? "ring-2 ring-green" : ""}
+    `}
     >
       <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
         {/* ROW: Toggle + Block Name */}
@@ -245,16 +249,9 @@ function SortableBlock({
               updateField(index, "enabled", block.enabled === false);
             }}
             className={`
-        inline-flex
-        h-4
-        w-8
-        items-center
-        rounded-full
-        transition-colors
-        duration-200
-        shadow-md
-        ${block.enabled !== false ? "bg-green/80" : "bg-zinc-700"}
-      `}
+            inline-flex h-4 w-8 items-center rounded-full transition-colors duration-200 shadow-md
+            ${block.enabled !== false ? "bg-green/80" : "bg-dashboard-muted-light dark:bg-dashboard-muted-dark"}
+          `}
           >
             <span
               className={`
@@ -276,7 +273,9 @@ function SortableBlock({
           />
 
           {block.enabled === false && (
-            <span className="text-[11px] text-gray-400 italic">disabled</span>
+            <span className="text-[11px] italic text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              disabled
+            </span>
           )}
         </div>
 
@@ -297,7 +296,9 @@ function SortableBlock({
               className="flex items-center gap-2 shrink-0 opacity-80 hover:opacity-100 transition"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="text-[11px] text-gray-400">Animate</span>
+              <span className="text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                Animate
+              </span>
 
               <button
                 type="button"
@@ -313,7 +314,11 @@ function SortableBlock({
           items-center
           rounded-full
           transition-colors duration-200
-          ${block.motion?.disabled ? "bg-zinc-700" : "bg-royalPurple"}
+          ${
+            block.motion?.disabled
+              ? "bg-dashboard-muted-light dark:bg-dashboard-muted-dark"
+              : "bg-royalPurple"
+          }
         `}
               >
                 <span
@@ -331,15 +336,17 @@ function SortableBlock({
 
           {/* CHEVRON */}
           <span
-            className={`text-gray-400 text-sm transition-transform duration-300 ${
-              block.collapsed ? "rotate-0" : "rotate-180"
-            }`}
+            className={`
+            text-sm transition-transform duration-300
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+            ${block.collapsed ? "rotate-0" : "rotate-180"}
+          `}
           >
             ▼
           </span>
         </div>
       </div>
-      <div className="text-xs text-gray-400 leading-snug mt-0.5 ml-[36px]">
+      <div className="text-xs leading-snug mt-0.5 ml-[36px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
         {getBlockLabel(block)}
       </div>
 

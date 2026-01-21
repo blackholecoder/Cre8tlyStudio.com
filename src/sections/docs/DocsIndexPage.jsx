@@ -92,13 +92,33 @@ export default function DocsIndexPage() {
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-10 px-6 text-silver">
+    <div
+      className="
+      w-full max-w-4xl mx-auto
+      py-10 px-6
+      text-dashboard-text-light
+      dark:text-dashboard-text-dark
+    "
+    >
       <header className="mb-10">
-        <h1 className="text-3xl font-bold text-silver flex items-center gap-3 mb-2 normal-case">
+        <h1
+          className="
+          text-3xl font-bold flex items-center gap-3 mb-2 normal-case
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+        "
+        >
           <ShieldQuestionMark className="w-8 h-8 text-green" />
           Documentation
         </h1>
-        <p className="text-sm text-gray-400">
+
+        <p
+          className="
+          text-sm
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+        "
+        >
           Search or browse through all Cre8tly Studio help guides, tutorials,
           and feature overviews.
         </p>
@@ -106,14 +126,35 @@ export default function DocsIndexPage() {
 
       {/* Search */}
       <div className="relative mb-8">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search
+          className="
+          absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+        "
+        />
+
         <input
           type="text"
           placeholder="Search documentation..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ paddingLeft: "50px" }}
-          className="w-full pl-14 pr-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-silver focus:ring-2 focus:ring-green focus:outline-none"
+          className="
+          w-full
+          px-4 py-3 pl-14
+          rounded-xl
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          placeholder-dashboard-muted-light
+          dark:placeholder-dashboard-muted-dark
+          focus:outline-none
+          focus:ring-2 focus:ring-green
+        "
         />
       </div>
 
@@ -123,12 +164,33 @@ export default function DocsIndexPage() {
           <Link
             to={doc.path}
             key={doc.id}
-            className="block p-5 rounded-xl bg-[#0d1117] border border-gray-800 hover:border-gray-600 hover:bg-gray-900 transition shadow"
+            className="
+            block p-5 rounded-xl transition shadow
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            border border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            hover:border-dashboard-muted-light
+            dark:hover:border-dashboard-muted-dark
+          "
           >
-            <h2 className="text-lg font-semibold mb-2 text-silver">
+            <h2
+              className="
+              text-lg font-semibold mb-2
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
+            "
+            >
               {doc.title}
             </h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
+
+            <p
+              className="
+              text-sm leading-relaxed
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+            "
+            >
               {doc.description}
             </p>
           </Link>
@@ -136,7 +198,13 @@ export default function DocsIndexPage() {
       </div>
 
       {filteredDocs.length === 0 && (
-        <p className="text-center text-gray-500 text-sm mt-10">
+        <p
+          className="
+          text-center text-sm mt-10 italic
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+        "
+        >
           No documents found for your search.
         </p>
       )}

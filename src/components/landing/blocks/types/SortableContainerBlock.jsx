@@ -43,17 +43,20 @@ export function SortableContainerBlock({
         setActiveChild(null); // selecting container clears child
       }}
       className="
-      mb-4 sm:mb-6
-      rounded-xl
-      p-2 sm:p-4
-      bg-black/60
-      transition-all duration-200
-      border
-      border-white/10 hover:border-dashed hover:border-white/30"
+        mb-4 sm:mb-6
+        rounded-xl
+        p-2 sm:p-4
+        bg-dashboard-bg-light/70 dark:bg-dashboard-bg-dark/70
+        transition-all duration-200
+        border
+        border-dashboard-border-light dark:border-dashboard-border-dark
+        hover:border-dashed
+        hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark
+      "
     >
       <div className="flex items-center gap-2 mb-2">
         {/* TITLE — FAR LEFT */}
-        <h3 className="text-green font-bold text-lg mr-auto">
+        <h3 className="text-dashboard-muted-light dark:text-green font-bold text-lg mr-auto">
           {block.title || "Untitled Section"}
         </h3>
 
@@ -64,7 +67,12 @@ export function SortableContainerBlock({
             e.stopPropagation();
             moveBlockUp(block.id);
           }}
-          className="px-2 py-1 text-xs rounded bg-white/5 hover:bg-white/10 text-gray-300"
+          className="
+            px-2 py-1 text-xs rounded
+            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+            hover:text-dashboard-text-light dark:hover:text-dashboard-text-dark
+          "
         >
           ↑
         </button>
@@ -76,7 +84,12 @@ export function SortableContainerBlock({
             e.stopPropagation();
             moveBlockDown(block.id);
           }}
-          className="px-2 py-1 text-xs rounded bg-white/5 hover:bg-white/10 text-gray-300"
+          className="
+            px-2 py-1 text-xs rounded
+            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+            hover:text-dashboard-text-light dark:hover:text-dashboard-text-dark
+          "
         >
           ↓
         </button>
@@ -88,7 +101,10 @@ export function SortableContainerBlock({
             e.stopPropagation();
             updateBlock(index, "collapsed", !block.collapsed);
           }}
-          className="text-gray-400 hover:text-white"
+          className="
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+            hover:text-dashboard-text-light dark:hover:text-dashboard-text-dark
+          "
         >
           ▼
         </button>
@@ -99,7 +115,14 @@ export function SortableContainerBlock({
           value={block.title || ""}
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => updateBlock(index, "title", e.target.value)}
-          className="mb-3 w-full bg-black text-white border border-gray-700 rounded px-3 py-2 text-sm"
+          className="
+            mb-3 w-full
+            rounded px-3 py-2 text-sm
+            bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+            text-dashboard-text-light dark:text-dashboard-text-dark
+            border
+            border-dashboard-border-light dark:border-dashboard-border-dark
+          "
         />
       )}
 

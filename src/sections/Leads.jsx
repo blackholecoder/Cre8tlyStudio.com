@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axios";
 import { Mail, Calendar, FileText } from "lucide-react";
 import Papa from "papaparse";
@@ -8,6 +8,8 @@ export default function Leads() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedLanding, setSelectedLanding] = useState("all");
+  const [landingOpen, setLandingOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 10;
@@ -33,6 +35,22 @@ export default function Leads() {
   useEffect(() => {
     console.log("Fetched leads:", leads);
   }, [leads]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setLandingOpen(false);
+      }
+    }
+
+    if (landingOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [landingOpen]);
 
   // ✅ Get unique landing pages for filter dropdown
   const pdfOptions = [
@@ -105,24 +123,88 @@ export default function Leads() {
 
         {/* 🔍 Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-          <select
-            value={selectedLanding}
-            onChange={(e) => setSelectedLanding(e.target.value)}
-            className="rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green
-            bg-dashboard-sidebar-light
-            dark:bg-dashboard-sidebar-dark
-            border border-dashboard-border-light
-            dark:border-dashboard-border-dark
-            text-dashboard-text-light
-            dark:text-dashboard-text-dark"
-          >
-            <option value="all">All PDFs</option>
-            {pdfOptions.map((opt, i) => (
-              <option key={i} value={opt.title}>
-                {opt.title || "Untitled PDF"}
-              </option>
-            ))}
-          </select>
+          <div ref={dropdownRef} className="relative w-full sm:w-64">
+            {/* Trigger */}
+            <button
+              type="button"
+              onClick={() => setLandingOpen((v) => !v)}
+              className="
+      w-full flex items-center justify-between
+      rounded-lg px-4 py-2 text-sm transition
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      text-dashboard-text-light dark:text-dashboard-text-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+    "
+            >
+              <span className="truncate">
+                {selectedLanding === "all"
+                  ? "All PDFs"
+                  : selectedLanding || "Untitled PDF"}
+              </span>
+
+              <span
+                className={`transition-transform ${
+                  landingOpen ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                ▼
+              </span>
+            </button>
+
+            {/* Dropdown */}
+            {landingOpen && (
+              <div
+                className="
+        absolute z-30 mt-2 w-full
+        rounded-lg shadow-lg
+        max-h-64 overflow-y-auto
+        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+      "
+              >
+                {/* All option */}
+                <div
+                  onClick={() => {
+                    setSelectedLanding("all");
+                    setLandingOpen(false);
+                  }}
+                  className="
+          px-4 py-2 cursor-pointer text-sm transition
+          text-dashboard-text-light dark:text-dashboard-text-dark
+          hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+        "
+                >
+                  All PDFs
+                </div>
+
+                {pdfOptions.map((opt, i) => {
+                  const active = selectedLanding === opt.title;
+
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setSelectedLanding(opt.title);
+                        setLandingOpen(false);
+                      }}
+                      className={`
+              px-4 py-2 cursor-pointer text-sm transition
+              ${
+                active
+                  ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark font-semibold"
+                  : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+              }
+              text-dashboard-text-light dark:text-dashboard-text-dark
+            `}
+                    >
+                      {opt.title || "Untitled PDF"}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (

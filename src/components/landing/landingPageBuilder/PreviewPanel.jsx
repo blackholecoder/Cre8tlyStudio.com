@@ -1806,8 +1806,16 @@ export default function PreviewPanel({
 
   return (
     <div
-      className="mt-6 sm:mt-12
- bg-[#0b0b0b] border border-gray-700 rounded-xl sm:rounded-2xl shadow-inner  p-3 sm:p-6 transition-all hover:border-silver/60"
+      className="
+      mt-6 sm:mt-12
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      rounded-xl sm:rounded-2xl
+      shadow-inner
+      p-3 sm:p-6
+      transition-all
+      hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark
+    "
     >
       {/* Header toggle */}
       <div
@@ -1816,10 +1824,20 @@ export default function PreviewPanel({
       >
         {/* Left side: title + description */}
         <div className="flex flex-col">
-          <h3 className="text-lg font-semibold text-silver tracking-wide">
+          <h3
+            className="
+            text-lg font-semibold tracking-wide
+            text-dashboard-text-light dark:text-dashboard-text-dark
+          "
+          >
             Landing Page Preview
           </h3>
-          <p className="mt-1 text-sm text-silver/80 leading-relaxed max-w-xl italic">
+          <p
+            className="
+            mt-1 text-sm italic leading-relaxed max-w-xl
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+          "
+          >
             Your live page may appear slightly different due to device, screen
             size, or browser rendering.
           </p>
@@ -1827,9 +1845,12 @@ export default function PreviewPanel({
 
         {/* Right side: chevron */}
         <span
-          className={`text-gray-400 text-sm transform transition-transform duration-300 ${
-            showPreviewSection ? "rotate-180" : "rotate-0"
-          }`}
+          className={`
+          text-dashboard-muted-light dark:text-dashboard-muted-dark
+          text-sm
+          transform transition-transform duration-300
+          ${showPreviewSection ? "rotate-180" : "rotate-0"}
+        `}
         >
           ▼
         </span>
@@ -1844,7 +1865,15 @@ export default function PreviewPanel({
         }`}
       >
         <div
-          className="mt-4 sm:mt-8 p-4 sm:p-10 rounded-xl text-center shadow-lg transition-all duration-500"
+          className="
+          mt-4 sm:mt-8
+          p-4 sm:p-10
+          rounded-xl
+          text-center
+          shadow-lg
+          transition-all duration-500
+          bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+        "
           style={{
             background: adjustForLandingOverlay(selectedTheme),
             fontFamily: fontName,
@@ -1931,7 +1960,7 @@ export default function PreviewPanel({
                 height: "auto", // <-- Add
                 aspectRatio: "unset",
                 objectFit: "cover",
-                border: "2px solid rgba(255, 255, 255, 0.06)",
+                border: "2px solid var(--dashboard-border-light)",
                 background: "#000",
                 boxShadow:
                   "0 15px 35px rgba(0, 0, 0, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15)",
@@ -1947,7 +1976,10 @@ export default function PreviewPanel({
                 <MotionWrapper
                   key={block.id || index}
                   index={index}
-                  motionSettings={landing.motion_settings}
+                  motionSettings={{
+                    ...landing.motion_settings,
+                    enabled: false,
+                  }}
                   blockMotion={block.motion}
                 >
                   {renderPreviewBlock(block, index, {
@@ -1963,7 +1995,12 @@ export default function PreviewPanel({
                 </MotionWrapper>
               ))
           ) : (
-            <p className="text-gray-400 italic">
+            <p
+              className="
+              italic
+              text-dashboard-muted-light dark:text-dashboard-muted-dark
+            "
+            >
               Start adding sections to preview your landing page...
             </p>
           )}

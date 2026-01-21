@@ -7,50 +7,52 @@ export default function SupportTab() {
 
   const faqs = [
     {
-      q: "How do I generate a lead magnet?",
-      a: "Fill out your prompt, upload a logo, add your link, select a theme, and click “Generate.” Your PDF will be automatically created and ready to download.",
+      q: "What is a lead magnet in Cre8tly Studio?",
+      a: "A lead magnet is a downloadable PDF you create to capture emails or deliver value to your audience. Cre8tly Studio generates a fully designed, ready-to-use PDF based on your prompt, theme, and branding.",
     },
     {
-      q: "How long does it take?",
-      a: "Most PDFs take between 5–15 seconds to generate, depending on the number of pages and theme you select.",
+      q: "How do I create a lead magnet?",
+      a: "Enter your prompt, choose a theme, optionally upload a logo or link, and click Generate. Cre8tly Studio builds your PDF automatically and saves it to your dashboard.",
+    },
+    {
+      q: "How long does it take to generate a PDF?",
+      a: "Most lead magnets are generated within 5–15 seconds, depending on content length and selected design options.",
     },
     {
       q: "Where can I find my generated PDFs?",
-      a: "All completed lead magnets are available in your dashboard under “My Lead Magnets.” You can view, download, or regenerate them anytime.",
+      a: "All completed PDFs are stored in your dashboard under My Lead Magnets. From there you can view, download, or attach them to landing pages.",
     },
     {
-      q: "Can I generate more than one lead magnet?",
-      a: "Yes! You can create as many as you want. Simply open the Lead Magnet Creator and repeat the process with a new prompt or design.",
+      q: "Can I create multiple lead magnets?",
+      a: "Yes. You can create multiple lead magnets as long as you have available slots or credits on your plan.",
+    },
+    {
+      q: "Can I regenerate an existing PDF?",
+      a: "No. Each lead magnet slot is intended for one finalized PDF. This prevents abuse and ensures consistent system performance. To make changes, you’ll need to generate a new lead magnet using a new slot.",
     },
     {
       q: "Can I use my own branding?",
-      a: "Absolutely. You can upload your own logo and link to your website or product page. Themes adjust automatically to fit your brand look.",
+      a: "Yes. You can upload your logo and add your own links. Themes automatically adapt to your branding for a consistent look.",
     },
     {
-  q: "What are Pro Covers?",
-  a: "Pro Covers is an exclusive upgrade that lets you upload custom cover images for your lead magnets. Your uploaded cover appears as the first page of your PDF, giving your content a professional, branded presentation. In addition to uploading your own designs, Pro Covers also includes access to thousands of royalty-free Unsplash images you can instantly use as backgrounds or full covers. This gives you unlimited creative flexibility without any licensing worries—available only with the Pro Covers plan.",
-},
-
-    {
-      q: "Can I edit or regenerate an existing PDF?",
-      a: "No. Each slot is designed for a single finalized PDF to ensure fair usage and prevent system abuse. Allowing unlimited regenerations could cause performance issues and disrupt other users’ workflows. If you’d like to create a new version, please start a new lead magnet using a fresh slot.",
+      q: "What are Pro Covers?",
+      a: "Pro Covers lets you upload a custom cover image that becomes the first page of your PDF. It also includes access to thousands of royalty-free Unsplash images you can use as covers or backgrounds. This feature is available only with the Business Basic and Business Builder plan.",
     },
-
+    {
+      q: "What happens if I reach my plan limit?",
+      a: "If you hit your limit, you’ll be prompted to upgrade or purchase additional credits. Your existing PDFs remain accessible at all times.",
+    },
+    {
+      q: "Can I upgrade my plan later?",
+      a: "Yes. You can upgrade your plan or buy more credits directly from your dashboard at any time.",
+    },
     {
       q: "Do you offer refunds?",
-      a: "Since Cre8tly Studio is a digital service that instantly generates custom content, we do not offer refunds after delivery. However, if you experience a technical issue or duplicate charge, please reach out, we’ll make it right.",
-    },
-    {
-      q: "Can I upgrade my plan or buy more credits?",
-      a: "Yes. Additional credits and premium plans are available directly from your account dashboard.",
-    },
-    {
-      q: "What if I reach my limit?",
-      a: "If you’ve hit your plan limit, you’ll see a message prompting you to upgrade or purchase more credits. You’ll never lose access to past PDFs.",
+      a: "Because Cre8tly Studio delivers instant, custom-generated digital content, refunds are not available after generation. If you encounter a technical issue or duplicate charge, contact support and we’ll help resolve it.",
     },
     {
       q: "How do I contact support?",
-      a: "You can reach out anytime on our Contact Us page Our team typically responds within 24-48 hours, Monday–Friday.",
+      a: "You can reach our support team through the Contact page. Responses typically arrive within 24–48 hours, Monday through Friday.",
     },
   ];
 
@@ -100,10 +102,10 @@ export default function SupportTab() {
 
             <div className="mt-6 text-center">
               <Link
-                to="/contact"
+                to="/docs"
                 className="text-green font-medium hover:underline"
               >
-                Need more help? Contact Support →
+                Need more help? Visit our Docs →
               </Link>
             </div>
           </div>

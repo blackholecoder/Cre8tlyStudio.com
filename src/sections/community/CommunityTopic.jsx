@@ -52,11 +52,11 @@ export default function CommunityTopic() {
       {/* 🔙 Back + Breadcrumbs */}
       <div
         className="flex items-center gap-2 text-sm
-  text-dashboard-muted-light dark:text-dashboard-muted-dark mb-4"
+      text-dashboard-muted-light dark:text-dashboard-muted-dark mb-4"
       >
         <button
           onClick={() => navigate("/community")}
-          className="text-green hover:text-green/80 transition"
+          className="text-blue hover:text-blue/80 transition"
         >
           ← Back
         </button>
@@ -79,7 +79,7 @@ export default function CommunityTopic() {
       <div className="flex items-center justify-between mb-8">
         <h1
           className="text-3xl font-bold
-  text-dashboard-text-light dark:text-dashboard-text-dark"
+          text-dashboard-text-light dark:text-dashboard-text-dark"
         >
           {topic.name}
         </h1>
@@ -87,13 +87,18 @@ export default function CommunityTopic() {
         <button
           onClick={() => setShowModal(true)}
           className="
-  flex items-center gap-2 px-4 py-2
-  bg-bookBtnColor text-black
-  rounded-lg
-  hover:opacity-90 transition
-"
+          flex items-center gap-2
+          px-4 py-2
+          rounded-lg font-medium
+          border border-dashboard-border-light dark:border-dashboard-border-dark
+          text-dashboard-text-light dark:text-dashboard-text-dark
+          hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+          transition
+          focus:outline-none focus:ring-2 focus:ring-green/30
+        "
         >
-          <Plus size={20} /> New Post
+          <Plus size={18} />
+          New Post
         </button>
       </div>
 
@@ -111,36 +116,93 @@ export default function CommunityTopic() {
                 try {
                   await axiosInstance.post(`/community/${topicId}/mark-viewed`);
                 } catch (err) {}
-
                 navigate(`/community/post/${post.id}`);
               }}
               className="
-                relative w-full text-left
-                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-                p-5 rounded-xl
-                border border-dashboard-border-light dark:border-dashboard-border-dark
-                hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-                transition
-              "
+              relative w-full text-left
+              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+              p-4 sm:p-5 rounded-xl
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+              transition
+              active:scale-[0.99]
+            "
             >
               {isNew && (
-                <span className="absolute top-3 right-3 bg-green text-black text-xs font-semibold px-2 py-1 rounded-full shadow-md">
+                <span
+                  className="
+                  absolute top-3 right-3
+                  bg-green text-black text-xs font-semibold
+                  px-2 py-1 rounded-full
+                "
+                >
                   NEW
                 </span>
               )}
 
-              <h3
-                className="text-lg font-semibold
-              text-dashboard-text-light dark:text-dashboard-text-dark"
-              >
-                {post.title}
-              </h3>
-              <p
-                className="text-sm mt-1
-              text-dashboard-muted-light dark:text-dashboard-muted-dark"
-              >
-                By {post.author}
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                {/* Left image */}
+                {post.image_url && (
+                  <div
+                    className="
+                    w-full sm:w-16
+                    aspect-[4/1] sm:aspect-square
+                    rounded-lg
+                    overflow-hidden
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    flex-shrink-0
+                  "
+                  >
+                    <img
+                      src={post.image_url}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="
+                      w-full h-full object-cover
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                    "
+                    />
+                  </div>
+                )}
+                {/* Right content */}
+                <div className="flex-1">
+                  <h3
+                    className="
+                    text-base sm:text-lg font-semibold line-clamp-2
+                    text-dashboard-text-light dark:text-dashboard-text-dark
+                  "
+                  >
+                    {post.title}
+                  </h3>
+                  {post.subtitle && (
+                    <p
+                      className="
+                      mt-1
+                      text-sm sm:text-base
+                      font-medium
+                      leading-snug
+                      line-clamp-2
+                      text-dashboard-muted-light
+                      dark:text-dashboard-muted-dark
+                    "
+                    >
+                      {post.subtitle}
+                    </p>
+                  )}
+
+                  <p
+                    className="
+                    text-sm mt-1
+                    text-dashboard-muted-light dark:text-dashboard-muted-dark
+                  "
+                  >
+                    By {post.author}
+                  </p>
+                </div>
+              </div>
             </button>
           );
         })}

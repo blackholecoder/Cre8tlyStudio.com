@@ -5,9 +5,23 @@ export default function ToggleDownloadButton({
   setShowDownloadButton,
 }) {
   return (
-    <div className="mt-10 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 hover:border-silver/60 transition-all">
+    <div
+      className="
+      mt-10
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      rounded-2xl
+      shadow-inner
+      p-6
+      transition-all
+      hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark
+    "
+    >
       <div className="flex items-center justify-between">
-        <label className="text-lg font-semibold text-silver tracking-wide">
+        <label
+          className="text-lg font-semibold tracking-wide
+          text-dashboard-text-light dark:text-dashboard-text-dark"
+        >
           Show “Download Now” Button
         </label>
 
@@ -20,18 +34,24 @@ export default function ToggleDownloadButton({
           />
           <span
             className={`block w-11 h-6 rounded-full transition-all duration-300 ${
-              showDownloadButton ? "bg-green" : "bg-gray-600"
+              showDownloadButton
+                ? "bg-green"
+                : "bg-dashboard-border-light dark:bg-dashboard-border-dark"
             }`}
           ></span>
           <span
-            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-              showDownloadButton ? "translate-x-5" : ""
-            }`}
+            className={`absolute left-1 top-1 w-4 h-4 rounded-full transition-transform duration-300
+          bg-dashboard-bg-light dark:bg-dashboard-bg-dark ${
+            showDownloadButton ? "translate-x-5" : ""
+          }`}
           ></span>
         </label>
       </div>
 
-      <p className="text-xs text-gray-400 mt-2">
+      <p
+        className="text-xs mt-2
+        text-dashboard-muted-light dark:text-dashboard-muted-dark"
+      >
         Turn this off to hide the email capture form for free PDF downloads.
       </p>
     </div>

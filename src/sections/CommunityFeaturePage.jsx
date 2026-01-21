@@ -267,12 +267,19 @@ export default function CommunityFeaturePage() {
               </p>
             </div>
 
-            <div className="flex">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => navigateWithReferral("/plans")}
+                onClick={() => navigateWithReferral("/signup-community")}
                 className="rounded-xl bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-lg hover:bg-gray-100 transition"
               >
-                Get started for free
+                Join the community
+              </button>
+
+              <button
+                onClick={() => navigateWithReferral("/plans")}
+                className="rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
+              >
+                Start free trial
               </button>
             </div>
           </div>

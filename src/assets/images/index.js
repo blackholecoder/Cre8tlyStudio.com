@@ -36,9 +36,10 @@ import audioPlayer from "./audio-player.webp";
 import freeSubDomain from "./subdomain.webp";
 import tools from "./tools.webp";
 import comingSoon from "./coming-soon.webp";
+import defaultImage from "./userImage.png";
 
 // Authors Assistant
-import bookFeature from "./book-feature-prompt-new-1.webp";
+import bookFeature from "./white-author.webp";
 import aiCopy from "./ai-copy-landing.webp";
 
 export {
@@ -80,4 +81,5 @@ export {
   comingSoon,
   bookFeature,
   aiCopy,
+  defaultImage,
 };

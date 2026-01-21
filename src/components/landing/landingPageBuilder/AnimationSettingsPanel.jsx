@@ -2,22 +2,60 @@ import { MOTION_PRESETS } from "../../../constants/motionPresets";
 import { MotionPreview } from "./MotionPreview";
 
 export default function AnimationSettingsPanel({ landing, setLanding }) {
-  const motion = {
-    enabled: landing.motion_settings?.enabled ?? false,
-    preset: landing.motion_settings?.preset ?? "fade-up",
-    duration: landing.motion_settings?.duration ?? 0.5,
-    delay: landing.motion_settings?.delay ?? 0,
-    stagger: landing.motion_settings?.stagger ?? 0.12,
-    easing: landing.motion_settings?.easing ?? "ease-out",
-    panel_open: landing.motion_settings?.panel_open ?? false,
+  const DEFAULT_MOTION = {
+    enabled: false,
+    preset: "fade-up",
+    duration: 0.5,
+    delay: 0,
+    stagger: 0.12,
+    easing: [0, 0, 0.2, 1],
+    panel_open: false,
   };
 
+  const motion = {
+    ...DEFAULT_MOTION,
+    ...(landing.motion_settings || {}),
+  };
+
+  const EASING_MAP = {
+    linear: "linear",
+    easeOut: [0, 0, 0.2, 1],
+    easeIn: [0.4, 0, 1, 1],
+    easeInOut: [0.4, 0, 0.2, 1],
+  };
+
+  function updateMotion(patch) {
+    const SAFE_EASINGS = [
+      "linear",
+      "cubic-bezier(0, 0, 0.2, 1)",
+      "cubic-bezier(0.4, 0, 1, 1)",
+      "cubic-bezier(0.4, 0, 0.2, 1)",
+    ];
+
+    setLanding((prev) => {
+      const next = {
+        ...DEFAULT_MOTION,
+        ...(prev.motion_settings || {}),
+        ...patch,
+      };
+
+      if (!SAFE_EASINGS.includes(next.easing)) {
+        next.easing = DEFAULT_MOTION.easing;
+      }
+
+      return {
+        ...prev,
+        motion_settings: next,
+      };
+    });
+  }
+
   return (
-    <div className="border border-gray-700 rounded-lg px-4 py-1 bg-black/30 mb-4">
+    <div className="border border-dashboard-border-light dark:border-dashboard-border-dark rounded-lg px-4 py-1 bg-dashboard-bg-light dark:bg-dashboard-bg-dark mb-4">
       {/* Header */}
       <div className="relative flex items-center mb-4 mt-4">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-silver font-medium">
+          <span className="text-sm font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
             Animate page sections
           </span>
 
@@ -25,27 +63,22 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
           <button
             type="button"
             onClick={() =>
-              setLanding((prev) => ({
-                ...prev,
-                motion_settings: {
-                  enabled: !motion.enabled,
-                  preset: motion.preset,
-                  duration: motion.duration,
-                  delay: motion.delay,
-                  stagger: motion.stagger,
-                  easing: motion.easing,
-                  panel_open: motion.panel_open,
-                },
-              }))
+              updateMotion({
+                enabled: !motion.enabled,
+                panel_open: !motion.enabled ? true : motion.panel_open,
+              })
             }
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${
-              motion.enabled ? "bg-royalPurple" : "bg-zinc-700"
+              motion.enabled
+                ? "bg-green"
+                : "bg-dashboard-border-light dark:bg-dashboard-border-dark"
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
-                motion.enabled ? "translate-x-4" : "translate-x-1"
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full shadow transition-transform duration-200
+  bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+  ${motion.enabled ? "translate-x-4" : "translate-x-1"}
+`}
             />
           </button>
         </div>
@@ -55,20 +88,14 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
           <button
             type="button"
             onClick={() =>
-              setLanding((prev) => ({
-                ...prev,
-                motion_settings: {
-                  enabled: motion.enabled,
-                  preset: motion.preset,
-                  duration: motion.duration,
-                  delay: motion.delay,
-                  stagger: motion.stagger,
-                  easing: motion.easing,
-                  panel_open: !motion.panel_open,
-                },
-              }))
+              updateMotion({
+                panel_open: !motion.panel_open,
+              })
             }
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2
+text-dashboard-muted-light dark:text-dashboard-muted-dark
+hover:text-dashboard-text-light dark:hover:text-dashboard-text-dark
+transition"
           >
             <span
               className={`inline-block transition-transform duration-200 ${
@@ -89,21 +116,22 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
         >
           {/* Preset */}
           <div>
-            <label className="block text-xs font-semibold text-gray-400 mb-4">
+            <label className="block text-xs font-semibold text-dashboard-muted-light dark:text-dashboard-muted-dark mb-4">
               Animation preset
             </label>
+
             <select
               value={motion.preset}
               onChange={(e) =>
-                setLanding((prev) => ({
-                  ...prev,
-                  motion_settings: {
-                    ...prev.motion_settings,
-                    preset: e.target.value,
-                  },
-                }))
+                updateMotion({
+                  preset: e.target.value,
+                })
               }
-              className="w-full rounded-md bg-black/40 border border-gray-600 text-white text-sm px-3 py-2"
+              className="w-full rounded-md
+bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+border border-dashboard-border-light dark:border-dashboard-border-dark
+text-dashboard-text-light dark:text-dashboard-text-dark
+text-sm px-3 py-2"
             >
               {MOTION_PRESETS.map((preset) => (
                 <option key={preset.value} value={preset.value}>
@@ -121,10 +149,9 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
             max={2}
             step={0.1}
             onChange={(v) =>
-              setLanding((prev) => ({
-                ...prev,
-                motion_settings: { ...prev.motion_settings, duration: v },
-              }))
+              updateMotion({
+                duration: v,
+              })
             }
           />
 
@@ -136,10 +163,9 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
             max={0.5}
             step={0.02}
             onChange={(v) =>
-              setLanding((prev) => ({
-                ...prev,
-                motion_settings: { ...prev.motion_settings, stagger: v },
-              }))
+              updateMotion({
+                stagger: v,
+              })
             }
           />
 
@@ -151,34 +177,33 @@ export default function AnimationSettingsPanel({ landing, setLanding }) {
             max={1}
             step={0.05}
             onChange={(v) =>
-              setLanding((prev) => ({
-                ...prev,
-                motion_settings: { ...prev.motion_settings, delay: v },
-              }))
+              updateMotion({
+                delay: v,
+              })
             }
           />
 
           {/* Easing */}
           <div>
-            <label className="block text-xs text-gray-400 mb-1">
+            <label className="block text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
               Animation easing
             </label>
             <select
               value={motion.easing}
               onChange={(e) =>
-                setLanding((prev) => ({
-                  ...prev,
-                  motion_settings: {
-                    ...prev.motion_settings,
-                    easing: e.target.value,
-                  },
-                }))
+                updateMotion({
+                  easing: EASING_MAP[e.target.value],
+                })
               }
-              className="w-full bg-black/40 border border-gray-600 rounded-md px-3 py-2 text-sm"
+              className="w-full rounded-md
+bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+border border-dashboard-border-light dark:border-dashboard-border-dark
+text-dashboard-text-light dark:text-dashboard-text-dark
+px-3 py-2 text-sm"
             >
-              <option value="ease-out">Ease out</option>
-              <option value="ease-in">Ease in</option>
-              <option value="ease-in-out">Ease in out</option>
+              <option value="easeOut">Ease out</option>
+              <option value="easeIn">Ease in</option>
+              <option value="easeInOut">Ease in out</option>
               <option value="linear">Linear</option>
               <option value="cubic-bezier(0.4, 0, 0.2, 1)">
                 Material smooth
@@ -203,7 +228,9 @@ function Range({ label, value, min, max, step, onChange }) {
 
   return (
     <div>
-      <label className="block text-xs text-gray-400 mb-1">{label}</label>
+      <label className="block text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+        {label}
+      </label>
 
       <input
         type="range"
@@ -217,12 +244,14 @@ function Range({ label, value, min, max, step, onChange }) {
           background: `linear-gradient(
             to right,
             #670fe7 ${percent}%,
-            #374151 ${percent}%
+            var(--dashboard-border-light) ${percent}%
           )`,
         }}
       />
 
-      <div className="text-xs text-gray-500 mt-1">{value}s</div>
+      <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1">
+        {value}s
+      </div>
     </div>
   );
 }

@@ -52,18 +52,25 @@ export default function CommunityHome() {
   return (
     <div
       className="
-      w-full flex justify-center items-start min-h-screen px-6 py-20
+    w-full h-screen overflow-hidden
+    flex justify-center items-start
+    px-6 py-20
     bg-dashboard-bg-light
     dark:bg-dashboard-bg-dark
   "
     >
       <div
         className="
-      bg-dashboard-sidebar-light
-      dark:bg-dashboard-sidebar-dark
-      border border-dashboard-border-light
-      dark:border-dashboard-border-dark
-      rounded-xl p-10 backdrop-blur-sm shadow-xl space-y-10
+    bg-dashboard-sidebar-light
+    dark:bg-dashboard-sidebar-dark
+    border border-dashboard-border-light
+    dark:border-dashboard-border-dark
+    rounded-xl
+    p-6 sm:p-8 lg:p-10
+    backdrop-blur-sm
+    shadow-xl
+    max-h-[calc(100vh-160px)]
+    flex flex-col
   "
       >
         {/* Logo */}
@@ -71,8 +78,8 @@ export default function CommunityHome() {
           <img
             src={headerLogo}
             alt="Cre8tly"
-            width={100}
-            height={100}
+            width={75}
+            height={75}
             className="
     block
     select-none
@@ -83,54 +90,53 @@ export default function CommunityHome() {
         {/* Page Title */}
         <h1
           className="
-          text-3xl font-bold mb-4 pb-8 text-center normal-case
+          text-3xl font-bold text-center normal-case
           text-dashboard-text-light
-          dark:text-dashboard-text-dark
+          dark:text-dashboard-text-dark mb-2
   "
         >
           Cre8tly Community 💬
         </h1>
+        <p
+          className="
+    text-center text-sm sm:text-base
+    max-w-xl mx-auto
+    text-dashboard-muted-light
+    dark:text-dashboard-muted-dark
+     mb-8
+  "
+        >
+          A space to share ideas, ask questions, <br />
+          and learn from builders and creators inside Cre8tly.
+        </p>
 
         {/* Scrollable Topics */}
-        <div className="max-w-5xl w-full overflow-y-auto max-h-[70vh] pr-2">
-          <div className="grid md:grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto pr-2">
+          <div className="grid md:grid-cols-2 gap-6 pb-6 pt-6">
             {topics.map((t) => (
               <button
                 key={t.id}
                 onClick={() => navigate(`/community/topic/${t.id}`)}
                 className="
-                relative p-6 rounded-xl transition-all text-left
-                bg-dashboard-sidebar-light
-                dark:bg-dashboard-sidebar-dark
-                border border-dashboard-border-light
-                dark:border-dashboard-border-dark
-                hover:border-green
-                hover:shadow-[0_0_12px_rgba(34,197,94,0.3)]
-"
+          relative p-6 rounded-xl transition-all text-left
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          hover:border-bookBtnColor
+          hover:-translate-y-[2px]
+          hover:shadow-lg
+        "
               >
-                {/* NEW BADGE */}
                 {t.has_new && (
                   <span className="absolute top-3 right-3 bg-green text-black text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                     NEW
                   </span>
                 )}
 
-                <h2
-                  className="
-                  text-xl font-semibold mb-2
-                text-dashboard-text-light
-                dark:text-dashboard-text-dark
-  "
-                >
-                  {t.name}
-                </h2>
-                <p
-                  className="
-                 text-sm
-                text-dashboard-muted-light
-                dark:text-dashboard-muted-dark
-  "
-                >
+                <h2 className="text-xl font-semibold mb-2">{t.name}</h2>
+
+                <p className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
                   {t.description}
                 </p>
               </button>

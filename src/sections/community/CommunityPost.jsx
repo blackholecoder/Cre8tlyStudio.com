@@ -8,6 +8,8 @@ import CommentThread from "./CommentThread";
 import ReplyBox from "../../components/community/ReplyBox";
 import { Img } from "react-image";
 import { headerLogo } from "../../assets/images";
+import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
+import { formatPostDate } from "../../helpers/formatPostDate";
 
 export default function CommunityPost() {
   const { user } = useAuth();
@@ -275,16 +277,22 @@ export default function CommunityPost() {
 
   return (
     <div
-      className="w-full flex justify-center items-start min-h-screen px-6 py-20
-  bg-dashboard-bg-light dark:bg-dashboard-bg-dark"
+      className="
+      w-full flex justify-center items-start min-h-screen
+      px-4 py-10
+      sm:px-6 sm:py-16
+      lg:py-20
+    "
     >
       <div
         className="
           w-full max-w-4xl
           bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
           border border-dashboard-border-light dark:border-dashboard-border-dark
-          rounded-xl p-10
-          shadow-xl space-y-10
+          rounded-xl
+          p-5 sm:p-8 lg:p-10
+          shadow-xl
+          space-y-6 sm:space-y-8 lg:space-y-10
         "
       >
         {/* Breadcrumb */}
@@ -296,7 +304,7 @@ export default function CommunityPost() {
         >
           <button
             onClick={() => navigate("/community")}
-            className="flex items-center gap-1 text-green hover:text-green/80 transition"
+            className="flex items-center gap-1 text-blue hover:text-blue/80 transition"
           >
             <ArrowLeft size={16} />
             Back
@@ -313,13 +321,23 @@ export default function CommunityPost() {
 
           <span>/</span>
 
-          <span className="text-dashboard-text-light dark:text-dashboard-text-dark font-medium">
+          <span
+            className="
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          font-medium
+          text-sm sm:text-base
+          truncate
+          max-w-[60vw] sm:max-w-none
+        "
+            title={post.title}
+          >
             {post.title}
           </span>
         </div>
 
         {/* Main content */}
-        <div className="w-full space-y-10">
+        <div className="w-full space-y-6 sm:space-y-8 lg:space-y-100">
           {/* Post Card */}
           <div
             className="
@@ -328,7 +346,7 @@ export default function CommunityPost() {
             rounded-xl p-8 shadow-lg
           "
           >
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-4 sm:mb-6">
               {isStudioPost ? (
                 <img
                   src={headerLogo}
@@ -361,41 +379,85 @@ export default function CommunityPost() {
               )}
 
               <div>
-                <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold flex items-center gap-2">
-                  {isStudioPost ? "Cre8tly Studio" : post.author}
+                <div className="flex items-center gap-[1px]">
+                  <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold">
+                    {isStudioPost ? "Cre8tly Studio" : post.author}
+                  </p>
 
                   {(isStudioPost || isAdmin) && (
                     <span
                       className="
-                      flex items-center gap-1
+                      flex items-center
                       text-dashboard-muted-light dark:text-dashboard-muted-dark
                       text-[10px]
-                      px-2 py-0.5
-                      border border-dashboard-border-light dark:border-dashboard-border-dark
+                      px-0.5 py-0.5
                       rounded-full
-  "
+                    "
                     >
                       <ShieldCheck
-                        size={11}
+                        size={15}
                         className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
                       />
                     </span>
                   )}
-                </p>
+                </div>
+
                 <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
-                  {timeAgo(post.created_at)}
+                  <span>{formatPostDate(post.created_at)}</span>
+                  <span className="mx-1">·</span>
+                  <span className="opacity-80">{timeAgo(post.created_at)}</span>
                 </p>
               </div>
             </div>
 
             <h1
-              className="text-2xl font-bold mb-4
-              text-dashboard-text-light dark:text-dashboard-text-dark"
+              className="
+              text-2xl sm:text-3xl
+              font-bold
+              tracking-tight
+              leading-tight
+              mb-2
+              text-dashboard-text-light
+              dark:text-dashboard-text-dark
+            "
             >
               {post.title}
             </h1>
+
+            {post.subtitle && (
+              <p
+                className="
+                text-base sm:text-lg
+                font-normal
+                leading-relaxed
+                max-w-2xl
+                text-dashboard-muted-light
+                dark:text-dashboard-muted-dark
+              "
+              >
+                {post.subtitle}
+              </p>
+            )}
+
+            {post.image_url && (
+              <div className="mb-6">
+                <img
+                  src={post.image_url}
+                  alt="Post"
+                  className="
+                w-full
+                max-h-[420px]
+                object-cover
+                rounded-xl
+                mt-12
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+              "
+                />
+              </div>
+            )}
             <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
-              {post.body}
+              {renderTextWithLinks(post.body)}
             </p>
           </div>
 
@@ -425,7 +487,7 @@ export default function CommunityPost() {
                     className="
                     bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
                     border border-dashboard-border-light dark:border-dashboard-border-dark
-                    p-6 rounded-lg shadow-inner
+                    p-4 sm:p-5 lg:p-6 rounded-lg shadow-inner
                   "
                   >
                     <div className="flex items-start gap-4">
@@ -458,7 +520,7 @@ export default function CommunityPost() {
                       <div className="flex-1">
                         {editCommentId !== c.id && (
                           <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
-                            {c.body}
+                            {renderTextWithLinks(c.body)}
                           </p>
                         )}
 
@@ -507,26 +569,29 @@ export default function CommunityPost() {
                         )}
 
                         <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
-                          <span>{c.author}</span>
-                          {commentAdmin && (
-                            <span
-                              className="
-                              flex items-center gap-1
-                              text-dashboard-muted-light dark:text-dashboard-muted-dark
-                              text-xs
-                              px-2 py-0.5
-                              border border-dashboard-border-light dark:border-dashboard-border-dark
-                              rounded-full
+                          <div className="flex items-center gap-0">
+                            <span>{c.author}</span>
+
+                            {commentAdmin && (
+                              <span
+                                className="
+                                flex items-center gap-1
+                                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                                text-xs
+                                px-1
+                                rounded-full
                               "
-                            >
-                              <ShieldCheck
-                                size={12}
-                                className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                              />
-                            </span>
-                          )}
-                          • <span>{timeAgo(c.created_at)}</span>
+                              >
+                                <ShieldCheck
+                                  className="text-dashboard-muted-light dark:text-green"
+                                  size={12}
+                                />
+                              </span>
+                            )}
+                          </div>
+                          <span>{timeAgo(c.created_at)}</span>
                           <button
+                            onClick={() => toggleLike(c)}
                             className={`text-xs ${
                               c.user_liked
                                 ? "text-red-600"
@@ -554,7 +619,8 @@ export default function CommunityPost() {
                               // Threaded replies exist → open/close thread
                               <button
                                 onClick={() => toggleReplies(c.id)}
-                                className="text-xs text-green hover:text-green/90"
+                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark
+                                  hover:opacity-80"
                               >
                                 {openReplies[c.id]
                                   ? "Hide replies"
@@ -564,20 +630,14 @@ export default function CommunityPost() {
                               // No replies → open reply box
                               <button
                                 onClick={() => setActiveReplyBox(c.id)}
-                                className="text-xs text-green hover:text-green/90"
+                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark
+                                  hover:opacity-80"
                               >
                                 Reply
                               </button>
                             )}
 
                             {/* Divider Dot */}
-                            {!openReplies[c.id] &&
-                              (c.user_id === user.id ||
-                                user.role === "admin") && (
-                                <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-xs">
-                                  •
-                                </span>
-                              )}
 
                             {/* Edit */}
                             {!openReplies[c.id] &&

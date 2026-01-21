@@ -8,6 +8,8 @@ import {
   SIDEBAR_SECTIONS,
   SidebarToggleIcon,
 } from "../../constants/sideBarSections";
+import { defaultImage } from "../../assets/images";
+import UpgradeRequiredModal from "../modals/UpgradeRequiredModal";
 
 const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
 
@@ -22,6 +24,7 @@ export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [communityCount, setCommunityCount] = useState(0);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
       return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "true";
@@ -29,6 +32,9 @@ export default function DashboardLayout({ children }) {
       return false;
     }
   });
+
+  const isCommunityOnly =
+    user?.is_member === 1 && !user?.plan && !user?.free_trial_expires_at;
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
@@ -95,22 +101,31 @@ export default function DashboardLayout({ children }) {
     const active = location.pathname === item.path;
     const Icon = item.icon;
 
+    const locked = isCommunityOnly && !item.allowCommunity;
+
     return (
       <button
         key={item.key}
         onClick={() => {
+          if (locked) {
+            setShowUpgradeModal(true);
+            return;
+          }
+
           navigate(item.path);
           if (window.innerWidth < 1024) setIsSidebarOpen(false);
         }}
         className={`w-full flex items-center rounded-lg transition
-  ${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3 text-left"}
-  ${
-    active
-      ? isCollapsed
-        ? "bg-green/20 text-green"
-        : "bg-green/10 text-green border border-green/30"
-      : "text-dashboard-muted-light dark:text-dashboard-muted-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-  }`}
+${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3 text-left"}
+${
+  active
+    ? isCollapsed
+      ? "bg-green/20 text-green"
+      : "bg-green/10 text-green border border-green/30"
+    : "text-dashboard-muted-light dark:text-dashboard-muted-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+}
+${locked ? "opacity-50 cursor-pointer" : ""}
+`}
       >
         <Icon size={20} />
 
@@ -130,7 +145,7 @@ export default function DashboardLayout({ children }) {
         )}
 
         {item.badge === "communityCount" && communityCount > 0 && (
-          <span className="ml-auto bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+          <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
             {communityCount > 9 ? "9+" : communityCount}
           </span>
         )}
@@ -246,7 +261,7 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
             }`}
           >
             <img
-              src={user?.profile_image || "/default-avatar.png"}
+              src={user?.profile_image || defaultImage}
               alt="Profile"
               className="w-9 h-9 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
             />
@@ -319,6 +334,10 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
       >
         {children}
       </main>
+      <UpgradeRequiredModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 }

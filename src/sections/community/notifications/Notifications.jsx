@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Img } from "react-image";
@@ -21,12 +21,30 @@ export default function Notifications() {
   }, []);
 
   const openNotification = async (notif) => {
+    if (!notif.is_read) {
+      await markRead(notif.id);
+    }
+
     if (notif.post_id) {
       navigate(
         `/community/post/${notif.post_id}?highlight=${notif.reference_id}`
       );
     }
   };
+
+  const markRead = useCallback(async (id) => {
+    try {
+      await axiosInstance.post("/notifications/mark-read", {
+        ids: [id],
+      });
+
+      setItems((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
+      );
+    } catch (err) {
+      console.error("Failed to mark notification read", err);
+    }
+  }, []);
 
   useEffect(() => {
     // Always restore scrolling when this page mounts
@@ -81,15 +99,29 @@ export default function Notifications() {
             <button
               key={n.id}
               onClick={() => openNotification(n)}
-              className="
+              className={`
+              relative
               w-full text-left p-4 rounded-lg transition
-              bg-dashboard-sidebar-light
-              dark:bg-dashboard-sidebar-dark
+              ${
+                n.is_read
+                  ? "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark opacity-80"
+                  : "bg-green/10 dark:bg-green/20 border-green/40"
+              }
               border border-dashboard-border-light
               dark:border-dashboard-border-dark
               hover:border-green
-"
+            `}
             >
+              {!n.is_read && (
+                <span
+                  className="
+        absolute top-3 right-3
+        w-2 h-2 rounded-full
+        bg-green
+      "
+                />
+              )}
+
               <div className="flex items-center gap-3">
                 {n.actor_image ? (
                   <Img

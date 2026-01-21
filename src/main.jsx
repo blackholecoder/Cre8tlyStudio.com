@@ -68,6 +68,7 @@ import AuthorsAssistant from "./sections/AuthorsAssistantPage.jsx";
 import SettingsDomains from "./settings/SettingsDomains.jsx";
 import CustomDomainsDocs from "./sections/docs/CustomDomainsDocs.jsx";
 import AuthorsAssistantDocs from "./sections/docs/AuthorsAssistantDocs.jsx";
+import SignupCommunity from "./sections/SignupCommunity.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -105,6 +106,7 @@ const AnimatedRoutes = () => {
           <Route path="smart-prompt" element={<SmartPromptPage />} />
           <Route path="landing" element={<LandingInfoPage />} />
           <Route path="plans" element={<PlansPage />} />
+          <Route path="/signup-community" element={<SignupCommunity />} />
 
           <Route path="resources" element={<Resources />}>
             <Route path="videos" element={<ResourcesVideos />} />

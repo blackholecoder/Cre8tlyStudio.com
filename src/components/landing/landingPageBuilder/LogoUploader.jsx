@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 
@@ -10,23 +8,41 @@ export default function LogoUploader({
   setShowLogoSection,
 }) {
   return (
-    <div className="mt-12 bg-[#0b0b0b] border border-gray-700 rounded-2xl shadow-inner p-6 transition-all hover:border-silver/60">
+    <div
+      className="
+      mt-12
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      rounded-2xl
+      shadow-inner
+      p-6
+      transition-all
+      hover:border-dashboard-muted-light dark:hover:border-dashboard-muted-dark
+    "
+    >
       {/* HEADER (toggle) */}
       <div
         className="flex items-center justify-between mb-5 cursor-pointer"
         onClick={() => setShowLogoSection((prev) => !prev)}
       >
-        <label className="text-lg font-semibold text-silver tracking-wide">
+        <label
+          className="text-lg font-semibold tracking-wide
+        text-dashboard-text-light dark:text-dashboard-text-dark"
+        >
           Brand Logo
         </label>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400 italic hidden sm:block">
+          <span
+            className="text-xs italic hidden sm:block
+            text-dashboard-muted-light dark:text-dashboard-muted-dark"
+          >
             Recommended: PNG or SVG · 200×200px+
           </span>
 
           <span
-            className={`text-gray-400 text-sm transition-transform duration-300 ${
+            className={`text-sm transition-transform duration-300
+            text-dashboard-muted-light dark:text-dashboard-muted-dark ${
               showLogoSection ? "rotate-180" : "rotate-0"
             }`}
           >
@@ -44,11 +60,26 @@ export default function LogoUploader({
         {!landing.logo_url ? (
           <label
             htmlFor="logoUpload"
-            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 hover:border-green rounded-xl py-10 px-6 cursor-pointer transition-all duration-300 group"
+            className="
+            flex flex-col items-center justify-center
+            border-2 border-dashed
+            border-dashboard-border-light dark:border-dashboard-border-dark
+            hover:border-green
+            rounded-xl
+            py-10 px-6
+            cursor-pointer
+            transition-all duration-300
+            group
+          "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-gray-500 group-hover:text-green transition"
+              className="
+              h-10 w-10
+              text-dashboard-muted-light dark:text-dashboard-muted-dark
+              group-hover:text-green
+              transition
+            "
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -61,7 +92,10 @@ export default function LogoUploader({
               />
             </svg>
 
-            <p className="mt-3 text-sm text-gray-400">
+            <p
+              className="mt-3 text-sm
+              text-dashboard-muted-light dark:text-dashboard-muted-dark"
+            >
               <span className="text-green font-medium">Click to upload</span> or
               drag your logo
             </p>
@@ -105,9 +139,25 @@ export default function LogoUploader({
           </label>
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <p className="text-sm text-gray-400 mb-3">Current Logo:</p>
+            <p
+              className="text-sm mb-3
+text-dashboard-muted-light dark:text-dashboard-muted-dark"
+            >
+              Current Logo:
+            </p>
 
-            <div className="relative bg-white rounded-lg shadow-md border border-gray-300 p-3 w-fit mx-auto">
+            <div
+              className="
+            relative
+            bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+            border border-dashboard-border-light dark:border-dashboard-border-dark
+            rounded-lg
+            shadow-md
+            p-3
+            w-fit
+            mx-auto
+          "
+            >
               <img
                 src={landing.logo_url}
                 alt="Uploaded Logo"
@@ -117,7 +167,8 @@ export default function LogoUploader({
 
             <button
               type="button"
-              className="text-red-400 text-xs mt-4 hover:underline"
+              className="text-xs mt-4
+              text-red-500 hover:underline"
               onClick={() => setLanding({ ...landing, logo_url: "" })}
             >
               Remove Logo

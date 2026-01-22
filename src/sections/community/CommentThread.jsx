@@ -156,8 +156,9 @@ export default function CommentThread({
             {/* Comment Body */}
             <p
               className="
+              prose prose-sm max-w-none
             text-dashboard-text-light dark:text-dashboard-text-dark
-            text-sm whitespace-pre-wrap mb-2
+             whitespace-pre-wrap mb-2
           "
             >
               {comment.body}

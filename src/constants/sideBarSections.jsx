@@ -6,11 +6,13 @@ import {
   DollarSign,
   Inbox,
   BarChart2,
-  MessageSquare,
+  MessagesSquare,
   Bell,
   MailSearch,
   Landmark,
   LayoutTemplate,
+  FileText,
+  List,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -82,10 +84,25 @@ export const SIDEBAR_SECTIONS = [
       {
         key: "community",
         label: "Community",
-        path: "/community",
-        icon: MessageSquare,
+        icon: MessagesSquare,
         badge: "communityCount",
+        isParent: true,
+      },
+      {
+        key: "community-topics",
+        label: "Categories",
+        path: "/community",
+        icon: List,
         allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "posts",
+        label: "Posts",
+        path: "/community/posts",
+        icon: FileText,
+        allowCommunity: true,
+        isSubItem: true,
       },
       {
         key: "alerts",

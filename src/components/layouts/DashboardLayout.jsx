@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import { Menu, LogOut, CircleQuestionMark, Sun, Moon } from "lucide-react";
+import {
+  Menu,
+  LogOut,
+  CircleQuestionMark,
+  Sun,
+  Moon,
+  ChevronDown,
+} from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
 import {
   SIDEBAR_SECTIONS,
@@ -32,6 +39,8 @@ export default function DashboardLayout({ children }) {
       return false;
     }
   });
+
+  const [communityOpen, setCommunityOpen] = useState(false);
 
   const isCommunityOnly =
     user?.is_member === 1 && !user?.plan && !user?.free_trial_expires_at;
@@ -90,6 +99,12 @@ export default function DashboardLayout({ children }) {
     }
   }, [isCollapsed]);
 
+  useEffect(() => {
+    if (location.pathname.startsWith("/community")) {
+      setCommunityOpen(true);
+    }
+  }, [location.pathname]);
+
   function hasAccess(item) {
     if (item.access === "pro" && isFreeTier) return false;
     if (item.access === "seller" && !user?.stripe_connect_account_id)
@@ -99,24 +114,39 @@ export default function DashboardLayout({ children }) {
 
   function renderSidebarItem(item) {
     const active = location.pathname === item.path;
-    const Icon = item.icon;
+    const Icon = item.icon || null;
 
     const locked = isCommunityOnly && !item.allowCommunity;
+    const isSubItem = item.isSubItem;
+    const isParent = item.isParent;
 
     return (
       <button
         key={item.key}
         onClick={() => {
+          if (isParent) {
+            setCommunityOpen((prev) => !prev);
+            return;
+          }
+
           if (locked) {
             setShowUpgradeModal(true);
             return;
           }
 
           navigate(item.path);
-          if (window.innerWidth < 1024) setIsSidebarOpen(false);
+
+          // only close sidebar on mobile if NOT a sub-item
+          if (window.innerWidth < 1024 && !isSubItem) {
+            setIsSidebarOpen(false);
+          }
         }}
         className={`w-full flex items-center rounded-lg transition
-${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3 text-left"}
+${
+  isCollapsed
+    ? "justify-center px-3 py-3"
+    : `gap-3 px-4 py-3 text-left ${isSubItem ? "pl-10 text-sm opacity-80" : ""}`
+}
 ${
   active
     ? isCollapsed
@@ -127,14 +157,25 @@ ${
 ${locked ? "opacity-50 cursor-pointer" : ""}
 `}
       >
-        <Icon size={20} />
+        {Icon && <Icon size={18} />}
 
         {!isCollapsed && (
-          <div className="flex flex-col flex-1">
-            <span className="font-medium leading-tight">{item.label}</span>
-            <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-              {item.description}
-            </span>
+          <div className="flex items-center flex-1">
+            <div className="flex flex-col">
+              <span className="font-medium leading-tight">{item.label}</span>
+              <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                {item.description}
+              </span>
+            </div>
+
+            {item.isParent && (
+              <ChevronDown
+                size={16}
+                className={`ml-auto transition-transform ${
+                  communityOpen ? "rotate-180" : ""
+                }`}
+              />
+            )}
           </div>
         )}
 
@@ -236,7 +277,13 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
                 )}
 
                 <div className="flex flex-col gap-1">
-                  {section.items.filter(hasAccess).map(renderSidebarItem)}
+                  {section.items
+                    .filter(hasAccess)
+                    .filter((item) => {
+                      if (item.isSubItem && !communityOpen) return false;
+                      return true;
+                    })
+                    .map(renderSidebarItem)}
                 </div>
               </div>
             ))}

@@ -61,14 +61,25 @@ export default function CommunityHome() {
     >
       <div
         className="
-    bg-dashboard-sidebar-light
-    dark:bg-dashboard-sidebar-dark
-    border border-dashboard-border-light
-    dark:border-dashboard-border-dark
-    rounded-xl
-    p-6 sm:p-8 lg:p-10
-    backdrop-blur-sm
-    shadow-xl
+    w-full max-w-5xl
+
+    /* mobile */
+    bg-transparent
+    border-none
+    rounded-none
+    shadow-none
+    p-0
+
+    /* desktop */
+    sm:bg-dashboard-sidebar-light
+    sm:dark:bg-dashboard-sidebar-dark
+    sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+    sm:rounded-xl
+    sm:p-8
+    lg:p-10
+    sm:shadow-xl
+    sm:backdrop-blur-sm
+
     max-h-[calc(100vh-160px)]
     flex flex-col
   "
@@ -106,27 +117,39 @@ export default function CommunityHome() {
      mb-8
   "
         >
-          A space to share ideas, ask questions, <br />
-          and learn from builders and creators inside Cre8tly.
+          A shared space for ideas, questions, discussions, and learning.
         </p>
 
         {/* Scrollable Topics */}
         <div className="flex-1 overflow-y-auto pr-2">
-          <div className="grid md:grid-cols-2 gap-6 pb-6 pt-6">
+          <div className="grid gap-3 sm:gap-6 md:grid-cols-2 pb-6 pt-6">
             {topics.map((t) => (
               <button
                 key={t.id}
                 onClick={() => navigate(`/community/topic/${t.id}`)}
                 className="
-          relative p-6 rounded-xl transition-all text-left
-          bg-dashboard-sidebar-light
-          dark:bg-dashboard-sidebar-dark
-          border border-dashboard-border-light
-          dark:border-dashboard-border-dark
-          hover:border-bookBtnColor
-          hover:-translate-y-[2px]
-          hover:shadow-lg
-        "
+                relative text-left transition-all
+
+                /* mobile */
+                bg-transparent
+                border-b border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                rounded-none
+                px-1 py-4
+                shadow-none
+                hover:bg-dashboard-bg-light/40
+                dark:hover:bg-dashboard-bg-dark/40
+
+                /* desktop */
+                sm:bg-dashboard-sidebar-light
+                sm:dark:bg-dashboard-sidebar-dark
+                sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+                sm:rounded-xl
+                sm:p-6
+                sm:hover:border-bookBtnColor
+                sm:hover:-translate-y-[2px]
+                sm:hover:shadow-lg
+              "
               >
                 {t.has_new && (
                   <span className="absolute top-3 right-3 bg-green text-black text-xs font-semibold px-2 py-1 rounded-full shadow-md">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { Plus } from "lucide-react";
 import CreatePostModal from "./CreatePostModal";
@@ -7,6 +7,7 @@ import CreatePostModal from "./CreatePostModal";
 export default function CommunityTopic() {
   const { topicId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [topic, setTopic] = useState(null);
   const [posts, setPosts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -116,7 +117,9 @@ export default function CommunityTopic() {
                 try {
                   await axiosInstance.post(`/community/${topicId}/mark-viewed`);
                 } catch (err) {}
-                navigate(`/community/post/${post.id}`);
+                navigate(`/community/post/${post.id}`, {
+                  state: { from: location.pathname },
+                });
               }}
               className="
               relative w-full text-left
@@ -172,7 +175,7 @@ export default function CommunityTopic() {
                   <h3
                     className="
                     text-base sm:text-lg font-semibold line-clamp-2
-                    text-dashboard-text-light dark:text-dashboard-text-dark
+                    text-dashboard-text-light dark:text-dashboard-text-dark underline
                   "
                   >
                     {post.title}

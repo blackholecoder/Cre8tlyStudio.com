@@ -18,6 +18,19 @@ export default {
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
       },
+      typography: ({ theme }) => ({
+        DEFAULT: {
+          css: {
+            "--tw-prose-links": theme("colors.blue"),
+          },
+        },
+        invert: {
+          css: {
+            "--tw-prose-links": theme("colors.sky.400"),
+            "--tw-prose-underline": theme("colors.sky.400"),
+          },
+        },
+      }),
       colors: {
         primary: "#ECEEFF",
         "coral-red": "#FF6452",
@@ -108,5 +121,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

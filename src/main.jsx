@@ -69,6 +69,7 @@ import SettingsDomains from "./settings/SettingsDomains.jsx";
 import CustomDomainsDocs from "./sections/docs/CustomDomainsDocs.jsx";
 import AuthorsAssistantDocs from "./sections/docs/AuthorsAssistantDocs.jsx";
 import SignupCommunity from "./sections/SignupCommunity.jsx";
+import MyPosts from "./sections/community/posts/MyPosts.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -222,7 +223,7 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/community/post/:postId"
+          path="/community/post/:slug"
           element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
               <motion.div
@@ -234,6 +235,24 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <CommunityPost />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/posts"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <MyPosts />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>
@@ -258,6 +277,7 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/prompts"
           element={

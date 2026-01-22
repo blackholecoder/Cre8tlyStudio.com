@@ -2,7 +2,15 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import CreateCommentBox from "./CreateCommentBox";
-import { ArrowLeft, ShieldCheck, Heart } from "lucide-react";
+import {
+  ArrowLeft,
+  ShieldCheck,
+  Heart,
+  Eye,
+  MessageCircle,
+  Share2,
+  Check,
+} from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
 import ReplyBox from "../../components/community/ReplyBox";
@@ -12,8 +20,8 @@ import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
 import { formatPostDate } from "../../helpers/formatPostDate";
 
 export default function CommunityPost() {
-  const { user } = useAuth();
-  const { postId } = useParams();
+  const { user, authLoading } = useAuth();
+  const { slug } = useParams();
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
@@ -23,6 +31,7 @@ export default function CommunityPost() {
   const [hasMore, setHasMore] = useState(true);
   const [openReplies, setOpenReplies] = useState({});
   const [replies, setReplies] = useState({});
+  const [copied, setCopied] = useState(false);
 
   const [editCommentId, setEditCommentId] = useState(null);
   const [editBody, setEditBody] = useState("");
@@ -33,6 +42,28 @@ export default function CommunityPost() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const highlightedCommentId = params.get("comment");
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!post || !post.slug) return;
+
+    if (!user) {
+      navigate(`/community/signup?redirect=/community/post/${post.slug}`, {
+        replace: true,
+      });
+    }
+  }, [user, authLoading, post]);
 
   useEffect(() => {
     // Always restore scrolling when this page mounts
@@ -51,17 +82,19 @@ export default function CommunityPost() {
   // Load post + first page of comments
   const load = async () => {
     try {
-      const res = await axiosInstance.get(`/community/posts/${postId}`);
+      const res = await axiosInstance.get(`/community/posts/${slug}`);
+      const postData = res.data.post;
+
       if (res.data.post?.is_admin_post === 1) {
         res.data.post.author = "Cre8tly Studio";
         res.data.post.author_image = headerLogo;
         res.data.post.author_role = "admin";
       }
 
-      setPost(res.data.post);
+      setPost(postData);
 
       const res2 = await axiosInstance.get(
-        `/community/posts/${postId}/comments?page=1&limit=10`
+        `/community/posts/${postData.id}/comments?page=1&limit=10`
       );
 
       setComments(res2.data.comments || []);
@@ -73,8 +106,9 @@ export default function CommunityPost() {
   };
 
   useEffect(() => {
+    if (!slug) return;
     load();
-  }, [postId]);
+  }, [slug]);
 
   // Infinite scroll load
   const loadMore = async () => {
@@ -84,7 +118,7 @@ export default function CommunityPost() {
 
     try {
       const res = await axiosInstance.get(
-        `/community/posts/${postId}/comments?page=${page}&limit=10`
+        `/community/posts/${post.id}/comments?page=${page}&limit=10`
       );
 
       setComments((prev) => [...prev, ...(res.data.comments || [])]);
@@ -253,7 +287,11 @@ export default function CommunityPost() {
     }, 500);
   }, [comments, replies]);
 
-  if (!post) return null;
+  if (!post) {
+    return <div className="p-10 text-center opacity-60">Loading post…</div>;
+  }
+
+  const backTo = location.state?.from || `/community/topic/${post.topic_id}`;
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
   const isStudioPost = post.author === "Cre8tly Studio";
@@ -272,28 +310,42 @@ export default function CommunityPost() {
   const isAdmin = post.author_role === "admin";
 
   if (!post) {
-    return <div className="p-10 text-center text-gray-300">Post not found</div>;
+    return <div className="p-10 text-center opacity-60">Loading post…</div>;
   }
+
+  const shareUrl = `${window.location.origin}/p/${post.slug}`;
 
   return (
     <div
       className="
       w-full flex justify-center items-start min-h-screen
-      px-4 py-10
+      px-4 py-14
       sm:px-6 sm:py-16
       lg:py-20
     "
     >
       <div
         className="
-          w-full max-w-4xl
-          bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-          border border-dashboard-border-light dark:border-dashboard-border-dark
-          rounded-xl
-          p-5 sm:p-8 lg:p-10
-          shadow-xl
-          space-y-6 sm:space-y-8 lg:space-y-10
-        "
+    w-full max-w-4xl
+
+    /* mobile */
+    bg-transparent
+    border-none
+    rounded-none
+    shadow-none
+    p-0
+
+    /* desktop */
+    sm:bg-dashboard-sidebar-light
+    sm:dark:bg-dashboard-sidebar-dark
+    sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+    sm:rounded-xl
+    sm:p-8
+    lg:p-10
+    sm:shadow-xl
+
+    space-y-6 sm:space-y-8 lg:space-y-10
+  "
       >
         {/* Breadcrumb */}
         <div
@@ -303,7 +355,7 @@ export default function CommunityPost() {
 "
         >
           <button
-            onClick={() => navigate("/community")}
+            onClick={() => navigate(backTo)}
             className="flex items-center gap-1 text-blue hover:text-blue/80 transition"
           >
             <ArrowLeft size={16} />
@@ -341,9 +393,18 @@ export default function CommunityPost() {
           {/* Post Card */}
           <div
             className="
-            bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-            border border-dashboard-border-light dark:border-dashboard-border-dark
-            rounded-xl p-8 shadow-lg
+            bg-transparent
+            border-none
+            rounded-none
+            shadow-none
+            p-0
+
+            sm:bg-dashboard-sidebar-light
+            sm:dark:bg-dashboard-sidebar-dark
+            sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+            sm:rounded-xl
+            sm:p-8
+            sm:shadow-lg
           "
           >
             <div className="flex items-center gap-4 mb-4 sm:mb-6">
@@ -370,7 +431,7 @@ export default function CommunityPost() {
                   }
                   decode={true}
                   alt="User avatar"
-                  className="w-12 h-12 rounded-full object-cover border border-green-600 transition-opacity duration-300"
+                  className="w-12 h-12 rounded-full object-cover  shadow-xl transition-opacity duration-300"
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-green/90 border border-green flex items-center justify-center text-xl font-bold text-green">
@@ -407,22 +468,55 @@ export default function CommunityPost() {
                   <span className="mx-1">·</span>
                   <span className="opacity-80">{timeAgo(post.created_at)}</span>
                 </p>
+                <div className="flex items-center gap-4 mt-0.5 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  <div className="flex items-center gap-[3px]">
+                    <Eye size={14} className="opacity-70" />
+                    <span>{post.views ?? 0}</span>
+                    <span>views</span>
+                  </div>
+
+                  <div className="flex items-center gap-[3px]">
+                    <MessageCircle size={14} className="opacity-70" />
+                    <span>{post.comment_count ?? 0}</span>
+                    <span>comments</span>
+                  </div>
+                  <button
+                    onClick={handleShare}
+                    className="
+                    relative
+                    flex items-center gap-1
+                    text-sky-400 hover:text-sky-400/80
+                    transition
+                  "
+                  >
+                    {copied ? (
+                      <>
+                        <Check size={14} className="text-green-500" />
+                        <span className="text-green-500 text-xs">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 size={14} />
+                        <span>Share</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <h1
+            <h2
               className="
-              text-2xl sm:text-3xl
+              not-prose
+              text-3xl sm:text-3xl
               font-bold
-              tracking-tight
-              leading-tight
               mb-2
               text-dashboard-text-light
               dark:text-dashboard-text-dark
             "
             >
               {post.title}
-            </h1>
+            </h2>
 
             {post.subtitle && (
               <p
@@ -456,9 +550,14 @@ export default function CommunityPost() {
                 />
               </div>
             )}
-            <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
-              {renderTextWithLinks(post.body)}
-            </p>
+            <div
+              className="
+              post-body
+              prose prose-md max-w-none
+              text-dashboard-text-light dark:text-dashboard-text-dark
+            "
+              dangerouslySetInnerHTML={{ __html: post.body }}
+            />
           </div>
 
           {/* Comments */}
@@ -519,9 +618,18 @@ export default function CommunityPost() {
 
                       <div className="flex-1">
                         {editCommentId !== c.id && (
-                          <p className="text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
+                          <div
+                            className="
+                            prose prose-sm max-w-none
+                            text-dashboard-text-light dark:text-dashboard-text-dark
+                            whitespace-pre-wrap
+                            dark:prose-invert
+                            dark:prose-a:text-sky-400
+                            dark:prose-a:decoration-sky-400
+                          "
+                          >
                             {renderTextWithLinks(c.body)}
-                          </p>
+                          </div>
                         )}
 
                         {editCommentId === c.id && (
@@ -673,7 +781,7 @@ export default function CommunityPost() {
                           <div className="mt-3 ml-6">
                             <ReplyBox
                               parentId={c.id}
-                              postId={postId}
+                              postId={post.id}
                               onReply={async (newReply) => {
                                 setReplies((prev) => ({
                                   ...prev,
@@ -699,7 +807,7 @@ export default function CommunityPost() {
                               setReplies={setReplies}
                               replyPages={replyPages}
                               timeAgo={timeAgo}
-                              postId={postId}
+                              postId={post.id}
                               toggleLike={toggleLike}
                               activeReplyBox={activeReplyBox}
                               setActiveReplyBox={setActiveReplyBox}
@@ -722,7 +830,7 @@ export default function CommunityPost() {
               <div ref={observerRef} className="h-10"></div>
             </div>
 
-            <CreateCommentBox postId={postId} onComment={load} />
+            <CreateCommentBox postId={post.id} onComment={load} />
           </div>
         </div>
       </div>

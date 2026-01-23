@@ -168,8 +168,6 @@ setTimeout(() => (exitAllowed = true), 1500);
   })
     .then((res) => res.json())
     .then((data) => {
-  console.log("TRACK VISITOR RESPONSE:", data);
-  console.log("Saving visitor ID now...");
   if (data?.visitor_id) {
   sessionStorage.setItem("visitor_id", data.visitor_id);
   exitAllowed = true; // <-- THIS FIXES EVERYTHING

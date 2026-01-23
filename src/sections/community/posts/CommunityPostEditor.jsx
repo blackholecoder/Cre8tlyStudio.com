@@ -13,6 +13,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import {
   Link2,
   Unlink,
@@ -21,6 +22,8 @@ import {
   X,
   Code,
   ChevronDown,
+  Bold,
+  Minus,
 } from "lucide-react";
 import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
@@ -45,6 +48,7 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
         codeBlock: true,
       }),
       Underline,
+      HorizontalRule,
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -131,34 +135,6 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
     }
   }, [editor]);
 
-  const insertImageFromFile = async (file) => {
-    if (!file) return;
-
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const res = await axiosInstance.post(
-        "/community/upload-image",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      if (!res.data?.image_url) {
-        throw new Error("No image_url returned from upload");
-      }
-
-      editor
-        .chain()
-        .focus()
-        .createParagraphNear()
-        .setImage({ src: res.data.image_url })
-        .run();
-    } catch (err) {
-      console.error("INLINE IMAGE UPLOAD FAILED:", err);
-    }
-  };
-
   if (!editor) return null;
 
   return (
@@ -173,16 +149,16 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
               type="button"
               onClick={() => setFormatOpen((v) => !v)}
               className="
-      flex items-center justify-between
-      min-w-[140px]
-      px-3 py-2
-      rounded-md
-      text-sm font-medium
-      bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-      border border-dashboard-border-light dark:border-dashboard-border-dark
-      text-dashboard-text-light dark:text-dashboard-text-dark
-      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-    "
+              flex items-center justify-between
+              min-w-[140px]
+              px-3 py-2
+              rounded-md
+              text-sm font-medium
+              bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              text-dashboard-text-light dark:text-dashboard-text-dark
+              hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+            "
             >
               <span>Body</span>
               <ChevronDown size={14} className="opacity-70" />
@@ -192,14 +168,14 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
             {formatOpen && (
               <div
                 className="
-        absolute left-0 mt-1 z-20
-        w-44
-        rounded-md
-        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-        border border-dashboard-border-light dark:border-dashboard-border-dark
-        shadow-lg
-        overflow-hidden
-      "
+                absolute left-0 mt-1 z-20
+                w-44
+                rounded-md
+                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                shadow-lg
+                overflow-hidden
+              "
               >
                 <button
                   onClick={setParagraph}
@@ -224,6 +200,23 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           </div>
 
           {/* existing buttons */}
+          <button
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={`
+            p-2 rounded
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+            ${editor.isActive("bold") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
+          `}
+          >
+            <Bold size={16} />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+          >
+            <Minus size={16} />
+          </button>
+
           <button
             onClick={() => setLinkOpen(true)}
             className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
@@ -267,6 +260,10 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           overflow-y-auto
           post-body
           prose prose-lg max-w-none
+
+          prose-strong:text-inherit
+          prose-strong:font-semibold
+
           prose-a:underline
           prose-a:underline-offset-2
           prose-a:font-medium
@@ -274,6 +271,7 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           prose-a:decoration-blue
 
           dark:prose-invert
+          dark:prose-strong:text-inherit
           dark:prose-a:text-sky-400
           dark:prose-a:decoration-sky-400
         "

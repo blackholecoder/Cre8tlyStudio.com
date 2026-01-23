@@ -152,6 +152,23 @@ export default function CreatePostModal({
             </div>
           )}
 
+          {!isEdit && topicId && (
+            <div className="mb-4">
+              <span className="text-xs uppercase tracking-wide text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                Posting in
+              </span>
+              <div
+                className="mt-1 inline-flex items-center px-3 py-1 rounded-full
+      bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+      text-sm font-medium
+      text-dashboard-text-light dark:text-dashboard-text-dark
+    "
+              >
+                {topics.find((t) => t.id === topicId)?.name || "General"}
+              </div>
+            </div>
+          )}
+
           {/* Post title */}
 
           <div className="space-y-1">
@@ -264,6 +281,36 @@ export default function CreatePostModal({
               </label>
             )}
           </div>
+          {/* Community reminder */}
+          {!isEdit && (
+            <div
+              className="
+      mb-3
+      rounded-lg
+      border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      bg-dashboard-hover-light
+      dark:bg-dashboard-hover-dark
+      px-4 py-3
+      text-xs sm:text-sm
+      text-dashboard-muted-light
+      dark:text-dashboard-muted-dark
+      space-y-2
+    "
+            >
+              <p>
+                This community works best when people show up as themselves.
+                Share something real, ask a genuine question, or offer a
+                perspective that might help someone else.
+              </p>
+
+              <p className="opacity-80">
+                This isn’t a place for quick promos or low-effort posts. Those
+                may be removed so the space stays thoughtful and worth showing
+                up for.
+              </p>
+            </div>
+          )}
 
           {/* Inset Image */}
           <div className="flex items-center justify-between mt-4 mb-1">

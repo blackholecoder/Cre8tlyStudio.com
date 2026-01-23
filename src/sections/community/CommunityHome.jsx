@@ -1,12 +1,52 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { headerLogo } from "../../assets/images";
+import CreatePostModal from "./CreatePostModal";
+import { Eye, MessageCircle } from "lucide-react";
 
 export default function CommunityHome() {
   const [topics, setTopics] = useState([]);
   const navigate = useNavigate();
   const [viewedTopics, setViewedTopics] = useState(new Set());
+
+  const [posts, setPosts] = useState([]);
+  const [activeTopic, setActiveTopic] = useState("all");
+  const [showModal, setShowModal] = useState(null);
+
+  async function handlePostClick(postId) {
+    try {
+      await axiosInstance.post(`/community/posts/${postId}/view`);
+    } catch (err) {
+      // intentionally silent, view tracking should never block navigation
+    }
+
+    navigate(`/community/post/${postId}`);
+  }
+
+  const fetchPosts = async () => {
+    try {
+      const res = await axiosInstance.get("/community/posts");
+      setPosts(res.data.posts || []);
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const filteredPosts = useMemo(() => {
+    return activeTopic === "all"
+      ? posts
+      : posts.filter((p) => p.topic_id === activeTopic);
+  }, [posts, activeTopic]);
+
+  const generalTopicId = useMemo(() => {
+    const general = topics.find((t) => t.slug === "general");
+    return general?.id || "";
+  }, [topics]);
 
   useEffect(() => {
     const fetchViews = async () => {
@@ -120,53 +160,180 @@ export default function CommunityHome() {
           A shared space for ideas, questions, discussions, and learning.
         </p>
 
+        <div className="flex justify-center mb-8">
+          <button
+            type="button"
+            onClick={() =>
+              setShowModal({
+                open: true,
+                topicId: generalTopicId,
+              })
+            }
+            className="
+      px-6 py-3
+      rounded-xl
+      font-semibold
+      bg-green text-black
+      hover:opacity-90
+      transition
+    "
+          >
+            Write a post
+          </button>
+        </div>
+
         {/* Scrollable Topics */}
-        <div className="flex-1 overflow-y-auto pr-2">
-          <div className="grid gap-3 sm:gap-6 md:grid-cols-2 pb-6 pt-6">
-            {topics.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => navigate(`/community/topic/${t.id}`)}
-                className="
-                relative text-left transition-all
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
+          <button
+            onClick={() => setActiveTopic("all")}
+            className={`px-4 py-2 rounded-full text-sm font-medium
+      ${
+        activeTopic === "all"
+          ? "bg-green text-black"
+          : "border border-dashboard-border-light dark:border-dashboard-border-dark"
+      }
+    `}
+          >
+            All
+          </button>
 
-                /* mobile */
-                bg-transparent
-                border-b border-dashboard-border-light
-                dark:border-dashboard-border-dark
-                rounded-none
-                px-1 py-4
-                shadow-none
-                hover:bg-dashboard-bg-light/40
-                dark:hover:bg-dashboard-bg-dark/40
-
-                /* desktop */
-                sm:bg-dashboard-sidebar-light
-                sm:dark:bg-dashboard-sidebar-dark
-                sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
-                sm:rounded-xl
-                sm:p-6
-                sm:hover:border-bookBtnColor
-                sm:hover:-translate-y-[2px]
-                sm:hover:shadow-lg
-              "
-              >
-                {t.has_new && (
-                  <span className="absolute top-3 right-3 bg-green text-black text-xs font-semibold px-2 py-1 rounded-full shadow-md">
-                    NEW
-                  </span>
+          {topics.map((t) => (
+            <button
+              type="button"
+              key={t.id}
+              onClick={() => setActiveTopic(t.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
+        ${
+          activeTopic === t.id
+            ? "bg-green text-black"
+            : "border border-dashboard-border-light dark:border-dashboard-border-dark"
+        }
+      `}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+        <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+          {filteredPosts.map((post) => (
+            <button
+              key={post.id}
+              onClick={() => handlePostClick(post.id)}
+              className="
+              relative
+              w-full text-left
+              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+              p-4 sm:p-5 rounded-xl
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+              transition
+            "
+            >
+              <div className="flex gap-4 items-start">
+                {/* Post image */}
+                {post.image_url && (
+                  <div
+                    className="
+                    w-16 h-16
+                    rounded-lg
+                    overflow-hidden
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    flex-shrink-0
+                  "
+                  >
+                    <img
+                      src={post.image_url}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 )}
 
-                <h2 className="text-xl font-semibold mb-2">{t.name}</h2>
+                {/* Right content */}
+                <div className="flex-1">
+                  <h3
+                    className="
+                    text-base sm:text-lg font-semibold
+                    text-dashboard-text-light dark:text-dashboard-text-dark
+                    line-clamp-2
+                  "
+                  >
+                    {post.title}
+                  </h3>
 
-                <p className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  {t.description}
-                </p>
-              </button>
-            ))}
-          </div>
+                  {post.subtitle && (
+                    <p
+                      className="
+                        mt-1 text-sm
+                        text-dashboard-muted-light dark:text-dashboard-muted-dark
+                        line-clamp-2
+                      "
+                    >
+                      {post.subtitle}
+                    </p>
+                  )}
+
+                  {/* Author row */}
+                  <div className="flex items-center gap-2 mt-2">
+                    {post.author_image ? (
+                      <img
+                        src={post.author_image}
+                        alt=""
+                        className="
+                        w-6 h-6 rounded-full object-cover
+                        border border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                      "
+                      />
+                    ) : (
+                      <div
+                        className="
+                        w-6 h-6 rounded-full
+                        bg-dashboard-hover-light
+                        dark:bg-dashboard-hover-dark
+                      "
+                      />
+                    )}
+
+                    <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      {post.author} · {post.topic_name}
+                    </span>
+                  </div>
+                  {/* Meta stats */}
+                  <div className="flex items-center gap-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    <div className="flex items-center gap-[3px]">
+                      <Eye size={14} className="opacity-70" />
+                      <span>{post.views ?? 0}</span>
+                      <span>views</span>
+                    </div>
+
+                    <div className="flex items-center gap-[3px]">
+                      <MessageCircle size={14} className="opacity-70" />
+                      <span>{post.comment_count ?? 0}</span>
+                      <span>comments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
+      {showModal?.open && (
+        <CreatePostModal
+          topicId={showModal.topicId}
+          topics={topics}
+          onClose={() => setShowModal(null)}
+          onPosted={() => {
+            setShowModal(null);
+            fetchPosts();
+            // optionally refetch posts
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -3,19 +3,30 @@ import axiosInstance from "../../api/axios";
 
 export default function CreateCommentBox({ postId, onComment }) {
   const [body, setBody] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
-    if (!body.trim()) return;
+    if (!body.trim() || submitting) return;
+
+    setSubmitting(true);
 
     try {
-      await axiosInstance.post(`/community/posts/${postId}/comments`, {
-        body,
-      });
+      const res = await axiosInstance.post(
+        `/community/posts/${postId}/comments`,
+        { body }
+      );
+
+      const newComment = res.data.comment;
 
       setBody("");
-      onComment();
+
+      if (onComment && newComment) {
+        onComment(newComment);
+      }
     } catch (err) {
       console.error("Failed to add comment:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -42,18 +53,24 @@ export default function CreateCommentBox({ postId, onComment }) {
 
       <button
         onClick={submit}
-        className="
-        mt-4
-        px-5 py-2
-        rounded-lg
-        transition
-        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-        text-dashboard-text-light dark:text-dashboard-text-dark
-        border border-dashboard-border-light dark:border-dashboard-border-dark
-        hover:bg-green hover:text-black
-      "
+        disabled={submitting}
+        className={`
+    mt-4
+    px-5 py-2
+    rounded-lg
+    transition
+    border
+    ${
+      submitting
+        ? "opacity-50 cursor-not-allowed"
+        : "hover:bg-green hover:text-black"
+    }
+    bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+    text-dashboard-text-light dark:text-dashboard-text-dark
+    border-dashboard-border-light dark:border-dashboard-border-dark
+  `}
       >
-        Comment
+        {submitting ? "Posting…" : "Comment"}
       </button>
     </div>
   );

@@ -37,8 +37,8 @@ Instantly generate beautifully branded, conversion-ready ebooks, guides and PDFs
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/svg+xml" href="/cre8tly-fav-white.svg">
-    <script type="module" crossorigin src="/assets/index-79418d53.js"></script>
-    <link rel="stylesheet" href="/assets/index-bcc91053.css">
+    <script type="module" crossorigin src="/assets/index-76720281.js"></script>
+    <link rel="stylesheet" href="/assets/index-34e0983d.css">
   </head>
   <body>
     <div id="root"></div>
@@ -170,8 +170,6 @@ setTimeout(() => (exitAllowed = true), 1500);
   })
     .then((res) => res.json())
     .then((data) => {
-  console.log("TRACK VISITOR RESPONSE:", data);
-  console.log("Saving visitor ID now...");
   if (data?.visitor_id) {
   sessionStorage.setItem("visitor_id", data.visitor_id);
   exitAllowed = true; // <-- THIS FIXES EVERYTHING

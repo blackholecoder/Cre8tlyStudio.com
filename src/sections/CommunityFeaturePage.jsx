@@ -2,22 +2,16 @@
 import {
   Users,
   MessageSquare,
-  Bell,
-  Heart,
-  CornerDownRight,
-  PlusCircle,
-  Sparkles,
+  FileText,
+  Upload,
+  Share2,
+  Lock,
+  PenTool,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 /* ------------------ helpers ------------------ */
-
-const Pill = ({ children }) => (
-  <span className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700">
-    {children}
-  </span>
-);
 
 const Card = ({ className = "", children }) => (
   <div
@@ -59,7 +53,7 @@ export default function CommunityFeaturePage() {
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-4 sm:px-6 pt-16 pb-14 sm:pt-20 sm:pb-20 overflow-hidden">
         {/* background */}
-        <div className="absolute inset-0 bg-royalPurple sm:rounded-xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black to-neutral-900 sm:rounded-xl" />
 
         <motion.div
           variants={stagger}
@@ -72,36 +66,24 @@ export default function CommunityFeaturePage() {
           <div className="flex flex-col gap-5 text-center lg:text-left px-2 sm:px-0">
             <motion.div
               variants={reveal}
-              className="flex flex-wrap gap-2 justify-center lg:justify-start"
+              className="text-sm font-medium tracking-wide text-white/70 uppercase"
             >
-              <Pill>
-                <Users className="h-4 w-4" />
-                Community
-              </Pill>
-              <Pill>
-                <Sparkles className="h-4 w-4" />
-                Built for engagement
-              </Pill>
-              <Pill>
-                <Bell className="h-4 w-4" />
-                Real time interaction
-              </Pill>
+              SUBSCRIPTION-FIRST · WRITING-LED · INVITE-ONLY
             </motion.div>
 
             <motion.h1
               variants={reveal}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white"
             >
-              Build community,
-              <span className="block">not just an audience.</span>
+              A subscription-first community built for writers.
             </motion.h1>
 
             <motion.p
               variants={reveal}
               className="max-w-2xl mx-auto lg:mx-0 text-lg text-white/90"
             >
-              Give your users a place to connect, ask questions, share ideas,
-              and stay engaged long after they download or buy.
+              Publish posts, invite your audience, and build a focused community
+              without follows, feeds, or algorithms.
             </motion.p>
           </div>
 
@@ -110,22 +92,18 @@ export default function CommunityFeaturePage() {
             variants={reveal}
             className="flex justify-center lg:justify-end pt-2 sm:pt-0"
           >
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-white/10 blur-xl" />
-
+            <div className="relative flex items-center justify-center">
               <div
                 className="
-            relative
-            flex items-center justify-center
-            rounded-full
-            bg-white/10
-            border border-white/20
-            h-28 w-28
-            sm:h-36 sm:w-36
-            lg:h-64 lg:w-64
-          "
+      flex items-center justify-center 
+      rounded-full
+      border border-white/10
+      h-28 w-28
+      sm:h-36 sm:w-36
+      lg:h-64 lg:w-64
+    "
               >
-                <Users className="h-14 w-14 sm:h-18 sm:w-18 lg:h-32 lg:w-32 text-white" />
+                <PenTool className="h-14 w-14 sm:h-18 sm:w-18 lg:h-32 lg:w-32 text-neutral-200" />
               </div>
             </div>
           </motion.div>
@@ -144,22 +122,19 @@ export default function CommunityFeaturePage() {
           >
             {[
               {
-                icon: MessageSquare,
-                title: "Create topics",
-                desc: "Organize discussions by topic so conversations stay focused and easy to follow.",
-                color: "bg-blue-600",
+                icon: Users,
+                title: "Subscribe only, no follows",
+                desc: "Members subscribe intentionally. No followers, no feeds, no algorithmic noise.",
               },
               {
-                icon: PlusCircle,
-                title: "Post and reply",
-                desc: "Start conversations, reply to posts, and keep discussions moving naturally.",
-                color: "bg-purple-600",
+                icon: FileText,
+                title: "Professional posts",
+                desc: "Publish long form posts with a clean editor built for serious writing.",
               },
               {
-                icon: CornerDownRight,
-                title: "Replies to replies",
-                desc: "Nested replies allow deeper conversations without clutter.",
-                color: "bg-emerald-600",
+                icon: Upload,
+                title: "Invite by CSV",
+                desc: "Upload your email list and invite your existing audience directly.",
               },
             ].map(({ icon: Icon, title, desc, color }) => (
               <motion.div
@@ -169,10 +144,8 @@ export default function CommunityFeaturePage() {
                 className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition"
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${color}`}
-                  >
-                    <Icon className="h-5 w-5 text-white" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700">
+                    <Icon className="h-5 w-5 text-black" />
                   </div>
                   <div className="font-bold">{title}</div>
                 </div>
@@ -193,13 +166,13 @@ export default function CommunityFeaturePage() {
           viewport={{ once: true }}
           className="mb-12 max-w-2xl"
         >
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-700">
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-800 leading-tight">
             Everything a modern
-            <span className="block">community needs.</span>
+            <span className="block">community needs</span>
           </h2>
           <p className="mt-4 text-gray-600">
-            Cre8tly Studio communities are designed to feel familiar, intuitive,
-            and engaging, just like the social platforms users already love.
+            Cre8tly Studio communities are designed for focus, ownership, and
+            meaningful discussion without algorithms, feeds, or follower counts.
           </p>
         </motion.div>
 
@@ -212,30 +185,36 @@ export default function CommunityFeaturePage() {
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
           {[
-            { icon: Bell, title: "Notifications", color: "text-blue-600" },
             {
-              icon: Heart,
-              title: "Likes and reactions",
-              color: "text-pink-600",
+              icon: Users,
+              title: "Creator profiles",
+              color: "text-blue-600",
+              desc: "Each creator has a dedicated profile with bio, links, and a clear identity.",
             },
             {
               icon: MessageSquare,
-              title: "Threaded discussions",
+              title: "Comments and discussion",
               color: "text-purple-600",
+              desc: "Readers can comment, reply, and take part in thoughtful discussion together.",
             },
             {
-              icon: Users,
-              title: "Built for growth",
+              icon: Share2,
+              title: "Shareable posts",
               color: "text-emerald-600",
+              desc: "Every post includes a shareable link you can use anywhere online.",
             },
-          ].map(({ icon: Icon, title, color }) => (
+            {
+              icon: Lock,
+              title: "Intentional access",
+              color: "text-pink-600",
+              desc: "Subscription based access keeps communities focused, respectful, and intentional.",
+            },
+          ].map(({ icon: Icon, title, desc, color }) => (
             <motion.div key={title} variants={reveal}>
               <Card className="p-6 hover:-translate-y-1 transition">
                 <Icon className={`h-5 w-5 ${color}`} />
                 <div className="mt-3 font-bold">{title}</div>
-                <p className="mt-2 text-sm text-gray-600">
-                  Designed to keep users engaged and coming back consistently.
-                </p>
+                <p className="mt-2 text-sm text-gray-600">{desc}</p>
               </Card>
             </motion.div>
           ))}
@@ -246,7 +225,7 @@ export default function CommunityFeaturePage() {
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <Card className="relative overflow-hidden p-10">
           {/* background gradient */}
-          <div className="absolute inset-0 bg-royalPurple" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black to-neutral-900 sm:rounded-xl" />
 
           {/* subtle dark overlay for contrast */}
           <div className="absolute inset-0 bg-black/20" />
@@ -258,12 +237,12 @@ export default function CommunityFeaturePage() {
               </div>
 
               <div className="mt-2 text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-                Turn users into members.
+                Build a community around your writing.
               </div>
 
               <p className="mt-3 text-white/90 max-w-xl">
-                Communities drive retention, trust, and long term growth. Give
-                your audience a place to stay connected.
+                Publish posts, invite your audience, and host thoughtful
+                discussion without followers or algorithms.
               </p>
             </div>
 

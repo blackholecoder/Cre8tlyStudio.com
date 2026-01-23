@@ -16,6 +16,7 @@ import {
   Mail,
   Cog,
   User,
+  Home,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -93,9 +94,9 @@ export const SIDEBAR_SECTIONS = [
       },
       {
         key: "community-topics",
-        label: "Categories",
+        label: "Home",
         path: "/community",
-        icon: List,
+        icon: Home,
         allowCommunity: true,
         isSubItem: true,
       },

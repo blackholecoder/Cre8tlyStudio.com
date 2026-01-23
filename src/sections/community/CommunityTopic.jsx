@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import { Plus } from "lucide-react";
+import { Eye, MessageCircle, Plus } from "lucide-react";
 import CreatePostModal from "./CreatePostModal";
 
 export default function CommunityTopic() {
@@ -57,7 +57,7 @@ export default function CommunityTopic() {
       >
         <button
           onClick={() => navigate("/community")}
-          className="text-blue hover:text-blue/80 transition"
+          className="opacity-70 hover:opacity-100 transition"
         >
           ← Back
         </button>
@@ -79,7 +79,7 @@ export default function CommunityTopic() {
       {/* Header + Create Button */}
       <div className="flex items-center justify-between mb-8">
         <h1
-          className="text-3xl font-bold
+          className="text-2xl font-semibold
           text-dashboard-text-light dark:text-dashboard-text-dark"
         >
           {topic.name}
@@ -89,8 +89,8 @@ export default function CommunityTopic() {
           onClick={() => setShowModal(true)}
           className="
           flex items-center gap-2
-          px-4 py-2
-          rounded-lg font-medium
+          px-3 py-1.5
+          rounded-md text-sm
           border border-dashboard-border-light dark:border-dashboard-border-dark
           text-dashboard-text-light dark:text-dashboard-text-dark
           hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
@@ -106,10 +106,6 @@ export default function CommunityTopic() {
       {/* Posts List */}
       <div className="space-y-4">
         {posts.map((post) => {
-          const isNew =
-            !topic.last_viewed ||
-            new Date(post.created_at) > new Date(topic.last_viewed);
-
           return (
             <button
               key={post.id}
@@ -124,25 +120,13 @@ export default function CommunityTopic() {
               className="
               relative w-full text-left
               bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-              p-4 sm:p-5 rounded-xl
+              p-3 sm:p-4 rounded-xl
               border border-dashboard-border-light dark:border-dashboard-border-dark
               hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
               transition
               active:scale-[0.99]
             "
             >
-              {isNew && (
-                <span
-                  className="
-                  absolute top-3 right-3
-                  bg-green text-black text-xs font-semibold
-                  px-2 py-1 rounded-full
-                "
-                >
-                  NEW
-                </span>
-              )}
-
               <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                 {/* Left image */}
                 {post.image_url && (
@@ -175,7 +159,7 @@ export default function CommunityTopic() {
                   <h3
                     className="
                     text-base sm:text-lg font-semibold line-clamp-2
-                    text-dashboard-text-light dark:text-dashboard-text-dark underline
+                    text-dashboard-text-light dark:text-dashboard-text-dark
                   "
                   >
                     {post.title}
@@ -204,6 +188,19 @@ export default function CommunityTopic() {
                   >
                     By {post.author}
                   </p>
+                  <div className="flex items-center gap-4 mt-1 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    <div className="flex items-center gap-[3px]">
+                      <Eye size={14} className="opacity-70" />
+                      <span>{post.views ?? 0}</span>
+                      <span>views</span>
+                    </div>
+
+                    <div className="flex items-center gap-[3px]">
+                      <MessageCircle size={14} className="opacity-70" />
+                      <span>{post.comment_count ?? 0}</span>
+                      <span>comments</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </button>

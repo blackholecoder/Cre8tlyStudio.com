@@ -4,6 +4,7 @@ import { useAuth } from "../../admin/AuthContext";
 import { Img } from "react-image";
 import { headerLogo } from "../../assets/images";
 import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
+import { toast } from "react-toastify";
 
 export default function CommentThread({
   comment,
@@ -86,10 +87,54 @@ export default function CommentThread({
             {/* Author + Meta */}
             <div className="flex items-center gap-3 mb-2">
               {/* Avatar */}
-              {comment.author_role === "admin" ? (
-                <div className="w-8 h-8 rounded-full  flex items-center justify-center text-[10px] font-semibold text-green">
+              <button
+                title={
+                  !comment.author_has_profile
+                    ? "Profile coming soon"
+                    : undefined
+                }
+                onClick={() => {
+                  // own comment → no nav
+                  if (user?.id === comment.user_id) return;
+
+                  // admin → no nav
+                  if (comment.author_role === "admin") return;
+
+                  // no profile → block
+                  if (!comment.author_has_profile) {
+                    toast.info("This author hasn’t set up their profile yet");
+                    return;
+                  }
+
+                  // safe navigation
+                  navigate(`/community/authors/${comment.user_id}`);
+                }}
+                className={`flex-shrink-0 ${
+                  !comment.author_has_profile || comment.author_role === "admin"
+                    ? "cursor-default"
+                    : "cursor-pointer"
+                }`}
+              >
+                {comment.author_role === "admin" ? (
+                  <div className="w-8 h-8 rounded-full  flex items-center justify-center text-[10px] font-semibold text-green">
+                    <Img
+                      src={headerLogo}
+                      loader={
+                        <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                      }
+                      unloader={
+                        <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                          {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                        </div>
+                      }
+                      decode={true}
+                      alt="User avatar"
+                      className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                    />
+                  </div>
+                ) : comment.author_image ? (
                   <Img
-                    src={headerLogo}
+                    src={comment.author_image}
                     loader={
                       <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
                     }
@@ -102,27 +147,12 @@ export default function CommentThread({
                     alt="User avatar"
                     className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
                   />
-                </div>
-              ) : comment.author_image ? (
-                <Img
-                  src={comment.author_image}
-                  loader={
-                    <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
-                  }
-                  unloader={
-                    <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
-                      {comment.author?.charAt(0)?.toUpperCase() || "U"}
-                    </div>
-                  }
-                  decode={true}
-                  alt="User avatar"
-                  className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
-                  {comment.author?.charAt(0)?.toUpperCase() || "U"}
-                </div>
-              )}
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
+                    {comment.author?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
+              </button>
 
               {/* Author + Meta */}
               <div className="flex items-center gap-[2px] text-xs text-gray-500">

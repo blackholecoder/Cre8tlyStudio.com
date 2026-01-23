@@ -18,6 +18,9 @@ import { Img } from "react-image";
 import { headerLogo } from "../../assets/images";
 import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
 import { formatPostDate } from "../../helpers/formatPostDate";
+import { confirmDelete } from "../../helpers/confirmToast";
+import { ButtonSpinner } from "../../helpers/buttonSpinner";
+import { toast } from "react-toastify";
 
 export default function CommunityPost() {
   const { user, authLoading } = useAuth();
@@ -38,6 +41,7 @@ export default function CommunityPost() {
   const [activeReplyBox, setActiveReplyBox] = useState(null);
 
   const [replyPages, setReplyPages] = useState({});
+  const [deletedCommentIds, setDeletedCommentIds] = useState(new Set());
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -250,38 +254,37 @@ export default function CommunityPost() {
     }
   };
 
-  const handleDelete = async (commentId, parentId = null) => {
-    if (!window.confirm("Delete this comment?")) return;
+  const handleDelete = (commentId, parentId = null) => {
+    confirmDelete({
+      message: "Delete this comment?",
+      onConfirm: async () => {
+        try {
+          // 🔥 optimistic UI removal
+          if (parentId) {
+            setReplies((prev) => ({
+              ...prev,
+              [parentId]: (prev[parentId] || []).filter(
+                (r) => r.id !== commentId
+              ),
+            }));
+          } else {
+            setComments((prev) => prev.filter((c) => c.id !== commentId));
 
-    try {
-      await axiosInstance.delete(`/community/comments/${commentId}`);
+            setPost((prev) => ({
+              ...prev,
+              comment_count: Math.max((prev.comment_count || 1) - 1, 0),
+            }));
+          }
 
-      if (parentId) {
-        setReplies((prev) => {
-          const list = prev[parentId] || [];
+          await axiosInstance.delete(`/community/comments/${commentId}`);
 
-          const filtered = list.filter((r) => r.id !== commentId);
-
-          const updated = {
-            ...prev,
-            [parentId]: filtered,
-          };
-
-          return updated;
-        });
-        await loadReplies(parentId);
-      } else {
-        setComments((prev) => {
-          const filtered = prev.filter((c) => c.id !== commentId);
-
-          return filtered;
-        });
-
-        await loadReplies(null);
-      }
-    } catch (err) {
-      console.error("❌ Delete failed:", err);
-    }
+          toast.success("Comment deleted");
+        } catch (err) {
+          console.error("❌ Delete failed:", err);
+          toast.error("Failed to delete comment");
+        }
+      },
+    });
   };
 
   const toggleLike = async (comment, parentId = null) => {
@@ -398,7 +401,7 @@ export default function CommunityPost() {
         >
           <button
             onClick={() => navigate(backTo)}
-            className="flex items-center gap-1 text-blue hover:text-blue/80 transition"
+            className="flex items-center gap-1 opacity-70 hover:opacity-100 transition"
           >
             <ArrowLeft size={16} />
             Back
@@ -451,11 +454,23 @@ export default function CommunityPost() {
           >
             <div className="flex items-center gap-4 mb-4 sm:mb-6">
               <button
+                title={
+                  !post.author_has_profile ? "Profile coming soon" : undefined
+                }
                 onClick={() => {
-                  if (user?.id === post.user_id) return; // do nothing
+                  // Own post → no navigation
+                  if (user?.id === post.user_id) return;
+
+                  // Author has no profile → block + inform
+                  if (!post.author_has_profile) {
+                    toast.info("This author hasn’t set up their profile yet");
+                    return;
+                  }
+
+                  // Safe navigation
                   navigate(`/community/authors/${post.user_id}`);
                 }}
-                className="group"
+                className={`group ${!post.author_has_profile ? "cursor-default" : "cursor-pointer"}`}
               >
                 {isStudioPost ? (
                   <img
@@ -519,15 +534,38 @@ export default function CommunityPost() {
                     <button
                       onClick={toggleSubscribe}
                       disabled={subLoading}
-                      className={`text-xs px-2 py-1 rounded-md border transition
-                        ${
-                          isSubscribed
-                            ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
-                            : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-                        }
-                      `}
+                      className={`
+                      text-xs
+                      px-2
+                      py-1
+                      min-w-[88px]
+                      rounded-md
+                      border
+                      transition
+                      flex
+                      items-center
+                      justify-center
+                      gap-1
+
+                      ${
+                        isSubscribed
+                          ? "bg-green/10 text-green border-green/30"
+                          : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark"
+                      }
+
+                      ${subLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
+                    `}
                     >
-                      {isSubscribed ? "Subscribed" : "Subscribe"}
+                      {subLoading ? (
+                        <>
+                          <ButtonSpinner />
+                          <span>
+                            {isSubscribed ? "Updating" : "Subscribing"}
+                          </span>
+                        </>
+                      ) : (
+                        <span>{isSubscribed ? "Subscribed" : "Subscribe"}</span>
+                      )}
                     </button>
                   )}
                 </div>
@@ -665,31 +703,63 @@ export default function CommunityPost() {
                   "
                   >
                     <div className="flex items-start gap-4">
-                      {c.author_image ? (
-                        <Img
-                          src={c.author_image}
-                          loader={
-                            <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
+                      <button
+                        title={
+                          !c.author_has_profile
+                            ? "Profile coming soon"
+                            : undefined
+                        }
+                        onClick={() => {
+                          // own comment → no navigation
+                          if (user?.id === c.user_id) return;
+
+                          // no profile → block
+                          if (!c.author_has_profile) {
+                            toast.info(
+                              "This author hasn’t set up their profile yet"
+                            );
+                            return;
                           }
-                          unloader={
-                            <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-                            border-dashboard-border-light dark:border-dashboard-border-dark
-                            text-dashboard-muted-light dark:text-dashboard-muted-dark
-                            "
-                            >
-                              {commentAvatar}
-                            </div>
-                          }
-                          decode={true}
-                          alt="Comment avatar"
-                          className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
-                          {commentAvatar}
-                        </div>
-                      )}
+
+                          // navigate
+                          navigate(`/community/authors/${c.user_id}`);
+                        }}
+                        className={`flex-shrink-0 ${
+                          !c.author_has_profile
+                            ? "cursor-default"
+                            : "cursor-pointer"
+                        }`}
+                      >
+                        {c.author_image ? (
+                          <Img
+                            src={c.author_image}
+                            loader={
+                              <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
+                            }
+                            unloader={
+                              <div
+                                className="
+                                w-10 h-10 rounded-full
+                                flex items-center justify-center
+                                text-sm font-semibold
+                                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                                border border-dashboard-border-light dark:border-dashboard-border-dark
+                                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                              "
+                              >
+                                {commentAvatar}
+                              </div>
+                            }
+                            decode
+                            alt="Comment avatar"
+                            className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                            {commentAvatar}
+                          </div>
+                        )}
+                      </button>
 
                       <div className="flex-1">
                         {editCommentId !== c.id && (
@@ -795,35 +865,29 @@ export default function CommunityPost() {
                         {/* Action Row */}
                         {editCommentId !== c.id && (
                           <div className="flex items-center gap-4 mt-2">
-                            {/* Reply */}
+                            {/* Reply is ALWAYS available */}
+                            <button
+                              onClick={() => setActiveReplyBox(c.id)}
+                              className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
+                            >
+                              Reply
+                            </button>
 
-                            {/* Reply toggle + open reply box */}
-                            {c.reply_count > 0 ? (
-                              // Threaded replies exist → open/close thread
+                            {/* View / Hide replies only if replies exist */}
+                            {c.reply_count > 0 && (
                               <button
                                 onClick={() => toggleReplies(c.id)}
-                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark
-                                  hover:opacity-80"
+                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
                               >
                                 {openReplies[c.id]
                                   ? "Hide replies"
                                   : `View replies (${c.reply_count})`}
                               </button>
-                            ) : (
-                              // No replies → open reply box
-                              <button
-                                onClick={() => setActiveReplyBox(c.id)}
-                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark
-                                  hover:opacity-80"
-                              >
-                                Reply
-                              </button>
                             )}
-
-                            {/* Divider Dot */}
 
                             {/* Edit */}
                             {!openReplies[c.id] &&
+                              user &&
                               (c.user_id === user.id ||
                                 user.role === "admin") && (
                                 <button
@@ -839,6 +903,7 @@ export default function CommunityPost() {
 
                             {/* Delete */}
                             {!openReplies[c.id] &&
+                              user &&
                               (c.user_id === user.id ||
                                 user.role === "admin") && (
                                 <button
@@ -848,7 +913,6 @@ export default function CommunityPost() {
                                   Delete
                                 </button>
                               )}
-                            {/* Reply Box for top-level comments */}
                           </div>
                         )}
 
@@ -858,12 +922,33 @@ export default function CommunityPost() {
                               parentId={c.id}
                               postId={post.id}
                               onReply={async (newReply) => {
+                                // 1️⃣ add reply locally
                                 setReplies((prev) => ({
                                   ...prev,
                                   [c.id]: [...(prev[c.id] || []), newReply],
                                 }));
-                                await loadReplies(c.id);
-                                setActiveReplyBox(null);
+
+                                // 2️⃣ increment reply_count on the parent comment
+                                setComments((prev) =>
+                                  prev.map((comment) =>
+                                    comment.id === c.id
+                                      ? {
+                                          ...comment,
+                                          reply_count:
+                                            (comment.reply_count || 0) + 1,
+                                        }
+                                      : comment
+                                  )
+                                );
+
+                                // 3️⃣ open replies immediately
+                                setOpenReplies((prev) => ({
+                                  ...prev,
+                                  [c.id]: true,
+                                }));
+
+                                // 4️⃣ close reply box
+                                setTimeout(() => setActiveReplyBox(null), 100);
                               }}
                               onCancel={() => setActiveReplyBox(null)}
                             />
@@ -905,7 +990,17 @@ export default function CommunityPost() {
               <div ref={observerRef} className="h-10"></div>
             </div>
 
-            <CreateCommentBox postId={post.id} onComment={load} />
+            <CreateCommentBox
+              postId={post.id}
+              onComment={(newComment) => {
+                setComments((prev) => [newComment, ...prev]);
+
+                setPost((prev) => ({
+                  ...prev,
+                  comment_count: (prev.comment_count || 0) + 1,
+                }));
+              }}
+            />
           </div>
         </div>
       </div>

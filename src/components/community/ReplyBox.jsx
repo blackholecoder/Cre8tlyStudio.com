@@ -1,22 +1,28 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
+import { ButtonSpinner } from "../../helpers/buttonSpinner";
 
 export default function ReplyBox({ parentId, postId, onReply, onCancel }) {
   const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
-    if (!body.trim()) return;
+    if (!body.trim() || loading) return;
+
+    setLoading(true);
 
     try {
-      await axiosInstance.post(`/community/comments/${parentId}/reply`, {
-        body,
-        postId,
-      });
+      const res = await axiosInstance.post(
+        `/community/comments/${parentId}/reply`,
+        { body, postId }
+      );
 
       setBody("");
-      onReply();
+      onReply(res.data.reply); // 👈 hydrated reply
     } catch (err) {
       console.error("Failed to submit reply:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,23 +50,32 @@ export default function ReplyBox({ parentId, postId, onReply, onCancel }) {
       <div className="flex items-center gap-3 mt-2">
         <button
           onClick={submit}
+          disabled={loading}
           className="
-         bg-green
-          text-dashboard-text-light
-          px-4
-          py-1.5
-          rounded-md
-          text-sm
-          font-medium
-          transition
-          hover:bg-green/90
-          focus:outline-none
-          focus:ring-2
-          focus:ring-green/40
-
-        "
+    bg-green
+    text-dashboard-text-light
+    px-4
+    py-1.5
+    rounded-md
+    text-sm
+    font-medium
+    flex
+    items-center
+    gap-2
+    transition
+    hover:bg-green/90
+    disabled:opacity-60
+    disabled:cursor-not-allowed
+  "
         >
-          Reply
+          {loading ? (
+            <>
+              <ButtonSpinner />
+              <span>Posting</span>
+            </>
+          ) : (
+            "Reply"
+          )}
         </button>
 
         <button

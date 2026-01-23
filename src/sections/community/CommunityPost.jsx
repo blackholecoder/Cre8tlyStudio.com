@@ -42,6 +42,8 @@ export default function CommunityPost() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const highlightedCommentId = params.get("comment");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
 
   const handleShare = async () => {
     try {
@@ -59,7 +61,7 @@ export default function CommunityPost() {
     if (!post || !post.slug) return;
 
     if (!user) {
-      navigate(`/community/signup?redirect=/community/post/${post.slug}`, {
+      navigate(`/signup-community?redirect=/community/post/${post.slug}`, {
         replace: true,
       });
     }
@@ -93,6 +95,17 @@ export default function CommunityPost() {
 
       setPost(postData);
 
+      if (user?.id && postData?.user_id && user.id !== postData.user_id) {
+        try {
+          const subRes = await axiosInstance.get(
+            `/community/subscriptions/${postData.user_id}/status`
+          );
+          setIsSubscribed(subRes.data.subscribed);
+        } catch (err) {
+          console.error("Failed to load subscription status", err);
+        }
+      }
+
       const res2 = await axiosInstance.get(
         `/community/posts/${postData.id}/comments?page=1&limit=10`
       );
@@ -105,10 +118,39 @@ export default function CommunityPost() {
     }
   };
 
+  const toggleSubscribe = async () => {
+    if (subLoading) return;
+
+    if (!user) {
+      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      return;
+    }
+
+    setSubLoading(true);
+
+    try {
+      if (isSubscribed) {
+        await axiosInstance.delete(
+          `/community/subscriptions/${post.user_id}/subscribe`
+        );
+        setIsSubscribed(false);
+      } else {
+        await axiosInstance.post(
+          `/community/subscriptions/${post.user_id}/subscribe`
+        );
+        setIsSubscribed(true);
+      }
+    } catch (err) {
+      console.error("Subscription toggle failed", err);
+    }
+
+    setSubLoading(false);
+  };
+
   useEffect(() => {
     if (!slug) return;
     load();
-  }, [slug]);
+  }, [slug, user]);
 
   // Infinite scroll load
   const loadMore = async () => {
@@ -408,58 +450,85 @@ export default function CommunityPost() {
           "
           >
             <div className="flex items-center gap-4 mb-4 sm:mb-6">
-              {isStudioPost ? (
-                <img
-                  src={headerLogo}
-                  className="w-12 h-12 rounded-full object-cover"
-                  alt="Cre8tly Studio"
-                />
-              ) : post.author_image ? (
-                <Img
-                  src={post.author_image}
-                  loader={
-                    <div className="w-12 h-12 rounded-full bg-gray-700/40 animate-pulse" />
-                  }
-                  unloader={
-                    <div
-                      className="w-12 h-12 rounded-full border flex items-center justify-center text-xl font-bold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+              <button
+                onClick={() => {
+                  if (user?.id === post.user_id) return; // do nothing
+                  navigate(`/community/authors/${post.user_id}`);
+                }}
+                className="group"
+              >
+                {isStudioPost ? (
+                  <img
+                    src={headerLogo}
+                    className="w-12 h-12 rounded-full object-cover"
+                    alt="Cre8tly Studio"
+                  />
+                ) : post.author_image ? (
+                  <Img
+                    src={post.author_image}
+                    loader={
+                      <div className="w-12 h-12 rounded-full bg-gray-700/40 animate-pulse" />
+                    }
+                    unloader={
+                      <div
+                        className="w-12 h-12 rounded-full border flex items-center justify-center text-xl font-bold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
                       border-dashboard-border-light dark:border-dashboard-border-dark
                       text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                    >
-                      {avatarInitial}
-                    </div>
-                  }
-                  decode={true}
-                  alt="User avatar"
-                  className="w-12 h-12 rounded-full object-cover  shadow-xl transition-opacity duration-300"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-green/90 border border-green flex items-center justify-center text-xl font-bold text-green">
-                  {avatarInitial}
-                </div>
-              )}
+                      >
+                        {avatarInitial}
+                      </div>
+                    }
+                    decode={true}
+                    alt="User avatar"
+                    className="w-12 h-12 rounded-full object-cover  shadow-xl transition-opacity duration-300"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-green/90 border border-green flex items-center justify-center text-xl font-bold text-green">
+                    {avatarInitial}
+                  </div>
+                )}
+              </button>
 
               <div>
-                <div className="flex items-center gap-[1px]">
-                  <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold">
-                    {isStudioPost ? "Cre8tly Studio" : post.author}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-[1px]">
+                    <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold">
+                      {isStudioPost ? "Cre8tly Studio" : post.author}
+                    </p>
 
-                  {(isStudioPost || isAdmin) && (
-                    <span
-                      className="
-                      flex items-center
-                      text-dashboard-muted-light dark:text-dashboard-muted-dark
-                      text-[10px]
-                      px-0.5 py-0.5
-                      rounded-full
-                    "
+                    {(isStudioPost || isAdmin) && (
+                      <span
+                        className="
+        flex items-center
+        text-dashboard-muted-light dark:text-dashboard-muted-dark
+        text-[10px]
+        px-0.5 py-0.5
+        rounded-full
+      "
+                      >
+                        <ShieldCheck
+                          size={15}
+                          className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                        />
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Subscribe button */}
+                  {!isStudioPost && user?.id !== post.user_id && (
+                    <button
+                      onClick={toggleSubscribe}
+                      disabled={subLoading}
+                      className={`text-xs px-2 py-1 rounded-md border transition
+                        ${
+                          isSubscribed
+                            ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
+                            : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+                        }
+                      `}
                     >
-                      <ShieldCheck
-                        size={15}
-                        className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                      />
-                    </span>
+                      {isSubscribed ? "Subscribed" : "Subscribe"}
+                    </button>
                   )}
                 </div>
 
@@ -554,7 +623,13 @@ export default function CommunityPost() {
               className="
               post-body
               prose prose-md max-w-none
-              text-dashboard-text-light dark:text-dashboard-text-dark
+              prose-pre:bg-zinc-900
+              dark:prose-pre:bg-zinc-800
+              prose-pre:text-gray-100
+              prose-pre:overflow-x-auto
+              prose-code:text-[#e5e7eb]
+              dark:prose-invert
+               text-dashboard-text-light dark:text-dashboard-text-dark
             "
               dangerouslySetInnerHTML={{ __html: post.body }}
             />

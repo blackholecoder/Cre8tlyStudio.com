@@ -70,6 +70,10 @@ import CustomDomainsDocs from "./sections/docs/CustomDomainsDocs.jsx";
 import AuthorsAssistantDocs from "./sections/docs/AuthorsAssistantDocs.jsx";
 import SignupCommunity from "./sections/SignupCommunity.jsx";
 import MyPosts from "./sections/community/posts/MyPosts.jsx";
+import Subscriptions from "./sections/community/subscriptions/Subscriptions.jsx";
+import ProfileSettings from "./sections/community/authors/ProfileSettings.jsx";
+import Profile from "./sections/community/authors/ProfilePage.jsx";
+import InviteAccept from "./sections/community/subscriptions/InviteAccept.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -123,6 +127,7 @@ const AnimatedRoutes = () => {
 
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="/community/invites/:token" element={<InviteAccept />} />
         </Route>
 
         {/* Redirect old /home to / */}
@@ -237,6 +242,70 @@ const AnimatedRoutes = () => {
                   <CommunityPost />
                 </DashboardLayout>
               </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/subscriptions"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <Subscriptions />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/settings"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <ProfileSettings />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/profile"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <Profile />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/profile/:userId"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
             </PrivateRoute>
           }
         />

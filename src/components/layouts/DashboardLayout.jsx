@@ -362,7 +362,7 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
       {/* Toggle button (mobile) */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 right-4 p-2 rounded-lg -50 transition bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-muted-light dark:text-dashboard-muted-dark"
+        className="lg:hidden fixed top-4 right-4 p-2 rounded-lg z-50 transition bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-muted-light dark:text-dashboard-muted-dark"
       >
         <Menu size={22} />
       </button>

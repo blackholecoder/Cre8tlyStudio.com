@@ -133,16 +133,38 @@ export default function MyPosts() {
           <button
             onClick={() => setShowCreate(true)}
             className="
-            px-3 py-2 rounded-lg text-sm font-medium
-            bg-dashboard-text-light dark:bg-dashboard-text-dark
-            text-dashboard-bg-light dark:text-dashboard-bg-dark
-            hover:opacity-90
-            transition
-          "
+    hidden md:inline-flex
+    px-3 py-2 rounded-lg text-sm font-medium
+    bg-dashboard-text-light dark:bg-dashboard-text-dark
+    text-dashboard-bg-light dark:text-dashboard-bg-dark
+    hover:opacity-90
+    transition
+  "
           >
             Create new
           </button>
         </div>
+      </div>
+      {/* Mobile action bar */}
+      <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="
+      w-full
+      py-2.5
+      rounded-lg
+      text-sm
+      font-medium
+      bg-dashboard-text-light
+      dark:bg-dashboard-text-dark
+      text-dashboard-bg-light
+      dark:text-dashboard-bg-dark
+      hover:opacity-90
+      transition
+    "
+        >
+          Create new post
+        </button>
       </div>
 
       {/* List */}

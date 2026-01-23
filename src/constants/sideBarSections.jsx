@@ -13,6 +13,9 @@ import {
   LayoutTemplate,
   FileText,
   List,
+  Mail,
+  Cog,
+  User,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -104,6 +107,31 @@ export const SIDEBAR_SECTIONS = [
         allowCommunity: true,
         isSubItem: true,
       },
+      {
+        key: "subscriptions",
+        label: "Subscriptions",
+        path: "/community/subscriptions",
+        icon: Mail,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "profile",
+        label: "Profile",
+        path: "/community/profile",
+        icon: User,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "profile-settings",
+        label: "Settings",
+        path: "/community/settings",
+        icon: Cog,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+
       {
         key: "alerts",
         label: "Alerts",

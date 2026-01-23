@@ -106,7 +106,7 @@ export default function CommunityHome() {
           dark:text-dashboard-text-dark mb-2
   "
         >
-          Cre8tly Community 💬
+          Cre8tly Community
         </h1>
         <p
           className="

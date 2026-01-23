@@ -3,6 +3,7 @@ import { ShieldCheck, Heart } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import { Img } from "react-image";
 import { headerLogo } from "../../assets/images";
+import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
 
 export default function CommentThread({
   comment,
@@ -156,12 +157,15 @@ export default function CommentThread({
             {/* Comment Body */}
             <p
               className="
-              prose prose-sm max-w-none
+            prose prose-sm max-w-none
+             dark:prose-invert
+             dark:prose-a:text-sky-400
+             dark:prose-a:decoration-sky-400
             text-dashboard-text-light dark:text-dashboard-text-dark
              whitespace-pre-wrap mb-2
           "
             >
-              {comment.body}
+              {renderTextWithLinks(comment.body)}
             </p>
 
             {/* ❤️ Likes + Reply/Edit/Delete */}

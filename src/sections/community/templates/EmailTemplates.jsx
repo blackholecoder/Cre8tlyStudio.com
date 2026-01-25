@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import api from "../../../api/axios";
 import { MailCheck, Loader2 } from "lucide-react";
 import CommunityPostEditor from "../posts/CommunityPostEditor";
 import { useAuth } from "../../../admin/AuthContext";
@@ -7,6 +6,9 @@ import EmailPreview from "./EmailPreview";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import SendTestEmailModal from "./SendTestEmailModal";
+
+const EMAIL_HTML_WARN_LIMIT = 100_000;
+const EMAIL_HTML_BLOCK_LIMIT = 150_000;
 
 export default function EmailTemplates() {
   const { user } = useAuth();
@@ -17,7 +19,12 @@ export default function EmailTemplates() {
   const [sendingTest, setSendingTest] = useState(false);
   const [confirmTestOpen, setConfirmTestOpen] = useState(false);
 
-  const isTestDisabled = sendingTest || !subject.trim() || !bodyHtml.trim();
+  const emailSize = bodyHtml?.length || 0;
+  const isTooLargeToSend = emailSize > EMAIL_HTML_BLOCK_LIMIT;
+  const isLargeWarning = emailSize > EMAIL_HTML_WARN_LIMIT;
+
+  const isTestDisabled =
+    sendingTest || !subject.trim() || !bodyHtml.trim() || isTooLargeToSend;
 
   useEffect(() => {
     fetchTemplate();
@@ -73,8 +80,20 @@ export default function EmailTemplates() {
 
       toast.success("Test email sent");
     } catch (err) {
-      console.error("Failed to send test email", err);
-      toast.error("Failed to send test email");
+      if (err?.response?.status === 429) {
+        const retrySeconds = err.response.data?.retry_after_seconds;
+
+        const minutes = retrySeconds ? Math.ceil(retrySeconds / 60) : null;
+
+        toast.warning(
+          minutes
+            ? `Too many test emails. Try again in ${minutes} minute${minutes > 1 ? "s" : ""}.`
+            : "Too many test emails. Please try again later."
+        );
+      } else {
+        console.error("Failed to send test email", err);
+        toast.error("Failed to send test email");
+      }
     } finally {
       setSendingTest(false);
     }
@@ -125,6 +144,12 @@ export default function EmailTemplates() {
           <label className="block text-sm text-gray-300 mb-2">Email Body</label>
           <CommunityPostEditor value={bodyHtml} onChange={setBodyHtml} />
         </div>
+        {isLargeWarning && !isTooLargeToSend && (
+          <p className="mt-2 text-sm text-yellow-500">
+            ⚠️ This email is very long and may be truncated or rejected by some
+            email clients.
+          </p>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3">
@@ -132,11 +157,11 @@ export default function EmailTemplates() {
             onClick={saveTemplate}
             disabled={saving}
             className="
-      px-4 py-2 rounded-md
-      bg-indigo-600 text-white
-      hover:bg-indigo-700
-      disabled:opacity-50
-    "
+            px-4 py-2 rounded-md
+            bg-indigo-600 text-white
+            hover:bg-indigo-700
+            disabled:opacity-50
+          "
           >
             {saving ? "Saving…" : "Save Template"}
           </button>
@@ -161,6 +186,18 @@ export default function EmailTemplates() {
             )}
           </button>
         </div>
+
+        {!sendingTest && !subject.trim() && (
+          <p className="text-xs text-gray-500 mt-2">
+            Add a subject and email body to send a test.
+          </p>
+        )}
+
+        {!sendingTest && isTooLargeToSend && (
+          <p className="text-xs text-red-500 mt-2">
+            This email is too large to send.
+          </p>
+        )}
       </div>
 
       {/* RIGHT: Preview */}

@@ -84,10 +84,10 @@ export default function CommunityTopic() {
         >
           {topic.name}
         </h1>
-
-        <button
-          onClick={() => setShowModal(true)}
-          className="
+        {posts.length > 0 && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="
           flex items-center gap-2
           px-3 py-1.5
           rounded-md text-sm
@@ -97,14 +97,71 @@ export default function CommunityTopic() {
           transition
           focus:outline-none focus:ring-2 focus:ring-green/30
         "
-        >
-          <Plus size={18} />
-          New Post
-        </button>
+          >
+            <Plus size={18} />
+            New Post
+          </button>
+        )}
       </div>
 
       {/* Posts List */}
       <div className="space-y-4">
+        {posts.length === 0 && (
+          <div
+            className="
+        mt-16
+        px-6
+        py-12
+        rounded-xl
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        text-center
+      "
+          >
+            <h2
+              className="
+          text-lg font-semibold
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          mb-2
+        "
+            >
+              This is the {topic.name} room
+            </h2>
+
+            <p
+              className="
+          text-sm
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+          max-w-md
+          mx-auto
+          leading-relaxed
+        "
+            >
+              No one has started a conversation here yet. This space is for
+              ideas, questions, and writing related to {topic.name}. Be the
+              first to set the tone.
+            </p>
+
+            <button
+              onClick={() => setShowModal(true)}
+              className="
+          mt-6
+          px-5 py-2.5
+          rounded-lg
+          bg-green text-black
+          font-medium
+          hover:opacity-90
+          transition
+        "
+            >
+              Write the first post
+            </button>
+          </div>
+        )}
         {posts.map((post) => {
           return (
             <button
@@ -211,7 +268,9 @@ export default function CommunityTopic() {
       {/* Create Post Modal */}
       {showModal && (
         <CreatePostModal
+          key={topicId}
           topicId={topicId}
+          topicName={topic.name}
           onClose={() => setShowModal(false)}
           onPosted={load}
         />

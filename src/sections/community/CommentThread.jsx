@@ -97,9 +97,6 @@ export default function CommentThread({
                   // own comment → no nav
                   if (user?.id === comment.user_id) return;
 
-                  // admin → no nav
-                  if (comment.author_role === "admin") return;
-
                   // no profile → block
                   if (!comment.author_has_profile) {
                     toast.info("This author hasn’t set up their profile yet");
@@ -115,24 +112,7 @@ export default function CommentThread({
                     : "cursor-pointer"
                 }`}
               >
-                {comment.author_role === "admin" ? (
-                  <div className="w-8 h-8 rounded-full  flex items-center justify-center text-[10px] font-semibold text-green">
-                    <Img
-                      src={headerLogo}
-                      loader={
-                        <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
-                      }
-                      unloader={
-                        <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-semibold text-gray-300">
-                          {comment.author?.charAt(0)?.toUpperCase() || "U"}
-                        </div>
-                      }
-                      decode={true}
-                      alt="User avatar"
-                      className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                    />
-                  </div>
-                ) : comment.author_image ? (
+                {comment.author_image ? (
                   <Img
                     src={comment.author_image}
                     loader={
@@ -143,7 +123,7 @@ export default function CommentThread({
                         {comment.author?.charAt(0)?.toUpperCase() || "U"}
                       </div>
                     }
-                    decode={true}
+                    decode
                     alt="User avatar"
                     className="w-8 h-8 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
                   />
@@ -158,9 +138,7 @@ export default function CommentThread({
               <div className="flex items-center gap-[2px] text-xs text-gray-500">
                 <div className="flex items-center gap-0">
                   <span className="font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
-                    {comment.author_role === "admin"
-                      ? "Cre8tly Studio"
-                      : comment.author}
+                    {comment.author}
                   </span>
 
                   {comment.author_role === "admin" && (

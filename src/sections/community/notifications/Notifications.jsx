@@ -122,94 +122,82 @@ export default function Notifications() {
                 />
               )}
 
-              <div className="flex items-center gap-3">
-                {n.actor_image ? (
-                  <Img
-                    src={n.actor_image}
-                    loader={
-                      <div
+              <div className="flex items-center justify-between gap-4">
+                {/* LEFT: Avatar + text */}
+                <div className="flex items-center gap-3 min-w-0">
+                  {/* Actor avatar */}
+                  {n.actor_image ? (
+                    <Img
+                      src={n.actor_image}
+                      loader={
+                        <div className="w-10 h-10 rounded-full border border-dashboard-border-light dark:border-dashboard-border-dark animate-pulse" />
+                      }
+                      unloader={
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark text-dashboard-text-light dark:text-dashboard-text-dark">
+                          {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
+                        </div>
+                      }
+                      decode
+                      alt="User avatar"
+                      className="w-10 h-10 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark text-dashboard-text-light dark:text-dashboard-text-dark">
+                      {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  )}
+
+                  {/* Text */}
+                  <div className="min-w-0">
+                    <p className="text-sm text-dashboard-text-light dark:text-dashboard-text-dark truncate">
+                      {n.actor_name ? (
+                        <>
+                          <span className="font-semibold">{n.actor_name}</span>{" "}
+                          {n.message.replace("Someone", "").trim()}
+                        </>
+                      ) : (
+                        n.message
+                      )}
+                    </p>
+                    {n.post_title && (
+                      <p
                         className="
-                        w-10 h-10 rounded-full object-cover transition-opacity duration-300
-                        border border-dashboard-border-light
-                        dark:border-dashboard-border-dark
-                      animate-pulse"
-                      />
-                    }
-                    unloader={
-                      <div
-                        className="
-                        w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
-                        bg-dashboard-sidebar-light
-                        dark:bg-dashboard-sidebar-dark
-                        border border-dashboard-border-light
-                        dark:border-dashboard-border-dark
-                        text-dashboard-text-light
-                        dark:text-dashboard-text-dark
-  "
+                        text-xs mt-1 truncate
+                        text-dashboard-muted-light
+                        dark:text-dashboard-muted-dark
+                      "
                       >
-                        {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
-                      </div>
-                    }
-                    decode={true}
-                    alt="User avatar"
-                    className="
-                    w-10 h-10 rounded-full object-cover transition-opacity duration-300
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-"
-                  />
-                ) : (
-                  <div
-                    className="
-                    w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
-                    bg-dashboard-sidebar-light
-                    dark:bg-dashboard-sidebar-dark
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-                    text-dashboard-text-light
-                    dark:text-dashboard-text-dark
-  "
-                  >
-                    {n.actor_name?.charAt(0)?.toUpperCase() || "U"}
-                  </div>
-                )}
-
-                <div>
-                  <p
-                    className="
-                    text-sm
-                    text-dashboard-text-light
-                    dark:text-dashboard-text-dark
-  "
-                  >
-                    {n.actor_name ? (
-                      <>
-                        <span
-                          className="
-                          font-semibold
-                          text-dashboard-text-light
-                          dark:text-dashboard-text-dark
-  "
-                        >
-                          {n.actor_name}
-                        </span>{" "}
-                        {n.message.replace("Someone", "").trim()}
-                      </>
-                    ) : (
-                      n.message
+                        {n.post_title}
+                      </p>
                     )}
-                  </p>
 
-                  <p
-                    className="
-                    text-[11px] mt-1
-                    text-dashboard-muted-light
-                    dark:text-dashboard-muted-dark
-                  "
-                  >
-                    {new Date(n.created_at).toLocaleString()}
-                  </p>
+                    <p className="text-[11px] mt-1 text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      {new Date(n.created_at).toLocaleString([], {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
                 </div>
+
+                {/* RIGHT: Post image */}
+                {n.post_image && (
+                  <img
+                    src={n.post_image}
+                    alt=""
+                    className="
+        w-12 h-12
+        rounded-lg
+        object-cover
+        flex-shrink-0
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+      "
+                  />
+                )}
               </div>
             </button>
           ))}

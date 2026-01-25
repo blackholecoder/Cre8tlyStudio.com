@@ -7,16 +7,16 @@ import {
   Inbox,
   BarChart2,
   MessagesSquare,
-  Bell,
   MailSearch,
   Landmark,
   LayoutTemplate,
   FileText,
-  List,
   Mail,
   Cog,
   User,
   Home,
+  BellRing,
+  MailCheck,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -109,6 +109,15 @@ export const SIDEBAR_SECTIONS = [
         isSubItem: true,
       },
       {
+        key: "notifications",
+        label: "Notifications",
+        path: "/community-alerts",
+        icon: BellRing,
+        badge: "communityCount",
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
         key: "subscriptions",
         label: "Subscriptions",
         path: "/community/subscriptions",
@@ -126,21 +135,21 @@ export const SIDEBAR_SECTIONS = [
       },
       {
         key: "profile-settings",
-        label: "Settings",
+        label: "Profile Settings",
         path: "/community/settings",
         icon: Cog,
         allowCommunity: true,
         isSubItem: true,
       },
-
       {
-        key: "alerts",
-        label: "Alerts",
-        path: "/community-alerts",
-        icon: Bell,
-        badge: "communityCount",
+        key: "subscriber-templates",
+        label: "Email Templates",
+        path: "/community/email-templates",
+        icon: MailCheck,
         allowCommunity: true,
+        isSubItem: true,
       },
+
       {
         key: "inbox",
         label: "Inbox",

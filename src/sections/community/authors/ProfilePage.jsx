@@ -4,6 +4,8 @@ import { ExternalLink } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../admin/AuthContext";
+import { ProfilePostCarousel } from "../posts/ProfilePostCarousel";
+import { ButtonSpinner } from "../../../helpers/buttonSpinner";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -121,17 +123,27 @@ export default function Profile() {
                     onClick={toggleSubscribe}
                     disabled={subLoading}
                     className={`
-                    mt-4
-                    text-sm px-4 py-2 rounded-lg border transition
-                    ${
-                      isSubscribed
-                        ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
-                        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark border-dashboard-border-light dark:border-dashboard-border-dark hover:opacity-80"
-                    }
-                    disabled:opacity-50
-                  `}
+    mt-4
+    text-sm px-4 py-2 rounded-lg border transition
+    flex items-center justify-center gap-2
+    ${
+      isSubscribed
+        ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
+        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark border-dashboard-border-light dark:border-dashboard-border-dark hover:opacity-80"
+    }
+    disabled:opacity-50
+  `}
                   >
-                    {isSubscribed ? "Subscribed" : "Subscribe"}
+                    {subLoading ? (
+                      <>
+                        <ButtonSpinner size={14} />
+                        <span className="text-xs">Please wait</span>
+                      </>
+                    ) : isSubscribed ? (
+                      "Subscribed"
+                    ) : (
+                      "Subscribe"
+                    )}
                   </button>
                 )}
 
@@ -140,6 +152,22 @@ export default function Profile() {
                     {profile.bio}
                   </p>
                 )}
+                <div
+                  className="
+                  mt-4 w-full
+                  flex items-center justify-center
+                  rounded-lg
+                  bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+                  px-4 py-2
+                  text-sm
+                  text-dashboard-text-light dark:text-dashboard-text-dark
+                "
+                >
+                  <span>{profile.subscriber_count.toLocaleString()}</span>
+                  <span className="ml-1 opacity-70">
+                    subscriber{profile.subscriber_count === 1 ? "" : "s"}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -211,6 +239,12 @@ export default function Profile() {
                 More posts and recommendations coming next.
               </p>
             </Section>
+            {/* Recent Posts */}
+            {profile.posts?.length > 0 && (
+              <Section title="Posts">
+                <ProfilePostCarousel posts={profile.posts} />
+              </Section>
+            )}
           </div>
         </div>
       </div>

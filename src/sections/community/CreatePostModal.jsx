@@ -2,10 +2,12 @@ import { useState, useRef } from "react";
 import axiosInstance from "../../api/axios";
 import { X, Image as ImageIcon } from "lucide-react";
 import CommunityPostEditor from "./posts/CommunityPostEditor";
+import { toast } from "react-toastify";
 
 export default function CreatePostModal({
   post = null,
   topicId,
+  topicName,
   topics = [],
   onClose,
   onPosted,
@@ -21,8 +23,20 @@ export default function CreatePostModal({
   const [imagePreview, setImagePreview] = useState(post?.image_url || null);
   const [uploading, setUploading] = useState(false);
 
+  const MAX_RELATED_TOPICS = 3;
+  const [relatedTopicIds, setRelatedTopicIds] = useState([]);
+
   const submit = async () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    const strippedBody = body?.replace(/<[^>]*>/g, "")?.trim();
+
+    if (!strippedBody) {
+      toast.error("Post body cannot be empty");
+      return;
+    }
 
     if (!isEdit && !topicId && !selectedTopicId) {
       toast.error("Please select a topic");
@@ -68,6 +82,7 @@ export default function CreatePostModal({
           subtitle,
           body,
           image_url: imageUrl,
+          relatedTopicIds: relatedTopicIds,
         });
       }
 
@@ -164,7 +179,7 @@ export default function CreatePostModal({
       text-dashboard-text-light dark:text-dashboard-text-dark
     "
               >
-                {topics.find((t) => t.id === topicId)?.name || "General"}
+                {topicName || "General"}
               </div>
             </div>
           )}
@@ -312,28 +327,77 @@ export default function CreatePostModal({
             </div>
           )}
 
-          {/* Inset Image */}
-          <div className="flex items-center justify-between mt-4 mb-1">
-            <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-              Body
-            </span>
-          </div>
-
           {/* Body */}
           <CommunityPostEditor
             ref={editorRef}
             value={body}
             onChange={setBody}
           />
-          <p
-            className="
-            mt-2 text-xs
-            text-dashboard-muted-light
-            dark:text-dashboard-muted-dark
-          "
-          >
-            Paste a YouTube link to embed a video automatically.
-          </p>
+
+          {/* Related Topics */}
+          {topics.length > 0 && (
+            <div className="mt-6 space-y-2">
+              <label
+                className="
+        text-sm font-medium
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+      "
+              >
+                Related topics (optional)
+              </label>
+
+              <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                Help readers find this post. Choose up to {MAX_RELATED_TOPICS}.
+              </p>
+              {/* 🔒 Lock notice */}
+              <p className="text-[11px] italic text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                Related topics are locked after publishing to keep discovery
+                consistent.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                {topics
+                  .filter((t) => !t.is_locked && t.id !== topicId)
+                  .map((t) => {
+                    const active = relatedTopicIds.includes(t.id);
+
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          setRelatedTopicIds((prev) => {
+                            if (active) {
+                              return prev.filter((id) => id !== t.id);
+                            }
+
+                            if (prev.length >= MAX_RELATED_TOPICS) {
+                              toast.info(
+                                `You can select up to ${MAX_RELATED_TOPICS} related topics`
+                              );
+                              return prev;
+                            }
+
+                            return [...prev, t.id];
+                          });
+                        }}
+                        className={`
+                px-3 py-1.5 rounded-full text-xs font-medium transition
+                ${
+                  active
+                    ? "bg-green text-black"
+                    : "border border-dashboard-border-light dark:border-dashboard-border-dark text-dashboard-text-light dark:text-dashboard-text-dark"
+                }
+              `}
+                      >
+                        {t.name}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
 
           {/* Submit */}
           <button

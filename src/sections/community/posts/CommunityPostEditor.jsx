@@ -14,20 +14,20 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import Blockquote from "@tiptap/extension-blockquote";
 import {
   Link2,
   Unlink,
   ImageIcon,
   SquarePlay,
-  X,
   Code,
   ChevronDown,
   Bold,
   Minus,
+  Italic,
 } from "lucide-react";
 import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
-import axiosInstance from "../../../api/axios";
 
 const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
   const hydrated = useRef(false);
@@ -42,11 +42,13 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
       StarterKit.configure({
         link: false,
         underline: false,
+        blockquote: false,
         heading: {
           levels: [1, 2, 3, 4, 5],
         },
         codeBlock: true,
       }),
+      Blockquote,
       Underline,
       HorizontalRule,
       Link.configure({
@@ -95,7 +97,22 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
 
   const setHeading = (level) => {
     if (!editor) return;
-    editor.chain().focus().toggleHeading({ level }).run();
+
+    const { from, to, empty } = editor.state.selection;
+    if (empty) return;
+
+    const text = editor.state.doc.textBetween(from, to, " ");
+
+    editor
+      .chain()
+      .focus()
+      .deleteRange({ from, to })
+      .insertContent({
+        type: "heading",
+        attrs: { level },
+        content: [{ type: "text", text }],
+      })
+      .run();
   };
 
   const setParagraph = () => {
@@ -141,14 +158,28 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
     <>
       <div className="rounded-xl border border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
         {/* Toolbar */}
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
+        <div
+          className="
+          flex items-center gap-2
+          px-3 py-2
+          border-b border-dashboard-border-light dark:border-dashboard-border-dark
+
+          overflow-x-auto
+          whitespace-nowrap
+
+          md:overflow-visible
+          md:whitespace-normal
+          no-scrollbar
+        "
+        >
           {/* NEW: text style dropdown */}
-          <div ref={formatRef} className="relative">
+          <div ref={formatRef} className="shrink-0 relative">
             {/* Trigger */}
             <button
               type="button"
               onClick={() => setFormatOpen((v) => !v)}
               className="
+              shrink-0
               flex items-center justify-between
               min-w-[140px]
               px-3 py-2
@@ -203,49 +234,74 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={`
+              shrink-0
             p-2 rounded
-            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark 
             ${editor.isActive("bold") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
           `}
           >
             <Bold size={16} />
           </button>
           <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={`
+    shrink-0
+    p-2 rounded
+    hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+    ${editor.isActive("italic") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
+  `}
+          >
+            <Italic size={16} />
+          </button>
+
+          <button
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            className={`
+            shrink-0
+            p-2 rounded
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+            ${editor.isActive("blockquote") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
+          `}
+            title="Quote"
+          >
+            ❝
+          </button>
+          <button
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
           >
             <Minus size={16} />
           </button>
 
           <button
             onClick={() => setLinkOpen(true)}
-            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
           >
             <Link2 size={16} />
           </button>
 
           <button
             onClick={() => editor.chain().focus().unsetLink().run()}
-            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
           >
             <Unlink size={16} />
           </button>
 
           <button
             onClick={() => setVideoOpen(true)}
-            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
           >
             <SquarePlay size={16} />
           </button>
 
           <button
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className="p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
           >
             <Code size={16} />
           </button>
 
-          <label className="p-2 rounded cursor-pointer hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark">
+          <label className="shrink-0 p-2 rounded cursor-pointer hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark">
             <ImageIcon size={16} />
             <input type="file" hidden />
           </label>
@@ -260,6 +316,9 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           overflow-y-auto
           post-body
           prose prose-lg max-w-none
+
+          prose-headings:mt-6 prose-headings:mb-2
+          prose-p:my-3
 
           prose-strong:text-inherit
           prose-strong:font-semibold

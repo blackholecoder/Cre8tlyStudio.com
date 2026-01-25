@@ -29,8 +29,24 @@ export default function ProfileSettings() {
   const [newMediaLabel, setNewMediaLabel] = useState("");
   const [newMediaUrl, setNewMediaUrl] = useState("");
 
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    new_free_subscriber: true,
+    canceled_free_subscription: true,
+    post_comments: true,
+  });
+
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
+  function togglePref(key) {
+    setNotificationPrefs((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  }
+
   useEffect(() => {
     fetchProfile();
+    fetchNotificationPrefs();
   }, []);
 
   async function fetchProfile() {
@@ -52,6 +68,25 @@ export default function ProfileSettings() {
     }
   }
 
+  async function fetchNotificationPrefs() {
+    try {
+      const res = await axiosInstance.get(
+        "/community/authors/me/notifications"
+      );
+
+      setNotificationPrefs({
+        new_free_subscriber: !!res.data.preferences.new_free_subscriber,
+        canceled_free_subscription:
+          !!res.data.preferences.canceled_free_subscription,
+        post_comments: !!res.data.preferences.post_comments,
+      });
+      setPrefsLoaded(true);
+    } catch (err) {
+      console.error("fetchNotificationPrefs error", err);
+      toast.error("Failed to load notification preferences");
+    }
+  }
+
   async function saveProfile() {
     try {
       setSaving(true);
@@ -64,6 +99,11 @@ export default function ProfileSettings() {
         services,
         media_links: mediaLinks,
       });
+
+      await axiosInstance.post(
+        "/community/authors/me/update-notifications",
+        notificationPrefs
+      );
 
       toast.success("Profile updated");
     } catch {
@@ -103,7 +143,7 @@ export default function ProfileSettings() {
           <div className="hidden md:flex justify-end">
             <button
               onClick={saveProfile}
-              disabled={saving}
+              disabled={saving || !prefsLoaded}
               className="
           px-4 py-2 rounded-lg text-sm font-medium
           bg-blue text-white
@@ -229,6 +269,55 @@ export default function ProfileSettings() {
               ))}
             </div>
           </Section>
+          <Section
+            title="Notifications"
+            description="Control which activity you want to be notified about"
+          >
+            <div className="space-y-6">
+              {/* Subscriptions */}
+              <div className="space-y-4">
+                {/* <NotificationRow
+                  title="New paid subscriber"
+                  description="When someone pays to subscribe"
+                  enabled={notificationPrefs.new_paid_subscriber}
+                  onToggle={() => togglePref("new_paid_subscriber")}
+                /> */}
+
+                <NotificationRow
+                  title="New free subscriber"
+                  description="When someone subscribes for free"
+                  enabled={notificationPrefs.new_free_subscriber}
+                  onToggle={() => togglePref("new_free_subscriber")}
+                />
+
+                {/* <NotificationRow
+                  title="Canceled paid subscription"
+                  description="When someone cancels a paid subscription"
+                  enabled={notificationPrefs.canceled_paid_subscription}
+                  onToggle={() => togglePref("canceled_paid_subscription")}
+                /> */}
+
+                <NotificationRow
+                  title="Canceled free subscription"
+                  description="When someone cancels a free subscription"
+                  enabled={notificationPrefs.canceled_free_subscription}
+                  onToggle={() => togglePref("canceled_free_subscription")}
+                />
+              </div>
+
+              <div className="border-t border-dashboard-border-light dark:border-dashboard-border-dark" />
+
+              {/* Engagement */}
+              <div className="space-y-4">
+                <NotificationRow
+                  title="Comments on your posts"
+                  description="When someone comments on a post you published"
+                  enabled={notificationPrefs.post_comments}
+                  onToggle={() => togglePref("post_comments")}
+                />
+              </div>
+            </div>
+          </Section>
         </div>
       </div>
     </div>
@@ -254,6 +343,38 @@ function Section({ title, description, children }) {
         )}
       </div>
       {children}
+    </div>
+  );
+}
+
+function Toggle({ enabled, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`
+        relative inline-flex h-6 w-11 items-center rounded-full transition
+        ${enabled ? "bg-indigo-500" : "bg-gray-400/40"}
+      `}
+    >
+      <span
+        className={`
+          inline-block h-5 w-5 transform rounded-full bg-white transition
+          ${enabled ? "translate-x-5" : "translate-x-1"}
+        `}
+      />
+    </button>
+  );
+}
+
+function NotificationRow({ title, description, enabled, onToggle }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="font-medium">{title}</p>
+        <p className="text-sm opacity-60">{description}</p>
+      </div>
+      <Toggle enabled={enabled} onChange={onToggle} />
     </div>
   );
 }

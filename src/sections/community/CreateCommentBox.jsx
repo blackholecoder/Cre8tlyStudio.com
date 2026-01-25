@@ -70,7 +70,7 @@ export default function CreateCommentBox({ postId, onComment }) {
     border-dashboard-border-light dark:border-dashboard-border-dark
   `}
       >
-        {submitting ? "Posting…" : "Comment"}
+        {submitting ? "Posting…" : "Post"}
       </button>
     </div>
   );

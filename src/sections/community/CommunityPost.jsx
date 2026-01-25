@@ -49,6 +49,8 @@ export default function CommunityPost() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
 
+  const isAdminUser = user?.role === "admin";
+
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -90,12 +92,6 @@ export default function CommunityPost() {
     try {
       const res = await axiosInstance.get(`/community/posts/${slug}`);
       const postData = res.data.post;
-
-      if (res.data.post?.is_admin_post === 1) {
-        res.data.post.author = "Cre8tly Studio";
-        res.data.post.author_image = headerLogo;
-        res.data.post.author_role = "admin";
-      }
 
       setPost(postData);
 
@@ -339,7 +335,7 @@ export default function CommunityPost() {
   const backTo = location.state?.from || `/community/topic/${post.topic_id}`;
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
-  const isStudioPost = post.author === "Cre8tly Studio";
+  const isStudioPost = post.is_admin_post === 1;
 
   const timeAgo = (d) => {
     const date = new Date(d);
@@ -463,7 +459,7 @@ export default function CommunityPost() {
 
                   // Author has no profile → block + inform
                   if (!post.author_has_profile) {
-                    toast.info("This author hasn’t set up their profile yet");
+                    toast.info("This! author hasn’t set up their profile yet");
                     return;
                   }
 
@@ -508,7 +504,7 @@ export default function CommunityPost() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-[1px]">
                     <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold">
-                      {isStudioPost ? "Cre8tly Studio" : post.author}
+                      {post.author}
                     </p>
 
                     {(isStudioPost || isAdmin) && (
@@ -888,8 +884,7 @@ export default function CommunityPost() {
                             {/* Edit */}
                             {!openReplies[c.id] &&
                               user &&
-                              (c.user_id === user.id ||
-                                user.role === "admin") && (
+                              c.user_id === user.id && (
                                 <button
                                   onClick={() => {
                                     setEditCommentId(c.id);

@@ -74,7 +74,16 @@ export default function AddSubscribersModal({ open, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="w-full max-w-lg rounded-2xl bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark p-6">
+      <div
+        className="
+        w-full max-w-lg
+        mx-4 sm:mx-6 md:mx-0
+        rounded-2xl
+        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+        p-6
+      "
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Add subscribers</h2>

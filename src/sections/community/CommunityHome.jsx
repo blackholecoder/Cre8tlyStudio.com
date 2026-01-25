@@ -183,16 +183,16 @@ export default function CommunityHome() {
         </div>
 
         {/* Scrollable Topics */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-12 mb-6">
           <button
             onClick={() => setActiveTopic("all")}
-            className={`px-4 py-2 rounded-full text-sm font-medium
-      ${
-        activeTopic === "all"
-          ? "bg-green text-black"
-          : "border border-dashboard-border-light dark:border-dashboard-border-dark"
-      }
-    `}
+            className={`px-4 h-9 rounded-full text-sm font-medium flex items-center justify-center
+              ${
+                activeTopic === "all"
+                  ? "bg-green text-black"
+                  : "border border-dashboard-border-light dark:border-dashboard-border-dark"
+              }
+            `}
           >
             All
           </button>
@@ -201,14 +201,14 @@ export default function CommunityHome() {
             <button
               type="button"
               key={t.id}
-              onClick={() => setActiveTopic(t.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
-        ${
-          activeTopic === t.id
-            ? "bg-green text-black"
-            : "border border-dashboard-border-light dark:border-dashboard-border-dark"
-        }
-      `}
+              onClick={() => navigate(`/community/topic/${t.id}`)}
+              className={`px-4 h-9 rounded-full text-sm font-medium flex items-center justify-center whitespace-nowrap
+  ${
+    activeTopic === t.id
+      ? "bg-green text-black"
+      : "border border-dashboard-border-light dark:border-dashboard-border-dark"
+  }
+`}
             >
               {t.name}
             </button>

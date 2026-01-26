@@ -2,14 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import {
-  Menu,
-  LogOut,
-  CircleQuestionMark,
-  Sun,
-  Moon,
-  ChevronDown,
-} from "lucide-react";
+import { Menu, LogOut, Sun, Moon, ChevronDown, X } from "lucide-react";
 import AnimatedLogo from "../animation/AnimatedLogo";
 import {
   SIDEBAR_SECTIONS,
@@ -20,6 +13,21 @@ import UpgradeRequiredModal from "../modals/UpgradeRequiredModal";
 
 const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(
+    () => window.matchMedia("(min-width: 1024px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  return isDesktop;
+}
+
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +36,6 @@ export default function DashboardLayout({ children }) {
   const SIDEBAR_EXPANDED_WIDTH = 260;
   const SIDEBAR_COLLAPSED_WIDTH = 72;
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [communityCount, setCommunityCount] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -47,17 +54,9 @@ export default function DashboardLayout({ children }) {
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
-  const isModalOpen = showUpgradeModal;
+  const isDesktop = useIsDesktop();
 
-  // ✅ Auto-close sidebar on resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth >= 1024);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -101,12 +100,6 @@ export default function DashboardLayout({ children }) {
     }
   }, [isCollapsed]);
 
-  useEffect(() => {
-    if (location.pathname.startsWith("/community")) {
-      setCommunityOpen(true);
-    }
-  }, [location.pathname]);
-
   function hasAccess(item) {
     if (item.access === "pro" && isFreeTier) return false;
     if (item.access === "seller" && !user?.stripe_connect_account_id)
@@ -139,9 +132,6 @@ export default function DashboardLayout({ children }) {
           navigate(item.path);
 
           // only close sidebar on mobile if NOT a sub-item
-          if (window.innerWidth < 1024 && !isSubItem) {
-            setIsSidebarOpen(false);
-          }
         }}
         className={`w-full flex items-center rounded-lg transition
 ${
@@ -202,218 +192,330 @@ ${locked ? "opacity-50 cursor-pointer" : ""}
 
   return (
     <div
-      className="dashboard flex relative h-screen overflow-hidden
+      className="dashboard relative min-h-screen 
   bg-dashboard-bg-light
   dark:bg-dashboard-bg-dark
   text-dashboard-text-light
   dark:text-dashboard-text-dark"
     >
       {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full overflow-hidden
+      {isDesktop && (
+        <aside
+          className={`fixed top-0 left-0 h-full overflow-hidden
         bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
         border-r border-dashboard-border-light dark:border-dashboard-border-dark
         flex flex-col transform transition-all duration-300 z-[60]
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
-        style={{
-          width: isCollapsed
-            ? `${SIDEBAR_COLLAPSED_WIDTH}px`
-            : `${SIDEBAR_EXPANDED_WIDTH}px`,
-        }}
-      >
-        {/* TOP (fixed) */}
-        <div className="p-4 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
-          <div
-            className={`flex items-center ${
-              isCollapsed ? "justify-center" : "justify-start gap-3"
-            }`}
-          >
-            {/* Menu toggle */}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-9 h-9 flex items-center justify-center rounded-md transition
+       lg:translate-x-0`}
+          style={{
+            width: isCollapsed
+              ? `${SIDEBAR_COLLAPSED_WIDTH}px`
+              : `${SIDEBAR_EXPANDED_WIDTH}px`,
+          }}
+        >
+          {/* TOP (fixed) */}
+          <div className="p-4 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "justify-start gap-3"
+              }`}
+            >
+              {/* Menu toggle */}
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="w-9 h-9 flex items-center justify-center rounded-md transition
             text-dashboard-muted-light dark:text-dashboard-muted-dark
             hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              <SidebarToggleIcon size={18} />
-            </button>
+                title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <SidebarToggleIcon size={18} />
+              </button>
 
-            {/* Logo (removed entirely when collapsed) */}
-            {!isCollapsed && (
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 flex items-center justify-center">
-                  <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse" />
-                  <AnimatedLogo className="relative z-10 w-10 h-10 animate-glow" />
-                </div>
+              {/* Logo (removed entirely when collapsed) */}
+              {!isCollapsed && (
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 flex items-center justify-center">
+                    <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse" />
+                    <AnimatedLogo className="relative z-10 w-10 h-10 animate-glow" />
+                  </div>
 
-                <div className="flex flex-col leading-tight">
-                  <span className="logoText font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
-                    Cre8tly
-                  </span>
-                  <span className="logoText text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                    Studio
-                  </span>
+                  <div className="flex flex-col leading-tight">
+                    <span className="logoText font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
+                      Cre8tly
+                    </span>
+                    <span className="logoText text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Studio
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* MIDDLE (SCROLL AREA) */}
-        <nav
-          className={`flex-1 overflow-y-auto pb-6 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent ${
-            isCollapsed ? "px-2" : "px-6"
-          }`}
-        >
-          <div className="flex flex-col gap-5 mt-2">
-            {SIDEBAR_SECTIONS.map((section) => (
-              <div key={section.section}>
-                {!isCollapsed && (
-                  <p
-                    className="px-4 mb-2 text-xs uppercase tracking-wide
-text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                  >
-                    {section.section}
-                  </p>
-                )}
-
-                <div className="flex flex-col gap-1">
-                  {section.items
-                    .filter(hasAccess)
-                    .filter((item) => {
-                      if (item.isSubItem && !communityOpen) return false;
-                      return true;
-                    })
-                    .map(renderSidebarItem)}
-                </div>
-              </div>
-            ))}
-          </div>
-        </nav>
-
-        {/* BOTTOM (fixed logout) */}
-        <div className="p-4 border-t border-dashboard-border-light dark:border-dashboard-border-dark space-y-3">
-          <button
-            onClick={() => navigate("/docs")}
-            className={`w-full flex items-center rounded-lg transition ${
-              isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
-            } text-dashboard-muted-light dark:text-dashboard-muted-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark`}
-          >
-            <CircleQuestionMark size={20} />
-            {!isCollapsed && <span className="font-medium">Documentation</span>}
-          </button>
-          {/* Profile Avatar */}
-          <div
-            className={`flex items-center ${
-              isCollapsed ? "justify-center" : "gap-3 px-2"
+          {/* MIDDLE (SCROLL AREA) */}
+          <nav
+            className={`flex-1 overflow-y-auto pb-6 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent ${
+              isCollapsed ? "px-2" : "px-6"
             }`}
           >
-            <img
-              src={user?.profile_image || defaultImage}
-              alt="Profile"
-              className="w-9 h-9 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark truncate">
-                {user?.name || "Account"}
-              </span>
-            )}
-          </div>
-          <button
-            onClick={() =>
-              updateTheme(user?.theme === "dark" ? "light" : "dark")
-            }
-            className={`
+            <div className="flex flex-col gap-5 mt-2">
+              {SIDEBAR_SECTIONS.map((section) => (
+                <div key={section.section}>
+                  {!isCollapsed && (
+                    <p
+                      className="px-4 mb-2 text-xs uppercase tracking-wide
+text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                    >
+                      {section.section}
+                    </p>
+                  )}
+
+                  <div className="flex flex-col gap-1">
+                    {section.items
+                      .filter(hasAccess)
+                      .filter((item) => {
+                        if (item.isSubItem && !communityOpen) return false;
+                        return true;
+                      })
+                      .map(renderSidebarItem)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </nav>
+
+          {/* BOTTOM (fixed logout) */}
+          <div className="p-4 border-t border-dashboard-border-light dark:border-dashboard-border-dark space-y-3">
+            {/* Profile Avatar */}
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "gap-3 px-2"
+              }`}
+            >
+              <img
+                src={user?.profile_image || defaultImage}
+                alt="Profile"
+                className="w-9 h-9 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark truncate">
+                  {user?.name || "Account"}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() =>
+                updateTheme(user?.theme === "dark" ? "light" : "dark")
+              }
+              className={`
     w-full flex items-center rounded-lg transition
     ${isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}
     text-dashboard-muted-light dark:text-dashboard-muted-dark
     hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
   `}
-          >
-            {user?.theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            >
+              {user?.theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
 
-            {!isCollapsed && (
-              <span className="font-medium">
-                {user?.theme === "dark" ? "Light mode" : "Dark mode"}
-              </span>
-            )}
-          </button>
+              {!isCollapsed && (
+                <span className="font-medium">
+                  {user?.theme === "dark" ? "Light mode" : "Dark mode"}
+                </span>
+              )}
+            </button>
 
-          {/* Logout */}
-          <button
-            onClick={logout}
-            className={`w-full flex items-center rounded-lg transition ${
-              isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
-            } text-red-500 hover:bg-red-600/10`}
-          >
-            <LogOut size={20} />
-            {!isCollapsed && <span className="font-medium">Logout</span>}
-          </button>
-        </div>
-      </aside>
-
-      {/* Mobile overlay */}
-      {isSidebarOpen && window.innerWidth < 1024 && (
-        <div
-          onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
-        />
+            {/* Logout */}
+            <button
+              onClick={logout}
+              className={`w-full flex items-center rounded-lg transition ${
+                isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
+              } text-red-500 hover:bg-red-600/10`}
+            >
+              <LogOut size={20} />
+              {!isCollapsed && <span className="font-medium">Logout</span>}
+            </button>
+          </div>
+        </aside>
       )}
 
-      {/* Main content */}
-      {/* <main
-        className="relative flex-1 h-full overflow-y-auto overscroll-y-contain transition-all duration-300 pb-24 md:pb-8"
-        style={{
-          marginLeft:
-            window.innerWidth >= 1024
-              ? isCollapsed
-                ? `${SIDEBAR_COLLAPSED_WIDTH}px`
-                : `${SIDEBAR_EXPANDED_WIDTH}px`
-              : "0px",
-        }}
-      >
-        {children}
-      </main> */}
-      <main
-        className="flex-1 h-full overflow-y-auto overscroll-y-contain transition-all duration-300 pb-24 md:pb-8"
-        style={{
-          marginLeft:
-            window.innerWidth >= 1024
-              ? isCollapsed
-                ? `${SIDEBAR_COLLAPSED_WIDTH}px`
-                : `${SIDEBAR_EXPANDED_WIDTH}px`
-              : "0px",
-        }}
-      >
-        {/* Mobile top bar */}
-        <div
-          className="
-      lg:hidden
-      sticky top-0 z-30
-      bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-      border-b border-dashboard-border-light dark:border-dashboard-border-dark
-    "
-        >
+      {!isDesktop && (
+        <div className="sticky top-0 z-30 bg-dashboard-bg-light dark:bg-dashboard-bg-dark border-b">
           <div className="flex justify-end p-3">
-            {!isModalOpen && !isSidebarOpen && (
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="
-            p-2 rounded-lg
-            bg-dashboard-sidebar-light
-            dark:bg-dashboard-sidebar-dark
-            text-dashboard-muted-light
-            dark:text-dashboard-muted-dark
-            shadow-sm
-          "
-              >
-                <Menu size={22} />
-              </button>
-            )}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 rounded-lg"
+            >
+              <Menu size={22} />
+            </button>
           </div>
         </div>
+      )}
+      {!isDesktop && mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-dashboard-bg-light dark:bg-dashboard-bg-dark overflow-y-auto">
+          <div className="p-4 space-y-4">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-semibold">Menu</span>
+              <button onClick={() => setMobileMenuOpen(false)}>
+                <X size={22} />
+              </button>
+            </div>
 
+            {/* Menu items */}
+            {SIDEBAR_SECTIONS.map((section) => (
+              <div
+                key={section.section}
+                className="space-y-3 pb-4 border-b border-dashboard-border-light dark:border-dashboard-border-dark"
+              >
+                <p className="text-xs uppercase text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  {section.section}
+                </p>
+
+                {section.items
+                  .filter(hasAccess)
+                  .filter((item) => !item.isSubItem || communityOpen)
+                  .map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        if (item.isParent) {
+                          setCommunityOpen((v) => !v);
+                          return;
+                        }
+
+                        if (isCommunityOnly && !item.allowCommunity) {
+                          setShowUpgradeModal(true);
+                          return;
+                        }
+
+                        navigate(item.path);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`
+                      w-full
+                      px-4 py-4
+                      rounded-xl
+                      text-left
+                      text-dashboard-text-light dark:text-dashboard-text-dark
+                      flex
+                      border
+                      transition
+                      shadow-sm
+                      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                      border-dashboard-border-light dark:border-dashboard-border-dark
+                      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+                      active:scale-[0.98]
+                      ${item.isSubItem ? "opacity-90" : ""}
+                    `}
+                    >
+                      <div className="flex items-center w-full gap-3">
+                        {item.isSubItem && (
+                          <span className="w-1 h-6 rounded-full bg-green/40" />
+                        )}
+
+                        {item.icon && (
+                          <item.icon
+                            size={18}
+                            className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                          />
+                        )}
+
+                        <span
+                          className={`font-medium ${item.isSubItem ? "text-sm opacity-90" : ""}`}
+                        >
+                          {item.label}
+                        </span>
+
+                        {/* BADGES */}
+                        {item.badge === "unreadCount" && unreadCount > 0 && (
+                          <span className="ml-auto mr-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                          </span>
+                        )}
+
+                        {item.badge === "communityCount" &&
+                          communityCount > 0 && (
+                            <span className="ml-auto mr-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                              {communityCount > 9 ? "9+" : communityCount}
+                            </span>
+                          )}
+
+                        {item.isParent && (
+                          <ChevronDown
+                            size={18}
+                            className={`ml-auto transition-transform ${
+                              communityOpen ? "rotate-180" : ""
+                            }`}
+                          />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+              </div>
+            ))}
+            {/* MOBILE FOOTER */}
+            <div className="pt-4 mt-4 border-t border-dashboard-border-light dark:border-dashboard-border-dark space-y-3">
+              {/* Profile */}
+              <div className="flex items-center gap-3 px-2">
+                <img
+                  src={user?.profile_image || defaultImage}
+                  alt="Profile"
+                  className="w-9 h-9 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
+                />
+                <span className="text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark truncate">
+                  {user?.name || "Account"}
+                </span>
+              </div>
+
+              {/* Theme toggle */}
+              <button
+                onClick={() => {
+                  updateTheme(user?.theme === "dark" ? "light" : "dark");
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl
+      text-dashboard-muted-light dark:text-dashboard-muted-dark
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+      transition"
+              >
+                {user?.theme === "dark" ? (
+                  <Sun size={18} />
+                ) : (
+                  <Moon size={18} />
+                )}
+                <span className="font-medium">
+                  {user?.theme === "dark" ? "Light mode" : "Dark mode"}
+                </span>
+              </button>
+
+              {/* Logout */}
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl
+      text-red-500
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      hover:bg-red-600/10
+      transition"
+              >
+                <LogOut size={20} />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main
+        className={`
+    flex-1
+    ${isDesktop ? (isCollapsed ? "ml-[72px]" : "ml-[260px]") : ""}
+    px-4 pb-24
+  `}
+      >
         {/* Page content */}
         {children}
       </main>

@@ -276,21 +276,19 @@ export default function CommentThread({
               {activeReplyBox === comment.id && (
                 <div className="mt-2">
                   <ReplyBox
-                    parentId={comment.id}
+                    parentComment={comment}
                     postId={postId}
-                    replyToUserId={comment.user_id}
                     onReply={async (newReply) => {
                       setActiveReplyBox(null);
 
+                      const threadId = comment.parent_id || comment.id;
+
                       setReplies((prev) => ({
                         ...prev,
-                        [comment.parent_id || comment.id]: [
-                          ...(prev[comment.parent_id || comment.id] || []),
-                          newReply,
-                        ],
+                        [threadId]: [...(prev[threadId] || []), newReply],
                       }));
-                      // setActiveReplyBox(null); // 🔥 close immediately
-                      await loadReplies(comment.parent_id || comment.id); // fetch fresh replies AFTER closing
+
+                      await loadReplies(threadId);
                     }}
                     onCancel={() => setActiveReplyBox(null)}
                   />

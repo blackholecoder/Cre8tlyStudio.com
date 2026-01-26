@@ -1,14 +1,8 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
-// import { ButtonSpinner } from "../../helpers/buttonSpinner";
+import { ButtonSpinner } from "../../helpers/buttonSpinner";
 
-export default function ReplyBox({
-  parentId,
-  postId,
-  onReply,
-  replyToUserId,
-  onCancel,
-}) {
+export default function ReplyBox({ parentComment, postId, onReply, onCancel }) {
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,14 +14,13 @@ export default function ReplyBox({
     const payload = {
       body,
       postId,
-      reply_to_user_id: replyToUserId,
     };
 
     console.log("🟢 Reply payload:", payload);
 
     try {
       const res = await axiosInstance.post(
-        `/community/comments/${parentId}/reply`,
+        `/community/comments/${parentComment.id}/reply`,
         payload,
       );
 
@@ -98,18 +91,26 @@ export default function ReplyBox({
           onClick={submit}
           disabled={loading}
           className="
-            px-5 py-2
-            rounded-lg
-            bg-green
-            text-black
-            font-medium
-            transition
-            hover:bg-green/90
-            disabled:opacity-60
-            disabled:cursor-not-allowed
-          "
+    px-5 py-2
+    rounded-lg
+    bg-green
+    text-black
+    font-medium
+    transition
+    hover:bg-green/90
+    disabled:opacity-60
+    disabled:cursor-not-allowed
+    flex items-center justify-center gap-2
+  "
         >
-          {loading ? "Posting…" : "Reply"}
+          {loading ? (
+            <>
+              <ButtonSpinner size="sm" />
+              <span>Posting…</span>
+            </>
+          ) : (
+            "Reply"
+          )}
         </button>
       </div>
     </div>

@@ -17,6 +17,7 @@ import {
   Home,
   BellRing,
   MailCheck,
+  CircleQuestionMark,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -177,6 +178,13 @@ export const SIDEBAR_SECTIONS = [
         label: "Plans",
         path: "/plans",
         icon: DollarSign,
+        allowCommunity: true,
+      },
+      {
+        key: "docs",
+        label: "Help",
+        path: "/docs",
+        icon: CircleQuestionMark,
         allowCommunity: true,
       },
     ],

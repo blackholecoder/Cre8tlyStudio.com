@@ -1,8 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { headerLogo } from "../../assets/images";
-import CreatePostModal from "./CreatePostModal";
 import { Eye, MessageCircle } from "lucide-react";
 
 export default function CommunityHome() {
@@ -12,7 +11,9 @@ export default function CommunityHome() {
 
   const [posts, setPosts] = useState([]);
   const [activeTopic, setActiveTopic] = useState("all");
-  const [showModal, setShowModal] = useState(null);
+
+  const [topicsOpen, setTopicsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   async function handlePostClick(postId) {
     try {
@@ -36,6 +37,22 @@ export default function CommunityHome() {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setTopicsOpen(false);
+      }
+    }
+
+    if (topicsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [topicsOpen]);
 
   const filteredPosts = useMemo(() => {
     return activeTopic === "all"
@@ -73,20 +90,6 @@ export default function CommunityHome() {
     };
 
     fetchTopics();
-  }, []);
-
-  useEffect(() => {
-    // Always restore scrolling when this page mounts
-    document.body.style.overflow = "auto";
-    document.body.style.position = "";
-    document.body.style.width = "";
-
-    return () => {
-      // Ensure scroll is restored if you navigate away and come back
-      document.body.style.overflow = "auto";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    };
   }, []);
 
   return (
@@ -163,57 +166,109 @@ export default function CommunityHome() {
         <div className="flex justify-center mb-8">
           <button
             type="button"
-            onClick={() =>
-              setShowModal({
-                open: true,
-                topicId: generalTopicId,
-              })
-            }
+            onClick={() => navigate("/community/create-post")}
             className="
-      px-6 py-3
-      rounded-xl
-      font-semibold
-      bg-green text-black
-      hover:opacity-90
-      transition
-    "
+    px-6 py-3
+    rounded-xl
+    font-semibold
+    bg-green text-black
+    hover:opacity-90
+    transition
+  "
           >
             Write a post
           </button>
         </div>
 
         {/* Scrollable Topics */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-12 mb-6">
+        <div ref={dropdownRef} className="relative mb-6 flex-shrink-0">
+          {/* Trigger */}
           <button
-            onClick={() => setActiveTopic("all")}
-            className={`px-4 h-9 rounded-full text-sm font-medium flex items-center justify-center
-              ${
-                activeTopic === "all"
-                  ? "bg-green text-black"
-                  : "border border-dashboard-border-light dark:border-dashboard-border-dark"
-              }
-            `}
+            type="button"
+            onClick={() => setTopicsOpen((v) => !v)}
+            className="
+      w-full sm:w-64
+      h-10
+      px-4
+      flex items-center justify-between
+      rounded-lg
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      text-sm font-medium
+      text-dashboard-text-light dark:text-dashboard-text-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+      transition
+    "
           >
-            All
+            <span>
+              {activeTopic === "all"
+                ? "All topics"
+                : topics.find((t) => t.id === activeTopic)?.name ||
+                  "Select topic"}
+            </span>
+
+            <svg
+              className={`w-4 h-4 transition-transform ${
+                topicsOpen ? "rotate-180" : ""
+              }`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                clipRule="evenodd"
+              />
+            </svg>
           </button>
 
-          {topics.map((t) => (
-            <button
-              type="button"
-              key={t.id}
-              onClick={() => navigate(`/community/topic/${t.id}`)}
-              className={`px-4 h-9 rounded-full text-sm font-medium flex items-center justify-center whitespace-nowrap
-  ${
-    activeTopic === t.id
-      ? "bg-green text-black"
-      : "border border-dashboard-border-light dark:border-dashboard-border-dark"
-  }
-`}
+          {/* Menu */}
+          {topicsOpen && (
+            <div
+              className="
+        absolute z-50 mt-2 w-full sm:w-64
+        rounded-lg
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+        shadow-xl
+        max-h-[400px] overflow-y-auto
+      "
             >
-              {t.name}
-            </button>
-          ))}
+              {/* All */}
+              <button
+                onClick={() => {
+                  setActiveTopic("all");
+                  setTopicsOpen(false);
+                }}
+                className="
+          w-full px-4 py-2 text-left text-sm
+          hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+        "
+              >
+                All topics
+              </button>
+
+              {/* Topics */}
+              {topics.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setActiveTopic(t.id);
+                    navigate(`/community/topic/${t.id}`);
+                    setTopicsOpen(false);
+                  }}
+                  className="
+            w-full px-4 py-2 text-left text-sm
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+          "
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
         <div className="space-y-4 flex-1 overflow-y-auto pr-2">
           {filteredPosts.map((post) => (
             <button
@@ -322,18 +377,6 @@ export default function CommunityHome() {
           ))}
         </div>
       </div>
-      {showModal?.open && (
-        <CreatePostModal
-          topicId={showModal.topicId}
-          topics={topics}
-          onClose={() => setShowModal(null)}
-          onPosted={() => {
-            setShowModal(null);
-            fetchPosts();
-            // optionally refetch posts
-          }}
-        />
-      )}
     </div>
   );
 }

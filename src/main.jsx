@@ -75,6 +75,7 @@ import ProfileSettings from "./sections/community/authors/ProfileSettings.jsx";
 import Profile from "./sections/community/authors/ProfilePage.jsx";
 import InviteAccept from "./sections/community/subscriptions/InviteAccept.jsx";
 import EmailTemplates from "./sections/community/templates/EmailTemplates.jsx";
+import CreatePostPage from "./sections/community/CreatePostPage.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -351,6 +352,42 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <EmailTemplates />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/create-post"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <CreatePostPage />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/edit-post/:postId"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <CreatePostPage isEdit />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>

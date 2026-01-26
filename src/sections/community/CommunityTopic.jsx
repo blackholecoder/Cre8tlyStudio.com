@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { Eye, MessageCircle, Plus } from "lucide-react";
-import CreatePostModal from "./CreatePostModal";
+// import CreatePostModal from "./CreatePostModal";
 
 export default function CommunityTopic() {
   const { topicId } = useParams();
@@ -20,7 +20,7 @@ export default function CommunityTopic() {
 
       // Get posts in this topic
       const res2 = await axiosInstance.get(
-        `/community/topics/${topicId}/posts`
+        `/community/topics/${topicId}/posts`,
       );
       setPosts(res2.data.posts);
     } catch (err) {
@@ -86,7 +86,14 @@ export default function CommunityTopic() {
         </h1>
         {posts.length > 0 && (
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() =>
+              navigate("/community/create-post", {
+                state: {
+                  topicId: topic.id,
+                  topicName: topic.name,
+                },
+              })
+            }
             className="
           flex items-center gap-2
           px-3 py-1.5
@@ -266,7 +273,7 @@ export default function CommunityTopic() {
       </div>
 
       {/* Create Post Modal */}
-      {showModal && (
+      {/* {showModal && (
         <CreatePostModal
           key={topicId}
           topicId={topicId}
@@ -274,7 +281,7 @@ export default function CommunityTopic() {
           onClose={() => setShowModal(false)}
           onPosted={load}
         />
-      )}
+      )} */}
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function BookEditor({ content, setContent }) {
         setContent(editor.getHTML());
         setTimeout(() => setIsSaving(false), 500);
       }, 300),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -375,13 +375,15 @@ export default function BookEditor({ content, setContent }) {
 
       <EditorContent
         editor={editor}
-        className={`prose max-w-none
-    ${isDark ? "prose-invert bg-[#0f0f0f] text-white" : "bg-white text-gray-900"}
+        className={`
+    prose max-w-none
+    ${isDark ? "prose-invert bg-[#0f0f0f] [&_*]:text-white" : "bg-white text-gray-900"}
     type-text
     min-h-[70vh] max-h-[90vh]
     resize-y overflow-auto
     p-8
-    focus:outline-none focus:ring-2 focus:ring-green-500/50`}
+    focus:outline-none focus:ring-2 focus:ring-green-500/50
+  `}
       />
     </div>
   );

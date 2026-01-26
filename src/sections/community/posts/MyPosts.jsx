@@ -7,17 +7,18 @@ import {
   Trash2,
 } from "lucide-react";
 import axiosInstance from "../../../api/axios";
-import CreatePostModal from "../CreatePostModal";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
 export default function MyPosts() {
-  const [showCreate, setShowCreate] = useState(false);
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const [editingPost, setEditingPost] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [topics, setTopics] = useState([]);
+  const { postId } = useParams();
+  const isEdit = Boolean(postId);
+  const [loadingPost, setLoadingPost] = useState(isEdit);
 
   const [loading, setLoading] = useState(true);
 
@@ -38,19 +39,29 @@ export default function MyPosts() {
   }, []);
 
   useEffect(() => {
-    if (showCreate || editingPost) {
-      document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.touchAction = "";
+    if (!isEdit) return;
+
+    async function fetchPost() {
+      try {
+        const res = await axiosInstance.get(`/community/posts/${postId}`);
+        const p = res.data.post;
+
+        setTitle(p.title || "");
+        setSubtitle(p.subtitle || "");
+        setBody(p.body || "");
+        setImagePreview(p.image_url || null);
+        setSelectedTopicId(p.topic_id || "");
+        setRelatedTopicIds(p.related_topic_ids || []);
+      } catch (err) {
+        console.error("Failed to load post:", err);
+        navigate("/community/my-posts");
+      } finally {
+        setLoadingPost(false);
+      }
     }
 
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.touchAction = "";
-    };
-  }, [showCreate, editingPost]);
+    fetchPost();
+  }, [postId, isEdit]);
 
   async function fetchTopics() {
     try {
@@ -138,17 +149,25 @@ export default function MyPosts() {
     setOpenMenuId(null);
   }
 
+  if (loadingPost) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm opacity-60">Loading post…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
       {/* Header */}
-      {!showCreate && !editingPost && (
-        <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
-            <h1 className="text-lg font-semibold">My Posts</h1>
 
-            <button
-              onClick={() => setShowCreate(true)}
-              className="
+      <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
+        <div className="flex items-center justify-between max-w-3xl mx-auto">
+          <h1 className="text-lg font-semibold">My Posts</h1>
+
+          <button
+            onClick={() => navigate("/community/create-post")}
+            className="
     hidden md:inline-flex
     px-3 py-2 rounded-lg text-sm font-medium
     bg-dashboard-text-light dark:bg-dashboard-text-dark
@@ -156,35 +175,34 @@ export default function MyPosts() {
     hover:opacity-90
     transition
   "
-            >
-              Create new
-            </button>
-          </div>
-        </div>
-      )}
-      {/* Mobile action bar */}
-      {!showCreate && !editingPost && (
-        <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-          <button
-            onClick={() => setShowCreate(true)}
-            className="
-            w-full
-            py-2.5
-            rounded-lg
-            text-sm
-            font-medium
-            bg-dashboard-text-light
-            dark:bg-dashboard-text-dark
-            text-dashboard-bg-light
-            dark:text-dashboard-bg-dark
-            hover:opacity-90
-            transition
-          "
           >
-            Create new post
+            Create new
           </button>
         </div>
-      )}
+      </div>
+
+      {/* Mobile action bar */}
+
+      <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+        <button
+          onClick={() => navigate("/community/create-post")}
+          className="
+      w-full
+      py-2.5
+      rounded-lg
+      text-sm
+      font-medium
+      bg-dashboard-text-light
+      dark:bg-dashboard-text-dark
+      text-dashboard-bg-light
+      dark:text-dashboard-bg-dark
+      hover:opacity-90
+      transition
+    "
+        >
+          Create new post
+        </button>
+      </div>
 
       {/* List */}
       <div className="px-4 py-4 pb-24 max-w-3xl mx-auto space-y-2">
@@ -314,7 +332,7 @@ export default function MyPosts() {
                       <button
                         onClick={() => {
                           setOpenMenuId(null);
-                          setEditingPost(post);
+                          navigate(`/community/edit-post/${post.id}`);
                         }}
                         className={`${menuItem} hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark text-sm`}
                       >
@@ -341,22 +359,6 @@ export default function MyPosts() {
           </div>
         ))}
       </div>
-
-      {editingPost && (
-        <CreatePostModal
-          post={editingPost}
-          onClose={() => setEditingPost(null)}
-          onPosted={fetchPosts}
-        />
-      )}
-
-      {showCreate && (
-        <CreatePostModal
-          topics={topics}
-          onClose={() => setShowCreate(false)}
-          onPosted={fetchPosts}
-        />
-      )}
     </div>
   );
 }

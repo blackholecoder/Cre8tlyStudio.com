@@ -21,6 +21,15 @@
   background-color: #ffffff;
 }
 
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 .post-body {
   font-family: "Cardo", sans-serif;
 }
@@ -923,7 +932,8 @@ input[type="color"]:focus {
     min-height: 100%;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    overscroll-behavior: none;
+    /* overscroll-behavior: none; */
+    overscroll-behavior-y: auto;
     overflow-x: hidden;
   }
 
@@ -951,14 +961,5 @@ input[type="color"]:focus {
 
   html {
     -webkit-overflow-scrolling: touch;
-  }
-
-  .no-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
   }
 }

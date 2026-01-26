@@ -27,7 +27,7 @@ export default function Notifications() {
 
     if (notif.post_id) {
       navigate(
-        `/community/post/${notif.post_id}?highlight=${notif.reference_id}`
+        `/community/post/${notif.post_id}?highlight=${notif.reference_id}`,
       );
     }
   };
@@ -39,7 +39,7 @@ export default function Notifications() {
       });
 
       setItems((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
+        prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n)),
       );
     } catch (err) {
       console.error("Failed to mark notification read", err);
@@ -61,16 +61,29 @@ export default function Notifications() {
   }, []);
 
   return (
-    <div className="w-full flex justify-center items-center min-h-[80vh] px-6 py-12">
-      {/* 🔥 Background Container */}
+    <div className="w-full flex justify-center items-start min-h-[80vh] px-3 sm:px-6 py-6 sm:py-12">
+      {/* Background Container */}
       <div
         className="
-        w-full max-w-2xl rounded-2xl p-8 shadow-xl backdrop-blur-sm
-        bg-dashboard-sidebar-light
-        dark:bg-dashboard-sidebar-dark
-        border border-dashboard-border-light
-        dark:border-dashboard-border-dark
-  "
+        w-full max-w-2xl
+
+        /* mobile */
+        p-4
+        rounded-none
+        border-none
+        shadow-none
+        bg-transparent
+
+        /* desktop */
+        sm:p-8
+        sm:rounded-2xl
+        sm:shadow-xl
+        sm:bg-dashboard-sidebar-light
+        sm:dark:bg-dashboard-sidebar-dark
+        sm:border
+        sm:border-dashboard-border-light
+        sm:dark:border-dashboard-border-dark
+      "
       >
         <h1
           className="
@@ -101,7 +114,7 @@ export default function Notifications() {
               onClick={() => openNotification(n)}
               className={`
               relative
-              w-full text-left p-4 rounded-lg transition
+              w-full text-left p-4 sm:p-4 rounded-lg transition
               ${
                 n.is_read
                   ? "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark opacity-80"

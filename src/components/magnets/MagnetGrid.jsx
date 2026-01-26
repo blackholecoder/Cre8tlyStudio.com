@@ -358,7 +358,7 @@ export default function MagnetGrid({
                         return;
                       }
                       const canvasUrl = `/canvas-editor?id=${m.id}&pdf=${encodeURIComponent(
-                        m.pdf_url
+                        m.pdf_url,
                       )}`;
                       window.open(canvasUrl, "_blank");
                     }}

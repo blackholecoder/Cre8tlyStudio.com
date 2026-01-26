@@ -30,14 +30,13 @@ import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
 
 const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
-  const hydrated = useRef(false);
   const formatRef = useRef(null);
   const [linkOpen, setLinkOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
 
   const editor = useEditor({
-    autofocus: "end",
+    autofocus: false,
     extensions: [
       StarterKit.configure({
         link: false,
@@ -143,14 +142,25 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [formatOpen]);
   // hydrate ONCE
-  useEffect(() => {
-    if (!editor || hydrated.current) return;
 
-    if (value && value.trim()) {
-      editor.commands.setContent(value, false);
-      hydrated.current = true;
-    }
-  }, [editor]);
+  // useEffect(() => {
+  //   if (!editor || hydrated.current) return;
+
+  //   if (value && value.trim()) {
+  //     editor.commands.setContent(value, false);
+  //     hydrated.current = true;
+  //   }
+  // }, [editor]);
+  useEffect(() => {
+    if (!editor) return;
+    if (!value || !value.trim()) return;
+
+    const current = editor.getHTML();
+
+    if (current === value) return;
+
+    editor.commands.setContent(value, false);
+  }, [editor, value]);
 
   if (!editor) return null;
 

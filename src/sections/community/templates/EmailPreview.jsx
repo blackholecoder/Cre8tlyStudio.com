@@ -44,19 +44,24 @@ export default function EmailPreview({ subject, bodyHtml, creatorName }) {
       {/* Email container */}
       <div
         className={`
-          mx-auto rounded-lg border border-gray-700 bg-white text-black
-          ${mode === "desktop" ? "max-w-xl" : "max-w-sm"}
-        `}
+    mx-auto rounded-lg
+    border border-dashboard-border-light dark:border-dashboard-border-dark
+    bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+    text-dashboard-text-light dark:text-dashboard-text-dark
+    ${mode === "desktop" ? "max-w-xl" : "max-w-sm"}
+  `}
       >
         {/* Subject */}
-        <div className="px-4 py-3 border-b border-gray-200">
-          <p className="text-xs text-gray-500 mb-1">Subject</p>
+        <div className="px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
+          <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mb-1">
+            Subject
+          </p>
           <p className="font-medium">{rendered.subject || "(No subject)"}</p>
         </div>
 
         {/* Body */}
         <div
-          className="px-4 py-4 prose prose-sm max-w-none"
+          className="px-4 py-4 prose prose-sm max-w-none post-body"
           dangerouslySetInnerHTML={{ __html: rendered.html || "<p></p>" }}
         />
       </div>

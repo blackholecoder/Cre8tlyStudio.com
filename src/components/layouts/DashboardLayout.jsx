@@ -47,6 +47,8 @@ export default function DashboardLayout({ children }) {
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
 
+  const isModalOpen = showUpgradeModal;
+
   // ✅ Auto-close sidebar on resize
   useEffect(() => {
     const handleResize = () => {
@@ -200,7 +202,7 @@ ${locked ? "opacity-50 cursor-pointer" : ""}
 
   return (
     <div
-      className="dashboard flex relative min-h-screen
+      className="dashboard flex relative h-screen overflow-hidden
   bg-dashboard-bg-light
   dark:bg-dashboard-bg-dark
   text-dashboard-text-light
@@ -359,17 +361,9 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
         />
       )}
 
-      {/* Toggle button (mobile) */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 right-4 p-2 rounded-lg z-50 transition bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-muted-light dark:text-dashboard-muted-dark"
-      >
-        <Menu size={22} />
-      </button>
-
       {/* Main content */}
-      <main
-        className="flex-1 min-h-screen overflow-y-auto transition-all duration-300"
+      {/* <main
+        className="relative flex-1 h-full overflow-y-auto overscroll-y-contain transition-all duration-300 pb-24 md:pb-8"
         style={{
           marginLeft:
             window.innerWidth >= 1024
@@ -380,7 +374,50 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
         }}
       >
         {children}
+      </main> */}
+      <main
+        className="flex-1 h-full overflow-y-auto overscroll-y-contain transition-all duration-300 pb-24 md:pb-8"
+        style={{
+          marginLeft:
+            window.innerWidth >= 1024
+              ? isCollapsed
+                ? `${SIDEBAR_COLLAPSED_WIDTH}px`
+                : `${SIDEBAR_EXPANDED_WIDTH}px`
+              : "0px",
+        }}
+      >
+        {/* Mobile top bar */}
+        <div
+          className="
+      lg:hidden
+      sticky top-0 z-30
+      bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+      border-b border-dashboard-border-light dark:border-dashboard-border-dark
+    "
+        >
+          <div className="flex justify-end p-3">
+            {!isModalOpen && !isSidebarOpen && (
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="
+            p-2 rounded-lg
+            bg-dashboard-sidebar-light
+            dark:bg-dashboard-sidebar-dark
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+            shadow-sm
+          "
+              >
+                <Menu size={22} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Page content */}
+        {children}
       </main>
+
       <UpgradeRequiredModal
         open={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}

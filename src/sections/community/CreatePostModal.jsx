@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { X, Image as ImageIcon } from "lucide-react";
 import CommunityPostEditor from "./posts/CommunityPostEditor";
@@ -55,7 +55,7 @@ export default function CreatePostModal({
         const uploadRes = await axiosInstance.post(
           "/community/upload-image",
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
 
         imageUrl = uploadRes.data.image_url;
@@ -95,19 +95,32 @@ export default function CreatePostModal({
     }
   };
 
+  const overlayRef = useRef(null);
+
+  useEffect(() => {
+    if (overlayRef.current) {
+      overlayRef.current.scrollTop = 0;
+    }
+  }, []);
+
   return (
     <div
+      ref={overlayRef}
       className="
-    fixed inset-0 z-50
-    flex items-center justify-center
-    px-3 sm:px-0
+    fixed inset-0 z-[100]
+    flex justify-center items-start sm:items-center
+    px-2 sm:px-0
+    pt-6 sm:pt-0 pb-6
     bg-black/60 backdrop-blur-sm
+    overflow-y-auto
   "
     >
       <div
         className="
     relative
-    w-full max-w-lg md:max-w-2xl
+    w-full
+    sm:max-w-lg md:max-w-2xl
+    mt-0 sm:mt-0
     max-h-[90vh]
     rounded-xl
     bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
@@ -120,10 +133,11 @@ export default function CreatePostModal({
         <button
           onClick={onClose}
           className="
-          absolute top-4 right-4
-          text-dashboard-muted-light dark:text-dashboard-muted-dark
-          hover:opacity-80
-        "
+    absolute top-4 right-4
+    z-[110]
+    text-dashboard-muted-light dark:text-dashboard-muted-dark
+    hover:opacity-80
+  "
         >
           <X size={22} />
         </button>
@@ -374,7 +388,7 @@ export default function CreatePostModal({
 
                             if (prev.length >= MAX_RELATED_TOPICS) {
                               toast.info(
-                                `You can select up to ${MAX_RELATED_TOPICS} related topics`
+                                `You can select up to ${MAX_RELATED_TOPICS} related topics`,
                               );
                               return prev;
                             }

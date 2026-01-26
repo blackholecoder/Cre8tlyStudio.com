@@ -102,7 +102,7 @@ export const SIDEBAR_SECTIONS = [
       },
       {
         key: "posts",
-        label: "Posts",
+        label: "My Posts",
         path: "/community/posts",
         icon: FileText,
         allowCommunity: true,

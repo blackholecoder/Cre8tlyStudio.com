@@ -37,6 +37,21 @@ export default function MyPosts() {
     return () => window.removeEventListener("click", closeMenu);
   }, []);
 
+  useEffect(() => {
+    if (showCreate || editingPost) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [showCreate, editingPost]);
+
   async function fetchTopics() {
     try {
       const res = await axiosInstance.get("/community/topics");
@@ -108,7 +123,7 @@ export default function MyPosts() {
       {
         closeButton: false,
         className: "rounded-xl",
-      }
+      },
     );
   }
 
@@ -117,7 +132,7 @@ export default function MyPosts() {
 
     navigator.clipboard.writeText(url).then(
       () => toast.success("Link copied to clipboard"),
-      () => toast.error("Failed to copy link")
+      () => toast.error("Failed to copy link"),
     );
 
     setOpenMenuId(null);
@@ -126,13 +141,14 @@ export default function MyPosts() {
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
       {/* Header */}
-      <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
-        <div className="flex items-center justify-between max-w-3xl mx-auto">
-          <h1 className="text-lg font-semibold">Posts</h1>
+      {!showCreate && !editingPost && (
+        <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
+            <h1 className="text-lg font-semibold">My Posts</h1>
 
-          <button
-            onClick={() => setShowCreate(true)}
-            className="
+            <button
+              onClick={() => setShowCreate(true)}
+              className="
     hidden md:inline-flex
     px-3 py-2 rounded-lg text-sm font-medium
     bg-dashboard-text-light dark:bg-dashboard-text-dark
@@ -140,35 +156,38 @@ export default function MyPosts() {
     hover:opacity-90
     transition
   "
+            >
+              Create new
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Mobile action bar */}
+      {!showCreate && !editingPost && (
+        <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="
+            w-full
+            py-2.5
+            rounded-lg
+            text-sm
+            font-medium
+            bg-dashboard-text-light
+            dark:bg-dashboard-text-dark
+            text-dashboard-bg-light
+            dark:text-dashboard-bg-dark
+            hover:opacity-90
+            transition
+          "
           >
-            Create new
+            Create new post
           </button>
         </div>
-      </div>
-      {/* Mobile action bar */}
-      <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-        <button
-          onClick={() => setShowCreate(true)}
-          className="
-      w-full
-      py-2.5
-      rounded-lg
-      text-sm
-      font-medium
-      bg-dashboard-text-light
-      dark:bg-dashboard-text-dark
-      text-dashboard-bg-light
-      dark:text-dashboard-bg-dark
-      hover:opacity-90
-      transition
-    "
-        >
-          Create new post
-        </button>
-      </div>
+      )}
 
       {/* List */}
-      <div className="px-4 py-4 max-w-3xl mx-auto space-y-2">
+      <div className="px-4 py-4 pb-24 max-w-3xl mx-auto space-y-2">
         {loading && <p className="text-sm opacity-60">Loading posts…</p>}
 
         {!loading && posts.length === 0 && (

@@ -1,8 +1,14 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
-import { ButtonSpinner } from "../../helpers/buttonSpinner";
+// import { ButtonSpinner } from "../../helpers/buttonSpinner";
 
-export default function ReplyBox({ parentId, postId, onReply, onCancel }) {
+export default function ReplyBox({
+  parentId,
+  postId,
+  onReply,
+  replyToUserId,
+  onCancel,
+}) {
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -11,14 +17,24 @@ export default function ReplyBox({ parentId, postId, onReply, onCancel }) {
 
     setLoading(true);
 
+    const payload = {
+      body,
+      postId,
+      reply_to_user_id: replyToUserId,
+    };
+
+    console.log("🟢 Reply payload:", payload);
+
     try {
       const res = await axiosInstance.post(
         `/community/comments/${parentId}/reply`,
-        { body, postId }
+        payload,
       );
 
+      console.log("🟢 Reply response:", res.data);
+
       setBody("");
-      onReply(res.data.reply); // 👈 hydrated reply
+      onReply(res.data.reply);
     } catch (err) {
       console.error("Failed to submit reply:", err);
     } finally {
@@ -27,74 +43,73 @@ export default function ReplyBox({ parentId, postId, onReply, onCancel }) {
   };
 
   return (
-    <div className="mt-3 pl-10">
+    <div className="mt-4">
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         className="
-        w-full
-        bg-dashboard-input-bg
-        border border-dashboard-border
-        rounded-lg
-        p-3
-        text-sm
-        text-dashboard-text
-        placeholder-dashboard-muted
-        focus:outline-none
-        focus:ring-2
-        focus:ring-green/40
-      "
-        placeholder="Write a reply..."
+          w-full
+          min-h-[120px]
+          resize-none
+          rounded-xl
+          p-4
+          text-base
+          bg-dashboard-bg-light
+          dark:bg-dashboard-bg-dark
+          border border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          text-dashboard-text-light
+          dark:text-dashboard-text-dark
+          placeholder-dashboard-muted-light
+          dark:placeholder-dashboard-muted-dark
+          focus:outline-none
+          focus:ring-2
+          focus:ring-green/40
+        "
+        placeholder="Write your reply…"
       />
 
-      <div className="flex items-center gap-3 mt-2">
+      <div className="flex justify-end gap-3 mt-4">
+        <button
+          onClick={onCancel}
+          className="
+    px-4 py-2
+    rounded-lg
+    text-sm
+    bg-dashboard-hover-light
+    dark:bg-dashboard-hover-dark
+    text-dashboard-text-light
+    dark:text-dashboard-text-dark
+    border
+    border-dashboard-border-light
+    dark:border-dashboard-border-dark
+    transition
+    hover:opacity-90
+    focus:outline-none
+    focus:ring-2
+    focus:ring-dashboard-border-light
+    dark:focus:ring-dashboard-border-dark
+  "
+        >
+          Cancel
+        </button>
+
         <button
           onClick={submit}
           disabled={loading}
           className="
-    bg-green
-    text-dashboard-text-light
-    px-4
-    py-1.5
-    rounded-md
-    text-sm
-    font-medium
-    flex
-    items-center
-    gap-2
-    transition
-    hover:bg-green/90
-    disabled:opacity-60
-    disabled:cursor-not-allowed
-  "
+            px-5 py-2
+            rounded-lg
+            bg-green
+            text-black
+            font-medium
+            transition
+            hover:bg-green/90
+            disabled:opacity-60
+            disabled:cursor-not-allowed
+          "
         >
-          {loading ? (
-            <>
-              <ButtonSpinner />
-              <span>Posting</span>
-            </>
-          ) : (
-            "Reply"
-          )}
-        </button>
-
-        <button
-          onClick={onCancel}
-          className="
-    px-4
-    py-1.5
-    bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-    text-dashboard-muted-light dark:text-dashboard-muted-dark
-    text-sm
-    rounded-md
-    transition
-    hover:bg-dashboard-border-light dark:hover:bg-dashboard-border-dark
-    focus:outline-none
-    focus:ring-2
-    focus:ring-dashboard-border-light dark:focus:ring-dashboard-border-dark
-  "
-        >
-          Cancel
+          {loading ? "Posting…" : "Reply"}
         </button>
       </div>
     </div>

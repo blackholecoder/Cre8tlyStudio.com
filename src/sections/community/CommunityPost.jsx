@@ -41,15 +41,12 @@ export default function CommunityPost() {
   const [activeReplyBox, setActiveReplyBox] = useState(null);
 
   const [replyPages, setReplyPages] = useState({});
-  const [deletedCommentIds, setDeletedCommentIds] = useState(new Set());
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const highlightedCommentId = params.get("comment");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
-
-  const isAdminUser = user?.role === "admin";
 
   const handleShare = async () => {
     try {
@@ -98,7 +95,7 @@ export default function CommunityPost() {
       if (user?.id && postData?.user_id && user.id !== postData.user_id) {
         try {
           const subRes = await axiosInstance.get(
-            `/community/subscriptions/${postData.user_id}/status`
+            `/community/subscriptions/${postData.user_id}/status`,
           );
           setIsSubscribed(subRes.data.subscribed);
         } catch (err) {
@@ -107,7 +104,7 @@ export default function CommunityPost() {
       }
 
       const res2 = await axiosInstance.get(
-        `/community/posts/${postData.id}/comments?page=1&limit=10`
+        `/community/posts/${postData.id}/comments?page=1&limit=10`,
       );
 
       setComments(res2.data.comments || []);
@@ -131,12 +128,12 @@ export default function CommunityPost() {
     try {
       if (isSubscribed) {
         await axiosInstance.delete(
-          `/community/subscriptions/${post.user_id}/subscribe`
+          `/community/subscriptions/${post.user_id}/subscribe`,
         );
         setIsSubscribed(false);
       } else {
         await axiosInstance.post(
-          `/community/subscriptions/${post.user_id}/subscribe`
+          `/community/subscriptions/${post.user_id}/subscribe`,
         );
         setIsSubscribed(true);
       }
@@ -160,7 +157,7 @@ export default function CommunityPost() {
 
     try {
       const res = await axiosInstance.get(
-        `/community/posts/${post.id}/comments?page=${page}&limit=10`
+        `/community/posts/${post.id}/comments?page=${page}&limit=10`,
       );
 
       setComments((prev) => [...prev, ...(res.data.comments || [])]);
@@ -180,7 +177,7 @@ export default function CommunityPost() {
       (entries) => {
         if (entries[0].isIntersecting) loadMore();
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 },
     );
 
     if (observerRef.current) observer.observe(observerRef.current);
@@ -193,7 +190,7 @@ export default function CommunityPost() {
 
     try {
       const res = await axiosInstance.get(
-        `/community/comments/${commentId}/replies?page=${page}&limit=${limit}`
+        `/community/comments/${commentId}/replies?page=${page}&limit=${limit}`,
       );
 
       // CLEAN the data
@@ -240,7 +237,7 @@ export default function CommunityPost() {
 
       // Reload comments or patch it locally
       setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? { ...c, body: editBody } : c))
+        prev.map((c) => (c.id === commentId ? { ...c, body: editBody } : c)),
       );
 
       setEditCommentId(null);
@@ -260,7 +257,7 @@ export default function CommunityPost() {
             setReplies((prev) => ({
               ...prev,
               [parentId]: (prev[parentId] || []).filter(
-                (r) => r.id !== commentId
+                (r) => r.id !== commentId,
               ),
             }));
           } else {
@@ -693,9 +690,21 @@ export default function CommunityPost() {
                   <div
                     key={c.id}
                     className="
-                    bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-                    border border-dashboard-border-light dark:border-dashboard-border-dark
-                    p-4 sm:p-5 lg:p-6 rounded-lg shadow-inner
+                    /* mobile */
+                    bg-transparent
+                    border-b border-dashboard-border-light/50 dark:border-dashboard-border-dark/50
+                    rounded-none
+                    shadow-none
+                    p-3
+
+                    /* desktop */
+                    sm:bg-dashboard-sidebar-light
+                    sm:dark:bg-dashboard-sidebar-dark
+                    sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+                    sm:rounded-lg
+                    sm:p-5
+                    lg:p-6
+                    sm:shadow-inner
                   "
                   >
                     <div className="flex items-start gap-4">
@@ -712,7 +721,7 @@ export default function CommunityPost() {
                           // no profile → block
                           if (!c.author_has_profile) {
                             toast.info(
-                              "This author hasn’t set up their profile yet"
+                              "This author hasn’t set up their profile yet",
                             );
                             return;
                           }
@@ -730,7 +739,7 @@ export default function CommunityPost() {
                           <Img
                             src={c.author_image}
                             loader={
-                              <div className="w-10 h-10 rounded-full bg-gray-700/40 animate-pulse" />
+                              <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
                             }
                             unloader={
                               <div
@@ -762,6 +771,7 @@ export default function CommunityPost() {
                           <div
                             className="
                             prose prose-sm max-w-none
+                            my-1
                             text-dashboard-text-light dark:text-dashboard-text-dark
                             whitespace-pre-wrap
                             dark:prose-invert
@@ -860,7 +870,7 @@ export default function CommunityPost() {
 
                         {/* Action Row */}
                         {editCommentId !== c.id && (
-                          <div className="flex items-center gap-4 mt-2">
+                          <div className="flex items-center gap-3 mt-1.5">
                             {/* Reply is ALWAYS available */}
                             <button
                               onClick={() => setActiveReplyBox(c.id)}
@@ -900,7 +910,7 @@ export default function CommunityPost() {
                             {!openReplies[c.id] &&
                               user &&
                               (c.user_id === user.id ||
-                                user.role === "admin") && (
+                                post.user_id === user.id) && (
                                 <button
                                   onClick={() => handleDelete(c.id)}
                                   className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
@@ -916,6 +926,7 @@ export default function CommunityPost() {
                             <ReplyBox
                               parentId={c.id}
                               postId={post.id}
+                              replyToUserId={c.user_id}
                               onReply={async (newReply) => {
                                 // 1️⃣ add reply locally
                                 setReplies((prev) => ({
@@ -932,8 +943,8 @@ export default function CommunityPost() {
                                           reply_count:
                                             (comment.reply_count || 0) + 1,
                                         }
-                                      : comment
-                                  )
+                                      : comment,
+                                  ),
                                 );
 
                                 // 3️⃣ open replies immediately
@@ -955,6 +966,7 @@ export default function CommunityPost() {
                           (replies[c.id] || []).map((reply) => (
                             <CommentThread
                               key={reply.id}
+                              postOwnerId={post.user_id}
                               comment={reply}
                               depth={1}
                               loadReplies={loadReplies}

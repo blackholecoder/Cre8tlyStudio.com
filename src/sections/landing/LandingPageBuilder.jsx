@@ -87,7 +87,7 @@ export default function LandingPageBuilder() {
           parentId: loc.parentId,
           index: targetIndex,
         },
-        removed
+        removed,
       );
 
       return { ...prev, content_blocks: updated };
@@ -116,7 +116,7 @@ export default function LandingPageBuilder() {
           parentId: loc.parentId,
           index: targetIndex,
         },
-        removed
+        removed,
       );
 
       return { ...prev, content_blocks: updated };
@@ -263,7 +263,7 @@ export default function LandingPageBuilder() {
     for (const container of blocks) {
       if (container.type !== "container") continue;
       const childIndex = (container.children || []).findIndex(
-        (c) => c.id === id
+        (c) => c.id === id,
       );
       if (childIndex !== -1) {
         return {
@@ -296,7 +296,7 @@ export default function LandingPageBuilder() {
           : {
               ...b,
               children: b.children.filter((_, i) => i !== loc.index),
-            }
+            },
       ),
     };
   };
@@ -318,7 +318,7 @@ export default function LandingPageBuilder() {
               item,
               ...(b.children || []).slice(loc.index),
             ],
-          }
+          },
     );
   };
 
@@ -350,7 +350,7 @@ export default function LandingPageBuilder() {
       const counts = countBlocksByType(landing?.content_blocks || []);
       return (counts[type] || 0) < limit;
     },
-    [landing?.content_blocks, countBlocksByType]
+    [landing?.content_blocks, countBlocksByType],
   );
 
   const updateBlock = React.useCallback((index, key, value) => {
@@ -377,7 +377,7 @@ export default function LandingPageBuilder() {
     // 🚫 Pro-only block gate
     if (!isPro && PRO_ONLY_BLOCKS.includes(type)) {
       toast.error(
-        "This block is a Pro feature. Upgrade to Pro to unlock Audio, Calendly, and Reviews."
+        "This block is a Pro feature. Upgrade to Pro to unlock Audio, Calendly, and Reviews.",
       );
       return;
     }
@@ -386,7 +386,7 @@ export default function LandingPageBuilder() {
       toast.error(
         `You can only add ${BLOCK_LIMITS[type]} ${
           BLOCK_LABELS[type] || type
-        } block`
+        } block`,
       );
       return;
     }
@@ -485,7 +485,7 @@ export default function LandingPageBuilder() {
       newBlock.text = "Offer Ends In:";
       newBlock.text_color = "#FFFFFF";
       newBlock.target_date = new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000
+        Date.now() + 7 * 24 * 60 * 60 * 1000,
       ).toISOString();
       newBlock.alignment = "center";
       newBlock.style_variant = "minimal"; // default style
@@ -981,7 +981,7 @@ export default function LandingPageBuilder() {
           textAlign: "center",
           marginTop: "80px",
         },
-      }
+      },
     );
   }
 
@@ -1060,7 +1060,7 @@ export default function LandingPageBuilder() {
         // ✅ restore cover and theme
         if (lp.cover_image_url) setCoverPreview(lp.cover_image_url);
         setBgTheme(
-          lp.bg_theme || "linear-gradient(to bottom, #ffffff, #F285C3)"
+          lp.bg_theme || "linear-gradient(to bottom, #ffffff, #F285C3)",
         );
       } catch (err) {
         console.error(err);
@@ -1087,7 +1087,7 @@ export default function LandingPageBuilder() {
     return (
       <div
         className="
-      flex flex-col items-center justify-center min-h-screen
+      flex flex-col items-center justify-center min-h-screen 
       bg-dashboard-bg-light dark:bg-dashboard-bg-dark
       text-dashboard-text-light dark:text-dashboard-text-dark
     "
@@ -1203,12 +1203,12 @@ export default function LandingPageBuilder() {
 
       if (invalidVideos.length > 0) {
         toast.error(
-          `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`
+          `Invalid video URLs in: ${invalidVideos.join(", ")}. Please use YouTube or Vimeo links.`,
         );
         return;
       }
       blocks = blocks.map((b) =>
-        b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b
+        b.type === "video" ? { ...b, url: normalizeVideoUrl(b.url) } : b,
       );
 
       await axiosInstance.put(
@@ -1223,7 +1223,7 @@ export default function LandingPageBuilder() {
           logo_url: landing.logo_url,
           show_download_button: showDownloadButton,
           motion_settings: landing.motion_settings,
-        }
+        },
       );
 
       toast.success("Landing page saved successfully!");
@@ -1262,7 +1262,7 @@ export default function LandingPageBuilder() {
       toast.error(
         isPro
           ? "You’ve reached the maximum of 30 saved versions."
-          : "Free accounts can save up to 10 versions. Upgrade to Pro to save more."
+          : "Free accounts can save up to 10 versions. Upgrade to Pro to save more.",
       );
       return;
     }
@@ -1278,7 +1278,7 @@ export default function LandingPageBuilder() {
         landing.id,
         trimmed,
         landing,
-        existing.id // <-- version ID for update
+        existing.id, // <-- version ID for update
       );
     } else {
       // CREATE NEW VERSION
@@ -1684,7 +1684,7 @@ export default function LandingPageBuilder() {
             onClick={() => {
               removeFromContainer(
                 activeChild.containerIndex,
-                activeChild.childId
+                activeChild.childId,
               );
               setActiveChild(null);
             }}

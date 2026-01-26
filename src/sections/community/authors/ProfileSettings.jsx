@@ -71,7 +71,7 @@ export default function ProfileSettings() {
   async function fetchNotificationPrefs() {
     try {
       const res = await axiosInstance.get(
-        "/community/authors/me/notifications"
+        "/community/authors/me/notifications",
       );
 
       setNotificationPrefs({
@@ -102,7 +102,7 @@ export default function ProfileSettings() {
 
       await axiosInstance.post(
         "/community/authors/me/update-notifications",
-        notificationPrefs
+        notificationPrefs,
       );
 
       toast.success("Profile updated");
@@ -134,7 +134,7 @@ export default function ProfileSettings() {
     <div className="h-screen flex flex-col bg-dashboard-bg-light dark:bg-dashboard-bg-dark overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 sticky top-3 z-20 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-        <div className="px-4 py-3 max-w-4xl mx-auto">
+        <div className="px-3 sm:px-4 py-3 max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold">Author Settings</h1>
           </div>
@@ -178,7 +178,7 @@ export default function ProfileSettings() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-6 max-w-4xl mx-auto space-y-8">
+        <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-4xl mx-auto space-y-6 sm:space-y-8">
           <Section title="Bio" description="Short one-line summary">
             <textarea
               value={bio}
@@ -330,10 +330,22 @@ function Section({ title, description, children }) {
   return (
     <div
       className="
-        rounded-2xl p-5 sm:p-6
-        bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-        border border-dashboard-border-light dark:border-dashboard-border-dark
-        shadow-sm
+        /* mobile */
+        p-4
+        rounded-none
+        border-none
+        shadow-none
+        bg-transparent
+
+        /* desktop */
+        sm:p-6
+        sm:rounded-2xl
+        sm:bg-dashboard-sidebar-light
+        sm:dark:bg-dashboard-sidebar-dark
+        sm:border
+        sm:border-dashboard-border-light
+        sm:dark:border-dashboard-border-dark
+        sm:shadow-sm
       "
     >
       <div className="mb-4">

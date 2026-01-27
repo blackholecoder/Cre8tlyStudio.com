@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
+import axiosInstance from "../../../api/axios";
 
 const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
   const formatRef = useRef(null);
@@ -141,16 +142,7 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [formatOpen]);
-  // hydrate ONCE
 
-  // useEffect(() => {
-  //   if (!editor || hydrated.current) return;
-
-  //   if (value && value.trim()) {
-  //     editor.commands.setContent(value, false);
-  //     hydrated.current = true;
-  //   }
-  // }, [editor]);
   useEffect(() => {
     if (!editor) return;
     if (!value || !value.trim()) return;
@@ -161,6 +153,17 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
 
     editor.commands.setContent(value, false);
   }, [editor, value]);
+
+  // async function uploadImage(file) {
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+
+  //   const res = await axiosInstance.post("/community/upload-image", formData, {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   });
+
+  //   return res.data.url;
+  // }
 
   if (!editor) return null;
 
@@ -313,7 +316,45 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
 
           <label className="shrink-0 p-2 rounded cursor-pointer hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark">
             <ImageIcon size={16} />
-            <input type="file" hidden />
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                try {
+                  const formData = new FormData();
+                  formData.append("image", file); // 👈 MUST be "image"
+
+                  const res = await axiosInstance.post(
+                    "/community/upload-image",
+                    formData,
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    },
+                  );
+
+                  const imageUrl = res.data?.image_url;
+                  if (!imageUrl) return;
+
+                  editor
+                    .chain()
+                    .focus()
+                    .createParagraphNear()
+                    .setImage({ src: imageUrl })
+                    .run();
+                } catch (err) {
+                  console.error("Image upload failed:", err);
+                } finally {
+                  // allow re-selecting the same file
+                  e.target.value = "";
+                }
+              }}
+            />
           </label>
         </div>
 

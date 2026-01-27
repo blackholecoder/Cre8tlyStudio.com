@@ -170,7 +170,13 @@ export default function CommentThread({
                 {/* Author + Meta */}
                 <div className="flex items-center gap-[2px] text-xs text-gray-500">
                   <div className="flex items-center gap-0">
-                    <span className="font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
+                    <span
+                      className="
+                      font-medium
+                      text-dashboard-muted-light
+                      dark:text-dashboard-muted-dark
+                    "
+                    >
                       {comment.author}
                     </span>
 

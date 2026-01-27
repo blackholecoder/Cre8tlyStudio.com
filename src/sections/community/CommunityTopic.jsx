@@ -49,7 +49,7 @@ export default function CommunityTopic() {
   if (!topic) return null;
 
   return (
-    <div className="pt-20 p-8 max-w-4xl mx-auto">
+    <div className="pt-20 px-0 sm:px-6 lg:px-6 max-w-4xl mx-auto">
       {/* 🔙 Back + Breadcrumbs */}
       <div
         className="flex items-center gap-2 text-sm
@@ -171,7 +171,7 @@ export default function CommunityTopic() {
         )}
         {posts.map((post) => {
           return (
-            <button
+            <div
               key={post.id}
               onClick={async () => {
                 try {
@@ -182,47 +182,26 @@ export default function CommunityTopic() {
                 });
               }}
               className="
-              relative w-full text-left
-              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-              p-3 sm:p-4 rounded-xl
-              border border-dashboard-border-light dark:border-dashboard-border-dark
-              hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+              w-full
+              px-4 py-3
+              sm:px-6 sm:py-4
+              lg:px-8 lg:py-6
+              border-b border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              hover:bg-dashboard-hover-light
+              dark:hover:bg-dashboard-hover-dark
               transition
-              active:scale-[0.99]
+              cursor-pointer
             "
             >
-              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
                 {/* Left image */}
-                {post.image_url && (
-                  <div
-                    className="
-                    w-full sm:w-16
-                    aspect-[4/1] sm:aspect-square
-                    rounded-lg
-                    overflow-hidden
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-                    flex-shrink-0
-                  "
-                  >
-                    <img
-                      src={post.image_url}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="
-                      w-full h-full object-cover
-                      bg-dashboard-hover-light
-                      dark:bg-dashboard-hover-dark
-                    "
-                    />
-                  </div>
-                )}
+
                 {/* Right content */}
-                <div className="flex-1">
+                <div className="min-w-0">
                   <h3
                     className="
-                    text-base sm:text-lg font-semibold line-clamp-2
+                    text-base sm:text-lg font-semibold line-clamp-1 lg:line-clamp-2
                     text-dashboard-text-light dark:text-dashboard-text-dark
                   "
                   >
@@ -235,7 +214,7 @@ export default function CommunityTopic() {
                       text-sm sm:text-base
                       font-medium
                       leading-snug
-                      line-clamp-2
+                      line-clamp-1 lg:line-clamp-2
                       text-dashboard-muted-light
                       dark:text-dashboard-muted-dark
                     "
@@ -252,36 +231,75 @@ export default function CommunityTopic() {
                   >
                     By {post.author}
                   </p>
-                  <div className="flex items-center gap-4 mt-1 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                    <div className="flex items-center gap-[3px]">
+                  <div className="flex items-center gap-2 mt-2">
+                    {post.author_image ? (
+                      <img
+                        src={post.author_image}
+                        alt=""
+                        className="
+                        w-6 h-6 rounded-full object-cover
+                        border border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                      "
+                      />
+                    ) : (
+                      <div
+                        className="
+                        w-6 h-6 rounded-full
+                        bg-dashboard-hover-light
+                        dark:bg-dashboard-hover-dark
+                      "
+                      />
+                    )}
+
+                    <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      {post.author} · {post.topic_name}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-6 sm:gap-8 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    <div className="flex items-center gap-1.5">
                       <Eye size={14} className="opacity-70" />
                       <span>{post.views ?? 0}</span>
-                      <span>views</span>
                     </div>
 
-                    <div className="flex items-center gap-[3px]">
+                    <div className="flex items-center gap-1.5">
                       <MessageCircle size={14} className="opacity-70" />
                       <span>{post.comment_count ?? 0}</span>
-                      <span>comments</span>
                     </div>
                   </div>
                 </div>
+                <div
+                  className="
+                  w-14 h-14
+                  sm:w-16 sm:h-16
+                  lg:w-20 lg:h-20
+                  rounded-lg
+                  flex-shrink-0
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  overflow-hidden
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                "
+                >
+                  {post.image_url ? (
+                    <img
+                      src={post.image_url}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full opacity-40" />
+                  )}
+                </div>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
-
-      {/* Create Post Modal */}
-      {/* {showModal && (
-        <CreatePostModal
-          key={topicId}
-          topicId={topicId}
-          topicName={topic.name}
-          onClose={() => setShowModal(false)}
-          onPosted={load}
-        />
-      )} */}
     </div>
   );
 }

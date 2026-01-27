@@ -11,6 +11,7 @@ export default function SignupCommunity() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -27,8 +28,13 @@ export default function SignupCommunity() {
     }
   }, [error]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "username" ? value.toLowerCase() : value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,11 +42,27 @@ export default function SignupCommunity() {
     setError("");
 
     try {
-      const payload = refSlug ? { ...formData, refSlug } : formData;
+      const username = formData.username.trim();
+
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        setError(
+          "Username must be 3–20 characters and contain only letters, numbers, or underscores.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        username,
+        ...(refSlug && { refSlug }),
+      };
 
       const res = await axios.post(
         "https://cre8tlystudio.com/api/auth/signup-community",
-        payload
+        payload,
       );
 
       if (res.status === 201) {
@@ -121,6 +143,19 @@ export default function SignupCommunity() {
               required
               className="w-full h-[48px] px-4 rounded-lg border border-gray-300"
             />
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
+              required
+              autoComplete="username"
+              className="w-full h-[48px] px-4 rounded-lg border border-gray-300"
+            />
+            <p className="text-xs text-gray-500">
+              3–20 characters, letters, numbers, underscores only
+            </p>
 
             <input
               type="email"

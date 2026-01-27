@@ -31,7 +31,7 @@ export default function Profile() {
   async function loadSubscriptionStatus() {
     try {
       const res = await axiosInstance.get(
-        `/community/subscriptions/${profile.id}/status`
+        `/community/subscriptions/${profile.id}/status`,
       );
       setIsSubscribed(res.data.subscribed);
     } catch (err) {
@@ -47,7 +47,7 @@ export default function Profile() {
     try {
       setLoading(true);
       const res = await axiosInstance.get(
-        userId ? `/community/authors/${userId}` : "/community/authors/me"
+        userId ? `/community/authors/${userId}` : "/community/authors/me",
       );
       setProfile(res.data.profile);
     } catch (err) {
@@ -70,12 +70,12 @@ export default function Profile() {
     try {
       if (isSubscribed) {
         await axiosInstance.delete(
-          `/community/subscriptions/${profile.id}/subscribe`
+          `/community/subscriptions/${profile.id}/subscribe`,
         );
         setIsSubscribed(false);
       } else {
         await axiosInstance.post(
-          `/community/subscriptions/${profile.id}/subscribe`
+          `/community/subscriptions/${profile.id}/subscribe`,
         );
         setIsSubscribed(true);
       }
@@ -118,6 +118,7 @@ export default function Profile() {
                 </div>
 
                 <h1 className="text-lg font-semibold">{profile.name}</h1>
+                <p>@{profile.username}</p>
                 {!isOwnProfile && (
                   <button
                     onClick={toggleSubscribe}

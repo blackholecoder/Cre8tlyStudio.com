@@ -48,17 +48,6 @@ export default function CommunityPost() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
 
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      toast.error("Failed to copy link");
-    }
-  };
-
   useEffect(() => {
     if (authLoading) return;
     if (!post || !post.slug) return;
@@ -353,11 +342,22 @@ export default function CommunityPost() {
 
   const shareUrl = `${window.location.origin}/p/${post.slug}`;
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
+
   return (
     <div
       className="
       w-full flex justify-center items-start min-h-screen
-      px-4 py-14
+      px-0 py-14
       sm:px-6 sm:py-16
       lg:py-20
     "
@@ -767,6 +767,37 @@ export default function CommunityPost() {
                       </button>
 
                       <div className="flex-1">
+                        <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
+                          <div className="flex items-center gap-0">
+                            <span
+                              className="
+                              font-medium
+                              text-dashboard-muted-light
+                              dark:text-dashboard-muted-dark
+                            "
+                            >
+                              {c.author}
+                            </span>
+
+                            {commentAdmin && (
+                              <span
+                                className="
+                                flex items-center gap-1
+                                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                                text-xs
+                                px-1
+                                rounded-full
+                              "
+                              >
+                                <ShieldCheck
+                                  className="text-dashboard-muted-light dark:text-green"
+                                  size={12}
+                                />
+                              </span>
+                            )}
+                          </div>
+                          <span>{timeAgo(c.created_at)}</span>
+                        </div>
                         {editCommentId !== c.id && (
                           <div
                             className="
@@ -827,50 +858,26 @@ export default function CommunityPost() {
                           </div>
                         )}
 
-                        <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
-                          <div className="flex items-center gap-0">
-                            <span>{c.author}</span>
-
-                            {commentAdmin && (
-                              <span
-                                className="
-                                flex items-center gap-1
-                                text-dashboard-muted-light dark:text-dashboard-muted-dark
-                                text-xs
-                                px-1
-                                rounded-full
-                              "
-                              >
-                                <ShieldCheck
-                                  className="text-dashboard-muted-light dark:text-green"
-                                  size={12}
-                                />
-                              </span>
-                            )}
-                          </div>
-                          <span>{timeAgo(c.created_at)}</span>
-                          <button
-                            onClick={() => toggleLike(c)}
-                            className={`text-xs ${
-                              c.user_liked
-                                ? "text-red-600"
-                                : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                            } hover:opacity-80`}
-                          >
-                            <Heart
-                              size={12}
-                              fill={
-                                c.user_liked ? "currentColor" : "transparent"
-                              }
-                              className="inline-block mr-1"
-                            />
-                            {c.like_count}
-                          </button>
-                        </div>
-
                         {/* Action Row */}
                         {editCommentId !== c.id && (
                           <div className="flex items-center gap-3 mt-1.5">
+                            <button
+                              onClick={() => toggleLike(c)}
+                              className={`text-xs ${
+                                c.user_liked
+                                  ? "text-red-600"
+                                  : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                              } hover:opacity-80`}
+                            >
+                              <Heart
+                                size={12}
+                                fill={
+                                  c.user_liked ? "currentColor" : "transparent"
+                                }
+                                className="inline-block mr-1"
+                              />
+                              {c.like_count}
+                            </button>
                             {/* Reply is ALWAYS available */}
                             <button
                               onClick={() => setActiveReplyBox(c.id)}
@@ -924,9 +931,8 @@ export default function CommunityPost() {
                         {activeReplyBox === c.id && (
                           <div className="mt-3 ml-6">
                             <ReplyBox
-                              parentId={c.id}
+                              parentComment={c}
                               postId={post.id}
-                              replyToUserId={c.user_id}
                               onReply={async (newReply) => {
                                 // 1️⃣ add reply locally
                                 setReplies((prev) => ({

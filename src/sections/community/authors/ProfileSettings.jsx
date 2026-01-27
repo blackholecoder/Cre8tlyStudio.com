@@ -15,7 +15,7 @@ const inputClass = `
 export default function ProfileSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
+  const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [about, setAbout] = useState("");
   const [currentEmployment, setCurrentEmployment] = useState("");
@@ -36,6 +36,7 @@ export default function ProfileSettings() {
   });
 
   const [prefsLoaded, setPrefsLoaded] = useState(false);
+  const [hasUsername, setHasUsername] = useState(false);
 
   function togglePref(key) {
     setNotificationPrefs((prev) => ({
@@ -54,7 +55,7 @@ export default function ProfileSettings() {
       setLoading(true);
       const res = await axiosInstance.get("/community/authors/me");
       const p = res.data.profile || {};
-
+      setUsername(p.username || "");
       setBio(p.bio || "");
       setAbout(p.about || "");
       setCurrentEmployment(p.current_employment || "");
@@ -91,7 +92,15 @@ export default function ProfileSettings() {
     try {
       setSaving(true);
 
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        toast.error(
+          "Username must be 3–20 characters and contain only letters, numbers, or underscores.",
+        );
+        return;
+      }
+
       await axiosInstance.post("/community/authors/me", {
+        username,
         bio,
         about,
         current_employment: currentEmployment,
@@ -179,6 +188,27 @@ export default function ProfileSettings() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-4xl mx-auto space-y-6 sm:space-y-8">
+          <Section
+            title="Username"
+            description="Your public @username. This will appear on your posts and profile."
+          >
+            {hasUsername && (
+              <p className="text-xs mt-1 text-yellow-600">
+                Usernames can’t be changed once set.
+              </p>
+            )}
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              placeholder="@username"
+              disabled={hasUsername}
+              className={`${inputClass} disabled:opacity-60`}
+            />
+
+            <p className="text-xs mt-1 text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              Letters, numbers, and underscores only
+            </p>
+          </Section>
           <Section title="Bio" description="Short one-line summary">
             <textarea
               value={bio}

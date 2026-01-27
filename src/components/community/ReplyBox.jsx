@@ -36,7 +36,7 @@ export default function ReplyBox({ parentComment, postId, onReply, onCancel }) {
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 -mx-3 -ml-4 sm:mx-0 sm:ml-0">
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}

@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    username: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -27,25 +28,46 @@ export default function SignupPage() {
     }
   }, [error]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "username" ? value.toLowerCase() : value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     try {
-      // ✅ Send refSlug only if present
-      const payload = refSlug ? { ...formData, refSlug } : formData;
+      const username = formData.username.trim();
+
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        setError(
+          "Username must be 3–20 characters and contain only letters, numbers, or underscores.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        username,
+        ...(refSlug && { refSlug }),
+      };
 
       const res = await axios.post(
-        "https://cre8tlystudio.com/api/auth/signup",
-        payload
+        "https://cre8tlystudio.com/api/auth/signup-community",
+        payload,
       );
 
       if (res.status === 201) {
         await login(formData.email, formData.password);
-        navigate("/dashboard");
+        navigate("/community");
       } else {
         setError(res.data.message || "Something went wrong");
       }
@@ -131,6 +153,26 @@ export default function SignupPage() {
               focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
             "
             />
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
+              required
+              autoComplete="username"
+              className="
+              w-full h-[48px] px-4 py-3 rounded-lg
+              bg-white
+              border border-gray-300
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black
+            "
+            />
+            <p className="text-xs text-gray-500">
+              3–20 characters, letters, numbers, underscores only
+            </p>
 
             <input
               type="email"

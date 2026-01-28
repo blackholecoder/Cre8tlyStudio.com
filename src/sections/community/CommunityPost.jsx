@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Share2,
   Check,
+  DollarSign,
 } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
@@ -21,6 +22,7 @@ import { formatPostDate } from "../../helpers/formatPostDate";
 import { confirmDelete } from "../../helpers/confirmToast";
 import { ButtonSpinner } from "../../helpers/buttonSpinner";
 import { toast } from "react-toastify";
+import TipModal from "./modals/TipModal";
 
 export default function CommunityPost() {
   const { user, authLoading } = useAuth();
@@ -39,6 +41,7 @@ export default function CommunityPost() {
   const [editCommentId, setEditCommentId] = useState(null);
   const [editBody, setEditBody] = useState("");
   const [activeReplyBox, setActiveReplyBox] = useState(null);
+  const [tipSuccess, setTipSuccess] = useState(false);
 
   const [replyPages, setReplyPages] = useState({});
 
@@ -47,6 +50,51 @@ export default function CommunityPost() {
   const highlightedCommentId = params.get("comment");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
+
+  const [tipOpen, setTipOpen] = useState(false);
+  const [tipLoading, setTipLoading] = useState(false);
+
+  const openTipModal = () => {
+    if (!user) {
+      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      return;
+    }
+    setTipOpen(true);
+  };
+
+  const handleTip = async (amountInCents) => {
+    if (tipLoading) return;
+    setTipLoading(true);
+
+    try {
+      const res = await axiosInstance.post(
+        "/seller-checkout/create-checkout-session",
+        {
+          checkoutType: "tip",
+          postId: post.id,
+          writerUserId: post.user_id,
+          tipAmountInCents: amountInCents,
+        },
+      );
+
+      window.location.href = res.data.url;
+    } catch (err) {
+      const message = err.response?.data?.message;
+
+      if (message === "Writer is not set up to receive tips") {
+        toast.info(
+          "This writer hasn’t enabled tips yet. You’ll be able to support them once they do.",
+        );
+        setTipLoading(false);
+        return;
+      }
+
+      toast.error("Failed to start tip checkout");
+      console.error(err);
+    }
+
+    setTipLoading(false);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -132,6 +180,51 @@ export default function CommunityPost() {
 
     setSubLoading(false);
   };
+
+  const togglePostLike = async () => {
+    if (!user) {
+      navigate(`/signup-community?redirect=/community/${post.slug}`);
+      return;
+    }
+
+    try {
+      if (post.has_liked) {
+        await axiosInstance.delete(`/community/${post.id}/like`);
+
+        setPost((prev) => ({
+          ...prev,
+          has_liked: 0,
+          like_count: Math.max((prev.like_count || 1) - 1, 0),
+        }));
+      } else {
+        await axiosInstance.post(`/community/${post.id}/like`);
+
+        setPost((prev) => ({
+          ...prev,
+          has_liked: 1,
+          like_count: (prev.like_count || 0) + 1,
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to toggle post like:", err);
+      toast.error("Failed to update like");
+    }
+  };
+
+  useEffect(() => {
+    if (params.get("tipped") === "1") {
+      setTipSuccess(true);
+
+      // remove param so it doesn't re-trigger
+      const url = new URL(window.location.href);
+      url.searchParams.delete("tipped");
+      window.history.replaceState({}, "", url.pathname);
+
+      setTimeout(() => {
+        setTipSuccess(false);
+      }, 1800);
+    }
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -568,39 +661,72 @@ export default function CommunityPost() {
                   <span className="mx-1">·</span>
                   <span className="opacity-80">{timeAgo(post.created_at)}</span>
                 </p>
-                <div className="flex items-center gap-4 mt-0.5 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                <div className="flex items-center gap-6 mt-0.5 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                   <div className="flex items-center gap-[3px]">
-                    <Eye size={14} className="opacity-70" />
+                    <Eye size={16} className="opacity-70" />
                     <span>{post.views ?? 0}</span>
-                    <span>views</span>
                   </div>
+                  <button
+                    onClick={togglePostLike}
+                    className={`
+                    flex items-center gap-[3px]
+                    transition
+                    ${post.has_liked ? "text-red-500" : "opacity-70 hover:opacity-100"}
+                  `}
+                  >
+                    <Heart
+                      size={16}
+                      fill={post.has_liked ? "currentColor" : "transparent"}
+                    />
+                    <span>{post.like_count ?? 0}</span>
+                  </button>
 
                   <div className="flex items-center gap-[3px]">
-                    <MessageCircle size={14} className="opacity-70" />
+                    <MessageCircle size={16} className="opacity-70" />
                     <span>{post.comment_count ?? 0}</span>
-                    <span>comments</span>
                   </div>
                   <button
                     onClick={handleShare}
                     className="
                     relative
                     flex items-center gap-1
-                    text-sky-400 hover:text-sky-400/80
+                     hover:text-sky-400/80
                     transition
                   "
                   >
                     {copied ? (
                       <>
-                        <Check size={14} className="text-green-500" />
-                        <span className="text-green-500 text-xs">Copied</span>
+                        <Check size={16} className="text-green" />
+                        <span className="text-green text-xs">Copied</span>
                       </>
                     ) : (
                       <>
-                        <Share2 size={14} />
-                        <span>Share</span>
+                        <Share2 size={16} />
                       </>
                     )}
                   </button>
+                  {user &&
+                    user.id !== post.user_id &&
+                    (tipSuccess ? (
+                      <div className="flex items-center gap-1 text-green text-xs">
+                        <Check size={14} />
+                        <span>Tip sent!</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={openTipModal}
+                        className="
+                        flex items-center gap-1
+                        text-dashboard-muted-light
+                        dark:text-dashboard-muted-dark
+                        hover:text-green
+                        transition
+                      "
+                      >
+                        <DollarSign size={16} />
+                        <span>Tip</span>
+                      </button>
+                    ))}
                 </div>
               </div>
             </div>
@@ -1017,6 +1143,12 @@ export default function CommunityPost() {
           </div>
         </div>
       </div>
+      <TipModal
+        open={tipOpen}
+        loading={tipLoading}
+        onTip={handleTip}
+        onClose={() => setTipOpen(false)}
+      />
     </div>
   );
 }

@@ -76,6 +76,7 @@ import Profile from "./sections/community/authors/ProfilePage.jsx";
 import InviteAccept from "./sections/community/subscriptions/InviteAccept.jsx";
 import EmailTemplates from "./sections/community/templates/EmailTemplates.jsx";
 import CreatePostPage from "./sections/community/CreatePostPage.jsx";
+import CommunitySubscribers from "./sections/community/subscriptions/CommunitySubscribers.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -260,6 +261,42 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <Subscriptions />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/subscriptions/subscribers"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <CommunitySubscribers />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/authors/:authorUserId/subscribers"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <CommunitySubscribers />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>

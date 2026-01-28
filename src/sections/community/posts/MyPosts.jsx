@@ -5,6 +5,7 @@ import {
   Pencil,
   Link as LinkIcon,
   Trash2,
+  Heart,
 } from "lucide-react";
 import axiosInstance from "../../../api/axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -275,8 +276,12 @@ export default function MyPosts() {
                 </p>
 
                 {/* Left stats */}
-                <div className="mt-2 flex items-center gap-4 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                   <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1">
+                      <Heart size={14} className="opacity-70" />
+                      {post.like_count ?? 0}
+                    </span>
                     <MessageCircle size={14} />
                     {post.comment_count ?? 0}
                   </span>

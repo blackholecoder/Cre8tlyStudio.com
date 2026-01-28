@@ -25,11 +25,18 @@ export default function Notifications() {
       await markRead(notif.id);
     }
 
-    if (notif.post_id) {
-      navigate(
-        `/community/post/${notif.post_id}?highlight=${notif.reference_id}`,
-      );
+    if (!notif.post_id) return;
+
+    // 🔹 Post likes → just open the post
+    if (notif.type === "post_like") {
+      navigate(`/community/post/${notif.post_id}`);
+      return;
     }
+
+    // 🔹 Comments / replies → highlight target
+    navigate(
+      `/community/post/${notif.post_id}?highlight=${notif.reference_id}`,
+    );
   };
 
   const markRead = useCallback(async (id) => {

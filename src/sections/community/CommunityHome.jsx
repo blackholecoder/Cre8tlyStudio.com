@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { headerLogo } from "../../assets/images";
-import { Check, Eye, MessageCircle, Share2 } from "lucide-react";
+import { Check, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function CommunityHome() {
@@ -74,6 +74,47 @@ export default function CommunityHome() {
       setTimeout(() => setCopiedPostId(null), 1500);
     } catch {
       toast.error("Failed to copy link");
+    }
+  };
+
+  const togglePostLike = async (e, post) => {
+    e.stopPropagation(); // ⛔ prevent navigation
+
+    if (!post?.id) return;
+
+    try {
+      if (post.has_liked) {
+        await axiosInstance.delete(`/community/${post.id}/like`);
+
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === post.id
+              ? {
+                  ...p,
+                  has_liked: 0,
+                  like_count: Math.max((p.like_count || 1) - 1, 0),
+                }
+              : p,
+          ),
+        );
+      } else {
+        await axiosInstance.post(`/community/${post.id}/like`);
+
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === post.id
+              ? {
+                  ...p,
+                  has_liked: 1,
+                  like_count: (p.like_count || 0) + 1,
+                }
+              : p,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error("Failed to toggle post like:", err);
+      toast.error("Failed to update like");
     }
   };
 
@@ -360,16 +401,36 @@ export default function CommunityHome() {
                   </div>
 
                   {/* Meta stats */}
-                  <div className="grid grid-cols-3 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                     <div className="flex items-center justify-center gap-[3px]">
                       <Eye size={14} className="opacity-70" />
                       <span>{post.views ?? 0}</span>
                     </div>
 
-                    <div className="flex items-center justify-center gap-[3px]">
+                    <button
+                      onClick={(e) => togglePostLike(e, post)}
+                      className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                    >
+                      <Heart
+                        size={14}
+                        className={`${
+                          post.has_liked
+                            ? "text-red-500 fill-red-500"
+                            : "opacity-70"
+                        }`}
+                      />
+                      <span>{post.like_count ?? 0}</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePostClick(post.id);
+                      }}
+                      className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                    >
                       <MessageCircle size={14} className="opacity-70" />
                       <span>{post.comment_count ?? 0}</span>
-                    </div>
+                    </button>
 
                     <button
                       onClick={(e) => handleShare(e, post)}

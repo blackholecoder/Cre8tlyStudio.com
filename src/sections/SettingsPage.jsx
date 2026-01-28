@@ -92,7 +92,7 @@ export default function DashboardSettings() {
         setUser({ ...user, twofa_enabled: 1 });
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...user, twofa_enabled: 1 })
+          JSON.stringify({ ...user, twofa_enabled: 1 }),
         );
         toast.success("✅ Two-Factor Authentication enabled!");
       } else {
@@ -113,7 +113,7 @@ export default function DashboardSettings() {
         "/auth/webauthn/register-options",
         {
           email: user.email,
-        }
+        },
       );
 
       // 2️⃣ Handle both possible formats for challenge
@@ -124,7 +124,7 @@ export default function DashboardSettings() {
       // 🔐 Decode challenge (Base64URL → Uint8Array)
       const challenge = Uint8Array.from(
         atob(challengeBase64.replace(/-/g, "+").replace(/_/g, "/")),
-        (c) => c.charCodeAt(0)
+        (c) => c.charCodeAt(0),
       );
 
       // 🔐 Decode user ID safely
@@ -164,7 +164,7 @@ export default function DashboardSettings() {
         type: credential.type,
         response: {
           attestationObject: bufferToBase64URL(
-            credential.response.attestationObject
+            credential.response.attestationObject,
           ),
           clientDataJSON: bufferToBase64URL(credential.response.clientDataJSON),
         },
@@ -176,7 +176,7 @@ export default function DashboardSettings() {
         {
           email: user.email,
           attResp,
-        }
+        },
       );
 
       // ✅ Success handling
@@ -185,7 +185,7 @@ export default function DashboardSettings() {
         setUser({ ...user, has_passkey: 1 });
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...user, has_passkey: 1 })
+          JSON.stringify({ ...user, has_passkey: 1 }),
         );
       } else {
         toast.error("Passkey registration failed.");
@@ -204,7 +204,7 @@ export default function DashboardSettings() {
         setUser({ ...user, has_passkey: 0 });
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...user, has_passkey: 0 })
+          JSON.stringify({ ...user, has_passkey: 0 }),
         );
       } else {
         toast.warning("Failed to remove passkey. Try again.");
@@ -239,7 +239,7 @@ export default function DashboardSettings() {
     const fetchSettings = async () => {
       try {
         const res = await axiosInstance.get(
-          `/upload-data/user/settings/${user.id}`
+          `/upload-data/user/settings/${user.id}`,
         );
         setSettings(res.data.settings);
       } catch (err) {
@@ -268,7 +268,7 @@ export default function DashboardSettings() {
             user_id: user.id,
             file_name: file.name,
             file_data: base64Data,
-          }
+          },
         );
 
         setSettings((prev) => ({
@@ -284,7 +284,7 @@ export default function DashboardSettings() {
           JSON.stringify({
             ...user,
             brand_identity_file: res.data.fileUrl,
-          })
+          }),
         );
 
         toast.success("Brand file uploaded successfully!");
@@ -304,7 +304,7 @@ export default function DashboardSettings() {
   const handleRemove = async () => {
     try {
       const res = await axiosInstance.delete(
-        `/upload-data/user/settings/remove/${user.id}`
+        `/upload-data/user/settings/remove/${user.id}`,
       );
 
       if (res.data.success) {
@@ -316,7 +316,7 @@ export default function DashboardSettings() {
 
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...user, brand_identity_file: null })
+          JSON.stringify({ ...user, brand_identity_file: null }),
         );
 
         toast.info("Brand identity file removed. Defaults restored.");
@@ -339,7 +339,7 @@ export default function DashboardSettings() {
       setUser((prev) => ({ ...prev, cta: settings?.cta }));
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...user, cta: settings?.cta })
+        JSON.stringify({ ...user, cta: settings?.cta }),
       );
 
       setCtaSaved(true);
@@ -814,20 +814,20 @@ export default function DashboardSettings() {
                           0,
                           0,
                           width,
-                          height
+                          height,
                         );
 
                         const hasAlpha = canvasHasTransparency(
                           ctx,
                           width,
-                          height
+                          height,
                         );
                         const mimeType = hasAlpha ? "image/png" : "image/jpeg";
                         const quality = hasAlpha ? undefined : 0.9;
                         const fileName = hasAlpha ? "avatar.png" : "avatar.jpg";
 
                         const blob = await new Promise((r) =>
-                          canvas.toBlob(r, mimeType, quality)
+                          canvas.toBlob(r, mimeType, quality),
                         );
 
                         setFile(blob);
@@ -910,14 +910,14 @@ export default function DashboardSettings() {
                 onClick={async () => {
                   try {
                     const res = await axiosInstance.post(
-                      "/auth/user/disable-2fa"
+                      "/auth/user/disable-2fa",
                     );
                     if (res.data.success) {
                       setTwofaEnabled(false);
                       setUser({ ...user, twofa_enabled: 0 });
                       localStorage.setItem(
                         "user",
-                        JSON.stringify({ ...user, twofa_enabled: 0 })
+                        JSON.stringify({ ...user, twofa_enabled: 0 }),
                       );
                       toast.info("2FA has been disabled.");
                     } else {
@@ -1069,147 +1069,102 @@ export default function DashboardSettings() {
             className="text-sm text-dashboard-muted-light
           dark:text-dashboard-muted-dark mb-4"
           >
-            Connect your Stripe Express account to receive payouts for sales you
-            make through Cre8tly Studio.
+            Connect Stripe to receive tips and future payouts.
           </p>
 
-          {/* 🔍 Free trial users cannot access Stripe */}
-          {isFreeTier ? (
-            <div className="text-center py-8">
-              <p
-                className="text-dashboard-muted-light
-              dark:text-dashboard-muted-dark
-              mb-3 text-sm max-w-[420px] mx-auto"
-              >
-                Selling products and connecting Stripe is a{" "}
-                <span className="text-green font-semibold">
-                  premium feature
-                </span>
-                . Upgrade to unlock payouts, the seller dashboard, and full
-                product sales.
-              </p>
-
-              <button
-                onClick={() => (window.location.href = "/plans")}
-                className="px-6 py-3 rounded-lg bg-royalPurple 
-              text-dashboard-text-light
-              dark:text-dashboard-text-dark
-                font-semibold shadow-md hover:opacity-90 transition mx-auto"
-              >
-                Upgrade to Unlock Selling
-              </button>
-            </div>
-          ) : (
-            <>
-              {/* Stripe Connected */}
-              {user?.stripe_connected ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-green font-semibold">
-                      ✅ Connected
-                    </span>
-                    <p
-                      className="text-xs text-dashboard-muted-light
+          {/* Stripe Connected */}
+          {user?.stripe_connected ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-green font-semibold">✅ Connected</span>
+                <p
+                  className="text-xs text-dashboard-muted-light
                     dark:text-dashboard-muted-dark
 "
-                    >
-                      Your Stripe account is active and ready for payouts.
-                    </p>
-                  </div>
+                >
+                  Your Stripe account is active and ready for payouts.
+                </p>
+              </div>
 
-                  <button
-                    onClick={() =>
-                      window.open(
-                        "https://dashboard.stripe.com/express",
-                        "_blank"
-                      )
-                    }
-                    className="
+              <button
+                onClick={() =>
+                  window.open("https://dashboard.stripe.com/express", "_blank")
+                }
+                className="
                     px-5 py-2
                     bg-blue hover:bg-blue/80
                     text-white
                     rounded-lg font-semibold transition
 "
-                  >
-                    Open Stripe Dashboard
-                  </button>
-                </div>
-              ) : user?.stripe_connect_account_id ? (
-                // Stripe pending setup
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-yellow-400 font-semibold">
-                      ⚠️ Pending Setup
-                    </span>
-                    <p
-                      className="text-xs text-dashboard-muted-light
+              >
+                Open Stripe Dashboard
+              </button>
+            </div>
+          ) : user?.stripe_connect_account_id ? (
+            // Stripe pending setup
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-yellow-400 font-semibold">
+                  ⚠️ Pending Setup
+                </span>
+                <p
+                  className="text-xs text-dashboard-muted-light
                     dark:text-dashboard-muted-dark
 "
-                    >
-                      Your Stripe account was created but not completed.
-                    </p>
-                  </div>
+                >
+                  Your Stripe account was created but not completed.
+                </p>
+              </div>
 
-                  <button
-                    onClick={async () => {
-                      try {
-                        const { data } = await axiosInstance.post(
-                          "/seller/create-account-link"
-                        );
-                        if (data.url) window.location.href = data.url;
-                      } catch (err) {
-                        console.error("Stripe connect error:", err);
-                        toast.error(
-                          "Failed to resume Stripe onboarding. Try again."
-                        );
-                      }
-                    }}
-                    className="px-6 py-2.5 bg-amber-500 text-dashboard-text-light
+              <button
+                onClick={async () => {
+                  try {
+                    const { data } = await axiosInstance.post(
+                      "/seller/create-account-link",
+                    );
+                    if (data.url) window.location.href = data.url;
+                  } catch (err) {
+                    console.error("Stripe connect error:", err);
+                    toast.error(
+                      "Failed to resume Stripe onboarding. Try again.",
+                    );
+                  }
+                }}
+                className="px-6 py-2.5 bg-amber-500 text-dashboard-text-light
                     dark:text-dashboard-text-dark
                     font-semibold rounded-lg hover:opacity-90 transition"
-                  >
-                    Complete Setup
-                  </button>
-                </div>
-              ) : (
-                // Stripe Start Setup
+              >
+                Complete Setup
+              </button>
+            </div>
+          ) : (
+            // Stripe Start Setup
 
-                <button
-                  onClick={async (e) => {
-                    if (isCommunityOnly) {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowUpgradeModal(true);
-                      return;
-                    }
-
-                    try {
-                      const { data } = await axiosInstance.post(
-                        "/seller/create-account-link"
-                      );
-                      if (data.url) window.location.href = data.url;
-                    } catch (err) {
-                      console.error("Stripe connect error:", err);
-                      toast.error(
-                        "Failed to start Stripe onboarding. Try again."
-                      );
-                    }
-                  }}
-                  className={`
-                    px-6 py-2.5 font-semibold rounded-lg transition
-                    ${
-                      isCommunityOnly
-                        ? "bg-gray-400 cursor-not-allowed opacity-60"
-                        : "bg-royalPurple hover:opacity-90"
-                    }
-                    text-dashboard-text-light
-                    dark:text-dashboard-text-dark
-                  `}
-                >
-                  Connect with Stripe
-                </button>
-              )}
-            </>
+            <button
+              onClick={async (e) => {
+                try {
+                  const { data } = await axiosInstance.post(
+                    "/seller/create-account-link",
+                  );
+                  if (data.url) window.location.href = data.url;
+                } catch (err) {
+                  console.error("Stripe connect error:", err);
+                  toast.error("Failed to start Stripe onboarding. Try again.");
+                }
+              }}
+              className="
+                  px-6 py-2.5
+                  font-semibold
+                  rounded-lg
+                  transition
+                  bg-royalPurple
+                  hover:opacity-90
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                "
+            >
+              Connect with Stripe
+            </button>
           )}
         </div>
 
@@ -1581,11 +1536,11 @@ export default function DashboardSettings() {
                           headers: {
                             Authorization: `Bearer ${user?.accessToken}`,
                           },
-                        }
+                        },
                       );
 
                       toast.success(
-                        "✅ Tour reset! It will replay next time you open Book Builder."
+                        "✅ Tour reset! It will replay next time you open Book Builder.",
                       );
                     } catch (err) {
                       console.error("❌ Failed to reset onboarding:", err);
@@ -1645,7 +1600,7 @@ export default function DashboardSettings() {
                   <button
                     onClick={() =>
                       toast.info(
-                        "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!"
+                        "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!",
                       )
                     }
                     className="flex-1 bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark font-semibold py-2.5 rounded-lg border border-dashboard-border-light dark:border-dashboard-border-dark hover:border-green hover:text-green transition"

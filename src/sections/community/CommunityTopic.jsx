@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import { Eye, MessageCircle, Plus } from "lucide-react";
+import { Eye, Heart, MessageCircle, Plus } from "lucide-react";
 // import CreatePostModal from "./CreatePostModal";
 
 export default function CommunityTopic() {
@@ -261,6 +261,10 @@ export default function CommunityTopic() {
                     <div className="flex items-center gap-1.5">
                       <Eye size={14} className="opacity-70" />
                       <span>{post.views ?? 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Heart size={14} className="opacity-70" />
+                      <span>{post.like_count ?? 0}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">

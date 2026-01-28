@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Users,
   MoreHorizontal,
@@ -12,10 +12,12 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import AddSubscribersModal from "./AddSubscribersModal";
 import PendingInvites from "./PendingInvites";
+import { useNavigate } from "react-router-dom";
 
 const GRID_COLS = "grid-cols-[48px_2.2fr_140px_160px_160px_120px_48px]";
 
 export default function Subscriptions() {
+  const navigate = useNavigate();
   const [openMenuId, setOpenMenuId] = useState(null);
   const [search, setSearch] = useState("");
   const [subscribers, setSubscribers] = useState([]);
@@ -56,7 +58,7 @@ export default function Subscriptions() {
   }, []);
 
   const filtered = subscribers.filter((s) =>
-    s.email.toLowerCase().includes(search.toLowerCase())
+    s.email.toLowerCase().includes(search.toLowerCase()),
   );
 
   function copyEmail(email) {
@@ -150,142 +152,168 @@ export default function Subscriptions() {
       </div>
 
       {/* Desktop grid */}
-      <div
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setOpenMenuId(null);
-          }
-        }}
-      >
-        <div className="hidden md:block px-4 max-w-6xl mx-auto">
-          {/* Header */}
-          <div
-            className={`
-    grid ${GRID_COLS}
-    items-center
-    px-4 py-3
-    text-xs
-    font-medium
-    text-white/50
-    bg-dashboard-hover-light
-    dark:bg-dashboard-hover-dark
-    rounded-t-xl
-    border
-    border-dashboard-border-light
-    dark:border-dashboard-border-dark
-  `}
-          >
-            {/* Checkbox */}
-            <div className="flex justify-center">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-white/30 bg-transparent accent-white/70"
-              />
-            </div>
 
-            <div>Subscriber</div>
-            <div>Type</div>
-            <div className="text-center">Activity</div>
-            <div className="flex items-center gap-1">Start date</div>
-            <div className="text-right">Revenue</div>
-            <div />
-          </div>
-
-          {/* Rows */}
-          <div className="space-y-1 mt-1">
-            {filtered.map((s) => (
-              <div
-                key={s.id}
-                className={`
+      <div className="hidden md:block px-4 max-w-6xl mx-auto">
+        {/* Header */}
+        <div
+          className={`
           grid ${GRID_COLS}
           items-center
           px-4 py-3
-          rounded-xl
-          bg-dashboard-sidebar-light
-          dark:bg-dashboard-sidebar-dark
+          text-xs
+          font-medium
+          text-white/50
+          bg-dashboard-hover-light
+          dark:bg-dashboard-hover-dark
+          rounded-t-xl
           border
           border-dashboard-border-light
           dark:border-dashboard-border-dark
-          hover:bg-dashboard-hover-light
-          dark:hover:bg-dashboard-hover-dark
-          transition
         `}
-              >
-                <div className="flex justify-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-white/30 bg-transparent accent-white/70"
-                  />
-                </div>
-                {/* Subscriber */}
-                <div className="flex items-center gap-3 min-w-0">
+        >
+          {/* Checkbox */}
+          <div className="flex justify-center">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-white/30 bg-transparent accent-white/70"
+            />
+          </div>
+
+          <div>Subscriber</div>
+          <div>Type</div>
+          <div className="text-center">Activity</div>
+          <div className="flex items-center gap-1">Start date</div>
+          <div className="text-right">Revenue</div>
+          <div />
+        </div>
+
+        {/* Rows */}
+        <div className="space-y-1 mt-1">
+          {filtered.map((s) => (
+            <div
+              key={s.id}
+              className={`
+              grid ${GRID_COLS}
+              items-center
+              px-4 py-3
+              rounded-xl
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              border
+              border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              hover:bg-dashboard-hover-light
+              dark:hover:bg-dashboard-hover-dark
+              transition
+            `}
+            >
+              <div className="flex justify-center">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-white/30 bg-transparent accent-white/70"
+                />
+              </div>
+              {/* Subscriber */}
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    if (!s.has_profile) {
+                      toast.info("This author hasn’t set up their profile yet");
+                      return;
+                    }
+
+                    navigate(`/community/authors/${s.id}`);
+                  }}
+                  className="
+                  flex-shrink-0"
+                >
                   {s.profile_image_url ? (
                     <img
                       src={s.profile_image_url}
                       alt={s.email}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="
+                      w-8 h-8
+                      rounded-full
+                      object-cover
+                      border
+                      border-dashboard-border-light
+                      dark:border-dashboard-border-dark
+                    "
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark flex items-center justify-center text-xs">
+                    <div
+                      className="
+                      w-8 h-8
+                      rounded-full
+                      bg-dashboard-hover-light
+                      dark:bg-dashboard-hover-dark
+                      flex
+                      items-center
+                      justify-center
+                      text-xs
+                    "
+                    >
                       {s.email.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm truncate">{s.email}</span>
-                </div>
+                </button>
 
-                {/* Type */}
-                <div>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${
-                      s.type === "Monthly Paid"
-                        ? "bg-green/20 text-green"
-                        : "bg-gray-500/20"
-                    }`}
-                  >
-                    {s.type}
-                  </span>
-                </div>
+                <span className="text-sm truncate">{s.email}</span>
+              </div>
 
-                {/* Activity */}
-                <div className="flex justify-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star
-                      key={i}
-                      size={10}
-                      className={
-                        i <= s.activity
-                          ? "text-yellow fill-yellow"
-                          : "opacity-30"
-                      }
-                    />
-                  ))}
-                </div>
-
-                {/* Start date */}
-                <div className="text-sm text-white/70">
-                  {formatDate(s.created_at)}
-                </div>
-
-                {/* Revenue */}
-                <div className="text-sm tabular-nums text-right text-white/70">
-                  ${s.revenue.toFixed(2)}
-                </div>
-
-                {/* Menu */}
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="relative flex justify-center"
+              {/* Type */}
+              <div>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs ${
+                    s.type === "Monthly Paid"
+                      ? "bg-green/20 text-green"
+                      : "bg-gray-500/20"
+                  }`}
                 >
-                  <button
-                    onClick={() => toggleMenu(s.id)}
-                    className="p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-                  >
-                    <MoreHorizontal size={16} />
-                  </button>
+                  {s.type}
+                </span>
+              </div>
 
-                  {openMenuId === s.id && (
-                    <div
-                      className="
+              {/* Activity */}
+              <div className="flex justify-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star
+                    key={i}
+                    size={10}
+                    className={
+                      i <= s.activity ? "text-yellow fill-yellow" : "opacity-30"
+                    }
+                  />
+                ))}
+              </div>
+
+              {/* Start date */}
+              <div className="text-sm text-white/70">
+                {formatDate(s.created_at)}
+              </div>
+
+              {/* Revenue */}
+              <div className="text-sm tabular-nums text-right text-white/70">
+                ${s.revenue.toFixed(2)}
+              </div>
+
+              {/* Menu */}
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="relative flex justify-center"
+              >
+                <button
+                  onClick={() => toggleMenu(s.id)}
+                  className="p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+
+                {openMenuId === s.id && (
+                  <div
+                    className="
                 absolute
                 top-10
                 right-0
@@ -300,35 +328,40 @@ export default function Subscriptions() {
                 dark:border-dashboard-border-dark
                 transition-all duration-150
               "
+                  >
+                    <button
+                      onClick={() => copyEmail(s.email)}
+                      className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                     >
-                      <button
-                        onClick={() => copyEmail(s.email)}
-                        className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-                      >
-                        <Copy size={14} />
-                        Copy email
-                      </button>
-                      <button
-                        onClick={() => sendMessage(s.email)}
-                        className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-                      >
-                        <MessageCircle size={14} />
-                        Send message
-                      </button>
-                      <button
-                        onClick={() => removeSubscriber(s.id)}
-                        className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-500 hover:bg-red-500/10"
-                      >
-                        <Trash2 size={14} />
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
+                      <Copy size={14} />
+                      Copy email
+                    </button>
+                    <button
+                      onClick={() => sendMessage(s.email)}
+                      className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+                    >
+                      <MessageCircle size={14} />
+                      Send message
+                    </button>
+                    <button
+                      onClick={() => removeSubscriber(s.id)}
+                      className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-500 hover:bg-red-500/10"
+                    >
+                      <Trash2 size={14} />
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+        {openMenuId && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setOpenMenuId(null)}
+          />
+        )}
       </div>
 
       {/* Mobile cards */}
@@ -341,17 +374,52 @@ export default function Subscriptions() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-3">
-                  {s.profile_image_url ? (
-                    <img
-                      src={s.profile_image_url}
-                      alt={s.email}
-                      className="w-8 h-8 rounded-full object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark flex items-center justify-center text-xs">
-                      {s.email.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      if (!s.has_profile) {
+                        toast.info(
+                          "This author hasn’t set up their profile yet",
+                        );
+                        return;
+                      }
+
+                      navigate(`/community/authors/${s.id}`);
+                    }}
+                    className="
+                    flex-shrink-0"
+                  >
+                    {s.profile_image_url ? (
+                      <img
+                        src={s.profile_image_url}
+                        alt={s.email}
+                        className="
+                        w-8 h-8
+                        rounded-full
+                        object-cover
+                        border
+                        border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                      "
+                      />
+                    ) : (
+                      <div
+                        className="
+                        w-8 h-8
+                        rounded-full
+                        bg-dashboard-hover-light
+                        dark:bg-dashboard-hover-dark
+                        flex
+                        items-center
+                        justify-center
+                        text-xs
+                      "
+                      >
+                        {s.email.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </button>
 
                   <div>
                     <p className="font-medium">{s.email}</p>
@@ -402,17 +470,17 @@ export default function Subscriptions() {
               {openMenuId === s.id && (
                 <div
                   className="
-        mt-2
-        w-full
-        rounded-xl
-        shadow-xl
-        bg-dashboard-sidebar-light
-        dark:bg-dashboard-sidebar-dark
-        border
-        border-dashboard-border-light
-        dark:border-dashboard-border-dark
-        overflow-hidden
-      "
+                  mt-2
+                  w-full
+                  rounded-xl
+                  shadow-xl
+                  bg-dashboard-sidebar-light
+                  dark:bg-dashboard-sidebar-dark
+                  border
+                  border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  overflow-hidden
+                "
                 >
                   <button
                     onClick={() => copyEmail(s.email)}

@@ -153,7 +153,14 @@ export default function Profile() {
                     {profile.bio}
                   </p>
                 )}
-                <div
+                <button
+                  onClick={() => {
+                    if (isOwnProfile) {
+                      navigate("/community/subscriptions/subscribers");
+                    } else {
+                      navigate(`/community/authors/${profile.id}/subscribers`);
+                    }
+                  }}
                   className="
                   mt-4 w-full
                   flex items-center justify-center
@@ -162,13 +169,15 @@ export default function Profile() {
                   px-4 py-2
                   text-sm
                   text-dashboard-text-light dark:text-dashboard-text-dark
+                  hover:opacity-80
+                  transition
                 "
                 >
                   <span>{profile.subscriber_count.toLocaleString()}</span>
                   <span className="ml-1 opacity-70">
                     subscriber{profile.subscriber_count === 1 ? "" : "s"}
                   </span>
-                </div>
+                </button>
               </div>
             </div>
 

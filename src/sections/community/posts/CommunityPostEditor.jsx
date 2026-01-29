@@ -35,6 +35,7 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
   const [linkOpen, setLinkOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const editor = useEditor({
     autofocus: false,
@@ -84,6 +85,17 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
 
     onUpdate({ editor }) {
       const html = editor.getHTML();
+
+      // text only, no markup
+      const text = editor.state.doc.textBetween(
+        0,
+        editor.state.doc.content.size,
+        " ",
+      );
+
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+
+      setWordCount(words);
 
       // 🚫 ignore empty editor emissions
       if (!html || html.trim() === "<p></p>") return;
@@ -153,17 +165,6 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
 
     editor.commands.setContent(value, false);
   }, [editor, value]);
-
-  // async function uploadImage(file) {
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-
-  //   const res = await axiosInstance.post("/community/upload-image", formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-
-  //   return res.data.url;
-  // }
 
   if (!editor) return null;
 
@@ -386,6 +387,27 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           dark:prose-a:decoration-sky-400
         "
         />
+        <div
+          className="
+    flex justify-end
+    px-4 py-2
+    text-xs
+
+    bg-dashboard-hover-light
+    dark:bg-dashboard-hover-dark
+
+    text-dashboard-muted-light
+    dark:text-dashboard-muted-dark
+
+    border-t
+    border-dashboard-border-light
+    dark:border-dashboard-border-dark
+
+    rounded-b-xl
+  "
+        >
+          {wordCount} words
+        </div>
       </div>
 
       <LinkModal

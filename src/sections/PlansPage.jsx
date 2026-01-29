@@ -27,7 +27,7 @@ export default function PlansPage() {
   const handleSelectPlan = async (planType) => {
     if (!user || !user.id) {
       toast.warning(
-        "Create a free account to continue. No credit card required."
+        "Create a free account to continue. No credit card required.",
       );
       return;
     }
@@ -53,7 +53,7 @@ export default function PlansPage() {
       const res = await api.post(
         "/checkout",
         { userId: user.id, productType, billingCycle },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       window.location.href = res.data.url;
@@ -86,8 +86,8 @@ export default function PlansPage() {
           Pricing
         </h1>
         <p className="text-black mt-4 text-center max-w-xl">
-          Start free. Upgrade anytime for professional tools, branding, and
-          automation built for creators and entrepreneurs.
+          Start free. Upgrade anytime for professional tools, branding,
+          <br /> and automation built for authors.
         </p>
       </div>
 

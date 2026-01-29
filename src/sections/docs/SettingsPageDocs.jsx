@@ -82,7 +82,7 @@ export default function SettingsDocs() {
               </span>
               <span className="px-2 py-1 rounded-full bg-gray-900 border border-gray-700 flex items-center gap-1">
                 <BookOpen className="w-3 h-3 text-green" />
-                Best For, every Cre8tly Studio user
+                Best For, every Messy Attic user
               </span>
             </div>
           </header>
@@ -165,8 +165,8 @@ export default function SettingsDocs() {
             <CreditCard className="w-5 h-5 text-green mb-2" />
 
             <p className="text-sm text-gray-300 mb-3">
-              To sell products through Cre8tly Studio, connect a Stripe Express
-              account.
+              To receive payment through The Messy Attic, connect a Stripe
+              Express account.
             </p>
 
             <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">

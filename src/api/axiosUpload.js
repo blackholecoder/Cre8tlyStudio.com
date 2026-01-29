@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const uploadClient = axios.create({
-  baseURL: "https://cre8tlystudio.com/api",
+  baseURL: "https://themessyattic.com/api",
   timeout: 0, // no timeout
   withCredentials: true,
 });

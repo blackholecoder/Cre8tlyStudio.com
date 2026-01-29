@@ -4,48 +4,48 @@ import { Plus } from "lucide-react";
 
 const faqs = [
   {
-    q: "How is Cre8tly Studio AI different from ChatGPT?",
-    a: "ChatGPT is a general writing tool. Cre8tly Studio is a product building system. It uses your brand identity, past content, and preferences to create consistent, ready to publish digital assets that actually match how you speak.",
+    q: "How is The Messy Attic AI different from ChatGPT?",
+    a: "ChatGPT is a general writing tool. The Messy Attic is a product building system. It uses your brand identity, past content, and preferences to create consistent, ready to publish digital assets that actually match how you speak.",
   },
   {
     q: "Is your site safe to use?",
-    a: "Yes. Cre8tly Studio is built with security as a priority. We use encrypted connections, modern authentication methods including passwordless login and two factor authentication, and industry standard safeguards to protect user data.",
+    a: "Yes. The Messy Attic is built with security as a priority. We use encrypted connections, modern authentication methods including passwordless login and two factor authentication, and industry standard safeguards to protect user data.",
   },
   {
-    q: "What is Cre8tly Studio?",
-    a: "Cre8tly Studio is an all-in-one, AI powered platform that lets you create digital products, landing pages, PDFs, and sell them instantly from one place.\n\n And when we say all-in-one, we mean it. With Cre8tly Studio, you have all the tools you need to create, market, and sell professional digital products from the same dashboard — no messy integrations or prior tech skills required.",
+    q: "What is The Messy Attic?",
+    a: "The Messy Attic is an all-in-one, AI powered platform that lets you create digital products, landing pages, PDFs, and sell them instantly from one place.\n\n And when we say all-in-one, we mean it. With The Messy Attic, you have all the tools you need to create, market, and sell professional digital products from the same dashboard — no messy integrations or prior tech skills required.",
   },
   {
-    q: "Why choose Cre8tly Studio?",
-    a: "Cre8tly Studio is built for creators, coaches, freelancers, entrepreneurs, and small businesses who want to launch and sell faster.\n\n That means you can expect constant platform enhancements and best-in-class customer support as you build and scale your business.\n\n And if you’re not so great at the tech side of things, you’re in the right place. Cre8tly Studio was created specifically for non-techie people to help them achieve entrepreneurial success online.",
+    q: "Why choose The Messy Attic?",
+    a: "The Messy Attic is built for creators, coaches, freelancers, entrepreneurs, and small businesses who want to launch and sell faster.\n\n That means you can expect constant platform enhancements and best-in-class customer support as you build and scale your business.\n\n And if you’re not so great at the tech side of things, you’re in the right place. The Messy Attic was created specifically for non-techie people to help them achieve entrepreneurial success online.",
   },
   {
-    q: "How does Cre8tly Studio help me build my business?",
-    a: "Cre8tly Studio gives you everything you need to create, sell, and grow your digital business, with guidance and support built in every step of the way.\n\n You never start from scratch. Cre8tly includes detailed docs, digital product preset prompt templates, and intuitive design tools that let you quickly create professional digital products, landing pages, audio products, and lead magnets, all without technical experience.\n\n On top of that, Cre8tly brings it all together with built in analytics, sales tracking, and product delivery, so you can manage, launch, and scale your business from one powerful platform.",
+    q: "How does The Messy Attic help me build my business?",
+    a: "The Messy Attic gives you everything you need to create, sell, and grow your digital business, with guidance and support built in every step of the way.\n\n You never start from scratch. Cre8tly includes detailed docs, digital product preset prompt templates, and intuitive design tools that let you quickly create professional digital products, landing pages, audio products, and lead magnets, all without technical experience.\n\n On top of that, Cre8tly brings it all together with built in analytics, sales tracking, and product delivery, so you can manage, launch, and scale your business from one powerful platform.",
   },
   {
-    q: "What can I create with Cre8tly Studio?",
+    q: "What can I create with The Messy Attic?",
     a: "You can create eBooks, lead magnets, landing pages, audio products, PDFs, full books, and full digital offers.",
   },
   {
     q: "Can I sell my products directly on the platform?",
-    a: "Yes. Cre8tly Studio includes checkout, delivery, and analytics so you can sell instantly without extra tools.\n\nYou can also create your own custom landing pages to showcase your products and drive conversions, all from the same dashboard.",
+    a: "Yes. The Messy Attic includes checkout, delivery, and analytics so you can sell instantly without extra tools.\n\nYou can also create your own custom landing pages to showcase your products and drive conversions, all from the same dashboard.",
   },
   {
-    q: "Does Cre8tly Studio support audio products?",
+    q: "Does The Messy Attic support audio products?",
     a: "Yes. You can upload audio files, preview them, and sell full tracks or collections.\n\nWe allow audio files up to 3 hours long.",
   },
   {
-    q: "How does Cre8tly Studio compare with other knowledge commerce platforms?",
-    a: "Cre8tly Studio stands out by giving you all the tools you need in one place, creation, design, marketing, checkout, delivery, and analytics, without needing extra integrations.\n\nUnlike many other platforms that limit what you can build or charge extra for essential features, Cre8tly lets you create digital products, landing pages, audio products, PDFs, and more from a single dashboard, with powerful support and intuitive tools designed for creators of all skill levels.",
+    q: "How does The Messy Attic compare with other knowledge commerce platforms?",
+    a: "The Messy Attic stands out by giving you all the tools you need in one place, creation, design, marketing, checkout, delivery, and analytics, without needing extra integrations.\n\nUnlike many other platforms that limit what you can build or charge extra for essential features, Cre8tly lets you create digital products, landing pages, audio products, PDFs, and more from a single dashboard, with powerful support and intuitive tools designed for creators of all skill levels.",
   },
   {
-    q: "Does Cre8tly Studio take a cut of my revenue?",
-    a: "No. Cre8tly Studio does not take a percentage of your sales.\n\nYou keep full control of your revenue. Like all platforms that process payments, standard payment processing fees apply based on your stripe payment provider.\n\nCre8tly supports modern checkout experiences and flexible payment options, helping you convert more customers while keeping your costs transparent and predictable.",
+    q: "Does The Messy Attic take a cut of my revenue?",
+    a: "No. The Messy Attic does not take a percentage of your sales.\n\nYou keep full control of your revenue. Like all platforms that process payments, standard payment processing fees apply based on your stripe payment provider.\n\nCre8tly supports modern checkout experiences and flexible payment options, helping you convert more customers while keeping your costs transparent and predictable.",
   },
   {
-    q: "Can I use Cre8tly Studio on mobile devices?",
-    a: "Yes. Cre8tly Studio is fully mobile friendly and works seamlessly on phones and tablets through the browser.\n\nCreators can manage products, build landing pages, track sales, and monitor analytics from any device, while customers can easily view landing pages, purchase products, and access digital content on mobile.\n\nWhile Cre8tly does not currently offer a standalone mobile app, everything is designed to work smoothly on mobile so you can run and grow your business from anywhere.",
+    q: "Can I use The Messy Attic on mobile devices?",
+    a: "Yes. The Messy Attic is fully mobile friendly and works seamlessly on phones and tablets through the browser.\n\nCreators can manage products, build landing pages, track sales, and monitor analytics from any device, while customers can easily view landing pages, purchase products, and access digital content on mobile.\n\nWhile Cre8tly does not currently offer a standalone mobile app, everything is designed to work smoothly on mobile so you can run and grow your business from anywhere.",
   },
   {
     q: "What is Author’s Assistant?",

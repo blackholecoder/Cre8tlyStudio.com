@@ -52,7 +52,7 @@ export default function LoginPage() {
       }
 
       // ✅ Normal login flow
-      navigate("/dashboard");
+      navigate("/community");
     } catch (err) {
       if (err.response?.data?.message) {
         setError(err.response.data.message);
@@ -82,7 +82,7 @@ export default function LoginPage() {
       // 1️⃣ Get challenge + credential request options
       const { data: options } = await axiosInstance.post(
         "/auth/webauthn/login-options",
-        { email }
+        { email },
       );
 
       // 2️⃣ Ask browser for credential
@@ -91,13 +91,13 @@ export default function LoginPage() {
           ...options,
           challenge: Uint8Array.from(
             atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")),
-            (c) => c.charCodeAt(0)
+            (c) => c.charCodeAt(0),
           ),
           allowCredentials: options.allowCredentials.map((c) => ({
             ...c,
             id: Uint8Array.from(
               atob(c.id.replace(/-/g, "+").replace(/_/g, "/")),
-              (c) => c.charCodeAt(0)
+              (c) => c.charCodeAt(0),
             ),
           })),
         },
@@ -112,7 +112,7 @@ export default function LoginPage() {
           type: credential.type,
           response: {
             authenticatorData: encodeBase64URL(
-              credential.response.authenticatorData
+              credential.response.authenticatorData,
             ),
             clientDataJSON: encodeBase64URL(credential.response.clientDataJSON),
             signature: encodeBase64URL(credential.response.signature),
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
       if (data.success) {
         saveAuth(data.user, data.accessToken, data.refreshToken);
-        navigate("/dashboard");
+        navigate("/community");
       } else {
         setError("Passkey login failed. Try again.");
       }
@@ -146,17 +146,17 @@ export default function LoginPage() {
 
     try {
       const res = await axiosInstance.post(
-        "https://cre8tlystudio.com/api/auth/user/verify-login-2fa",
+        "https://themessyattic.com/api/auth/user/verify-login-2fa",
         {
           token: twofaCode,
           twofaToken,
-        }
+        },
       );
 
       if (res.data.success) {
         // ✅ Use AuthContext's saveAuth so everything syncs
         saveAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
-        navigate("/dashboard");
+        navigate("/community");
       } else {
         setError("Invalid 2FA code. Try again.");
       }
@@ -212,13 +212,13 @@ export default function LoginPage() {
           <div className="flex items-center gap-1 mb-5">
             <img
               src={headerLogo}
-              alt="Cre8tly Studio"
+              alt="The Messy Attic"
               className="h-12 w-12 object-contain"
             />
 
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-semibold text-gray-900">
-                Cre8tly Studio
+                The Messy Attic
               </span>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function LoginPage() {
               </h3>
 
               <p className="text-sm text-gray-600 mb-5">
-                New to Cre8tly Studio?{" "}
+                New to The Messy Attic?{" "}
                 <button
                   onClick={handleSignUpRedirect}
                   className="font-semibold hover:underline"

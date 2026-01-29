@@ -205,7 +205,7 @@ const Nav = () => {
                 style={{ fontFamily: '"PT Serif", serif' }}
                 className="ml-2 text-lg font-semibold text-black tracking-tight whitespace-nowrap"
               >
-                Cre8tly Studio
+                The Messy Attic
               </span>
             </div>
           </div>
@@ -257,21 +257,21 @@ const Nav = () => {
                     <MegaItem
                       icon={LayoutTemplate}
                       title="Landing Pages"
-                      desc="Build high converting pages"
+                      desc="Create landing pages that sell your books"
                       onClick={() => navigateWithReferral("/landing")}
                     />
 
                     <MegaItem
                       icon={BookOpen}
                       title="Digital Products"
-                      desc="Sell downloads and content"
+                      desc="Sell Books, audio, and downloads"
                       onClick={() => navigateWithReferral("/smart-prompt")}
                     />
 
                     <MegaItem
                       icon={Users}
                       title="Communities"
-                      desc="Create engaged audiences"
+                      desc="Where writers come to grow"
                       onClick={() => navigateWithReferral("/community-feature")}
                     />
                   </div>
@@ -345,12 +345,12 @@ const Nav = () => {
               Resources
             </button>
 
-            <button
+            {/* <button
               onClick={() => navigateWithReferral("/plans")}
               className="hover:text-black text-[16.5px] md:text-[16.5px] lg:text-[16.5px]"
             >
               Pricing
-            </button>
+            </button> */}
           </div>
 
           <div className="hidden md:flex items-center justify-end relative">
@@ -364,7 +364,7 @@ const Nav = () => {
                 </button>
 
                 <button
-                  onClick={() => navigateWithReferral("/plans")}
+                  onClick={() => navigateWithReferral("/signup-community")}
                   className="relative overflow-hidden px-5 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-900 transition"
                 >
                   {/* Horizontal glide layer */}
@@ -380,7 +380,7 @@ const Nav = () => {
                     animate-button-glide
                     "
                   />
-                  <span className="relative z-10">Get Started for Free →</span>
+                  <span className="relative z-10">Join for Free →</span>
                 </button>
               </>
             ) : (
@@ -499,14 +499,14 @@ const Nav = () => {
             {/* TOP BAR */}
             <div className="flex items-center justify-between px-6 py-4 border-b">
               <span className="font-extrabold text-lg text-black">
-                Cre8tly Studio
+                The Messy Attic
               </span>
 
               <div className="flex items-center gap-3">
                 {!user && (
                   <button
                     onClick={() => {
-                      navigateWithReferral("/plans");
+                      navigateWithReferral("/signup-community");
                       setIsOpen(false);
                     }}
                     className="rounded-full bg-black px-4 py-2 text-sm font-bold text-white"
@@ -528,17 +528,6 @@ const Nav = () => {
             <div className="flex-1 overflow-y-auto px-6 py-8 overscroll-contain">
               <div className="mx-auto max-w-md rounded-3xl border bg-white shadow-xl p-6 space-y-10">
                 {/* PRIMARY NAV */}
-                <div className="space-y-3">
-                  <MenuItem
-                    icon={CreditCard}
-                    title="Pricing"
-                    desc="Compare plans and features"
-                    onClick={() => {
-                      navigateWithReferral("/plans");
-                      setIsOpen(false);
-                    }}
-                  />
-                </div>
 
                 {/* BUILD & LAUNCH */}
                 <div>
@@ -549,7 +538,7 @@ const Nav = () => {
                   <MenuItem
                     icon={Sparkles}
                     title="Smart Prompt"
-                    desc="Turn ideas into structured prompts"
+                    desc="Turn ideas into published books"
                     onClick={() => {
                       navigateWithReferral("/smart-prompt");
                       setIsOpen(false);
@@ -559,7 +548,7 @@ const Nav = () => {
                   <MenuItem
                     icon={LayoutTemplate}
                     title="Landing Pages"
-                    desc="Create high converting pages"
+                    desc="Create landing pages that sell your books"
                     onClick={() => {
                       navigateWithReferral("/landing");
                       setIsOpen(false);
@@ -569,7 +558,7 @@ const Nav = () => {
                   <MenuItem
                     icon={Download}
                     title="Digital Products"
-                    desc="Sell PDFs, audio, and downloads"
+                    desc="Sell Books, audio, and downloads"
                     onClick={() => {
                       navigateWithReferral("/landing");
                       setIsOpen(false);
@@ -586,7 +575,7 @@ const Nav = () => {
                   <MenuItem
                     icon={Users}
                     title="Communities"
-                    desc="Create engaged audiences"
+                    desc="Where writers come to grow"
                     onClick={() => {
                       navigateWithReferral("/community-feature");
                       setIsOpen(false);

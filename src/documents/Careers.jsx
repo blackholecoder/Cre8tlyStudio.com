@@ -72,13 +72,13 @@ export default function Careers() {
             <h1 className="text-3xl font-bold text-gray-700 text-center mb-6 leading-tight">
               Apply to Work
               <span className="block mt-1 text-gray-900">
-                With Cre8tly Studio
+                For The Messy Attic
               </span>
             </h1>
 
             <p className="text-gray-600 text-center mb-8">
               We’re looking for motivated independent contractors to help
-              creators grow.
+              creators grow our platform.
               <span className="block mt-1 text-gray-900">
                 Tell us a bit about yourself.
               </span>
@@ -190,7 +190,7 @@ export default function Careers() {
                 name="message"
                 value={form.message}
                 onChange={handleChange}
-                placeholder="Why do you want to join Cre8tly Studio?"
+                placeholder="Why do you want to join The Messy Attic?"
                 rows={2}
                 required
                 className="

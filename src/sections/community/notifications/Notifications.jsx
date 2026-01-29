@@ -68,7 +68,7 @@ export default function Notifications() {
   }, []);
 
   return (
-    <div className="w-full flex justify-center items-start min-h-[80vh] px-3 sm:px-6 py-6 sm:py-12">
+    <div className="w-full flex justify-center items-start min-h-[80vh] px-0 sm:px-0 py-3 sm:py-3">
       {/* Background Container */}
       <div
         className="

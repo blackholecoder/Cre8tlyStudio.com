@@ -238,8 +238,7 @@ export default function SmartPromptPage() {
           </h2>
 
           <p className="text-gray-600 max-w-xl mx-auto mb-10 text-lg">
-            Start creating, designing, and selling with Cre8tly Studio in
-            minutes.
+            Start earning an income with The Messy Attic in minutes.
           </p>
 
           <button

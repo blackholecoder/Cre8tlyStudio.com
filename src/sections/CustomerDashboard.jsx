@@ -38,7 +38,7 @@ export default function CustomerDashboard() {
   }
 
   const activeMagnetData = (magnets.magnets || []).find(
-    (m) => m.id === editorId
+    (m) => m.id === editorId,
   );
 
   const location = useLocation();
@@ -61,7 +61,7 @@ export default function CustomerDashboard() {
       const updatedMagnets = (prev.magnets || []).map((m) =>
         m.id === magnetId
           ? { ...m, prompt: promptText, status: "pending", theme }
-          : m
+          : m,
       );
       return { ...prev, magnets: updatedMagnets };
     });
@@ -79,14 +79,14 @@ export default function CustomerDashboard() {
 
   // ✅ Pagination-safe sorting
   const sortedMagnets = [...magnetList].sort(
-    (a, b) => (a.slot_number || 0) - (b.slot_number || 0)
+    (a, b) => (a.slot_number || 0) - (b.slot_number || 0),
   );
 
   const totalPages = Math.ceil(sortedMagnets.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedMagnets = sortedMagnets.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
 
   // ✅ Prompt modal open
@@ -128,8 +128,8 @@ export default function CustomerDashboard() {
   async function handleDeleteMagnet(id) {
     try {
       await axiosInstance.delete(
-        `https://cre8tlystudio.com/api/lead-magnets/magnets/${id}`,
-        {}
+        `https://themessyattic.com/api/lead-magnets/magnets/${id}`,
+        {},
       );
       // Refresh magnets after deletion
       fetchMagnets();
@@ -181,7 +181,7 @@ export default function CustomerDashboard() {
             text-dashboard-muted-light
             dark:text-dashboard-muted-dark"
               >
-                Please wait while we load your content from Cre8tly Studio.
+                Please wait while we load your content from The Messy Attic.
               </p>
             </div>
           ) : magnets.magnets?.length > 0 ? (

@@ -6,8 +6,8 @@ const Privacy = () => {
         <br />
 
         <p className="document-p-text">
-          Cre8tly Studio respects your privacy and is committed to protecting it
-          in accordance with this Privacy Policy (“Policy”). This Policy
+          The Messy Attic respects your privacy and is committed to protecting
+          it in accordance with this Privacy Policy (“Policy”). This Policy
           explains how we collect, use, and safeguard your personal information
           when you visit our website, purchase subscriptions or credits, or use
           any of our software services (“Services”).
@@ -15,7 +15,7 @@ const Privacy = () => {
         <br />
 
         <p className="document-p-text">
-          By accessing or using Cre8tly Studio’s Services, you acknowledge that
+          By accessing or using The Messy Attic's Services, you acknowledge that
           you have read and understood this Policy and agree to its terms. If
           you do not agree, please do not use our Services.
         </p>
@@ -71,7 +71,7 @@ const Privacy = () => {
         </h1>
         <br />
         <p className="document-p-text">
-          If you choose to connect a custom domain to your Cre8tly Studio
+          If you choose to connect a custom domain to your The Messy Attic
           account, we may process limited technical information related to that
           domain, such as the domain name, DNS configuration status, and
           connection metadata, for the sole purpose of verifying domain
@@ -103,7 +103,7 @@ const Privacy = () => {
         </h1>
         <br />
         <p className="document-p-text">
-          If you choose to become a seller on Cre8tly Studio, we may collect
+          If you choose to become a seller on The Messy Attic, we may collect
           additional information necessary to operate your Seller Dashboard and
           process payments through Stripe Connect. This may include:
           <br />
@@ -121,7 +121,7 @@ const Privacy = () => {
           <br />
           <br />
           Stripe Connect handles identity verification, tax information, payout
-          processing, and bank account details. Cre8tly Studio does not store
+          processing, and bank account details. The Messy Attic does not store
           your full financial or banking information. Any data collected by
           Stripe is governed by Stripe’s own privacy policy.
           <br />
@@ -137,7 +137,7 @@ const Privacy = () => {
         </h1>
         <br />
         <p className="document-p-text">
-          Sellers on Cre8tly Studio are responsible for the handling, storage,
+          Sellers on The Messy Attic are responsible for the handling, storage,
           and use of any customer information they receive through product
           purchases on their landing pages. By offering digital products as a
           seller, you agree to the following:
@@ -155,7 +155,7 @@ const Privacy = () => {
           and data protection standards in your region, including but not
           limited to GDPR or CCPA where required.
           <br />
-          • You understand that Cre8tly Studio does not control or monitor how
+          • You understand that The Messy Attic does not control or monitor how
           you use customer information after it has been provided to you. You
           are independently accountable for your actions as a seller.
           <br />
@@ -164,7 +164,7 @@ const Privacy = () => {
           or termination of your Seller Dashboard access.
           <br />
           <br />
-          Cre8tly Studio does not provide legal advice to sellers. You are
+          The Messy Attic does not provide legal advice to sellers. You are
           responsible for ensuring that your digital products and data practices
           comply with all applicable laws and platform requirements.
         </p>
@@ -210,7 +210,7 @@ const Privacy = () => {
         <h1 className="document-title-text">Children’s Privacy</h1>
         <br />
         <p className="document-p-text">
-          Cre8tly Studio does not knowingly collect personal information from
+          The Messy Attic does not knowingly collect personal information from
           children under the age of 18. If you believe we may have collected
           such information, please contact us immediately and we will delete it.
         </p>
@@ -243,7 +243,7 @@ const Privacy = () => {
           Privacy Policy, please contact us at:
         </p>
         <br />
-        <p className="document-p-text">privacy@cre8tlystudio.com</p>
+        <p className="document-p-text">privacy@themessyattic.com</p>
         <br />
         <p className="document-p-text">
           This document was last updated on August 26, 2025.

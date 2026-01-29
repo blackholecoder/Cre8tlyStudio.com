@@ -10,13 +10,13 @@ const Footer = () => {
           <a href="/" className="flex-shrink-0">
             <img
               src={headerLogo}
-              alt="Cre8tly Studio Logo"
+              alt="The Messy Attic Logo"
               width={50}
               height={50}
             />
           </a>
           <p>
-            © {new Date().getFullYear()} Alure Digital. All rights reserved
+            © {new Date().getFullYear()} The Messy Attic. All rights reserved
           </p>
         </div>
 

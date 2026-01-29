@@ -25,8 +25,8 @@ const PlatformShowcase = () => {
 
         {/* Subhead */}
         <p className="mt-6 text-base md:text-lg text-gray-700 max-w-3xl mx-auto">
-          Stop stitching tools together. Cre8tly Studio brings creation, design,
-          publishing, and selling into one seamless workflow.
+          Stop stitching tools together. The Messy Attic brings creation,
+          design, publishing, and selling into one seamless workflow.
         </p>
 
         {/* Feature Pills */}
@@ -55,7 +55,7 @@ const PlatformShowcase = () => {
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg font-medium">
               <img
                 src={showcase}
-                alt="Cre8tly Studio platform preview"
+                alt="The Messy Attic platform preview"
                 className="w-full h-full object-cover"
               />
             </div>

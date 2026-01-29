@@ -77,8 +77,8 @@ export default function StripePayments() {
           variants={fadeUp}
           className="max-w-2xl mx-auto text-black/80 text-lg mb-10"
         >
-          Cre8tly Studio connects Stripe directly to your products so you can
-          create offers, launch landing pages, and get paid without friction.
+          The Messy Attic connects Stripe directly to your products so you can
+          get paid without friction.
         </motion.p>
 
         <motion.button
@@ -256,7 +256,7 @@ export default function StripePayments() {
 
         <div className="mt-20 text-center">
           <p className="text-lg text-black/80 mb-4">
-            Your money never sits in Cre8tly Studio
+            Your money never sits in The Messy Attic
           </p>
 
           <p className="max-w-2xl mx-auto text-black/60">

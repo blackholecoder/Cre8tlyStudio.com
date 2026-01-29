@@ -66,7 +66,7 @@ export default function LandingInfoPage() {
     {
       title: "Build and Publish Landing Pages Instantly",
       description:
-        "Create high-converting landing pages in minutes and publish them instantly with a free Cre8tly Studio subdomain you can share anywhere.",
+        "Create high-converting landing pages in minutes and publish them instantly with a free The Messy Attic subdomain you can share anywhere.",
       image: landing,
     },
     {
@@ -114,7 +114,7 @@ export default function LandingInfoPage() {
     {
       title: "Offer PDFs You’ve Already Created",
       description:
-        "Attach any PDF created inside Cre8tly Studio directly to your landing page and turn it into a downloadable or sellable offer.",
+        "Attach any PDF created inside The Messy Attic directly to your landing page and turn it into a downloadable or sellable offer.",
       image: offer,
     },
     {
@@ -284,9 +284,9 @@ export default function LandingInfoPage() {
                   type="button"
                   onClick={() =>
                     window.open(
-                      "https://theinspirecollective.cre8tlystudio.com/",
+                      "https://theinspirecollective.themessyattic.com/",
                       "_blank",
-                      "noopener,noreferrer"
+                      "noopener,noreferrer",
                     )
                   }
                   className="

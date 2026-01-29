@@ -7,7 +7,7 @@ import axiosInstance from "../../api/axios";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
-  window.location.origin
+  window.location.origin,
 ).toString();
 
 export default function PDFPreviewModal({
@@ -35,7 +35,7 @@ export default function PDFPreviewModal({
     if (!fileUrl) return null;
 
     return {
-      url: `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}&preview=1`,
+      url: `https://themessyattic.com/api/pdf/proxy?url=${encodeURIComponent(fileUrl)}&preview=1`,
     };
   }, [fileUrl]);
 
@@ -96,8 +96,8 @@ export default function PDFPreviewModal({
         .replace(/\s+/g, "_");
 
       // ✅ Build proxy download URL with title param (forces download)
-      const proxyDownloadUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(
-        fileUrl
+      const proxyDownloadUrl = `https://themessyattic.com/api/pdf/proxy?url=${encodeURIComponent(
+        fileUrl,
       )}&title=${encodeURIComponent(safeTitle)}${
         sourceType === "magnet" && magnetId ? `&magnetId=${magnetId}` : ""
       }`;

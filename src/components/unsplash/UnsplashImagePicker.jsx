@@ -24,9 +24,9 @@ export default function UnsplashImagePicker({ onSelect }) {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://cre8tlystudio.com/api/unsplash/search?query=${encodeURIComponent(
-          query
-        )}&per_page=30&page=${newPage}`
+        `https://themessyattic.com/api/unsplash/search?query=${encodeURIComponent(
+          query,
+        )}&per_page=30&page=${newPage}`,
       );
 
       const results = res.data.results || res.data;

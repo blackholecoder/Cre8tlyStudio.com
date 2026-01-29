@@ -29,7 +29,7 @@ import { performBooleanOperation } from "../../helpers/booleanOps";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "/pdf.worker.min.js",
-  window.location.origin
+  window.location.origin,
 ).toString();
 
 function PDFPage({
@@ -264,7 +264,7 @@ export default function CanvasEditor() {
       setLoading(true);
       try {
         // ✅ Same proxy as your PDFPreviewModal uses
-        const proxyUrl = `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`;
+        const proxyUrl = `https://themessyattic.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`;
 
         // ✅ Request as blob (same as react-pdf)
         const response = await axiosInstance.get(proxyUrl, {
@@ -424,7 +424,7 @@ export default function CanvasEditor() {
 
       // ✅ 1. Fetch the original PDF
       const res = await fetch(
-        `https://cre8tlystudio.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`
+        `https://themessyattic.com/api/pdf/proxy?url=${encodeURIComponent(pdfUrl)}`,
       );
       const original = await res.arrayBuffer();
       const pdfDoc = await PDFDocument.load(original);
@@ -432,7 +432,7 @@ export default function CanvasEditor() {
       // ✅ 2. Apply overlays from each page
       for (let i = 0; i < pages.length; i++) {
         const overlayCanvas = document.querySelector(
-          `[data-pdf-page="${i}"] .konva-overlay .konvajs-content canvas:first-child`
+          `[data-pdf-page="${i}"] .konva-overlay .konvajs-content canvas:first-child`,
         );
 
         if (!overlayCanvas) continue;
@@ -457,13 +457,13 @@ export default function CanvasEditor() {
       formData.append("file", finalBlob, "final.pdf");
 
       const uploadRes = await axiosInstance.put(
-        `https://cre8tlystudio.com/api/edit/${leadMagnetId}/editor/commit`,
+        `https://themessyattic.com/api/edit/${leadMagnetId}/editor/commit`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       const title = uploadRes.data?.title || "Lead Magnet";
@@ -495,7 +495,7 @@ export default function CanvasEditor() {
           pauseOnHover: true,
           draggable: true,
           theme: "dark",
-        }
+        },
       );
     }
   }

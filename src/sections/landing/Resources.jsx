@@ -35,7 +35,7 @@ export default function Resources() {
             className="text-black/80 max-w-2xl mb-16"
           >
             Free training, guides, and tools to help you design, launch, and
-            sell digital products faster.
+            sell your book faster.
           </motion.p>
         </>
       )}
@@ -58,7 +58,7 @@ export default function Resources() {
             </div>
 
             <p className="text-black/70 leading-relaxed">
-              Step by step walkthroughs covering the full Cre8tly Studio
+              Step by step walkthroughs covering the full The Messy Attic Pro
               workflow, from idea to launch.
             </p>
 
@@ -101,7 +101,7 @@ export default function Resources() {
 
             <p className="text-black/70 leading-relaxed">
               Get help with your account, products, billing, or technical
-              questions from the Cre8tly Studio support team.
+              questions from the Messy Attic support team.
             </p>
 
             <div className="mt-6 text-sm font-semibold text-green-600 group-hover:underline">

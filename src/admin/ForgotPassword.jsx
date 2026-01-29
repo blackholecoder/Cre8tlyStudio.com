@@ -41,11 +41,11 @@ export default function ForgotPassword() {
           <div className="flex items-center gap-2 mb-6">
             <img
               src={headerLogo}
-              alt="Cre8tly Studio"
+              alt="The Messy Attic"
               className="h-12 w-12 object-contain"
             />
             <span className="text-lg font-semibold text-gray-900">
-              Cre8tly Studio
+              The Messy Attic
             </span>
           </div>
 

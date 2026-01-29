@@ -518,7 +518,7 @@ function renderPreviewBlock(block, index, context) {
                     sellerId: user?.id,
                     pdfUrl: block.pdf_url,
                     price_in_cents: Math.round((block.price || 10) * 100),
-                  }
+                  },
                 );
 
                 if (res.data?.url) window.location.href = res.data.url;
@@ -583,8 +583,8 @@ function renderPreviewBlock(block, index, context) {
       }
 
       const referralUrl = user?.referral_slug
-        ? `https://cre8tlystudio.com/r/${user.referral_slug}`
-        : "https://cre8tlystudio.com/sign-up";
+        ? `https://themessyattic.com/r/${user.referral_slug}`
+        : "https://themessyattic.com/sign-up";
 
       return (
         <div
@@ -763,10 +763,10 @@ function renderPreviewBlock(block, index, context) {
                 ? (() => {
                     const angle = ((block.shadow_angle || 135) * Math.PI) / 180;
                     const offsetX = Math.round(
-                      Math.cos(angle) * (block.shadow_offset || 10)
+                      Math.cos(angle) * (block.shadow_offset || 10),
                     );
                     const offsetY = Math.round(
-                      Math.sin(angle) * (block.shadow_offset || 10)
+                      Math.sin(angle) * (block.shadow_offset || 10),
                     );
                     return `${offsetX}px ${offsetY}px ${
                       block.shadow_depth || 25
@@ -1701,7 +1701,7 @@ function renderPreviewBlock(block, index, context) {
     }
     case "scroll_arrow": {
       const animationType = ["bounce", "float", "pulse"].includes(
-        block.animation_type
+        block.animation_type,
       )
         ? block.animation_type
         : "bounce";

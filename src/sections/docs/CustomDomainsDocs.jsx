@@ -39,7 +39,8 @@ export default function CustomDomainsDocs() {
           </div>
 
           <p className="text-xs text-gray-400 mb-3">
-            Learn how to connect and verify your own domain with Cre8tly Studio.
+            Learn how to connect and verify your own domain with The Messy
+            Attic.
           </p>
 
           <ul className="space-y-1 text-sm">
@@ -171,7 +172,7 @@ export default function CustomDomainsDocs() {
             <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">
               <li>Type, CNAME</li>
               <li>Host, @ or www</li>
-              <li>Value, domains.cre8tlystudio.com</li>
+              <li>Value, domains.themessyattic.com</li>
               <li>Proxy must be ON if using Cloudflare</li>
             </ul>
           </section>
@@ -230,7 +231,7 @@ export default function CustomDomainsDocs() {
                   My domain points correctly but pages do not load
                 </h3>
                 <p className="text-sm text-gray-300">
-                  Ensure your CNAME record points to domains.cre8tlystudio.com
+                  Ensure your CNAME record points to domains.themessyattic.com
                   and that proxy mode is enabled if using Cloudflare.
                 </p>
               </div>

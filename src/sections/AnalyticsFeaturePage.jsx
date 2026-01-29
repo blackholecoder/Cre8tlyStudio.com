@@ -103,7 +103,7 @@ export default function AnalyticsFeaturePage() {
       { key: "30", label: "30 days", mult: 2.8 },
       { key: "90", label: "90 days", mult: 6.9 },
     ],
-    []
+    [],
   );
 
   const [rangeKey, setRangeKey] = useState("30");
@@ -117,7 +117,7 @@ export default function AnalyticsFeaturePage() {
     const downloads = Math.round(baseDownloads * r.mult);
     const conversion = Math.max(
       5,
-      Math.min(40, Math.round((downloads / clicks) * 100))
+      Math.min(40, Math.round((downloads / clicks) * 100)),
     );
 
     return {
@@ -353,7 +353,7 @@ export default function AnalyticsFeaturePage() {
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
               <div className="text-sm font-semibold text-gray-700">
-                Cre8tly Studio Analytics
+                The Messy Attic Analytics
               </div>
 
               <div className="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-700 leading-tight">

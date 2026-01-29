@@ -1,18 +1,23 @@
-export default function OutOfSlotsModal({ open, onClose, onRefresh, isFirstTime = false }) {
+export default function OutOfSlotsModal({
+  open,
+  onClose,
+  onRefresh,
+  isFirstTime = false,
+}) {
   if (!open) return null;
 
   const title = isFirstTime
-    ? "Welcome to Cre8tly Studio"
+    ? "Welcome to The Messy Attic"
     : "Out of Lead Magnet Slots";
 
   const message = isFirstTime
-    ? `Welcome to Cre8tly Studio, your creative command center for building
+    ? `Welcome to The Messy Attic, your creative command center for building
        high-converting lead magnets in minutes. 
-       To start creating, visit Cre8tlyStudio.com in your browser and
+       To start creating, visit themessyattic.com in your browser and
        purchase your first token pack. 
        Once purchased, click below to refresh your account and begin.`
     : `You’ve reached your current plan’s limit.
-       To purchase more tokens or lifetime unlocks, visit Cre8tlyStudio.com
+       To purchase more tokens or lifetime unlocks, visit themessyattic.com
        in your browser and log in with the same account.
        Once purchased, click below to refresh your slots instantly.`;
 
@@ -37,7 +42,9 @@ export default function OutOfSlotsModal({ open, onClose, onRefresh, isFirstTime 
             }}
             className="bg-gradient-to-r from-[#00E07A] to-[#6A5ACD] text-white px-8 py-3 rounded-xl font-semibold tracking-wide shadow-[0_0_12px_rgba(0,224,122,0.6)] hover:shadow-[0_0_20px_rgba(106,90,205,0.8)] hover:scale-[1.03] transition-all duration-200"
           >
-            {isFirstTime ? "I’ve Purchased My First Pack" : "I’ve Purchased Tokens"}
+            {isFirstTime
+              ? "I’ve Purchased My First Pack"
+              : "I’ve Purchased Tokens"}
           </button>
 
           <button

@@ -26,9 +26,21 @@ export default function CommentThread({
   onReplySubmit,
   openReplies,
   toggleReplyVisibility,
+  expandedComments,
+  setExpandedComments,
 }) {
   const { user } = useAuth();
   const children = replies[comment.id] || [];
+
+  const MAX_LENGTH = 420;
+
+  const isExpanded = expandedComments?.[comment.id] === true;
+  const isLong = comment.body.length > MAX_LENGTH;
+
+  const displayText =
+    !isExpanded && isLong
+      ? comment.body.slice(0, MAX_LENGTH).trim() + "…"
+      : comment.body;
 
   const replyTotal =
     comment.reply_count ??
@@ -220,8 +232,37 @@ export default function CommentThread({
              whitespace-pre-wrap mb-2
           "
               >
-                {renderTextWithLinks(comment.body)}
+                {renderTextWithLinks(displayText)}
               </p>
+              {/* SEE MORE */}
+              {!isExpanded && isLong && (
+                <button
+                  onClick={() =>
+                    setExpandedComments((prev) => ({
+                      ...prev,
+                      [comment.id]: true,
+                    }))
+                  }
+                  className="text-xs text-sky-400 mt-1 hover:underline"
+                >
+                  See more
+                </button>
+              )}
+
+              {/* SEE LESS */}
+              {isExpanded && isLong && (
+                <button
+                  onClick={() =>
+                    setExpandedComments((prev) => ({
+                      ...prev,
+                      [comment.id]: false,
+                    }))
+                  }
+                  className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1 hover:underline"
+                >
+                  See less
+                </button>
+              )}
 
               {/* ❤️ Likes + Reply/Edit/Delete */}
               <div className="flex items-center gap-4 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1">

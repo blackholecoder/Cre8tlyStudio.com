@@ -33,8 +33,9 @@ export const footerLinks2 = [
 ];
 
 export const brand = {
-  name: "Cre8tly Studio",
-  tagline: "The fastest way to turn your idea into a sellable digital product.",
+  name: "The Messy Attic",
+  tagline:
+    "a supportive writing community where writers come together to share work, encourage one another, and grow through honest feedback and connection.",
   bgHero: banner, // or a hosted video poster
   brandLogo: headerLogo,
   latestSingle: {

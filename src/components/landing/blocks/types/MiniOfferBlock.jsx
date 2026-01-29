@@ -21,7 +21,7 @@ export default function MiniOfferBlock({
 
   const availablePdfs = useMemo(
     () => pdfList?.filter((p) => p.status === "completed" && p.pdf_url) || [],
-    [pdfList]
+    [pdfList],
   );
 
   const updateField = (key, value) => {
@@ -65,7 +65,7 @@ export default function MiniOfferBlock({
       const res = await axiosInstance.post(
         "/landing/upload-media-block",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (res.data.url) {
@@ -144,7 +144,7 @@ export default function MiniOfferBlock({
                 if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
                   updateField(
                     "bg_color",
-                    val.startsWith("#") ? val : `#${val}`
+                    val.startsWith("#") ? val : `#${val}`,
                   );
                 }
               }}
@@ -291,7 +291,7 @@ export default function MiniOfferBlock({
             if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
               updateField(
                 "secondary_text_color",
-                val.startsWith("#") ? val : `#${val}`
+                val.startsWith("#") ? val : `#${val}`,
               );
             }
           }}
@@ -324,7 +324,7 @@ export default function MiniOfferBlock({
             if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
               updateField(
                 "utility_text_color",
-                val.startsWith("#") ? val : `#${val}`
+                val.startsWith("#") ? val : `#${val}`,
               );
             }
           }}
@@ -594,7 +594,7 @@ export default function MiniOfferBlock({
                   }}
                   className="w-full p-2 bg-black border border-gray-600 rounded text-white mt-1"
                 >
-                  <option value="internal">Cre8tly Studio PDF</option>
+                  <option value="internal">The Messy Attic PDF</option>
                   <option value="external">Upload Existing Product</option>
                 </select>
 
@@ -624,7 +624,7 @@ export default function MiniOfferBlock({
                               headers: {
                                 "Content-Type": "multipart/form-data",
                               },
-                            }
+                            },
                           );
 
                           if (!res.data?.success) {
@@ -635,7 +635,7 @@ export default function MiniOfferBlock({
                           updateField("external_file_url", res.data.url);
                           updateField(
                             "external_file_name",
-                            res.data.file_name || file.name
+                            res.data.file_name || file.name,
                           );
                           updateField("product_source", "external");
 
@@ -680,7 +680,7 @@ export default function MiniOfferBlock({
                         }
 
                         const selectedPdf = availablePdfs.find(
-                          (p) => p.pdf_url === selectedUrl
+                          (p) => p.pdf_url === selectedUrl,
                         );
 
                         if (!selectedPdf) {
@@ -696,14 +696,14 @@ export default function MiniOfferBlock({
                         updateField("image_url", "");
                         updateField(
                           "page_count",
-                          selectedPdf.page_count || null
+                          selectedPdf.page_count || null,
                         );
 
                         setCoverLoading(true);
 
                         try {
                           const res = await axiosInstance.get(
-                            `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedPdf.pdf_url)}`
+                            `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedPdf.pdf_url)}`,
                           );
 
                           if (res.data?.cover_image) {
@@ -855,7 +855,7 @@ export default function MiniOfferBlock({
                       if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
                         updateField(
                           "button_color",
-                          val.startsWith("#") ? val : `#${val}`
+                          val.startsWith("#") ? val : `#${val}`,
                         );
                       }
                     }}
@@ -887,7 +887,7 @@ export default function MiniOfferBlock({
                       if (/^#?[0-9A-Fa-f]{0,6}$/.test(val)) {
                         updateField(
                           "button_text_color",
-                          val.startsWith("#") ? val : `#${val}`
+                          val.startsWith("#") ? val : `#${val}`,
                         );
                       }
                     }}

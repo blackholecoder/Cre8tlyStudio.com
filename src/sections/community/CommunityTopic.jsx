@@ -10,7 +10,6 @@ export default function CommunityTopic() {
   const location = useLocation();
   const [topic, setTopic] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [showModal, setShowModal] = useState(false);
 
   const load = async () => {
     try {
@@ -49,7 +48,7 @@ export default function CommunityTopic() {
   if (!topic) return null;
 
   return (
-    <div className="pt-20 px-0 sm:px-6 lg:px-6 max-w-4xl mx-auto">
+    <div className="sm:pt-16 px-0 sm:px-6 lg:px-6 max-w-4xl mx-auto">
       {/* 🔙 Back + Breadcrumbs */}
       <div
         className="flex items-center gap-2 text-sm
@@ -61,19 +60,6 @@ export default function CommunityTopic() {
         >
           ← Back
         </button>
-
-        <span className="mx-1">/</span>
-
-        <button
-          onClick={() => navigate("/community")}
-          className="hover:text-gray-200"
-        >
-          Community
-        </button>
-
-        <span className="mx-1">/</span>
-
-        <span className="text-gray-200">{topic.name}</span>
       </div>
 
       {/* Header + Create Button */}
@@ -154,7 +140,14 @@ export default function CommunityTopic() {
             </p>
 
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() =>
+                navigate("/community/create-post", {
+                  state: {
+                    topicId: topic.id,
+                    topicName: topic.name,
+                  },
+                })
+              }
               className="
           mt-6
           px-5 py-2.5

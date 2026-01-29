@@ -54,7 +54,7 @@ export default function VideoPlayer() {
         preload="metadata"
       >
         <source
-          src="https://cre8tlystudio.nyc3.cdn.digitaloceanspaces.com/Videos/new_cre8tly_video_v2.mp4"
+          src="https://themessyattic.nyc3.cdn.digitaloceanspaces.com/Videos/new_cre8tly_video_v2.mp4"
           type="video/mp4"
         />
         Your browser does not support the video tag.

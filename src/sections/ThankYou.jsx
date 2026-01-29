@@ -6,7 +6,7 @@ function ThankYou() {
   const { search } = useLocation();
   const sessionId = useMemo(
     () => new URLSearchParams(search).get("session_id"),
-    [search]
+    [search],
   );
 
   const [delivery, setDelivery] = useState(null);
@@ -21,7 +21,7 @@ function ThankYou() {
 
       try {
         const res = await axiosInstance.get(
-          `/seller-checkout/downloads/${sessionId}/info`
+          `/seller-checkout/downloads/${sessionId}/info`,
         );
         if (res.data?.success) {
           setDelivery(res.data); // <— correct
@@ -79,7 +79,7 @@ function ThankYou() {
 
   // Build correct PDF proxy URL (audio does NOT use this)
   const pdfProxyUrl = isPdf
-    ? `https://cre8tlystudio.com/api/seller-checkout/downloads/${sessionId}/file`
+    ? `https://themessyattic.com/api/seller-checkout/downloads/${sessionId}/file`
     : null;
 
   // -----------------------------------------------------

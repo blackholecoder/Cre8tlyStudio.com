@@ -12,7 +12,7 @@ export default function FreePDFSection() {
     e.preventDefault();
 
     axios
-      .post("https://cre8tlystudio.com/api/pdf/free-pdf", { email })
+      .post("https://themessyattic.com/api/pdf/free-pdf", { email })
       .then(() => {
         setPdfSuccess(true);
         setPdfError("");
@@ -27,7 +27,7 @@ export default function FreePDFSection() {
         console.error("Error sending PDF:", err);
         if (err.response && err.response.status === 409) {
           setPdfError(
-            "You’ve already downloaded this guide, check your inbox 📩"
+            "You’ve already downloaded this guide, check your inbox 📩",
           );
         } else {
           setPdfError("Something went wrong. Please try again later.");
@@ -67,7 +67,9 @@ export default function FreePDFSection() {
 
             <ul className="text-gray-400 mb-8 space-y-3 text-sm sm:text-base heading-text">
               <li>📈 Proven steps to grow your email list organically</li>
-              <li>🎯 Smart lead magnet formulas that attract real subscribers</li>
+              <li>
+                🎯 Smart lead magnet formulas that attract real subscribers
+              </li>
               <li>💡 How to craft irresistible opt-in offers</li>
               <li>⚙️ Tools and automations to scale your growth</li>
             </ul>
@@ -101,7 +103,9 @@ export default function FreePDFSection() {
                 exit={{ opacity: 0, y: -10 }}
                 className="bg-gradient-to-r from-red-600/20 to-orange-500/20 border border-red-500 text-red-300 rounded-2xl shadow-xl p-6 mt-6 max-w-xl mx-auto lg:mx-0"
               >
-                <h3 className="text-xl font-bold mb-2 text-red-400">⚠️ Oops!</h3>
+                <h3 className="text-xl font-bold mb-2 text-red-400">
+                  ⚠️ Oops!
+                </h3>
                 <p className="text-sm leading-relaxed text-red-200 heading-text">
                   {pdfError}
                 </p>
@@ -118,9 +122,7 @@ export default function FreePDFSection() {
                 <h3 className="text-xl font-bold mb-2">✅ Success!</h3>
                 <p className="text-sm leading-relaxed text-green-200 heading-text">
                   Check your inbox for{" "}
-                  <strong>
-                    “The Secret Formula to Grow Your Email List.”
-                  </strong>{" "}
+                  <strong>“The Secret Formula to Grow Your Email List.”</strong>{" "}
                   If you don’t see it, check your{" "}
                   <strong>spam/junk folder</strong> and mark the email as safe
                   to ensure future tips reach you. 💌
@@ -133,10 +135,8 @@ export default function FreePDFSection() {
               helpful insights to grow your business and brand.
             </p>
           </div>
-          
         </div>
       </div>
-      
     </section>
   );
 }

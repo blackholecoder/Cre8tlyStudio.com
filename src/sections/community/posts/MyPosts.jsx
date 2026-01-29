@@ -277,14 +277,15 @@ export default function MyPosts() {
 
                 {/* Left stats */}
                 <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  <span className="flex items-center gap-1">
-                    <span className="flex items-center gap-1">
-                      <Heart size={14} className="opacity-70" />
-                      {post.like_count ?? 0}
-                    </span>
-                    <MessageCircle size={14} />
-                    {post.comment_count ?? 0}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <Heart size={14} className="opacity-70" />
+                    <span>{post.like_count ?? 0}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <MessageCircle size={14} className="opacity-70" />
+                    <span>{post.comment_count ?? 0}</span>
+                  </div>
 
                   {post.is_pinned === 1 && <span>Pinned</span>}
                   {post.is_locked === 1 && <span>Locked</span>}

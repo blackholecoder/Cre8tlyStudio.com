@@ -91,7 +91,7 @@ export default function StripeCheckoutBlock({
         <option value="" disabled>
           Select product source
         </option>
-        <option value="internal">Cre8tly Studio Product</option>
+        <option value="internal">The Messy Attic Product</option>
         <option value="external">Upload Existing Product</option>
       </select>
 
@@ -154,7 +154,7 @@ export default function StripeCheckoutBlock({
                     headers: {
                       "Content-Type": "multipart/form-data",
                     },
-                  }
+                  },
                 );
 
                 const data = res.data;
@@ -170,13 +170,13 @@ export default function StripeCheckoutBlock({
                 updateBlock(
                   index,
                   "external_file_name",
-                  data.file_name || file.name
+                  data.file_name || file.name,
                 );
                 e.target.value = "";
               } catch (err) {
                 console.error(
                   "❌ Upload error:",
-                  err.response?.data || err.message
+                  err.response?.data || err.message,
                 );
                 alert(err.response?.data?.message || "Upload failed");
               } finally {

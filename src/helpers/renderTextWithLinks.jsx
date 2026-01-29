@@ -28,7 +28,7 @@ export function renderTextWithLinks(text) {
         "
       >
         {label}
-      </a>
+      </a>,
     );
 
     lastIndex = index + match.length;

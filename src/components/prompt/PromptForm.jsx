@@ -64,7 +64,7 @@ export default function PromptForm({
       if (!tooLong) {
         toast.error(
           `Your prompt is too long (${length.toLocaleString()} / ${limit.toLocaleString()} characters). Please shorten it before submitting.`,
-          { autoClose: 6000 }
+          { autoClose: 6000 },
         );
       }
       setTooLong(true);
@@ -72,7 +72,7 @@ export default function PromptForm({
     } else if (length > softLimit) {
       setTooLong(false);
       setWarning(
-        `Approaching limit — ${length.toLocaleString()} / ${limit.toLocaleString()} characters.`
+        `Approaching limit — ${length.toLocaleString()} / ${limit.toLocaleString()} characters.`,
       );
     } else {
       setTooLong(false);
@@ -178,7 +178,7 @@ export default function PromptForm({
                     if (next > limit) {
                       if (isFreePlan) {
                         toast.info(
-                          "🚀 Upgrade your plan to unlock more than 5 pages."
+                          "🚀 Upgrade your plan to unlock more than 5 pages.",
                         );
                       }
                       return limit;
@@ -427,7 +427,7 @@ export default function PromptForm({
 
         {/* Editable text area */}
         <textarea
-          placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter...`}
+          placeholder={`Example:\nJoin my free newsletter...`}
           value={cta}
           onChange={(e) => setCta(e.target.value)}
           rows={5}

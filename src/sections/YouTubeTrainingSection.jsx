@@ -22,7 +22,7 @@ export default function YouTubeTrainingSection() {
             />
           </div>
           <p className="mt-3 text-black text-sm sm:text-base font-medium text-left">
-            How to Create a Lead Magnet in Cre8tly Studio, Part 1, Pro Document
+            How to Create a Lead Magnet in The Messy Attic, Part 1, Pro Document
             Creation
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function YouTubeTrainingSection() {
             />
           </div>
           <p className="mt-3 text-black text-sm sm:text-base font-medium text-left">
-            How to Create a Lead Magnet in Cre8tly Studio, Part 5, Landing Page
+            How to Create a Lead Magnet in The Messy Attic, Part 5, Landing Page
             Builder
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function YouTubeTrainingSection() {
             />
           </div>
           <p className="mt-3 text-black text-sm sm:text-base font-medium text-left">
-            How to Create a Lead Magnet in Cre8tly Studio, Part 6, Seller
+            How to Create a Lead Magnet in The Messy Attic, Part 6, Seller
             Dashboard and Analytics
           </p>
         </div>

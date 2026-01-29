@@ -4,7 +4,7 @@ import axiosInstance from "../../../api/axios";
 
 export default function PageUrlUsernameField({ landing, setLanding }) {
   const hasCustomDomain = Boolean(
-    landing?.domain?.hasPrimaryDomain && landing?.domain?.primaryDomain
+    landing?.domain?.hasPrimaryDomain && landing?.domain?.primaryDomain,
   );
 
   const primaryDomain = landing?.domain?.primaryDomain;
@@ -42,7 +42,7 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
           if (landing.username?.trim()?.length >= 3) {
             try {
               const res = await axiosInstance.get(
-                `/landing/check-username/${landing.username.trim()}`
+                `/landing/check-username/${landing.username.trim()}`,
               );
 
               toast[res.data.available ? "success" : "error"](res.data.message);
@@ -97,8 +97,8 @@ export default function PageUrlUsernameField({ landing, setLanding }) {
             This will be used for your page URL{" "}
             <span className="block text-dashboard-muted-light dark:text-dashboard-muted-dark break-all">
               {landing.username
-                ? `https://${landing.username}.cre8tlystudio.com`
-                : "https://yourname.cre8tlystudio.com"}
+                ? `https://${landing.username}.themessyattic.com`
+                : "https://yourname.themessyattic.com"}
             </span>
           </>
         )}

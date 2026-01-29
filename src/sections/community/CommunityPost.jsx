@@ -53,6 +53,23 @@ export default function CommunityPost() {
 
   const [tipOpen, setTipOpen] = useState(false);
   const [tipLoading, setTipLoading] = useState(false);
+  const [expandedComments, setExpandedComments] = useState({});
+
+  useEffect(() => {
+    if (!comments.length) return;
+
+    setExpandedComments((prev) => {
+      const next = { ...prev };
+
+      comments.forEach((c) => {
+        if (next[c.id] === undefined) {
+          next[c.id] = c.body.length <= 420; // short comments auto-expanded
+        }
+      });
+
+      return next;
+    });
+  }, [comments]);
 
   const openTipModal = () => {
     if (!user) {
@@ -450,9 +467,9 @@ export default function CommunityPost() {
     <div
       className="
       w-full flex justify-center items-start min-h-screen
-      px-0 py-14
-      sm:px-6 sm:py-16
-      lg:py-20
+      px-0 py-0
+      sm:px-6 sm:py-0
+      lg:py-0
     "
     >
       <div
@@ -492,31 +509,6 @@ export default function CommunityPost() {
             <ArrowLeft size={16} />
             Back
           </button>
-
-          <span>/</span>
-
-          <button
-            onClick={() => navigate("/community")}
-            className="hover:text-gray-200"
-          >
-            Community
-          </button>
-
-          <span>/</span>
-
-          <span
-            className="
-          text-dashboard-text-light
-          dark:text-dashboard-text-dark
-          font-medium
-          text-sm sm:text-base
-          truncate
-          max-w-[60vw] sm:max-w-none
-        "
-            title={post.title}
-          >
-            {post.title}
-          </span>
         </div>
 
         {/* Main content */}
@@ -538,7 +530,7 @@ export default function CommunityPost() {
             sm:shadow-lg
           "
           >
-            <div className="flex items-center gap-4 mb-4 sm:mb-6">
+            <div className="flex items-start gap-4 mb-4 sm:mb-6">
               <button
                 title={
                   !post.author_has_profile ? "Profile coming soon" : undefined
@@ -556,13 +548,13 @@ export default function CommunityPost() {
                   // Safe navigation
                   navigate(`/community/authors/${post.user_id}`);
                 }}
-                className={`group ${!post.author_has_profile ? "cursor-default" : "cursor-pointer"}`}
+                className={`group -mt-2.5 ${!post.author_has_profile ? "cursor-default" : "cursor-pointer"}`}
               >
                 {isStudioPost ? (
                   <img
                     src={headerLogo}
                     className="w-12 h-12 rounded-full object-cover"
-                    alt="Cre8tly Studio"
+                    alt="The Messy Attic"
                   />
                 ) : post.author_image ? (
                   <Img
@@ -600,12 +592,12 @@ export default function CommunityPost() {
                     {(isStudioPost || isAdmin) && (
                       <span
                         className="
-        flex items-center
-        text-dashboard-muted-light dark:text-dashboard-muted-dark
-        text-[10px]
-        px-0.5 py-0.5
-        rounded-full
-      "
+                        flex items-center
+                        text-dashboard-muted-light dark:text-dashboard-muted-dark
+                        text-[10px]
+                        px-0.5 py-0.5
+                        rounded-full
+                      "
                       >
                         <ShieldCheck
                           size={15}
@@ -656,12 +648,117 @@ export default function CommunityPost() {
                   )}
                 </div>
 
-                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm">
+                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm mt-1">
                   <span>{formatPostDate(post.created_at)}</span>
                   <span className="mx-1">·</span>
                   <span className="opacity-80">{timeAgo(post.created_at)}</span>
                 </p>
-                <div className="flex items-center gap-6 mt-0.5 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+
+                {/* Mobile meta + actions */}
+                <div
+                  className="
+                  sm:hidden
+                  mt-2
+                  w-full
+                  flex items-center
+                  justify-between
+                  text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                "
+                >
+                  {/* Views (meta, not clickable) */}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Eye size={18} className="opacity-70" />
+                      <span>{post.views ?? 0}</span>
+                    </div>
+                    {/* Like */}
+                    <button
+                      onClick={togglePostLike}
+                      className="
+                      flex items-center gap-2
+                      text-sm
+                      active:scale-95
+                      transition
+                    "
+                    >
+                      <Heart
+                        size={18}
+                        className={
+                          post.has_liked
+                            ? "text-red-500 fill-red-500"
+                            : "opacity-80"
+                        }
+                      />
+                      <span>{post.like_count ?? 0}</span>
+                    </button>
+
+                    {/* Comments */}
+                    <button
+                      onClick={() =>
+                        document
+                          .getElementById("comments")
+                          ?.scrollIntoView({ behavior: "smooth" })
+                      }
+                      className="
+                      flex items-center gap-2
+                      text-sm
+                      active:scale-95
+                      transition
+                    "
+                    >
+                      <MessageCircle size={18} className="opacity-80" />
+                      <span>{post.comment_count ?? 0}</span>
+                    </button>
+
+                    {/* Share */}
+                    <button
+                      onClick={handleShare}
+                      className="
+                      flex items-center gap-2
+                      text-sm
+                      active:scale-95
+                      transition
+                    "
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={18} className="text-green" />
+                        </>
+                      ) : (
+                        <>
+                          <Share2 size={18} className="opacity-80" />
+                        </>
+                      )}
+                    </button>
+                    {user &&
+                      user.id !== post.user_id &&
+                      (tipSuccess ? (
+                        <div className="flex items-center gap-2 text-sm text-green">
+                          <Check size={18} />
+                          <span>Sent</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={openTipModal}
+                          className="
+                          flex items-center gap-2
+                          text-sm
+                          active:scale-95
+                          transition
+                        "
+                        >
+                          <DollarSign size={18} className="opacity-80" />
+                          <span>Tip</span>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Desktop Menu */}
+                <div className="hidden sm:flex items-center gap-6 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                   <div className="flex items-center gap-[3px]">
                     <Eye size={16} className="opacity-70" />
                     <span>{post.views ?? 0}</span>
@@ -697,7 +794,6 @@ export default function CommunityPost() {
                     {copied ? (
                       <>
                         <Check size={16} className="text-green" />
-                        <span className="text-green text-xs">Copied</span>
                       </>
                     ) : (
                       <>
@@ -733,13 +829,16 @@ export default function CommunityPost() {
 
             <h2
               className="
-              not-prose
-              text-3xl sm:text-3xl
-              font-bold
-              mb-2
-              text-dashboard-text-light
-              dark:text-dashboard-text-dark
-            "
+    not-prose
+    text-3xl sm:text-3xl
+    font-bold
+    mb-1
+    tracking-tight
+    leading-tight
+    text-left
+    text-dashboard-text-light
+    dark:text-dashboard-text-dark
+  "
             >
               {post.title}
             </h2>
@@ -811,6 +910,16 @@ export default function CommunityPost() {
               {comments.map((c) => {
                 const commentAvatar = c.author?.charAt(0).toUpperCase() ?? "U";
                 const commentAdmin = c.author_role === "admin";
+
+                const MAX_LENGTH = 420;
+
+                const isExpanded = expandedComments[c.id] !== false;
+                const isLong = c.body.length > MAX_LENGTH;
+
+                const displayText =
+                  !isExpanded && isLong
+                    ? c.body.slice(0, MAX_LENGTH).trim() + "…"
+                    : c.body;
 
                 return (
                   <div
@@ -925,19 +1034,49 @@ export default function CommunityPost() {
                           <span>{timeAgo(c.created_at)}</span>
                         </div>
                         {editCommentId !== c.id && (
-                          <div
-                            className="
-                            prose prose-sm max-w-none
-                            my-1
-                            text-dashboard-text-light dark:text-dashboard-text-dark
-                            whitespace-pre-wrap
-                            dark:prose-invert
-                            dark:prose-a:text-sky-400
-                            dark:prose-a:decoration-sky-400
-                          "
-                          >
-                            {renderTextWithLinks(c.body)}
-                          </div>
+                          <>
+                            <div
+                              className="
+                              prose prose-sm max-w-none
+                              my-1
+                              text-dashboard-text-light dark:text-dashboard-text-dark
+                              whitespace-pre-wrap
+                              dark:prose-invert
+                              dark:prose-a:text-sky-400
+                              dark:prose-a:decoration-sky-400
+                            "
+                            >
+                              {renderTextWithLinks(displayText)}
+                            </div>
+
+                            {!isExpanded && isLong && (
+                              <button
+                                onClick={() =>
+                                  setExpandedComments((prev) => ({
+                                    ...prev,
+                                    [c.id]: true,
+                                  }))
+                                }
+                                className="text-xs text-sky-400 mt-1 hover:underline"
+                              >
+                                See more
+                              </button>
+                            )}
+
+                            {isExpanded && isLong && (
+                              <button
+                                onClick={() =>
+                                  setExpandedComments((prev) => ({
+                                    ...prev,
+                                    [c.id]: false,
+                                  }))
+                                }
+                                className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1 hover:underline"
+                              >
+                                See less
+                              </button>
+                            )}
+                          </>
                         )}
 
                         {editCommentId === c.id && (
@@ -1118,6 +1257,8 @@ export default function CommunityPost() {
                               onReplySubmit={saveEditedComment}
                               openReplies={openReplies}
                               toggleReplyVisibility={toggleReplies}
+                              expandedComments={expandedComments}
+                              setExpandedComments={setExpandedComments}
                             />
                           ))}
                       </div>

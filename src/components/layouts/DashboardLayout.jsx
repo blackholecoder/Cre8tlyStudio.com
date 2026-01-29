@@ -8,7 +8,7 @@ import {
   SIDEBAR_SECTIONS,
   SidebarToggleIcon,
 } from "../../constants/sideBarSections";
-import { defaultImage } from "../../assets/images";
+import { defaultImage, headerLogo } from "../../assets/images";
 import UpgradeRequiredModal from "../modals/UpgradeRequiredModal";
 
 const SIDEBAR_COLLAPSE_KEY = "cre8tly_sidebar_collapsed";
@@ -235,15 +235,19 @@ ${locked ? "opacity-50 cursor-pointer" : ""}
                 <div className="flex items-center gap-3">
                   <div className="relative w-10 h-10 flex items-center justify-center">
                     <div className="absolute w-[90%] h-[90%] rounded-full bg-green-400/25 blur-lg animate-pulse" />
-                    <AnimatedLogo className="relative z-10 w-10 h-10 animate-glow" />
+                    <img
+                      src={headerLogo}
+                      alt="The Messy Attic"
+                      className="h-12 w-12 object-contain"
+                    />
                   </div>
 
                   <div className="flex flex-col leading-tight">
-                    <span className="logoText font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
-                      Cre8tly
+                    <span className="logoText text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark.  ">
+                      The Messy
                     </span>
-                    <span className="logoText text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                      Studio
+                    <span className="logoText text-dashboard-text-light dark:text-dashboard-text-dark">
+                      Attic
                     </span>
                   </div>
                 </div>
@@ -337,7 +341,7 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
       )}
 
       {!isDesktop && (
-        <div className="sticky top-0 z-30 bg-dashboard-bg-light dark:bg-dashboard-bg-dark border-b">
+        <div className="sticky top-0 z-30 bg-dashboard-bg-light dark:bg-dashboard-bg-dark ">
           <div className="flex justify-end p-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -495,11 +499,11 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
                   setMobileMenuOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl
-      text-red-500
-      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-      border border-dashboard-border-light dark:border-dashboard-border-dark
-      hover:bg-red-600/10
-      transition"
+                text-red-500
+                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                hover:bg-red-600/10
+                transition"
               >
                 <LogOut size={20} />
                 <span className="font-medium">Logout</span>

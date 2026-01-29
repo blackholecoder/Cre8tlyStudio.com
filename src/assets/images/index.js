@@ -1,4 +1,4 @@
-import headerLogo from "./cre8tly-logo.svg";
+import headerLogo from "./themessyattic-logo.svg";
 import banner from "./ai-hero.jpg";
 import ebookCover from "./ultimate-branding.jpg";
 import showcase from "./showcase.png";

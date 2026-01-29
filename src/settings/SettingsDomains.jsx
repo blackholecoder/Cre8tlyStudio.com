@@ -244,7 +244,7 @@ export default function SettingsDomains() {
                         <div className="bg-black/60 rounded-md p-3 text-xs font-mono text-gray-200 space-y-1">
                           <div>Type: CNAME</div>
                           <div>Host: @</div>
-                          <div>Value: domains.cre8tlystudio.com</div>
+                          <div>Value: domains.themessyattic.com</div>
                           <div>Proxy: ON (orange cloud)</div>
                         </div>
                       </div>
@@ -258,7 +258,7 @@ export default function SettingsDomains() {
                         <div className="bg-black/60 rounded-md p-3 text-xs font-mono text-gray-200 space-y-1">
                           <div>Type: CNAME</div>
                           <div>Host: www</div>
-                          <div>Value: domains.cre8tlystudio.com</div>
+                          <div>Value: domains.themessyattic.com</div>
                           <div>Proxy: ON (orange cloud)</div>
                         </div>
                       </div>
@@ -278,7 +278,7 @@ export default function SettingsDomains() {
         <div className="bg-black/40 border border-gray-700 rounded-xl p-5 mt-10">
           <p className="text-xs text-gray-400 leading-relaxed">
             By connecting a domain, you confirm that you own or control this
-            domain and have permission to use it. Cre8tly Studio reserves the
+            domain and have permission to use it. The Messy Attic reserves the
             right to suspend or remove domains used for impersonation, abuse,
             copyright infringement, or unlawful activity.
           </p>

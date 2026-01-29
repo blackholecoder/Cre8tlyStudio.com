@@ -50,8 +50,8 @@ export default function BottomActionsBar({
         <a
           href={
             landing.username
-              ? `https://${landing.username}.cre8tlystudio.com?owner_preview=${encodeURIComponent(
-                  user?.id || ""
+              ? `https://${landing.username}.themessyattic.com?owner_preview=${encodeURIComponent(
+                  user?.id || "",
                 )}`
               : undefined
           }
@@ -103,7 +103,7 @@ export default function BottomActionsBar({
               type="button"
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `https://${landing.username}.cre8tlystudio.com`
+                  `https://${landing.username}.themessyattic.com`,
                 );
                 setCopied(true);
                 setTimeout(() => setCopied(false), 1500);
@@ -112,7 +112,7 @@ export default function BottomActionsBar({
             >
               {copied
                 ? "Copied!"
-                : `https://${landing.username}.cre8tlystudio.com`}
+                : `https://${landing.username}.themessyattic.com`}
             </button>
           ) : (
             <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">

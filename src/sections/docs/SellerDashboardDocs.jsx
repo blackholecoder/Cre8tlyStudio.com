@@ -70,7 +70,7 @@ export default function SellerDashboardDocs() {
                 </h1>
                 <p className="text-xs text-gray-400 mt-1">
                   Track your sales, payouts, customers, and follow-up emails
-                  directly inside Cre8tly Studio.
+                  directly inside The Messy Attic.
                 </p>
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function SellerDashboardDocs() {
             <ol className="list-decimal list-inside text-sm text-gray-300 space-y-1">
               <li>Stripe processes the payment</li>
               <li>
-                You receive the revenue (minus Stripe and Cre8tly Studio
+                You receive the revenue (minus Stripe and The Messy Attic
                 Platform fees)
               </li>
               <li>The customer is redirected to your Thank You page</li>

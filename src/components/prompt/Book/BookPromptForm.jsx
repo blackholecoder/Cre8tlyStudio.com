@@ -52,7 +52,7 @@ export default function BookPromptForm({
   const [canEdit, setCanEdit] = useState(false);
   const { accessToken } = useAuth();
   const [hasShownBanner, setHasShownBanner] = useState(
-    sessionStorage.getItem("shownDraftBanner") === "true"
+    sessionStorage.getItem("shownDraftBanner") === "true",
   );
   const [draftAuthor, setDraftAuthor] = useState(authorName || "");
   const [uploading, setUploading] = useState(false);
@@ -82,7 +82,7 @@ export default function BookPromptForm({
   const [sectionTitleDraft, setSectionTitleDraft] = useState("");
 
   const activeSection = sections.find(
-    (section) => section.id === activeSectionId
+    (section) => section.id === activeSectionId,
   );
 
   const activeSectionWordCount = activeSection
@@ -91,7 +91,7 @@ export default function BookPromptForm({
 
   const totalChapterWordCount = sections.reduce(
     (sum, section) => sum + getWordCount(section.content),
-    0
+    0,
   );
 
   useEffect(() => {
@@ -147,7 +147,7 @@ export default function BookPromptForm({
         toast.error(
           `This file contains ${wordCount.toLocaleString()} words. 
 The maximum allowed per chapter is ${MAX_CHAPTER_WORDS.toLocaleString()}. 
-Please split the file into multiple chapters.`
+Please split the file into multiple chapters.`,
         );
         return;
       }
@@ -155,7 +155,7 @@ Please split the file into multiple chapters.`
       // ✅ SAFE TO INSERT
       setText(importedText);
       toast.success(
-        `Imported ${wordCount.toLocaleString()} words successfully`
+        `Imported ${wordCount.toLocaleString()} words successfully`,
       );
     } catch (err) {
       console.error("Upload failed:", err);
@@ -290,7 +290,7 @@ Please split the file into multiple chapters.`
           book_type: bookType,
           font_name: fontName,
           font_file: fontFile,
-        })
+        }),
       );
     };
 
@@ -337,7 +337,7 @@ Please split the file into multiple chapters.`
           book_type: bookType,
           font_name: fontName,
           font_file: fontFile,
-        }
+        },
       );
 
       setLastSavedAt(new Date().toISOString());
@@ -364,8 +364,8 @@ Please split the file into multiple chapters.`
       // ✅ Choose correct endpoint based on part number
       const endpoint =
         partNumber > 1
-          ? `https://cre8tlystudio.com/api/books/${bookId}/part/${partNumber}/draft`
-          : "https://cre8tlystudio.com/api/books/draft";
+          ? `https://themessyattic.com/api/books/${bookId}/part/${partNumber}/draft`
+          : "https://themessyattic.com/api/books/draft";
 
       const res = await axiosInstance.post(
         endpoint,
@@ -380,7 +380,7 @@ Please split the file into multiple chapters.`
           font_name: fontName, // ✅ added
           font_file: fontFile,
         },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } },
       );
 
       // ✅ Only setBookId if prop exists and new id was returned
@@ -410,24 +410,26 @@ Please split the file into multiple chapters.`
 
     if (adjustedTotalWordCount > MAX_CHAPTER_WORDS) {
       toast.error(
-        `This chapter has ${adjustedTotalWordCount.toLocaleString()} words. The maximum allowed is ${MAX_CHAPTER_WORDS.toLocaleString()}. Please split this into another chapter.`
+        `This chapter has ${adjustedTotalWordCount.toLocaleString()} words. The maximum allowed is ${MAX_CHAPTER_WORDS.toLocaleString()}. Please split this into another chapter.`,
       );
       return;
     }
     setSections((prev) =>
       prev.map((section) =>
-        section.id === activeSectionId ? { ...section, content: text } : section
-      )
+        section.id === activeSectionId
+          ? { ...section, content: text }
+          : section,
+      ),
     );
 
     const sectionsForSubmit = sections.map((section) =>
-      section.id === activeSectionId ? { ...section, content: text } : section
+      section.id === activeSectionId ? { ...section, content: text } : section,
     );
 
     const combinedPrompt = sectionsForSubmit
       .map(
         (s, index) =>
-          `Section ${index + 1}: ${s.title || "Untitled"}\n${s.content || ""}`
+          `Section ${index + 1}: ${s.title || "Untitled"}\n${s.content || ""}`,
       )
       .join("\n\n");
 
@@ -559,7 +561,7 @@ Please split the file into multiple chapters.`
       ),
       {
         duration: 5000,
-      }
+      },
     );
 
     // finalize delete after timeout
@@ -887,8 +889,8 @@ Please split the file into multiple chapters.`
                                     title:
                                       sectionTitleDraft.trim() || section.title,
                                   }
-                                : section
-                            )
+                                : section,
+                            ),
                           );
                           setEditingSectionId(null);
                         }}
@@ -984,8 +986,8 @@ Please split the file into multiple chapters.`
                     prev.map((section) =>
                       section.id === activeSectionId
                         ? { ...section, content: html }
-                        : section
-                    )
+                        : section,
+                    ),
                   );
                 }}
               />

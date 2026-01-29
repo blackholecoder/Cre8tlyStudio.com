@@ -52,7 +52,7 @@ export default function AuthorsAssistant() {
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg font-medium">
               <img
                 src={bookFeature}
-                alt="Cre8tly Studio platform preview"
+                alt="The Messy Attic platform preview"
                 className="w-full h-full object-cover shadow-sm"
               />
             </div>

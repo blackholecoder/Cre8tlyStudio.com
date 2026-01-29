@@ -149,7 +149,7 @@ export default function CommunityHome() {
     <div
       className="
     w-full min-h-screen
-    px-0 py-10
+    px-0 py-0
     bg-dashboard-bg-light
     dark:bg-dashboard-bg-dark
   "
@@ -201,7 +201,7 @@ export default function CommunityHome() {
           dark:text-dashboard-text-dark mb-2
   "
           >
-            Cre8tly Community
+            The Messy Attic
           </h1>
           <p
             className="
@@ -212,7 +212,9 @@ export default function CommunityHome() {
             mb-8
           "
           >
-            A shared space for ideas, questions, discussions, and learning.
+            where writers come together to share work,
+            <br /> encourage one another, and grow
+            <br /> through honest feedback and connection.
           </p>
 
           <div className="flex justify-center mb-8">
@@ -470,7 +472,29 @@ export default function CommunityHome() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full opacity-40" />
+                    <div
+                      className="
+                      w-full h-full
+                      flex items-center justify-center
+                      bg-gradient-to-br
+                      from-sky-400/80
+                      via-sky-300/90
+                      to-blue/80
+                    "
+                    >
+                      <span
+                        className="
+                        text-[10px] sm:text-xs
+                        font-medium
+                        uppercase
+                        tracking-wide
+                       text-dashboard-text-light dark:text-dashboard-text-dark
+                        select-none
+                      "
+                      >
+                        No image
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

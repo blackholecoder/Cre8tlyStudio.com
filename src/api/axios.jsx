@@ -4,8 +4,8 @@ import { isTokenExpired, refreshAccessToken } from "../admin/authHelpers";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
-    ? "https://cre8tlystudio.com/api"
-    : "https://cre8tlystudio.com/api";
+    ? "https://themessyattic.com/api"
+    : "https://themessyattic.com/api";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -44,7 +44,7 @@ axiosInstance.interceptors.response.use(
       window.location.href = "/";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 axiosInstance.interceptors.response.use(
@@ -61,7 +61,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

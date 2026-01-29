@@ -84,7 +84,7 @@ export default function CreatePostPage({ post = null, topicId }) {
           payload.image_url = imageUrl;
         }
 
-        await axiosInstance.put(`/community/posts/${postId}`, payload);
+        await axiosInstance.put(`/community/${postId}`, payload);
       } else {
         const finalTopicId = lockedTopicId || selectedTopicId;
 

@@ -15,7 +15,7 @@ export default function LandingAnalytics() {
   useEffect(() => {
     async function fetchLandingId() {
       const res = await axiosInstance.get(
-        `https://cre8tlystudio.com/api/landing-analytics/id/by-user/${user.id}`
+        `https://themessyattic.com/api/landing-analytics/id/by-user/${user.id}`,
       );
       setLandingPageId(res.data.id);
     }
@@ -35,11 +35,11 @@ export default function LandingAnalytics() {
         "🚀 Fetching analytics for:",
         landingPageId,
         "range:",
-        selectedRange
+        selectedRange,
       );
 
       const res = await axiosInstance.get(
-        `https://cre8tlystudio.com/api/landing-analytics/summary/${landingPageId}?days=${selectedRange}`
+        `https://themessyattic.com/api/landing-analytics/summary/${landingPageId}?days=${selectedRange}`,
       );
 
       if (res.data && res.data.success) {
@@ -198,7 +198,7 @@ export default function LandingAnalytics() {
               dark:text-dashboard-metric-dark"
             >
               {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                data.views?.reduce((acc, v) => acc + v.total, 0) || 0
+                data.views?.reduce((acc, v) => acc + v.total, 0) || 0,
               )}
             </h2>
 
@@ -215,7 +215,7 @@ export default function LandingAnalytics() {
                 })}{" "}
                 –{" "}
                 {new Date(
-                  chartData[chartData.length - 1].date
+                  chartData[chartData.length - 1].date,
                 ).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",

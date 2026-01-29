@@ -504,7 +504,7 @@ export default function LandingPageBuilder() {
     }
 
     if (type === "referral_button") {
-      newBlock.text = "Join Cre8tly Studio";
+      newBlock.text = "Join The Messy Attic";
       newBlock.button_color = "#7bed9f";
       newBlock.text_color = "#000000";
       newBlock.alignment = "center";
@@ -1130,7 +1130,7 @@ export default function LandingPageBuilder() {
         text-dashboard-muted-light dark:text-dashboard-muted-dark
       "
         >
-          Cre8tly Studio is fetching your latest content blocks.
+          The Messy Attic is fetching your latest content blocks.
         </p>
       </div>
     );
@@ -1212,7 +1212,7 @@ export default function LandingPageBuilder() {
       );
 
       await axiosInstance.put(
-        `https://cre8tlystudio.com/api/landing/update/${landing.id}`,
+        `https://themessyattic.com/api/landing/update/${landing.id}`,
         {
           ...landing,
           font: fontName, // ✅ override stale landing.font

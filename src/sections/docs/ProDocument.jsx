@@ -40,7 +40,7 @@ export default function ProDocuments() {
 
           <p className="text-xs text-gray-400 mb-3">
             A full guide for creating professional ebooks, guides, and digital
-            documents inside Cre8tly Studio Pro.
+            documents inside The Messy Attic Pro.
           </p>
 
           <ul className="space-y-1 text-sm">
@@ -76,7 +76,7 @@ export default function ProDocuments() {
               <FileText className="w-7 h-7 text-green" />
               <div>
                 <h1 className="text-2xl font-bold text-silver">
-                  How To Create Pro Documents in Cre8tly Studio
+                  How To Create Pro Documents in The Messy Attic
                 </h1>
                 <p className="text-xs text-gray-400 mt-1">
                   A complete walkthrough for building professional ebooks,
@@ -127,7 +127,7 @@ export default function ProDocuments() {
               2. Starting A New Pro Document
             </h2>
             <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300 mb-3">
-              <li>Open your Cre8tly Studio dashboard.</li>
+              <li>Open your The Messy Attic dashboard.</li>
               <li>Navigate to the Pro Documents section.</li>
               <li>Select Create New Pro Document.</li>
               <li>You will see the expanded Pro Document Creator fields.</li>
@@ -318,8 +318,8 @@ export default function ProDocuments() {
               8.2 What Happens When You Generate
             </h3>
             <p className="text-sm text-gray-300 mb-2">
-              Once you submit, Cre8tly Studio formats your content, applies your
-              theme, builds a table of contents, designs the cover, and
+              Once you submit, The Messy Attic formats your content, applies
+              your theme, builds a table of contents, designs the cover, and
               assembles your book into a professional-grade document.
             </p>
             <p className="text-xs text-gray-400">

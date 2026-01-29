@@ -9,9 +9,12 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchAllMagnets() {
       try {
-        const res = await axios.get("https://cre8tlystudio.com/api/lead-magnets/all", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const res = await axios.get(
+          "https://themessyattic.com/api/lead-magnets/all",
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          },
+        );
         setMagnets(res.data);
       } catch (err) {
         console.error("Error fetching all lead magnets:", err);
@@ -28,7 +31,9 @@ export default function AdminDashboard() {
           <li key={m.id} className="bg-charcoal p-4 rounded-lg text-white">
             <p>User: {m.user_id}</p>
             <p>Prompt: {m.prompt}</p>
-            <p>Status: <span className="text-green">{m.status}</span></p>
+            <p>
+              Status: <span className="text-green">{m.status}</span>
+            </p>
           </li>
         ))}
       </ul>

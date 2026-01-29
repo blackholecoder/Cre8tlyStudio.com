@@ -22,68 +22,6 @@ import {
 
 export const SIDEBAR_SECTIONS = [
   {
-    section: "Core",
-    items: [
-      {
-        key: "dashboard",
-        label: "Digital Products",
-        path: "/dashboard",
-        icon: Package,
-        access: "all",
-      },
-      {
-        key: "assistant",
-        label: "Assistant",
-        path: "/books",
-        icon: BookOpen,
-        access: "pro",
-      },
-      {
-        key: "prompts",
-        label: "Prompt Memory",
-        path: "/prompts",
-        icon: SquareTerminal,
-        access: "pro",
-      },
-    ],
-  },
-
-  {
-    section: "Growth",
-    access: "pro",
-    items: [
-      {
-        key: "landing",
-        label: "Landing Pages",
-        path: "/landing-page-builder",
-        icon: LayoutTemplate,
-        access: "pro",
-      },
-      {
-        key: "leads",
-        label: "Leads",
-        path: "/leads",
-        icon: MailSearch,
-        access: "pro",
-      },
-      {
-        key: "analytics",
-        label: "Analytics",
-        path: "/landing-analytics",
-        icon: BarChart2,
-        access: "pro",
-      },
-      {
-        key: "seller",
-        label: "Seller Dashboard",
-        path: "/seller-dashboard",
-        icon: Landmark,
-        access: "seller",
-      },
-    ],
-  },
-
-  {
     section: "Community",
     items: [
       {
@@ -150,14 +88,67 @@ export const SIDEBAR_SECTIONS = [
         allowCommunity: true,
         isSubItem: true,
       },
+    ],
+  },
+  {
+    section: "Tools",
+    items: [
+      {
+        key: "assistant",
+        label: "Assistant",
+        path: "/books",
+        icon: BookOpen,
+        access: "pro",
+      },
+      {
+        key: "dashboard",
+        label: "Digital Products",
+        path: "/dashboard",
+        icon: Package,
+        access: "all",
+      },
 
       {
-        key: "inbox",
-        label: "Inbox",
-        path: "/notifications",
-        icon: Inbox,
-        badge: "unreadCount",
-        allowCommunity: true,
+        key: "prompts",
+        label: "Prompt Memory",
+        path: "/prompts",
+        icon: SquareTerminal,
+        access: "pro",
+      },
+    ],
+  },
+
+  {
+    section: "Growth",
+    access: "pro",
+    items: [
+      {
+        key: "landing",
+        label: "Landing Pages",
+        path: "/landing-page-builder",
+        icon: LayoutTemplate,
+        access: "pro",
+      },
+      {
+        key: "leads",
+        label: "Leads",
+        path: "/leads",
+        icon: MailSearch,
+        access: "pro",
+      },
+      {
+        key: "analytics",
+        label: "Analytics",
+        path: "/landing-analytics",
+        icon: BarChart2,
+        access: "pro",
+      },
+      {
+        key: "seller",
+        label: "Seller Dashboard",
+        path: "/seller-dashboard",
+        icon: Landmark,
+        access: "seller",
       },
     ],
   },
@@ -166,6 +157,14 @@ export const SIDEBAR_SECTIONS = [
     section: "Account",
     items: [
       {
+        key: "inbox",
+        label: "Inbox",
+        path: "/notifications",
+        icon: Inbox,
+        badge: "unreadCount",
+        allowCommunity: true,
+      },
+      {
         key: "settings",
         label: "Settings",
         path: "/settings",
@@ -173,13 +172,7 @@ export const SIDEBAR_SECTIONS = [
         indicator: "brandConfigured",
         allowCommunity: true,
       },
-      {
-        key: "plans",
-        label: "Plans",
-        path: "/plans",
-        icon: DollarSign,
-        allowCommunity: true,
-      },
+
       {
         key: "docs",
         label: "Help",

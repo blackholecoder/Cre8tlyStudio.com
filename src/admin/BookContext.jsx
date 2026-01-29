@@ -10,12 +10,11 @@ export function BookProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
   // ✅ Fetch all user books
   const fetchBooks = async () => {
     if (!accessToken) return;
     try {
-      const res = await axios.get("https://cre8tlystudio.com/api/books", {
+      const res = await axios.get("https://themessyattic.com/api/books", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setBooks(res.data);
@@ -35,7 +34,7 @@ export function BookProvider({ children }) {
 
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get("https://cre8tlystudio.com/api/books", {
+        const res = await axios.get("https://themessyattic.com/api/books", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 
@@ -52,7 +51,9 @@ export function BookProvider({ children }) {
   }, [accessToken]);
 
   return (
-    <BookContext.Provider value={{ books, setBooks, fetchBooks, loading, error }}>
+    <BookContext.Provider
+      value={{ books, setBooks, fetchBooks, loading, error }}
+    >
       {children}
     </BookContext.Provider>
   );

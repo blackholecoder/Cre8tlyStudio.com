@@ -7,7 +7,7 @@ const Terms = () => {
 
         <p className="document-p-text">
           These Terms and Conditions (“Agreement”) govern your access to and use
-          of the Cre8tly Studio website, platform, and all related products and
+          of the The Messy Attic website, platform, and all related products and
           services (collectively, “Services”). By creating an account, making a
           purchase, or otherwise using our Services, you (“User”, “you”, or
           “your”) agree to be legally bound by this Agreement. If you do not
@@ -18,14 +18,14 @@ const Terms = () => {
         <h1 className="document-title-text">Ownership and License</h1>
         <br />
         <p className="document-p-text">
-          Cre8tly Studio owns and retains all rights, title, and interest in the
-          Services, including all software, source code, algorithms, designs,
-          trade secrets, and intellectual property. Your purchase provides a
-          limited, non-transferable, non-exclusive license to use the Services
-          for your personal or business needs in accordance with this Agreement.
-          No ownership rights are transferred to you. Any attempt to copy,
-          reverse-engineer, resell, or distribute the software or digital output
-          without written permission is strictly prohibited.
+          The Messy Attic owns and retains all rights, title, and interest in
+          the Services, including all software, source code, algorithms,
+          designs, trade secrets, and intellectual property. Your purchase
+          provides a limited, non-transferable, non-exclusive license to use the
+          Services for your personal or business needs in accordance with this
+          Agreement. No ownership rights are transferred to you. Any attempt to
+          copy, reverse-engineer, resell, or distribute the software or digital
+          output without written permission is strictly prohibited.
         </p>
         <br />
 
@@ -44,11 +44,11 @@ const Terms = () => {
         <h1 className="document-title-text">Custom Domains</h1>
         <br />
         <p className="document-p-text">
-          Cre8tly Studio may allow eligible users to connect and use a custom
+          The Messy Attic may allow eligible users to connect and use a custom
           domain name with their landing pages and digital products. By adding a
           custom domain, you represent and warrant that you are the legal owner
           of the domain or have full authorization to use and control it. You
-          grant Cre8tly Studio permission to route traffic, provision security
+          grant The Messy Attic permission to route traffic, provision security
           certificates, and host content associated with the domain for the
           purpose of providing the Services.
         </p>
@@ -56,18 +56,18 @@ const Terms = () => {
         <p className="document-p-text">
           Custom domains are not activated until ownership has been verified
           through DNS configuration or other technical validation methods
-          determined by Cre8tly Studio. We do not serve content on unverified
+          determined by The Messy Attic. We do not serve content on unverified
           domains. You are solely responsible for maintaining control of your
           domain and ensuring that it does not infringe upon trademarks,
           intellectual property rights, or applicable laws.
         </p>
         <br />
         <p className="document-p-text">
-          Cre8tly Studio reserves the right, in its sole discretion, to suspend,
-          disable, or remove any custom domain that is used for unlawful
-          activity, trademark infringement, impersonation, abuse, or violation
-          of these Terms, without prior notice. Loss of access to a custom
-          domain does not entitle you to a refund of subscription fees or
+          The Messy Attic reserves the right, in its sole discretion, to
+          suspend, disable, or remove any custom domain that is used for
+          unlawful activity, trademark infringement, impersonation, abuse, or
+          violation of these Terms, without prior notice. Loss of access to a
+          custom domain does not entitle you to a refund of subscription fees or
           credits.
         </p>
         <br />
@@ -87,7 +87,7 @@ const Terms = () => {
         </h1>
         <br />
         <p className="document-p-text">
-          Cre8tly Studio provides tools that allow independent sellers to
+          The Messy Attic provides tools that allow independent sellers to
           upload, price, and sell their digital products through their own
           landing pages using the Seller Dashboard. By becoming a seller, you
           acknowledge and agree to the following:
@@ -97,7 +97,7 @@ const Terms = () => {
           Connect, and sellers must maintain a valid Stripe Express account to
           receive funds.
           <br />
-          • Cre8tly Studio is a platform provider and is not the merchant of
+          • The Messy Attic is a platform provider and is not the merchant of
           record for seller products. All digital items sold through landing
           pages are created and owned by the seller.
           <br />
@@ -148,8 +148,8 @@ const Terms = () => {
         <br />
         <p className="document-p-text">
           All software, designs, branding, content, and related intellectual
-          property are owned exclusively by Cre8tly Studio or its licensors. You
-          may not reproduce, republish, modify, or exploit any part of the
+          property are owned exclusively by The Messy Attic or its licensors.
+          You may not reproduce, republish, modify, or exploit any part of the
           Services without our express written consent.
         </p>
         <br />
@@ -168,7 +168,7 @@ const Terms = () => {
         <h1 className="document-title-text">Limitation of Liability</h1>
         <br />
         <p className="document-p-text">
-          To the fullest extent permitted by law, Cre8tly Studio, its owners,
+          To the fullest extent permitted by law, The Messy Attic, its owners,
           employees, and affiliates shall not be liable for any indirect,
           incidental, consequential, or punitive damages, including but not
           limited to loss of profits, business interruption, or data loss,
@@ -202,7 +202,7 @@ const Terms = () => {
           at:
         </p>
         <br />
-        <p className="document-p-text">legal@cre8tlystudio.com</p>
+        <p className="document-p-text">legal@themessyattic.com</p>
         <br />
         <p className="document-p-text">
           This document was last updated on August 26, 2025.

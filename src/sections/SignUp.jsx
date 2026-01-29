@@ -61,7 +61,7 @@ export default function SignupPage() {
       };
 
       const res = await axios.post(
-        "https://cre8tlystudio.com/api/auth/signup-community",
+        "https://themessyattic.com/api/auth/signup-community",
         payload,
       );
 
@@ -104,13 +104,13 @@ export default function SignupPage() {
           <div className="flex items-center gap-1 mb-5">
             <img
               src={headerLogo}
-              alt="Cre8tly Studio"
+              alt="The Messy Attic"
               className="h-12 w-12 object-contain"
             />
 
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-semibold text-gray-900">
-                Cre8tly Studio
+                The Messy Attic
               </span>
             </div>
           </div>

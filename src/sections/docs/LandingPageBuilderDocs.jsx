@@ -48,7 +48,7 @@ export default function LandingBuilderDocs() {
 
           <p className="text-xs text-gray-400 mb-3">
             Learn how to design, brand, and publish high-converting landing
-            pages with Cre8tly Studio.
+            pages with The Messy Attic.
           </p>
 
           <ul className="space-y-1 text-sm">
@@ -107,7 +107,7 @@ export default function LandingBuilderDocs() {
               ship a clean, on-brand page without touching raw HTML or CSS.
             </p>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">
-              Every landing page you create in Cre8tly Studio is built from
+              Every landing page you create in The Messy Attic is built from
               reusable blocks. You can reorder them, change backgrounds, swap
               images, and customize copy while keeping the layout consistent and
               conversion-focused.
@@ -141,7 +141,7 @@ export default function LandingBuilderDocs() {
             </ul>
             <p className="text-sm text-gray-300">
               Think of it as your “front door” for each offer, controlled fully
-              inside Cre8tly Studio.
+              inside The Messy Attic.
             </p>
           </section>
 
@@ -421,12 +421,12 @@ export default function LandingBuilderDocs() {
             <p className="text-sm text-gray-300 mb-3">
               The Stripe Checkout Block is what turns your landing page into a
               sales engine. Each block connects a single published PDF inside
-              your Cre8tly Studio account to your Stripe Express account so you
+              your The Messy Attic account to your Stripe Express account so you
               can sell digital products securely and instantly.
             </p>
 
             <p className="text-sm text-gray-300 mb-3">
-              Cre8tly Studio does not allow outside links, external files, or
+              The Messy Attic does not allow outside links, external files, or
               downloads. You can only sell PDFs you have created and published
               inside your Cre8tly account. This ensures clean delivery, proper
               analytics tracking, and secure fulfillment for buyers.
@@ -484,9 +484,9 @@ export default function LandingBuilderDocs() {
             </h2>
 
             <p className="text-sm text-gray-300 mb-3">
-              Each landing page in Cre8tly Studio is published on its own custom
-              subdomain. Instead of managing slugs or manual meta tags, you
-              choose a subdomain name and Cre8tly Studio handles the rest.
+              Each landing page in The Messy Attic is published on its own
+              custom subdomain. Instead of managing slugs or manual meta tags,
+              you choose a subdomain name and The Messy Attic handles the rest.
             </p>
 
             <ul className="list-disc list-inside text-sm text-gray-300 space-y-1 mb-3">
@@ -500,13 +500,13 @@ export default function LandingBuilderDocs() {
                 <span className="font-semibold">Public URL,</span> your page is
                 published at{" "}
                 <span className="font-mono text-gray-400">
-                  https://theblueprint.cre8tlystudio.com
+                  https://theblueprint.themessyattic.com
                 </span>{" "}
                 (using whatever subdomain you chose).
               </li>
               <li>
                 <span className="font-semibold">Automatic Meta Handling,</span>{" "}
-                Cre8tly Studio manages the basic metadata and structure behind
+                The Messy Attic manages the basic metadata and structure behind
                 the scenes so you can focus on your offer and design instead of
                 SEO setup.
               </li>
@@ -550,7 +550,7 @@ export default function LandingBuilderDocs() {
             </h2>
 
             <p className="text-sm text-gray-300 mb-3">
-              Cre8tly Studio gives you full control over how your landing page
+              The Messy Attic gives you full control over how your landing page
               evolves. You can update the live version instantly, or create
               separate versions to test new layouts, colors, or offers without
               affecting what your visitors see.
@@ -648,7 +648,7 @@ export default function LandingBuilderDocs() {
               Publishing / Live Site Behavior
             </h3>
             <p className="text-sm text-gray-300">
-              Cre8tly Studio does not require a separate publishing step. The
+              The Messy Attic does not require a separate publishing step. The
               live site is updated the moment you click{" "}
               <span className="font-semibold">Save Changes</span>. Applying a
               version does not go live until you save.

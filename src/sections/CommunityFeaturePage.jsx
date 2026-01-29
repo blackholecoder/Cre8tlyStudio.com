@@ -171,8 +171,8 @@ export default function CommunityFeaturePage() {
             <span className="block">community needs</span>
           </h2>
           <p className="mt-4 text-gray-600">
-            Cre8tly Studio communities are designed for focus, ownership, and
-            meaningful discussion without algorithms, feeds, or follower counts.
+            The Messy Attic communities are designed for focus, ownership, and
+            meaningful discussion without algorithms or social feeds.
           </p>
         </motion.div>
 
@@ -233,7 +233,7 @@ export default function CommunityFeaturePage() {
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
               <div className="text-sm font-semibold text-white/80">
-                Cre8tly Studio Community
+                The Messy Attic Community
               </div>
 
               <div className="mt-2 text-3xl sm:text-4xl font-extrabold text-white leading-tight">

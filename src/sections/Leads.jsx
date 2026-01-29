@@ -19,7 +19,7 @@ export default function Leads() {
       setLoading(true);
       try {
         const res = await axiosInstance.get(
-          `https://cre8tlystudio.com/api/landing/leads?page=${page}&limit=${limit}`
+          `https://themessyattic.com/api/landing/leads?page=${page}&limit=${limit}`,
         );
         setLeads(res.data.leads || []);
         setTotal(res.data.total || 0);

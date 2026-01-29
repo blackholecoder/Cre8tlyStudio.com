@@ -40,7 +40,7 @@ function PromptPage() {
     const checkSession = async () => {
       try {
         const res = await axios.get(
-          `https://cre8tlystudio.com/api/lead-magnets/${sessionId}`
+          `https://themessyattic.com/api/lead-magnets/${sessionId}`,
         );
         if (res.data) {
           setValid(true);
@@ -66,7 +66,7 @@ function PromptPage() {
     setSubmitting(true);
 
     try {
-      await axios.post("https://cre8tlystudio.com/api/lead-magnets/prompt", {
+      await axios.post("https://themessyattic.com/api/lead-magnets/prompt", {
         sessionId,
         prompt,
       });
@@ -77,7 +77,7 @@ function PromptPage() {
       const interval = setInterval(async () => {
         try {
           const res = await axios.get(
-            `https://cre8tlystudio.com/api/lead-magnets/${sessionId}`
+            `https://themessyattic.com/api/lead-magnets/${sessionId}`,
           );
           if (res.data.status === "completed" && res.data.pdf_url) {
             setPdfUrl(res.data.pdf_url);

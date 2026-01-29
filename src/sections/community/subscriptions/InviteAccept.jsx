@@ -20,7 +20,7 @@ export default function InviteAccept() {
   async function verifyInvite() {
     try {
       const res = await axiosInstance.get(
-        `/community/subscriptions/invites/${token}`
+        `/community/subscriptions/invites/${token}`,
       );
       setInvite(res.data.invite);
     } catch {
@@ -33,14 +33,14 @@ export default function InviteAccept() {
   async function acceptInvite() {
     if (!user) {
       navigate(
-        `/signup-community?email=${encodeURIComponent(invite.email)}&invite=${token}`
+        `/signup-community?email=${encodeURIComponent(invite.email)}&invite=${token}`,
       );
       return;
     }
 
     try {
       navigate(
-        `/signup-community?email=${encodeURIComponent(invite.email)}&invite=${token}`
+        `/signup-community?email=${encodeURIComponent(invite.email)}&invite=${token}`,
       );
 
       toast.success("Subscription activated");
@@ -65,9 +65,9 @@ export default function InviteAccept() {
       <div className="w-full max-w-md rounded-2xl bg-white dark:bg-dashboard-sidebar-dark border border-gray-200 dark:border-dashboard-border-dark shadow-xl p-8 text-center">
         {/* Brand */}
         <div className="flex flex-col items-center mb-6">
-          <img src={headerLogo} alt="Cre8tly Studio" className="h-16 mb-2" />
+          <img src={headerLogo} alt="The Messy Attic" className="h-16 mb-2" />
           <div className="text-lg font-semibold tracking-wide text-gray-700 dark:text-gray-300">
-            Cre8tly Community
+            yThe Messy Attic Community
           </div>
         </div>
 

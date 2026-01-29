@@ -28,7 +28,7 @@ export default function SmartPromptBuilder({ onPromptReady }) {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://cre8tlystudio.com/api/lead-magnets/prompt-builder",
+        "https://themessyattic.com/api/lead-magnets/prompt-builder",
         {
           userId: user.id, // ✅ include user ID for tone lookup
           audience,
@@ -40,7 +40,7 @@ export default function SmartPromptBuilder({ onPromptReady }) {
           headers: {
             Authorization: `Bearer ${accessToken}`, // ✅ optional, if route uses auth middleware
           },
-        }
+        },
       );
 
       onPromptReady(res.data.prompt);

@@ -889,7 +889,7 @@ export default function DashboardSettings() {
           dark:text-dashboard-muted-dark
 "
           >
-            Add an extra layer of security to your Cre8tly Studio account.
+            Add an extra layer of security to your Messy Attic account.
           </p>
 
           {twofaEnabled ? (
@@ -1448,7 +1448,7 @@ export default function DashboardSettings() {
             {/* Inner card for textarea + button */}
             <div className="rounded-lg p-5 space-y-4">
               <textarea
-                placeholder={`Example:\nCreate your first lead magnet today with Cre8tlyStudio or join my free newsletter at https://yourwebsite.com.\n\nLet’s keep this journey going together — no tech overwhelm, no burnout, just steady growth.`}
+                placeholder={`Example:\nJoin my free newsletter at https://yourwebsite.com.`}
                 value={settings?.cta || ""}
                 onClick={(e) => {
                   if (isCommunityOnly) {
@@ -1580,7 +1580,7 @@ export default function DashboardSettings() {
                   dark:text-dashboard-muted-dark
                   mb-4 leading-relaxed"
                 >
-                  Need an ISBN for your book? Cre8tly Studio can guide you
+                  Need an ISBN for your book? The Messy Attic can guide you
                   through the process. An ISBN (International Standard Book
                   Number) identifies your book worldwide and is required for
                   publishing on major retailers like Amazon, Apple Books, and
@@ -1600,7 +1600,7 @@ export default function DashboardSettings() {
                   <button
                     onClick={() =>
                       toast.info(
-                        "Our team will soon offer a Pro ISBN Concierge service directly inside Cre8tly Studio!",
+                        "Our team will soon offer a Pro ISBN Concierge service directly inside The Messy Attic!",
                       )
                     }
                     className="flex-1 bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark font-semibold py-2.5 rounded-lg border border-dashboard-border-light dark:border-dashboard-border-dark hover:border-green hover:text-green transition"

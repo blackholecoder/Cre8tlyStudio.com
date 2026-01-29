@@ -61,8 +61,8 @@ const PricingSection = () => {
                 </p>
 
                 <p className="text-gray-300 text-lg font-medium mb-6">
-                  Try Cre8tly Studio free for 7 days — includes 1 lead magnet
-                  slot (up to 5 pages).
+                  Try The Messy Attic Pro free for 7 days — includes 1 lead
+                  magnet slot (up to 5 pages).
                 </p>
 
                 <button
@@ -85,7 +85,7 @@ const PricingSection = () => {
             </p>
 
             <p className="text-gray-400 mb-8 text-sm leading-relaxed">
-              Unlock every tool inside Cre8tly Studio, advanced design,
+              Unlock every tool inside The Messy Attic, advanced design,
               automation, selling features, and complete creative freedom for
               your brand.
             </p>

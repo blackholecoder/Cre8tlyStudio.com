@@ -31,17 +31,21 @@
 }
 
 .post-body {
-  font-family: "Cardo", sans-serif;
+  font-family: "PT Serif", sans-serif;
+}
+
+.header-landing-font {
+  font-family: "PT Serif", sans-serif;
 }
 
 .post-body {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   line-height: 1.5;
   letter-spacing: 0.025em;
   color: var(--post-text);
 }
 .dark .post-body {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   line-height: 1.5;
   letter-spacing: 0.025em;
   color: #e5e7eb;
@@ -155,7 +159,6 @@ h1 {
     "wght" 900,
     "wdth" 75;
   letter-spacing: -0.02em;
-  text-transform: uppercase;
   word-spacing: 6px;
   margin-top: 0;
   margin-bottom: 0;
@@ -270,7 +273,7 @@ input[type="color"] {
   top: 40px; /* pushes below the input */
 }
 
-/* 🖤 True Black Input Styling — Cre8tly Studio Builder */
+/* 🖤 True Black Input Styling — The Messy Attic Builder */
 input[type="text"],
 input[type="url"],
 input[type="email"],
@@ -310,7 +313,7 @@ select::-ms-expand {
   display: none;
 }
 
-/* 🧭 Custom white dropdown arrow for Cre8tly Studio builder */
+/* 🧭 Custom white dropdown arrow for The Messy Attic builder */
 .select-wrapper::after {
   content: "";
   position: absolute;
@@ -836,7 +839,7 @@ input[type="color"]:focus {
     );
   }
 
-  /* 🎚️ Cre8tly Studio Slider — clean, compact, and consistent */
+  /* 🎚️ The Messy Attic Slider — clean, compact, and consistent */
   .cre8tly-slider {
     @apply appearance-none w-full h-1 bg-gray-600 rounded-full cursor-pointer;
     accent-color: #00b4ff; /* Fallback accent color */

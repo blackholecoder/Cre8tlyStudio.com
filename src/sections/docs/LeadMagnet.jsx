@@ -78,11 +78,11 @@ export default function LeadMagnetPage() {
               <FileText className="w-7 h-7 text-green" />
               <div>
                 <h1 className="text-2xl font-bold text-silver">
-                  How To Create A Lead Magnet In Cre8tly Studio
+                  How To Create A Lead Magnet In The Messy Attic
                 </h1>
                 <p className="text-xs text-gray-400 mt-1">
                   A step by step guide that shows you exactly how to create your
-                  lead magnet inside Cre8tly Studio.
+                  lead magnet inside The Messy Attic.
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function LeadMagnetPage() {
               1. Introduction
             </h2>
             <p className="text-sm text-gray-300 mb-3 leading-relaxed">
-              The Lead Magnet Creator in Cre8tly Studio is built to help you
+              The Lead Magnet Creator in The Messy Attic is built to help you
               turn one detailed prompt into a fully designs lead magnet PDF. You
               do not have to worry about layout, spacing, fonts, or design, the
               platform handles the structure for you.
@@ -112,7 +112,7 @@ export default function LeadMagnetPage() {
             <p className="text-sm text-gray-300 mb-3 leading-relaxed">
               A lead magnet is a free resource you give away in exchange for an
               email address or a follow, for example a guide, checklist,
-              workbook, starter kit, or cheatsheet. Inside Cre8tly Studio, you
+              workbook, starter kit, or cheatsheet. Inside The Messy Attic, you
               simply enter your idea, choose your styling, and the system
               creates the document for you.
             </p>
@@ -130,7 +130,7 @@ export default function LeadMagnetPage() {
               2. Starting A New Lead Magnet
             </h2>
             <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300 mb-3">
-              <li>Open your Cre8tly Studio dashboard.</li>
+              <li>Open your The Messy Attic dashboard.</li>
               <li>Go to the Lead Magnets area in your navigation.</li>
               <li>Click the button to create a new lead magnet or project.</li>
               <li>
@@ -203,7 +203,7 @@ export default function LeadMagnetPage() {
             </h3>
             <p className="text-sm text-gray-300 mb-2">
               The large white editor box is your prompt field. This is where you
-              describe the content you want Cre8tly Studio to generate, for
+              describe the content you want The Messy Attic to generate, for
               example who the audience is, what the topic is, what sections to
               include, tone, and any examples or bullets.
             </p>

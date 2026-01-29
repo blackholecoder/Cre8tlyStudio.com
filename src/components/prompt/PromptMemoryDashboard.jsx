@@ -20,7 +20,7 @@ export default function PromptMemoryDashboard() {
     async function fetchPrompts() {
       try {
         const res = await api.get(
-          `/lead-magnets/prompt-memory/${user.id}?page=${page}&limit=20`
+          `/lead-magnets/prompt-memory/${user.id}?page=${page}&limit=20`,
         );
 
         setPrompts(res.data.prompts);
@@ -57,7 +57,7 @@ export default function PromptMemoryDashboard() {
         text-dashboard-muted-light
         dark:text-dashboard-muted-dark"
         >
-          View all prompts you’ve generated with Cre8tly Studio.
+          View all prompts you’ve generated with The Messy Attic.
         </p>
       </div>
 

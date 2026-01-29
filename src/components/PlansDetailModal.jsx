@@ -52,7 +52,7 @@ Author’s Assistant is a complete book creation and publishing system designed 
       content: `
 The Pro Business Builder Pack is the ultimate growth suite for creators, entrepreneurs, and marketers who want to look professional, build trust, and scale with confidence.
 
-It gives you everything you need to build high-converting landing pages, capture leads automatically, and sell digital products under your own brand using Cre8tly Studio’s advanced tools.
+It gives you everything you need to build high-converting landing pages, capture leads automatically, and sell digital products under your own brand using The Messy Attic’s advanced tools.
 
 Features include:
 • High-converting landing pages and lead forms  

@@ -59,13 +59,13 @@ export default function Contact() {
             <div className="flex items-center gap-1 mb-5">
               <img
                 src={headerLogo}
-                alt="Cre8tly Studio"
+                alt="The Messy Attic"
                 className="h-12 w-12 object-contain"
               />
 
               <div className="flex flex-col leading-tight">
                 <span className="text-lg font-semibold text-gray-900">
-                  Cre8tly Studio
+                  The Messy Attic
                 </span>
               </div>
             </div>

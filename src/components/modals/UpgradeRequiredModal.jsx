@@ -38,7 +38,7 @@ export default function UpgradeRequiredModal({ open, onClose }) {
           <button
             onClick={() => {
               onClose();
-              navigate("/dashboard/plans");
+              navigate("/plans");
             }}
             className="
             px-4 py-2 rounded-lg text-sm font-medium transition

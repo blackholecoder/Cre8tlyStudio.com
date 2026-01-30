@@ -9,6 +9,7 @@ export default function BookCardList({
   books = [],
   onAddPrompt,
   onGenerateNext,
+  onArchiveBook,
 }) {
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [activeBookId, setActiveBookId] = useState(null);
@@ -205,7 +206,6 @@ export default function BookCardList({
               )}
 
               {/* Continue Story */}
-              {/* Continue Story */}
               {b.prompt && canContinue && (
                 <button
                   onClick={() =>
@@ -221,6 +221,26 @@ export default function BookCardList({
                       ? "Finish Book"
                       : `Continue Story (Part ${(b.part_number || 1) + 1})`}
                   </span>
+                </button>
+              )}
+
+              {!b.is_complete && b.status !== "pending" && (
+                <button
+                  onClick={() => onArchiveBook(b.id)}
+                  className="
+                    w-full
+                    border border-red-500/40
+                    text-red-400
+                    rounded-lg
+                    py-2
+                    text-sm
+                    font-semibold
+                    hover:bg-red-500/10
+                    transition
+                  "
+                  title="Archive Book"
+                >
+                  Archive Book
                 </button>
               )}
             </div>

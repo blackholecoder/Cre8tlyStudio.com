@@ -8,7 +8,12 @@ import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
 import { Tooltip } from "../tools/toolTip";
 
-export default function BookGrid({ books = [], onAddPrompt, onGenerateNext }) {
+export default function BookGrid({
+  books = [],
+  onAddPrompt,
+  onGenerateNext,
+  onArchiveBook,
+}) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [activeBookId, setActiveBookId] = useState(null);
@@ -211,7 +216,7 @@ dark:text-dashboard-muted-dark
                           month: "short",
                           day: "2-digit",
                           year: "numeric",
-                        }
+                        },
                       )}{" "}
                       {new Date(b.created_at_prompt).toLocaleTimeString([], {
                         hour: "numeric",
@@ -292,6 +297,26 @@ dark:text-dashboard-muted-dark
                         ? "Finish Book"
                         : `Continue Story (Part ${(b.part_number || 1) + 1})`}
                     </span>
+                  </button>
+                )}
+
+                {!b.is_complete && b.status !== "pending" && (
+                  <button
+                    onClick={() => onArchiveBook(b.id)}
+                    className="
+                    w-full
+                    border border-red-500/40
+                    text-red-400
+                    rounded-lg
+                    py-2
+                    text-sm
+                    font-semibold
+                    hover:bg-red-500/10
+                    transition
+                  "
+                    title="Archive Book"
+                  >
+                    Archive Book
                   </button>
                 )}
               </div>

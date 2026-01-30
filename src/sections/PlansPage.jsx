@@ -36,6 +36,18 @@ export default function PlansPage() {
       setLoadingPlan(planType);
       const token = localStorage.getItem("accessToken");
 
+      // 🔴 AUTHOR’S ASSISTANT (NEW SUBSCRIPTION FLOW)
+      if (planType === "author") {
+        const res = await api.post(
+          "/seller-checkout/create-authors-assistant-subscription",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+
+        window.location.href = res.data.url;
+        return;
+      }
+
       let productType = planType;
       let billingCycle = null;
 
@@ -153,6 +165,93 @@ export default function PlansPage() {
               Go to Dashboard
             </button>
           )}
+        </div>
+
+        {/* ---------- Authors (Subscription) ---------- */}
+
+        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
+          {/* IDENTITY */}
+          <h2 className="text-2xl font-bold mb-1 text-pink-400 design-text">
+            Author’s Assistant
+          </h2>
+          <p className="text-sm text-gray-400 mb-4">
+            Active subscription · Up to 750 pages per book
+          </p>
+
+          {/* PRICE */}
+          <p className="text-4xl font-extrabold text-pink-400">
+            $49.99
+            <span className="text-lg font-medium text-gray-400">/month</span>
+          </p>
+          <p className="text-xs text-gray-500 mb-4">
+            Cancel anytime · Access ends when subscription ends
+          </p>
+
+          {/* OUTCOME ANCHOR */}
+          <p className="text-gray-300 mb-6 text-sm leading-relaxed">
+            A structured writing and publishing system designed to help you
+            plan, write, finalize, and publish a full-length book, while
+            preserving your unique voice and intent.
+          </p>
+
+          {/* CORE CAPABILITIES */}
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Write with confidence
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Generate chapters and structured sections</li>
+              <li>✅ Rewrite, expand, or shorten any passage</li>
+              <li>✅ Save unlimited revisions without losing progress</li>
+              <li>✅ Continue writing with full book-level context</li>
+            </ul>
+          </div>
+
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Maintain continuity
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Up to 750 pages across a single book project</li>
+              <li>✅ Import existing drafts, notes, or research</li>
+              <li>✅ Edit chapters individually without breaking structure</li>
+            </ul>
+          </div>
+
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
+              Publish professionally
+            </p>
+            <ul className="text-sm text-gray-300 space-y-2">
+              <li>✅ Finalize and lock your completed book</li>
+              <li>✅ Combine all chapters into a single EPUB</li>
+              <li>
+                ✅ Publish EPUBs compatible with Kindle and major platforms
+              </li>
+            </ul>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={() => handleSelectPlan("author")}
+            disabled={loadingPlan === "author"}
+            className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg transition-all ${
+              loadingPlan === "author"
+                ? "opacity-50 cursor-not-allowed bg-gray-700"
+                : "bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:opacity-90"
+            }`}
+          >
+            {loadingPlan === "author"
+              ? "Redirecting..."
+              : "Start Writing with Author’s Assistant"}
+          </button>
+
+          <button
+            onClick={() => setSelectedPlan("author")}
+            className="text-pink-400 text-sm hover:underline mt-3 text-center"
+          >
+            Learn more about Author’s Assistant
+          </button>
         </div>
 
         {/* ---------- Business Basic (Annual) ---------- */}
@@ -372,85 +471,6 @@ export default function PlansPage() {
             className="mt-4 text-sm text-gray-400 hover:text-white hover:underline text-center"
           >
             Compare with annual option
-          </button>
-        </div>
-
-        <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-pink-400 transition">
-          {/* IDENTITY */}
-          <h2 className="text-2xl font-bold mb-1 text-pink-400 design-text">
-            Author’s Assistant
-          </h2>
-          <p className="text-sm text-gray-400 mb-4">
-            One book · Up to 750 pages
-          </p>
-
-          {/* PRICE */}
-          <p className="text-4xl font-extrabold text-pink-400">$850</p>
-
-          {/* OUTCOME ANCHOR */}
-          <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-            A structured writing and publishing system designed to help you
-            plan, write, finalize, and publish a full-length book, while
-            preserving your unique voice and intent.
-          </p>
-
-          {/* CORE CAPABILITIES */}
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
-              Write with confidence
-            </p>
-            <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Generate chapters and structured sections</li>
-              <li>✅ Rewrite, expand, or shorten any passage</li>
-              <li>✅ Save unlimited revisions without losing progress</li>
-              <li>✅ Continue writing with full book-level context</li>
-            </ul>
-          </div>
-
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
-              Maintain continuity
-            </p>
-            <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Up to 750 pages across a single book project</li>
-              <li>✅ Import existing drafts, notes, or research</li>
-              <li>✅ Edit chapters individually without breaking structure</li>
-            </ul>
-          </div>
-
-          <div className="mb-8">
-            <p className="text-xs uppercase tracking-wide text-pink-400 mb-2">
-              Publish professionally
-            </p>
-            <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Finalize and lock your completed book</li>
-              <li>✅ Combine all chapters into a single EPUB</li>
-              <li>
-                ✅ Publish EPUBs compatible with Kindle and major platforms
-              </li>
-            </ul>
-          </div>
-
-          {/* CTA */}
-          <button
-            onClick={() => handleSelectPlan("author")}
-            disabled={loadingPlan === "author"}
-            className={`mt-auto w-full py-3 text-lg font-semibold rounded-lg transition-all ${
-              loadingPlan === "author"
-                ? "opacity-50 cursor-not-allowed bg-gray-700"
-                : "bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:opacity-90"
-            }`}
-          >
-            {loadingPlan === "author"
-              ? "Redirecting..."
-              : "Write Your Book with Author’s Assistant"}
-          </button>
-
-          <button
-            onClick={() => setSelectedPlan("author")}
-            className="text-pink-400 text-sm hover:underline mt-3 text-center"
-          >
-            Learn more about Author’s Assistant
           </button>
         </div>
       </div>

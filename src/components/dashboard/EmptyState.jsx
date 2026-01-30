@@ -3,18 +3,14 @@ export default function EmptyState({ onCheckout, type = "magnet" }) {
 
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-[60vh]">
-      <p className="text-silver mb-6">
+      <p className="text-silver text-lg max-w-md leading-relaxed italic">
         {isBook
           ? "You haven’t written any books yet."
           : "You haven’t created any lead magnets yet."}
       </p>
-
-      <button
-        onClick={onCheckout}
-        className="px-6 py-3 rounded-lg bg-gradient-to-r from-green to-royalPurple text-white font-semibold hover:opacity-90 transition shadow-lg"
-      >
-        {isBook ? "Write My First Book" : "Generate My First Lead Magnet"}
-      </button>
+      <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm mt-2">
+        Get started whenever you’re ready.
+      </p>
     </div>
   );
 }

@@ -61,7 +61,7 @@ export default function SignupPage() {
       };
 
       const res = await axios.post(
-        "https://themessyattic.com/api/auth/signup-community",
+        "https://themessyattic.com/api/auth/signup",
         payload,
       );
 

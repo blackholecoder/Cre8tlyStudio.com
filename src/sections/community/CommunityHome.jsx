@@ -212,9 +212,9 @@ export default function CommunityHome() {
             mb-8
           "
           >
-            where writers come together to share work,
-            <br /> encourage one another, and grow
-            <br /> through honest feedback and connection.
+            where writers come together to share work, encourage one another,
+            <br />
+            and grow through honest feedback and connection.
           </p>
 
           <div className="flex justify-center mb-8">
@@ -237,7 +237,10 @@ export default function CommunityHome() {
           </div>
 
           {/* Scrollable Topics */}
-          <div ref={dropdownRef} className="relative mb-6 flex-shrink-0">
+          <div
+            ref={dropdownRef}
+            className="relative mb-6 flex-shrink-0 flex justify-center"
+          >
             {/* Trigger */}
             <button
               type="button"
@@ -324,14 +327,12 @@ export default function CommunityHome() {
               </div>
             )}
           </div>
-        </div>
-      </div>
-      <div className="w-full mt-4">
-        <div className="max-w-4xl mx-auto space-y-2 px-0 sm:px-6">
-          {filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              className="
+          <div className="w-full mt-4">
+            <div className="max-w-4xl mx-auto space-y-2 px-0 sm:px-6">
+              {filteredPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="
               w-full
               px-4 py-3
               sm:px-6 sm:py-4
@@ -342,117 +343,117 @@ export default function CommunityHome() {
               dark:hover:bg-dashboard-hover-dark
               transition
             "
-            >
-              <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
-                {/* Post image */}
-
-                {/* Right content TEXT BLOCK */}
-                <div
-                  onClick={() => handlePostClick(post.id)}
-                  className="min-w-0 cursor-pointer group"
                 >
-                  <h3
-                    className="
+                  <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
+                    {/* Post image */}
+
+                    {/* Right content TEXT BLOCK */}
+                    <div
+                      onClick={() => handlePostClick(post.id)}
+                      className="min-w-0 cursor-pointer group"
+                    >
+                      <h3
+                        className="
                     text-base sm:text-lg font-semibold
                     text-dashboard-text-light dark:text-dashboard-text-dark
                     line-clamp-1 lg:line-clamp-2
                     group-hover:underline
                     
                   "
-                  >
-                    {post.title}
-                  </h3>
+                      >
+                        {post.title}
+                      </h3>
 
-                  {post.subtitle && (
-                    <p
-                      className="
+                      {post.subtitle && (
+                        <p
+                          className="
                         mt-1 text-sm
                         text-dashboard-muted-light dark:text-dashboard-muted-dark
                         line-clamp-1 lg:line-clamp-2
                       "
-                    >
-                      {post.subtitle}
-                    </p>
-                  )}
+                        >
+                          {post.subtitle}
+                        </p>
+                      )}
 
-                  {/* Author row */}
-                  <div className="flex items-center gap-2 mt-2">
-                    {post.author_image ? (
-                      <img
-                        src={post.author_image}
-                        alt=""
-                        className="
+                      {/* Author row */}
+                      <div className="flex items-center gap-2 mt-2">
+                        {post.author_image ? (
+                          <img
+                            src={post.author_image}
+                            alt=""
+                            className="
                         w-6 h-6 rounded-full object-cover
                         border border-dashboard-border-light
                         dark:border-dashboard-border-dark
                       "
-                      />
-                    ) : (
-                      <div
-                        className="
+                          />
+                        ) : (
+                          <div
+                            className="
                         w-6 h-6 rounded-full
                         bg-dashboard-hover-light
                         dark:bg-dashboard-hover-dark
                       "
-                      />
-                    )}
+                          />
+                        )}
 
-                    <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                      {post.author} · {post.topic_name}
-                    </span>
-                  </div>
+                        <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                          {post.author} · {post.topic_name}
+                        </span>
+                      </div>
 
-                  {/* Meta stats */}
-                  <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                    <div className="flex items-center justify-center gap-[3px]">
-                      <Eye size={14} className="opacity-70" />
-                      <span>{post.views ?? 0}</span>
+                      {/* Meta stats */}
+                      <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                        <div className="flex items-center justify-center gap-[3px]">
+                          <Eye size={14} className="opacity-70" />
+                          <span>{post.views ?? 0}</span>
+                        </div>
+
+                        <button
+                          onClick={(e) => togglePostLike(e, post)}
+                          className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                        >
+                          <Heart
+                            size={14}
+                            className={`${
+                              post.has_liked
+                                ? "text-red-500 fill-red-500"
+                                : "opacity-70"
+                            }`}
+                          />
+                          <span>{post.like_count ?? 0}</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePostClick(post.id);
+                          }}
+                          className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                        >
+                          <MessageCircle size={14} className="opacity-70" />
+                          <span>{post.comment_count ?? 0}</span>
+                        </button>
+
+                        <button
+                          onClick={(e) => handleShare(e, post)}
+                          className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                        >
+                          {copiedPostId === post.id ? (
+                            <>
+                              <Check size={14} className="text-green-500" />
+                              <span className="text-green-500">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Share2 size={14} className="opacity-70" />
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-
-                    <button
-                      onClick={(e) => togglePostLike(e, post)}
-                      className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                    >
-                      <Heart
-                        size={14}
-                        className={`${
-                          post.has_liked
-                            ? "text-red-500 fill-red-500"
-                            : "opacity-70"
-                        }`}
-                      />
-                      <span>{post.like_count ?? 0}</span>
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePostClick(post.id);
-                      }}
-                      className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                    >
-                      <MessageCircle size={14} className="opacity-70" />
-                      <span>{post.comment_count ?? 0}</span>
-                    </button>
-
-                    <button
-                      onClick={(e) => handleShare(e, post)}
-                      className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                    >
-                      {copiedPostId === post.id ? (
-                        <>
-                          <Check size={14} className="text-green-500" />
-                          <span className="text-green-500">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 size={14} className="opacity-70" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div
-                  className="
+                    <div
+                      className="
                   w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
                   rounded-lg
                   flex-shrink-0
@@ -462,18 +463,18 @@ export default function CommunityHome() {
                   bg-dashboard-hover-light
                   dark:bg-dashboard-hover-dark
                 "
-                >
-                  {post.image_url ? (
-                    <img
-                      src={post.image_url}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="
+                    >
+                      {post.image_url ? (
+                        <img
+                          src={post.image_url}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="
                       w-full h-full
                       flex items-center justify-center
                       bg-gradient-to-br
@@ -481,9 +482,9 @@ export default function CommunityHome() {
                       via-sky-300/90
                       to-blue/80
                     "
-                    >
-                      <span
-                        className="
+                        >
+                          <span
+                            className="
                         text-[10px] sm:text-xs
                         font-medium
                         uppercase
@@ -491,15 +492,17 @@ export default function CommunityHome() {
                        text-dashboard-text-light dark:text-dashboard-text-dark
                         select-none
                       "
-                      >
-                        No image
-                      </span>
+                          >
+                            No image
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

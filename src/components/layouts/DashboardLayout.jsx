@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
 import { Menu, LogOut, Sun, Moon, ChevronDown, X } from "lucide-react";
-import AnimatedLogo from "../animation/AnimatedLogo";
+
 import {
   SIDEBAR_SECTIONS,
   SidebarToggleIcon,
@@ -47,12 +47,21 @@ export default function DashboardLayout({ children }) {
     }
   });
 
-  const [communityOpen, setCommunityOpen] = useState(false);
-
-  const isCommunityOnly =
-    user?.is_member === 1 && !user?.plan && !user?.free_trial_expires_at;
+  const [communityOpen, setCommunityOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("communityOpen") === "true";
+  });
 
   const isFreeTier = user?.has_free_magnet === 1 && user?.magnet_slots === 1;
+
+  const hasActiveAuthorsAssistant =
+    Boolean(user?.authors_assistant_override) ||
+    (user?.subscription_status === "active" && user?.has_book === 1);
+
+  const isCommunityOnly =
+    user?.is_member === 1 &&
+    !hasActiveAuthorsAssistant &&
+    !user?.free_trial_expires_at;
 
   const isDesktop = useIsDesktop();
 
@@ -72,6 +81,18 @@ export default function DashboardLayout({ children }) {
     const interval = setInterval(fetchUnreadCount, 30000); // refresh every 30s
     return () => clearInterval(interval);
   }, [user?.id]);
+
+  useEffect(() => {
+    if (isDesktop) {
+      localStorage.setItem("communityOpen", String(communityOpen));
+    }
+  }, [communityOpen, isDesktop]);
+
+  useEffect(() => {
+    if (!isDesktop) {
+      setCommunityOpen(false);
+    }
+  }, [location.pathname, isDesktop]);
 
   // ⭐ Fetch unread community notifications
   useEffect(() => {
@@ -101,6 +122,10 @@ export default function DashboardLayout({ children }) {
   }, [isCollapsed]);
 
   function hasAccess(item) {
+    if (item.access === "books") {
+      return hasActiveAuthorsAssistant;
+    }
+
     if (item.access === "pro" && isFreeTier) return false;
     if (item.access === "seller" && !user?.stripe_connect_account_id)
       return false;
@@ -111,7 +136,8 @@ export default function DashboardLayout({ children }) {
     const active = location.pathname === item.path;
     const Icon = item.icon || null;
 
-    const locked = isCommunityOnly && !item.allowCommunity;
+    const locked =
+      isCommunityOnly && !hasActiveAuthorsAssistant && !item.allowCommunity;
     const isSubItem = item.isSubItem;
     const isParent = item.isParent;
 

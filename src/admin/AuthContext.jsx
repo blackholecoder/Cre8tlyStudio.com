@@ -76,7 +76,6 @@ export function AuthProvider({ children }) {
       const enriched = enrichUser(meRes.data);
       setUser(enriched);
       applyTheme(enriched.theme);
-      await refreshUser();
       localStorage.setItem("user", JSON.stringify(enriched));
 
       return { requires2FA: false };

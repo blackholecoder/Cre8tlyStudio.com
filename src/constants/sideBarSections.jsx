@@ -98,7 +98,7 @@ export const SIDEBAR_SECTIONS = [
         label: "Assistant",
         path: "/books",
         icon: BookOpen,
-        access: "pro",
+        access: "books",
       },
       {
         key: "dashboard",

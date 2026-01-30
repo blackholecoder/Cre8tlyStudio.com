@@ -229,7 +229,7 @@ export default function CustomerDashboard() {
           open={showOutOfSlots}
           onClose={() => setShowOutOfSlots(false)}
           onRefresh={refreshUserSlots}
-          isFirstTime={magnets.length === 0}
+          context="leadMagnets"
         />
 
         <GenerationOverlay

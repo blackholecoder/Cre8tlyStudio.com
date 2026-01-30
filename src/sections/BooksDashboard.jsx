@@ -15,9 +15,10 @@ import DashboardLayout from "../components/layouts/DashboardLayout.jsx";
 import BookGrid from "../components/book/BookGrid.jsx";
 import axiosInstance from "../api/axios.jsx";
 import BooksDashboardHeader from "../components/dashboard/BooksDashboardHeader.jsx";
+import { toast } from "react-toastify";
 
 export default function BooksDashboard() {
-  const { accessToken, authLoading } = useAuth();
+  const { accessToken, authLoading, user, refreshUser } = useAuth();
   const { books, setBooks, fetchBooks, loading } = useBooks();
   const [openPrompt, setOpenPrompt] = useState(false);
   const [activeBook, setActiveBook] = useState(null);
@@ -32,13 +33,13 @@ export default function BooksDashboard() {
 
   // ✅ Pagination
   const sortedBooks = [...books].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    (a, b) => new Date(b.created_at) - new Date(a.created_at),
   );
   const totalPages = Math.ceil(sortedBooks.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedBooks = sortedBooks.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
 
   async function openBookModal(bookId, partNumber = 1) {
@@ -93,8 +94,8 @@ export default function BooksDashboard() {
   function handlePromptSubmitted(bookId, promptText) {
     setBooks((prev) =>
       prev.map((b) =>
-        b.id === bookId ? { ...b, prompt: promptText, status: "pending" } : b
-      )
+        b.id === bookId ? { ...b, prompt: promptText, status: "pending" } : b,
+      ),
     );
     setTimeout(fetchBooks, 3000);
   }
@@ -105,28 +106,97 @@ export default function BooksDashboard() {
     setOpenPrompt(true);
   }
 
+  async function handleCreateNewBook() {
+    try {
+      const res = await axiosInstance.post("/books/get-new-book");
+
+      const { bookId } = res.data;
+
+      // Refresh books from backend
+      await fetchBooks();
+
+      // Open setup flow for the new book
+      setActiveBook({
+        id: bookId,
+        part_number: 1,
+      });
+
+      setShowNewBookModal(true);
+    } catch (err) {
+      if (err.response?.status === 400) {
+        setShowOutOfSlots(true);
+        return;
+      }
+
+      console.error("Failed to create new book", err);
+      toast.error("Could not create a new book");
+    }
+  }
+
   async function refreshUserSlots() {
     try {
-      const res = await axiosInstance.get("/auth/me");
+      // Use the canonical refresh
+      const refreshedUser = await refreshUser();
 
-      if (res.data) {
-        fetchBooks(); // refresh dashboard books
+      if (refreshedUser) {
+        setSubscriptionStatus(refreshedUser.subscription_status);
+        await fetchBooks();
       }
     } catch (err) {
       console.error("Failed to refresh slots:", err);
     }
   }
 
-  useEffect(() => {
-    if (authLoading) return; // ⏳ wait for auth restore
+  async function handleArchiveBook(bookId) {
+    try {
+      await axiosInstance.post(`/books/${bookId}/archive`);
 
-    if (!accessToken) {
-      setShowGenerating(false);
-      navigate("/login");
+      // Remove locally (instant UI feedback)
+      setBooks((prev) => prev.filter((b) => b.id !== bookId));
+
+      // Refresh user + slots
+      await refreshUserSlots();
+    } catch (err) {
+      console.error("Failed to archive book", err);
+      toast.error("Failed to archive book");
     }
-  }, [authLoading, accessToken]);
+  }
 
   // ✅ Render
+
+  if (authLoading || !user) {
+    return (
+      <DashboardLayout>
+        <LoadingState label="Checking subscription…" />
+      </DashboardLayout>
+    );
+  }
+  // 🚫 inactive or canceled subscription
+  const hasActiveAuthorsAssistant =
+    Boolean(user?.authors_assistant_override) ||
+    (user?.subscription_status === "active" && user?.has_book === 1);
+
+  if (!hasActiveAuthorsAssistant) {
+    return (
+      <DashboardLayout>
+        <EmptyState
+          type="subscription"
+          onCheckout={() => navigate("/plans")}
+          title="Author’s Assistant is not active"
+          description="Upgrade or activate Author’s Assistant to continue writing."
+        />
+      </DashboardLayout>
+    );
+  }
+
+  const ACTIVE_LIMIT = 3;
+
+  const activeBookCount = books.filter(
+    (b) => b.is_complete === 0 && !b.deleted_at,
+  ).length;
+
+  const availableSlots = Math.max(ACTIVE_LIMIT - activeBookCount, 0);
+
   return (
     <DashboardLayout>
       <div
@@ -138,8 +208,10 @@ export default function BooksDashboard() {
   "
       >
         <BooksDashboardHeader
-          books={books}
+          activeBookCount={activeBookCount}
+          availableSlots={availableSlots}
           onCheckout={() => navigate("/plans")}
+          onCreateBook={handleCreateNewBook}
         />
 
         {/* Content */}
@@ -156,6 +228,7 @@ export default function BooksDashboard() {
                 onGenerateNext={(id, partNumber) =>
                   openBookModal(id, partNumber)
                 }
+                onArchiveBook={handleArchiveBook}
               />
 
               <BookCardList
@@ -164,6 +237,7 @@ export default function BooksDashboard() {
                 onGenerateNext={(id, partNumber) =>
                   openBookModal(id, partNumber)
                 }
+                onArchiveBook={handleArchiveBook}
               />
             </>
           )}
@@ -219,7 +293,7 @@ export default function BooksDashboard() {
           open={showOutOfSlots}
           onClose={() => setShowOutOfSlots(false)}
           onRefresh={refreshUserSlots}
-          isFirstTime={books.length === 0}
+          context="books"
         />
 
         <GenerationOverlay

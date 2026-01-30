@@ -1,25 +1,22 @@
 export default function OutOfSlotsModal({
   open,
   onClose,
-  onRefresh,
-  isFirstTime = false,
+  context = "books", // "books" | "leadMagnets"
 }) {
   if (!open) return null;
 
-  const title = isFirstTime
-    ? "Welcome to The Messy Attic"
-    : "Out of Lead Magnet Slots";
+  const COPY = {
+    books: {
+      title: "Book Limit Reached",
+      message: `You can only have 3 active books at one time. Finish or archive an existing book\n to create a new one.`,
+    },
+    leadMagnets: {
+      title: "Monthly Limit Reached",
+      message: `You’ve used all 15 lead magnet slots for this month. Your slots will automatically reset at the start of your next billing cycle.`,
+    },
+  };
 
-  const message = isFirstTime
-    ? `Welcome to The Messy Attic, your creative command center for building
-       high-converting lead magnets in minutes. 
-       To start creating, visit themessyattic.com in your browser and
-       purchase your first token pack. 
-       Once purchased, click below to refresh your account and begin.`
-    : `You’ve reached your current plan’s limit.
-       To purchase more tokens or lifetime unlocks, visit themessyattic.com
-       in your browser and log in with the same account.
-       Once purchased, click below to refresh your slots instantly.`;
+  const { title, message } = COPY[context];
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn font-montserrat">
@@ -36,22 +33,10 @@ export default function OutOfSlotsModal({
           </p>
 
           <button
-            onClick={async () => {
-              if (onRefresh) await onRefresh();
-              if (onClose) onClose();
-            }}
+            onClick={onClose}
             className="bg-gradient-to-r from-[#00E07A] to-[#6A5ACD] text-white px-8 py-3 rounded-xl font-semibold tracking-wide shadow-[0_0_12px_rgba(0,224,122,0.6)] hover:shadow-[0_0_20px_rgba(106,90,205,0.8)] hover:scale-[1.03] transition-all duration-200"
           >
-            {isFirstTime
-              ? "I’ve Purchased My First Pack"
-              : "I’ve Purchased Tokens"}
-          </button>
-
-          <button
-            onClick={onClose}
-            className="block mx-auto mt-4 text-sm text-gray-400 hover:text-white transition"
-          >
-            Cancel
+            Close
           </button>
         </div>
       </div>

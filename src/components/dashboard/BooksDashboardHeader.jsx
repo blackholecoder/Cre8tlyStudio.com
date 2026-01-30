@@ -2,17 +2,14 @@ import { FileEdit, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 
-export default function BooksDashboardHeader({ books = [], onCheckout }) {
+export default function BooksDashboardHeader({
+  availableSlots,
+  onCheckout,
+  onCreateBook,
+}) {
   const { user } = useAuth();
 
   if (!user) return null;
-
-  const totalSlots = user?.book_slots ?? 0;
-
-  const usedSlots = books.filter((b) => b.is_complete === 1).length;
-
-  const availableSlots = Math.max(totalSlots - usedSlots, 0);
-
   return (
     <div className="mb-8">
       {/* Top row */}
@@ -60,17 +57,32 @@ export default function BooksDashboardHeader({ books = [], onCheckout }) {
         </div>
 
         {/* Right actions */}
-        <div className="flex items-start gap-3">
+        <div className="flex flex-col w-full md:w-auto md:flex-row items-stretch md:items-start gap-3">
+          {availableSlots > 0 && (
+            <button
+              onClick={onCreateBook}
+              className="
+              w-full md:w-auto
+              px-4 py-2.5
+              rounded-lg
+              bg-green text-black font-semibold
+              hover:opacity-90 transition
+            "
+            >
+              New Book
+            </button>
+          )}
           <Link
             to="/docs/authors-assistant"
             className="
-            inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition
+            inline-flex items-center justify-center gap-2
+            w-full md:w-auto
+            rounded-lg px-4 py-3 text-sm transition
             border border-dashboard-border-light
             dark:border-dashboard-border-dark
             bg-dashboard-hover-light
             dark:bg-dashboard-hover-dark
-            text-black
-            dark:text-green
+            text-black dark:text-green
             hover:opacity-90
           "
           >

@@ -42,6 +42,7 @@ export default function CreatePostPage({ post = null, topicId }) {
       toast.error("Title is required");
       return;
     }
+
     const strippedBody = body?.replace(/<[^>]*>/g, "")?.trim();
 
     if (!strippedBody) {
@@ -84,7 +85,7 @@ export default function CreatePostPage({ post = null, topicId }) {
           payload.image_url = imageUrl;
         }
 
-        await axiosInstance.put(`/community/${postId}`, payload);
+        await axiosInstance.put(`/community/posts/${postId}`, payload);
       } else {
         const finalTopicId = lockedTopicId || selectedTopicId;
 

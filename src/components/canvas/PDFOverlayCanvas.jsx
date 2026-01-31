@@ -51,11 +51,6 @@ export default function PDFOverlayCanvas({
     isDuplicating,
   }) {
     const [img, status] = useImage(shape.src, "anonymous");
-    // const isSelected = selectedIds?.includes(shape.id);
-
-    useEffect(() => {
-      console.log("🖼 Loading image:", shape.id, status);
-    }, [status, shape.id]);
 
     if (!shape?.src || status !== "loaded" || !img) return null;
 
@@ -87,7 +82,7 @@ export default function PDFOverlayCanvas({
               ? prev.includes(shape.id)
                 ? prev.filter((id) => id !== shape.id)
                 : [...prev, shape.id]
-              : [shape.id]
+              : [shape.id],
           );
         }}
         onDragStart={(e) => {
@@ -99,7 +94,7 @@ export default function PDFOverlayCanvas({
           const node = e.target;
           const { x, y } = node.position();
           setShapes((prev) =>
-            prev.map((s) => (s.id === shape.id ? { ...s, x, y } : s))
+            prev.map((s) => (s.id === shape.id ? { ...s, x, y } : s)),
           );
         }}
         onTransformEnd={(e) => {
@@ -120,8 +115,8 @@ export default function PDFOverlayCanvas({
                     width: newWidth,
                     height: newHeight,
                   }
-                : s
-            )
+                : s,
+            ),
           );
 
           node.scaleX(1);
@@ -231,8 +226,6 @@ export default function PDFOverlayCanvas({
     if (savedShapes) {
       try {
         setShapes(JSON.parse(savedShapes));
-
-        console.log(`✅ Restored shapes for page ${window.currentPDFPage}`);
       } catch (err) {
         console.error("⚠️ Failed to parse saved shapes:", err);
       }
@@ -272,7 +265,7 @@ export default function PDFOverlayCanvas({
           };
         }
         return shape;
-      })
+      }),
     );
   };
   // useEffect(() => {
@@ -297,12 +290,6 @@ export default function PDFOverlayCanvas({
       const nodes = selectedIds
         .map((id) => stage.findOne(`#${id}`))
         .filter(Boolean);
-
-      // 🧠 log safely
-      console.log(
-        "Transformer nodes:",
-        nodes.map((n) => n.id())
-      );
 
       if (nodes.length > 0) {
         tr.nodes(nodes);
@@ -792,7 +779,7 @@ export default function PDFOverlayCanvas({
                   id: s.id,
                   type: s.type,
                   src: s.src?.slice(0, 60),
-                }))
+                })),
               );
               console.groupEnd();
 
@@ -825,13 +812,13 @@ export default function PDFOverlayCanvas({
                       fillLinearGradientEndPoint={{
                         x:
                           Math.cos(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) *
                           (shape.radiusX ?? 50) *
                           2,
                         y:
                           Math.sin(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) *
                           (shape.radiusY ?? 50) *
                           2,
@@ -855,12 +842,12 @@ export default function PDFOverlayCanvas({
                         x:
                           (shape.shadowOffset ?? 0) *
                           Math.cos(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                         y:
                           (shape.shadowOffset ?? 0) *
                           Math.sin(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
@@ -873,7 +860,7 @@ export default function PDFOverlayCanvas({
                             ? prev.includes(shape.id)
                               ? prev.filter((id) => id !== shape.id)
                               : [...prev, shape.id]
-                            : [shape.id]
+                            : [shape.id],
                         );
                       }}
                       draggable
@@ -915,9 +902,9 @@ export default function PDFOverlayCanvas({
                             GAP: 6,
                             grid: Array.from(
                               { length: Math.floor(stage.width() / 50) },
-                              (_, i) => i * 50
+                              (_, i) => i * 50,
                             ),
-                          }
+                          },
                         );
 
                         // 🧲 apply magnet snap
@@ -955,8 +942,8 @@ export default function PDFOverlayCanvas({
                                     width: radiusX * 2,
                                     height: radiusY * 2,
                                   }
-                                : s
-                            )
+                                : s,
+                            ),
                           );
                         }
                         isDuplicating.current = false;
@@ -995,11 +982,11 @@ export default function PDFOverlayCanvas({
                             // 🟦 Rectangles and others (same as before)
                             const newWidth = Math.max(
                               20,
-                              (s.width ?? 100) * scaleX
+                              (s.width ?? 100) * scaleX,
                             );
                             const newHeight = Math.max(
                               20,
-                              (s.height ?? 100) * scaleY
+                              (s.height ?? 100) * scaleY,
                             );
 
                             return {
@@ -1013,7 +1000,7 @@ export default function PDFOverlayCanvas({
                                 ? Math.min(newWidth, newHeight) * 0.1
                                 : 0,
                             };
-                          })
+                          }),
                         );
 
                         // ✅ Reset transforms so no “jump” occurs visually
@@ -1092,12 +1079,12 @@ export default function PDFOverlayCanvas({
                         x:
                           (shape.shadowOffset ?? 0) *
                           Math.cos(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                         y:
                           (shape.shadowOffset ?? 0) *
                           Math.sin(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
@@ -1110,7 +1097,7 @@ export default function PDFOverlayCanvas({
                             ? prev.includes(shape.id)
                               ? prev.filter((id) => id !== shape.id)
                               : [...prev, shape.id]
-                            : [shape.id]
+                            : [shape.id],
                         );
                       }}
                       draggable
@@ -1153,9 +1140,9 @@ export default function PDFOverlayCanvas({
                             GAP: 6,
                             grid: Array.from(
                               { length: Math.floor(stage.width() / 50) },
-                              (_, i) => i * 50
+                              (_, i) => i * 50,
                             ),
-                          }
+                          },
                         );
 
                         // 🧲 Apply magnet snap — adjusted by rotation-safe offset
@@ -1179,8 +1166,8 @@ export default function PDFOverlayCanvas({
                           const { x, y } = e.target.position();
                           setShapes((prev) =>
                             prev.map((s) =>
-                              s.id === shape.id ? { ...s, x, y } : s
-                            )
+                              s.id === shape.id ? { ...s, x, y } : s,
+                            ),
                           );
                         }
                         isDuplicating.current = false;
@@ -1192,7 +1179,7 @@ export default function PDFOverlayCanvas({
                         const scaleY = node.scaleY();
 
                         const newPoints = (shape.points || [0, 0, 100, 0]).map(
-                          (p, i) => (i % 2 === 0 ? p * scaleX : p * scaleY)
+                          (p, i) => (i % 2 === 0 ? p * scaleX : p * scaleY),
                         );
 
                         setShapes((prev) =>
@@ -1205,8 +1192,8 @@ export default function PDFOverlayCanvas({
                                   points: newPoints,
                                   rotation: node.rotation(),
                                 }
-                              : s
-                          )
+                              : s,
+                          ),
                         );
 
                         node.scaleX(1);
@@ -1284,8 +1271,8 @@ export default function PDFOverlayCanvas({
                               prev.map((s) =>
                                 s.id === shape.id
                                   ? { ...s, text: plainText, width: newWidth }
-                                  : s
-                              )
+                                  : s,
+                              ),
                             );
                           }}
                           onBlur={(e) => {
@@ -1312,8 +1299,8 @@ export default function PDFOverlayCanvas({
                                       isRichEditing: false,
                                       draggable: true,
                                     }
-                                  : s
-                              )
+                                  : s,
+                              ),
                             );
                             setTimeout(() => stage?.batchDraw(), 20);
                           }}
@@ -1336,11 +1323,11 @@ export default function PDFOverlayCanvas({
                       fillLinearGradientEndPoint={{
                         x:
                           Math.cos(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.width ?? 200),
                         y:
                           Math.sin(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.height ?? 50),
                       }}
                       fillLinearGradientColorStops={[
@@ -1374,12 +1361,12 @@ export default function PDFOverlayCanvas({
                         x:
                           (shape.shadowOffset ?? 0) *
                           Math.cos(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                         y:
                           (shape.shadowOffset ?? 0) *
                           Math.sin(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
@@ -1394,7 +1381,7 @@ export default function PDFOverlayCanvas({
                             ? prev.includes(shape.id)
                               ? prev.filter((id) => id !== shape.id)
                               : [...prev, shape.id]
-                            : [shape.id]
+                            : [shape.id],
                         );
                       }}
                       onDblClick={(e) => {
@@ -1402,8 +1389,8 @@ export default function PDFOverlayCanvas({
                           prev.map((s) =>
                             s.id === shape.id
                               ? { ...s, isRichEditing: true }
-                              : s
-                          )
+                              : s,
+                          ),
                         );
                       }}
                       onDragStart={(e) =>
@@ -1445,9 +1432,9 @@ export default function PDFOverlayCanvas({
                             GAP: 6,
                             grid: Array.from(
                               { length: Math.floor(stage.width() / 50) },
-                              (_, i) => i * 50
+                              (_, i) => i * 50,
                             ),
-                          }
+                          },
                         );
 
                         // 🧲 Adjust position for snapping to centers and edges
@@ -1473,8 +1460,8 @@ export default function PDFOverlayCanvas({
                           const { x, y } = e.target.position();
                           setShapes((prev) =>
                             prev.map((s) =>
-                              s.id === shape.id ? { ...s, x, y } : s
-                            )
+                              s.id === shape.id ? { ...s, x, y } : s,
+                            ),
                           );
                         }
                         isDuplicating.current = false;
@@ -1523,11 +1510,11 @@ export default function PDFOverlayCanvas({
                       fillLinearGradientEndPoint={{
                         x:
                           Math.cos(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.width ?? 100),
                         y:
                           Math.sin(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.height ?? 100),
                       }}
                       fillLinearGradientColorStops={[
@@ -1547,12 +1534,12 @@ export default function PDFOverlayCanvas({
                         x:
                           (shape.shadowOffset ?? 0) *
                           Math.cos(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                         y:
                           (shape.shadowOffset ?? 0) *
                           Math.sin(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
@@ -1561,7 +1548,7 @@ export default function PDFOverlayCanvas({
                       onClick={(e) => {
                         const isShift = e.evt.shiftKey;
                         setSelectedIds((prev) =>
-                          isShift ? [...prev, shape.id] : [shape.id]
+                          isShift ? [...prev, shape.id] : [shape.id],
                         );
                         setPanelOpen(true);
                       }}
@@ -1610,9 +1597,9 @@ export default function PDFOverlayCanvas({
                             GAP: 6,
                             grid: Array.from(
                               { length: Math.floor(stage.width() / 50) },
-                              (_, i) => i * 50
+                              (_, i) => i * 50,
                             ),
-                          }
+                          },
                         );
 
                         // 🧲 apply magnet snap
@@ -1648,8 +1635,8 @@ export default function PDFOverlayCanvas({
                                     width: clientRect.width ?? s.width,
                                     height: clientRect.height ?? s.height,
                                   }
-                                : s
-                            )
+                                : s,
+                            ),
                           );
                         }
 
@@ -1685,7 +1672,7 @@ export default function PDFOverlayCanvas({
                               height: newHeight,
                               rotation: node.rotation(),
                             };
-                          })
+                          }),
                         );
 
                         node.scaleX(1);
@@ -1709,11 +1696,11 @@ export default function PDFOverlayCanvas({
                       fillLinearGradientEndPoint={{
                         x:
                           Math.cos(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.width ?? 100),
                         y:
                           Math.sin(
-                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180
+                            ((shape.gradient?.angle ?? 0) * Math.PI) / 180,
                           ) * (shape.height ?? 100),
                       }}
                       fillLinearGradientColorStops={[
@@ -1735,12 +1722,12 @@ export default function PDFOverlayCanvas({
                         x:
                           (shape.shadowOffset ?? 0) *
                           Math.cos(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                         y:
                           (shape.shadowOffset ?? 0) *
                           Math.sin(
-                            ((shape.shadowAngle ?? 315) * Math.PI) / 180
+                            ((shape.shadowAngle ?? 315) * Math.PI) / 180,
                           ),
                       }}
                       shadowOpacity={(shape.shadowOpacity ?? 0.5) * adjusted}
@@ -1753,7 +1740,7 @@ export default function PDFOverlayCanvas({
                             ? prev.includes(shape.id)
                               ? prev.filter((id) => id !== shape.id)
                               : [...prev, shape.id]
-                            : [shape.id]
+                            : [shape.id],
                         );
                       }}
                       draggable
@@ -1802,9 +1789,9 @@ export default function PDFOverlayCanvas({
                             GAP: 6,
                             grid: Array.from(
                               { length: Math.floor(stage.width() / 50) },
-                              (_, i) => i * 50
+                              (_, i) => i * 50,
                             ),
-                          }
+                          },
                         );
 
                         // 🧲 apply magnet snap
@@ -1826,8 +1813,8 @@ export default function PDFOverlayCanvas({
                           const { x, y } = e.target.position();
                           setShapes((prev) =>
                             prev.map((s) =>
-                              s.id === shape.id ? { ...s, x, y } : s
-                            )
+                              s.id === shape.id ? { ...s, x, y } : s,
+                            ),
                           );
                         }
                         isDuplicating.current = false;
@@ -1844,11 +1831,11 @@ export default function PDFOverlayCanvas({
 
                             const newWidth = Math.max(
                               20,
-                              (s.width ?? 100) * scaleX
+                              (s.width ?? 100) * scaleX,
                             );
                             const newHeight = Math.max(
                               20,
-                              (s.height ?? 100) * scaleY
+                              (s.height ?? 100) * scaleY,
                             );
 
                             // 🟢 Preserve user-defined corner radius
@@ -1869,7 +1856,7 @@ export default function PDFOverlayCanvas({
                               rotation: node.rotation(),
                               cornerRadius: newCornerRadius,
                             };
-                          })
+                          }),
                         );
 
                         // ✅ reset transform scaling to prevent jump
@@ -1911,7 +1898,7 @@ export default function PDFOverlayCanvas({
                   strokeWidth={0.5}
                   listening={false}
                 />
-              )
+              ),
             )}
             {Array.from(
               { length: Math.floor(stageSize.height / 50) },
@@ -1923,7 +1910,7 @@ export default function PDFOverlayCanvas({
                   strokeWidth={0.5}
                   listening={false}
                 />
-              )
+              ),
             )}
 
             {[...new Set(guides.vertical.map((v) => Math.round(v)))].map(
@@ -1936,7 +1923,7 @@ export default function PDFOverlayCanvas({
                   dash={[4, 4]}
                   listening={false}
                 />
-              )
+              ),
             )}
 
             {[...new Set(guides.horizontal.map((h) => Math.round(h)))].map(
@@ -1949,7 +1936,7 @@ export default function PDFOverlayCanvas({
                   dash={[4, 4]}
                   listening={false}
                 />
-              )
+              ),
             )}
 
             <Transformer
@@ -1990,7 +1977,7 @@ export default function PDFOverlayCanvas({
           updateSelected={updateSelected}
           deleteSelected={deleteSelected}
         />,
-        document.body
+        document.body,
       )}
     </div>
   );

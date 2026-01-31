@@ -76,7 +76,7 @@ export default function EditorModal({
       if (data.editableHtml) {
         fullHtml = fullHtml.replace(
           /<div class="page-inner">([\s\S]*?)<\/div>/,
-          `<div class="page-inner">${data.editableHtml}</div>`
+          `<div class="page-inner">${data.editableHtml}</div>`,
         );
       }
 
@@ -193,13 +193,13 @@ export default function EditorModal({
         // Normal text color depends on theme
         iframeDoc.documentElement.style.setProperty(
           "--text-color",
-          isDark ? "#ffffff" : "#000000"
+          isDark ? "#ffffff" : "#000000",
         );
 
         // Highlight background uses selected color
         iframeDoc.documentElement.style.setProperty(
           "--hl",
-          highlightColor || "#fff330"
+          highlightColor || "#fff330",
         );
 
         // Highlight text is always black for proper contrast on light backgrounds
@@ -210,8 +210,8 @@ export default function EditorModal({
         const base64Font = btoa(
           new Uint8Array(buf).reduce(
             (data, byte) => data + String.fromCharCode(byte),
-            ""
-          )
+            "",
+          ),
         );
 
         const style = iframeDoc.createElement("style");
@@ -404,7 +404,7 @@ pre code {
           "--hl",
           typeof highlightColor === "string" && highlightColor
             ? highlightColor
-            : "#fff330"
+            : "#fff330",
         );
 
         // ✅ Force body re-render with same content
@@ -447,7 +447,6 @@ pre code {
           const target = iframeDoc.querySelector(".page-inner");
           if (target) {
             target.innerHTML = html;
-            console.log("🔄 Updated .page-inner content live (cleaned images)");
           } else {
             console.warn("⚠️ .page-inner not found in iframe");
           }

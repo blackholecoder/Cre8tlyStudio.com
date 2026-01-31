@@ -34,7 +34,6 @@ export default function BookPromptModal({
 
   useEffect(() => {
     if (initialBookData) {
-      console.log("🩵 Syncing initialBookData to state:", initialBookData);
       setBookName(initialBookData.bookName || "");
       setAuthorName(initialBookData.authorName || "");
       setBookType(initialBookData.bookType || "fiction");

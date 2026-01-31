@@ -8,8 +8,6 @@ export default function ColorThemeChooser({
   includeGradients = true,
   isPro = false,
 }) {
-  console.log("ColorThemeChooser props → isPro:", isPro);
-
   const [showThemes, setShowThemes] = useState(() => {
     const saved = localStorage.getItem("showThemes");
     return saved === "true";
@@ -74,7 +72,7 @@ export default function ColorThemeChooser({
       setUseCustomGradient(true);
 
       const match = bgTheme.match(
-        /linear-gradient\(([^,]+),\s*([^,]+),\s*([^)]+)\)/
+        /linear-gradient\(([^,]+),\s*([^,]+),\s*([^)]+)\)/,
       );
 
       if (match) {

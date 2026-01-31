@@ -1600,7 +1600,6 @@ export default function LandingPageBuilder() {
 
             const { blockType, blockIndex, containerIndex, updateChildBlock } =
               aiContext;
-            console.log("AI CONTEXT", aiContext);
 
             // FAQ handling
             if (blockType === "faq") {

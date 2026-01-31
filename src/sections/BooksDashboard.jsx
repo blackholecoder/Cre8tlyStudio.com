@@ -50,7 +50,6 @@ export default function BooksDashboard() {
       const res = await axiosInstance.get(`/books/${bookId}`);
 
       if (res.data) {
-        console.log("📘 Fresh data from backend:", res.data);
         selectedBook = { ...selectedBook, ...res.data };
       }
     } catch (err) {

@@ -31,13 +31,6 @@ export default function LandingAnalytics() {
     if (!landingPageId) return;
     setLoading(true);
     try {
-      console.log(
-        "🚀 Fetching analytics for:",
-        landingPageId,
-        "range:",
-        selectedRange,
-      );
-
       const res = await axiosInstance.get(
         `https://themessyattic.com/api/landing-analytics/summary/${landingPageId}?days=${selectedRange}`,
       );

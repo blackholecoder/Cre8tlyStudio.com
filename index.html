@@ -171,9 +171,7 @@ setTimeout(() => (exitAllowed = true), 1500);
   if (data?.visitor_id) {
   sessionStorage.setItem("visitor_id", data.visitor_id);
   exitAllowed = true; // <-- THIS FIXES EVERYTHING
-} else {
-    console.log("❌ No visitor_id returned from server");
-  }
+} 
 })
 
 

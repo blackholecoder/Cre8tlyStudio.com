@@ -49,7 +49,6 @@ export default function CustomerDashboard() {
   if (typeof window !== "undefined") {
     const params = new URLSearchParams(location.search);
     if (params.get("session_id")) {
-      console.log("✅ Stripe checkout success:", params.get("session_id"));
       fetchMagnets();
       window.history.replaceState({}, document.title, "/dashboard");
     }

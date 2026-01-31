@@ -436,8 +436,6 @@ export default function CanvasEditor() {
         );
 
         if (!overlayCanvas) continue;
-
-        console.log("🎨 Exporting overlay for page", i, overlayCanvas);
         document.body.appendChild(overlayCanvas.cloneNode(true));
 
         const imgData = overlayCanvas.toDataURL("image/png");
@@ -540,8 +538,6 @@ export default function CanvasEditor() {
             height: 200,
             draggable: true,
           };
-
-          console.log("✅ Added image shape:", newShape);
 
           // ✅ add to current page (preserving undo)
           setShapesByPage((prev) => {

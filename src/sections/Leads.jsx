@@ -33,10 +33,6 @@ export default function Leads() {
   }, [page]);
 
   useEffect(() => {
-    console.log("Fetched leads:", leads);
-  }, [leads]);
-
-  useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setLandingOpen(false);

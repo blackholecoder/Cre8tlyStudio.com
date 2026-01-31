@@ -33,7 +33,6 @@ export default function PromptModal({
   const [loading, setLoading] = useState(false);
 
   const { user, refreshUser } = useAuth();
-  console.log("isFreePlan =", Number(user?.has_free_magnet) === 1);
   const navigate = useNavigate();
 
   const isFreePlan = Number(user?.has_free_magnet) === 1;
@@ -84,7 +83,7 @@ export default function PromptModal({
     // 3️⃣ Prevent more than 5 pages for free users
     if (freshUser?.isFreeTier && pages > 5) {
       toast.warn(
-        "Free tier limited to 5 pages maximum. Please upgrade to unlock more."
+        "Free tier limited to 5 pages maximum. Please upgrade to unlock more.",
       );
       return;
     }

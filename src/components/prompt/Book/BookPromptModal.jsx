@@ -24,10 +24,10 @@ export default function BookPromptModal({
 
   const [bookName, setBookName] = useState(initialBookData?.bookName || "");
   const [authorName, setAuthorName] = useState(
-    initialBookData?.authorName || ""
+    initialBookData?.authorName || "",
   );
   const [bookType, setBookType] = useState(
-    initialBookData?.bookType || "fiction"
+    initialBookData?.bookType || "fiction",
   );
   const [fontName, setFontName] = useState("Classic AdobeArabic");
   const [fontFile, setFontFile] = useState("/fonts/AdobeArabic-Regular.ttf");
@@ -93,7 +93,7 @@ export default function BookPromptModal({
     } catch (err) {
       setShowGenerating(false);
       toast.error(
-        err.response?.data?.message || "Book generation failed. Try again."
+        err.response?.data?.message || "Book generation failed. Try again.",
       );
       console.error("❌ Book generation error:", err);
     } finally {
@@ -159,6 +159,7 @@ export default function BookPromptModal({
       "
       >
         <BookPromptForm
+          key={`${bookId}-${partNumber}`}
           text={text}
           setText={setText}
           pageCount={pageCount}

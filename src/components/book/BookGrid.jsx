@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { CheckCircle, Timer, Plus, Layers, Rocket } from "lucide-react";
+import { CheckCircle, Timer, Plus, Layers, Rocket, Pencil } from "lucide-react";
 import PDFPreviewModal from "../../components/dashboard/PDFPreviewModal";
 import BookPartsModal from "./BookPartsModal";
 import OnboardingGuide from "../onboarding/OnboardingGuide";
@@ -61,7 +61,10 @@ export default function BookGrid({
         {books.map((b) => {
           const isFinalized = b.is_complete === 1;
           const canContinue = !isFinalized && b.pages < 750;
-          const canEdit = !isFinalized && b.can_edit === 1;
+
+          const hasDraft =
+            b.is_draft === 1 ||
+            (b.draft_text && b.draft_text.trim().length > 0);
 
           return (
             <motion.div
@@ -235,26 +238,49 @@ dark:text-dashboard-muted-dark
 
               {/* Actions */}
               <div className="book-actions flex flex-col items-stretch gap-2 mt-4 w-full">
-                {!b.prompt && (
+                {hasDraft && !b.prompt && (
                   <button
-                    onClick={() => onAddPrompt(b.id, b.part_number)}
+                    onClick={() => onAddPrompt(b.id, b.part_number || 1)}
+                    className="
+                    w-full
+                    bg-blue
+                    text-white
+                    rounded-lg
+                    py-2
+                    text-sm
+                    font-semibold
+                    hover:opacity-90
+                    transition
+                    flex items-center justify-center gap-2
+                  "
+                    title="Continue Draft"
+                  >
+                    <Pencil size={16} className="shrink-0" />
+                    <span>Continue Draft</span>
+                  </button>
+                )}
+
+                {!hasDraft && !b.prompt && (
+                  <button
+                    onClick={() => onAddPrompt(b.id, b.part_number || 1)}
                     className="
                     w-full
                     bg-dashboard-hover-light
                     dark:bg-dashboard-hover-dark
                     text-dashboard-text-light
                     dark:text-dashboard-text-dark
-                    rounded-lg py-2 text-sm font-semibold
-                    transition-all
-                    hover:bg-green
-                    hover:text-black
+                    rounded-lg
+                    py-2
+                    text-sm
+                    font-semibold
+                    hover:bg-green hover:text-black
+                    transition
+                    flex items-center justify-center gap-2
                   "
                     title="Create Chapter"
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      <Plus size={16} />
-                      <span>Add Chapter</span>
-                    </div>
+                    <Plus size={16} className="shrink-0" />
+                    <span>Add Chapter</span>
                   </button>
                 )}
 

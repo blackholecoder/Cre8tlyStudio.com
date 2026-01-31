@@ -33,8 +33,7 @@ export default function BookPromptForm({
   bookType,
   setBookType,
   loading,
-  bookId,
-  setBookId, // may be undefined when editing existing book
+  bookId, // may be undefined when editing existing book
   partLocked,
   partNumber,
   onClose,
@@ -49,7 +48,6 @@ export default function BookPromptForm({
   const [saving, setSaving] = useState(false);
   const [restored, setRestored] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState(null);
-  const [canEdit, setCanEdit] = useState(false);
   const { accessToken } = useAuth();
   const [hasShownBanner, setHasShownBanner] = useState(
     sessionStorage.getItem("shownDraftBanner") === "true",
@@ -67,6 +65,7 @@ export default function BookPromptForm({
   const hasLoadedDraft = useRef(false);
 
   const [justSaved, setJustSaved] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(true);
 
   // NEW AUTHOR PAGES REFACTOR
   const [sections, setSections] = useState([
@@ -93,6 +92,9 @@ export default function BookPromptForm({
     (sum, section) => sum + getWordCount(section.content),
     0,
   );
+
+  const hasBookPart =
+    Boolean(bookId) && (hasLoadedDraft.current || isAiGenerated);
 
   useEffect(() => {
     // ONLY hydrate initial empty state
@@ -167,19 +169,46 @@ Please split the file into multiple chapters.`,
   }
 
   useEffect(() => {
+    // 🔥 HARD RESET ON BOOK CHANGE
+
+    setText("");
+    setTitle("");
+    setSections([
+      {
+        id: "section-1",
+        title: "Section 1",
+        content: "",
+      },
+    ]);
+    setActiveSectionId("section-1");
+
+    setIsAiGenerated(false);
+    setLastSavedAt(null);
+    setDraftAuthor(authorName || "");
+    setRestored(false);
+    setJustSaved(false);
+
+    lastSavedRef.current = "";
+    hasLoadedDraft.current = false;
+
+    setLoadingDraft(true);
+  }, [bookId]);
+
+  // load draft effect
+  useEffect(() => {
     async function loadDraft() {
-      if (!bookId) return;
+      if (!bookId) {
+        setLoadingDraft(false);
+        return;
+      }
 
       try {
-        // Decide which endpoint to hit
         const endpoint =
           partNumber > 1
             ? `/books/${bookId}/part/${partNumber}/draft`
             : `/books/draft/${bookId}`;
 
         const res = await axiosInstance.get(endpoint);
-
-        setCanEdit(Boolean(Number(res.data.can_edit)));
 
         if (res.data?.sections_json) {
           const parsedSections = Array.isArray(res.data.sections_json)
@@ -198,15 +227,15 @@ Please split the file into multiple chapters.`,
             if (res.data.link) setLink(res.data.link);
             if (res.data.author_name) setDraftAuthor(res.data.author_name);
             if (res.data.book_type) setBookType(res.data.book_type);
+            if (res.data.title) {
+              setTitle(res.data.title);
+            }
 
             hasLoadedDraft.current = true;
-            return; // ⛔ STOP — GPT wins
+            return;
           }
         }
 
-        // -----------------------------
-        // 🔥 1. Load DRAFT if available
-        // -----------------------------
         if (res.data?.draft_text) {
           setIsAiGenerated(false);
 
@@ -230,8 +259,10 @@ Please split the file into multiple chapters.`,
           if (res.data.last_saved_at) setLastSavedAt(res.data.last_saved_at);
           if (res.data.author_name) setDraftAuthor(res.data.author_name);
           if (res.data.book_type) setBookType(res.data.book_type);
+          if (res.data.title) {
+            setTitle(res.data.title);
+          }
 
-          // Banner only for drafts
           if (!hasShownBanner) {
             setRestored(true);
             toast.info("Loaded saved draft ✍️");
@@ -246,6 +277,9 @@ Please split the file into multiple chapters.`,
         if (err.response?.status !== 404) {
           console.error("Failed to load draft:", err);
         }
+      } finally {
+        // 🔴 THIS IS THE CRITICAL LINE
+        setLoadingDraft(false);
       }
     }
 
@@ -361,32 +395,11 @@ Please split the file into multiple chapters.`,
     setSaving(true);
 
     try {
-      // ✅ Choose correct endpoint based on part number
-      const endpoint =
-        partNumber > 1
-          ? `https://themessyattic.com/api/books/${bookId}/part/${partNumber}/draft`
-          : "https://themessyattic.com/api/books/draft";
-
-      const res = await axiosInstance.post(
-        endpoint,
-        {
-          bookId,
-          draftText: text,
-          sections,
-          bookName,
-          link,
-          author_name: draftAuthor || authorName,
-          book_type: bookType,
-          font_name: fontName, // ✅ added
-          font_file: fontFile,
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } },
-      );
-
-      // ✅ Only setBookId if prop exists and new id was returned
-      if (res.data.id && typeof setBookId === "function") {
-        setBookId(res.data.id);
-      }
+      await axiosInstance.post(`/books/${bookId}/part/${partNumber}/draft`, {
+        draftText: text,
+        sections,
+        title: chapterTitle,
+      });
 
       toast.success("Draft saved successfully 💾");
     } catch (err) {
@@ -447,7 +460,6 @@ Please split the file into multiple chapters.`,
       font_name: fontName,
       font_file: fontFile,
       partNumber,
-      isEditing: canEdit ? true : false,
     };
 
     try {
@@ -569,8 +581,6 @@ Please split the file into multiple chapters.`,
       setPendingDelete(null);
     }, 5000);
   }
-
-  const showArrow = sections.length > 1;
 
   return (
     <>
@@ -974,28 +984,27 @@ Please split the file into multiple chapters.`,
                 into a new chapter.
               </div>
             )}
-            {!partLocked || canEdit ? (
-              <BookEditor
-                content={text}
-                setContent={(html) => {
-                  // 1️⃣ Keep existing behavior (temporary bridge)
-                  setText(html);
-
-                  // 2️⃣ Write into the active section
-                  setSections((prev) =>
-                    prev.map((section) =>
-                      section.id === activeSectionId
-                        ? { ...section, content: html }
-                        : section,
-                    ),
-                  );
-                }}
-              />
+            loadingDraft ? (
+            <div className="p-8 text-center text-gray-400 italic">
+              Loading your draft…
+            </div>
             ) : (
-              <div className="p-4 bg-gray-800 text-gray-400 rounded-lg border border-gray-700">
-                Chapter is locked.
-              </div>
-            )}
+            <BookEditor
+              bookId={bookId}
+              key={`${bookId}-${partNumber}`}
+              content={text}
+              setContent={(html) => {
+                setText(html);
+                setSections((prev) =>
+                  prev.map((section) =>
+                    section.id === activeSectionId
+                      ? { ...section, content: html }
+                      : section,
+                  ),
+                );
+              }}
+            />
+            )
           </div>
           <FontSelector
             fontName={fontName}
@@ -1058,21 +1067,24 @@ dark:text-dashboard-muted-dark mb-2 font-medium"
               <button
                 type="button"
                 onClick={handleSaveDraft}
-                disabled={saving}
-                className={`flex-1 px-6 py-3 rounded-xl bg-gray-700 text-white font-semibold text-lg shadow-lg transition ${
-                  saving
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-green hover:text-black"
+                disabled={saving || !hasBookPart}
+                className={`flex-1 px-6 py-3 rounded-xl font-semibold text-lg shadow-lg transition ${
+                  saving || !hasBookPart
+                    ? "bg-gray-700 opacity-50 cursor-not-allowed"
+                    : "bg-gray-700 hover:bg-green hover:text-black"
                 }`}
               >
-                {saving ? "Saving..." : "Save Draft"}
+                {saving
+                  ? "Saving..."
+                  : !hasBookPart
+                    ? "Create chapter first"
+                    : "Save Draft"}
               </button>
             )}
 
             {!loading && (
               <button
                 type="submit"
-                disabled={partLocked && !canEdit}
                 className="flex-1 px-6 py-3 rounded-xl bg-bookBtnColor text-black font-semibold text-lg shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2"
               >
                 {isAiGenerated ? (

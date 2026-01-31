@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import { Plus, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const inputClass = `
   w-full rounded-xl px-4 py-3 text-sm
@@ -217,7 +218,6 @@ export default function ProfileSettings() {
               className={`${inputClass} resize-none`}
             />
           </Section>
-
           <Section title="About" description="Writer introduction">
             <textarea
               value={about}
@@ -226,7 +226,6 @@ export default function ProfileSettings() {
               className={inputClass}
             />
           </Section>
-
           <Section title="Current Employment">
             <input
               value={currentEmployment}
@@ -234,7 +233,6 @@ export default function ProfileSettings() {
               className={inputClass}
             />
           </Section>
-
           <TagSection
             title="Interests"
             value={newInterest}
@@ -242,7 +240,6 @@ export default function ProfileSettings() {
             list={interests}
             setList={setInterests}
           />
-
           <TagSection
             title="Services Provided"
             value={newService}
@@ -250,7 +247,6 @@ export default function ProfileSettings() {
             list={services}
             setList={setServices}
           />
-
           <Section title="Media Links">
             <div className="flex gap-2 mb-3">
               <input
@@ -299,6 +295,49 @@ export default function ProfileSettings() {
               ))}
             </div>
           </Section>
+
+          <Section
+            title="Unlock more tools"
+            description="Upgrade your plan to access premium writing and publishing features."
+          >
+            <div
+              className="
+              flex flex-col sm:flex-row
+              items-start sm:items-center
+              justify-between
+              gap-4
+              rounded-xl
+              p-4
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              border
+              border-dashboard-border-light
+              dark:border-dashboard-border-dark
+            "
+            >
+              <p className="text-sm opacity-80 max-w-xl">
+                Author’s Assistant and the Pro Document Generator are available
+                on paid plans with expanded limits and advanced tools.
+              </p>
+
+              <Link to="/plans">
+                <button
+                  className="
+          px-4 py-2
+          rounded-lg
+          text-sm font-medium
+          bg-blue
+          text-white
+          hover:opacity-90
+          whitespace-nowrap
+        "
+                >
+                  View plans
+                </button>
+              </Link>
+            </div>
+          </Section>
+
           <Section
             title="Notifications"
             description="Control which activity you want to be notified about"

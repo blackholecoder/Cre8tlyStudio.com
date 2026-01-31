@@ -21,6 +21,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import "highlight.js/styles/github-dark.css";
 import { Tooltip } from "../tools/toolTip";
+import axiosInstance from "../../api/axios";
 
 function debounce(fn, delay) {
   let timeout;
@@ -32,9 +33,8 @@ function debounce(fn, delay) {
   return debounced;
 }
 
-export default function BookEditor({ content, setContent }) {
-  const editorRef = useRef(null);
-  const hasHydratedRef = useRef(false);
+export default function BookEditor({ bookId, content, setContent }) {
+  const DRAFT_KEY = bookId ? `book-editor-draft-${bookId}` : null;
 
   const [isSaving, setIsSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
@@ -56,11 +56,17 @@ export default function BookEditor({ content, setContent }) {
   const debouncedUpdate = useMemo(
     () =>
       debounce(({ editor }) => {
+        const html = editor.getHTML();
+
         setIsSaving(true);
-        setContent(editor.getHTML());
-        setTimeout(() => setIsSaving(false), 500);
+        setContent(html);
+        if (DRAFT_KEY) {
+          localStorage.setItem(DRAFT_KEY, html);
+        }
+
+        setTimeout(() => setIsSaving(false), 400);
       }, 300),
-    [],
+    [bookId],
   );
 
   useEffect(() => {
@@ -70,7 +76,6 @@ export default function BookEditor({ content, setContent }) {
   }, [debouncedUpdate]);
 
   const editor = useEditor({
-    autofocus: "end",
     extensions: [
       TextStyle,
       Color,
@@ -103,24 +108,22 @@ export default function BookEditor({ content, setContent }) {
 
   useEffect(() => {
     if (!editor) return;
-    if (!content) return;
-    if (hasHydratedRef.current) return;
 
-    editor.commands.setContent(content);
-    hasHydratedRef.current = true;
+    // Only set if editor is empty or content actually changed
+    const currentHTML = editor.getHTML();
+
+    if (content && content !== currentHTML) {
+      editor.commands.setContent(content, false);
+    }
   }, [editor, content]);
 
   if (editor) window.__EDITOR = editor;
 
   useEffect(() => {
-    if (editor) {
+    if (editor && content) {
       editor.commands.focus("end");
     }
-  }, [editor]);
-
-  useEffect(() => {
-    editorRef.current = editor;
-  }, [editor]);
+  }, [editor, content]);
 
   if (!editor) return null;
 
@@ -143,8 +146,17 @@ export default function BookEditor({ content, setContent }) {
 
           <button
             type="button"
-            onClick={() => {
-              setContent(editor.getHTML());
+            onClick={async () => {
+              const html = editor.getHTML();
+              setContent(html);
+              localStorage.setItem(DRAFT_KEY, html);
+
+              // optional backend save
+              await axiosInstance.post("/books/draft", {
+                bookId,
+                draftText: html,
+              });
+
               setSavedAt(Date.now());
             }}
             className="px-3 py-1 text-xs rounded bg-green text-black"

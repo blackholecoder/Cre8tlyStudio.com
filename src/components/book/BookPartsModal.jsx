@@ -69,8 +69,6 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
 
       // ✅ Lock UI immediately
       setIsComplete(true);
-      setParts((prev) => prev.map((p) => ({ ...p, can_edit: 0 })));
-
       setShowFinalizeModal(false);
     } catch (err) {
       console.error("❌ Finalize failed:", err);
@@ -128,13 +126,13 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
                         onClose();
                         onEditChapter(bookId, p.part_number);
                       }}
-                      disabled={isComplete || !p.can_edit}
+                      disabled={isComplete}
                       className={`px-3 py-1 rounded text-sm font-semibold transition
-  ${
-    !isComplete && p.can_edit
-      ? "bg-gray-900 border border-gray-700 text-white hover:bg-gray-700"
-      : "bg-gray-800 text-gray-500 cursor-not-allowed"
-  }`}
+                      ${
+                        !isComplete
+                          ? "bg-gray-900 border border-gray-700 text-white hover:bg-gray-700"
+                          : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                      }`}
                     >
                       Edit Chapter
                     </button>

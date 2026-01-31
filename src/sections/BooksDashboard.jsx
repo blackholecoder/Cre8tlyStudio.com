@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../admin/AuthContext.jsx";
 import { useBooks } from "../admin/BookContext.jsx";
@@ -73,7 +73,7 @@ export default function BooksDashboard() {
       bookName === "Untitled Book";
 
     // ✔ If missing core info, open setup modal
-    if (missingAuthor || missingBookName) {
+    if ((missingAuthor || missingBookName) && !selectedBook.is_draft) {
       setActiveBook({ id: bookId, part_number: partNumber });
       setShowNewBookModal(true);
       return;
@@ -100,28 +100,26 @@ export default function BooksDashboard() {
     setTimeout(fetchBooks, 3000);
   }
 
-  function handleAddBookInfo({ bookName, authorName, bookType }) {
+  function handleAddBookInfo({ bookId, bookName, authorName, bookType }) {
     setNewBookData({ bookName, authorName, bookType });
+
+    setActiveBook({
+      id: bookId,
+      part_number: 1,
+      book_name: bookName,
+      author_name: authorName,
+      book_type: bookType,
+    });
+
     setShowNewBookModal(false);
     setOpenPrompt(true);
   }
-
   async function handleCreateNewBook() {
     try {
       const res = await axiosInstance.post("/books/get-new-book");
 
-      const { bookId } = res.data;
-
       // Refresh books from backend
       await fetchBooks();
-
-      // Open setup flow for the new book
-      setActiveBook({
-        id: bookId,
-        part_number: 1,
-      });
-
-      setShowNewBookModal(true);
     } catch (err) {
       if (err.response?.status === 400) {
         setShowOutOfSlots(true);
@@ -255,7 +253,6 @@ export default function BooksDashboard() {
         {/* Modals */}
         {showNewBookModal && activeBook && (
           <NewBookModal
-            bookId={activeBook.id}
             accessToken={accessToken}
             onCreate={handleAddBookInfo}
             onClose={() => setShowNewBookModal(false)}

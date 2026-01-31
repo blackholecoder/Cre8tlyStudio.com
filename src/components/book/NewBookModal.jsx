@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import axiosInstance from "../../api/axios";
 
 export default function NewBookModal({ onCreate, onClose }) {
   const [bookName, setBookName] = useState("");
@@ -262,13 +263,30 @@ export default function NewBookModal({ onCreate, onClose }) {
               </button>
 
               <button
-                onClick={() => {
-                  setConfirmOpen(false);
-                  onCreate({
-                    bookName,
-                    authorName: author,
-                    bookType,
-                  });
+                onClick={async () => {
+                  try {
+                    setLoading(true);
+
+                    const res = await axiosInstance.post("/books/create-book", {
+                      bookName,
+                      authorName: author,
+                      bookType,
+                    });
+
+                    setConfirmOpen(false);
+
+                    onCreate({
+                      bookId: res.data.id, // 🔑 THIS IS THE KEY
+                      bookName,
+                      authorName: author,
+                      bookType,
+                    });
+                  } catch (err) {
+                    console.error("Failed to create book:", err);
+                    toast.error("Failed to create book");
+                  } finally {
+                    setLoading(false);
+                  }
                 }}
                 className="
             px-5 py-2 

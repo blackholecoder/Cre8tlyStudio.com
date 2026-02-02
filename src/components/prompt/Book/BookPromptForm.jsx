@@ -984,27 +984,27 @@ Please split the file into multiple chapters.`,
                 into a new chapter.
               </div>
             )}
-            loadingDraft ? (
-            <div className="p-8 text-center text-gray-400 italic">
-              Loading your draft…
-            </div>
+            {loadingDraft ? (
+              <div className="p-8 text-center text-gray-400 italic">
+                Loading your draft…
+              </div>
             ) : (
-            <BookEditor
-              bookId={bookId}
-              key={`${bookId}-${partNumber}`}
-              content={text}
-              setContent={(html) => {
-                setText(html);
-                setSections((prev) =>
-                  prev.map((section) =>
-                    section.id === activeSectionId
-                      ? { ...section, content: html }
-                      : section,
-                  ),
-                );
-              }}
-            />
-            )
+              <BookEditor
+                bookId={bookId}
+                key={`${bookId}-${partNumber}`}
+                content={text}
+                setContent={(html) => {
+                  setText(html);
+                  setSections((prev) =>
+                    prev.map((section) =>
+                      section.id === activeSectionId
+                        ? { ...section, content: html }
+                        : section,
+                    ),
+                  );
+                }}
+              />
+            )}
           </div>
           <FontSelector
             fontName={fontName}

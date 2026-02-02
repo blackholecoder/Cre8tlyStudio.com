@@ -38,7 +38,8 @@ export default function BookEditor({ bookId, content, setContent }) {
 
   const [isSaving, setIsSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
-  const [theme, setTheme] = useState("dark"); // "dark" | "light"
+  const [theme, setTheme] = useState("dark");
+  const hasInitialized = useRef(false);
 
   const isDark = theme === "dark";
 
@@ -107,23 +108,16 @@ export default function BookEditor({ bookId, content, setContent }) {
   });
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || hasInitialized.current) return;
 
-    // Only set if editor is empty or content actually changed
-    const currentHTML = editor.getHTML();
-
-    if (content && content !== currentHTML) {
+    if (content) {
       editor.commands.setContent(content, false);
     }
-  }, [editor, content]);
+
+    hasInitialized.current = true;
+  }, [editor]);
 
   if (editor) window.__EDITOR = editor;
-
-  useEffect(() => {
-    if (editor && content) {
-      editor.commands.focus("end");
-    }
-  }, [editor, content]);
 
   if (!editor) return null;
 

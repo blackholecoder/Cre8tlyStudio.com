@@ -164,7 +164,7 @@ export default function Saved() {
                     <img
                       src={post.author_image}
                       alt=""
-                      className="w-6 h-6 rounded-full object-cover border"
+                      className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
                     <div className="w-6 h-6 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark" />
@@ -216,7 +216,7 @@ export default function Saved() {
               </div>
 
               {/* IMAGE */}
-              <div className="w-16 h-16 rounded-lg overflow-hidden border bg-dashboard-hover-light dark:bg-dashboard-hover-dark">
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-dashboard-hover-light dark:bg-dashboard-hover-dark">
                 {post.image_url ? (
                   <img
                     src={post.image_url}
@@ -224,8 +224,28 @@ export default function Saved() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs opacity-60">
-                    No image
+                  <div
+                    className="
+                    w-full h-full
+                    flex items-center justify-center
+                    bg-gradient-to-br
+                    from-sky-400/80
+                    via-sky-300/90
+                    to-blue/80
+                  "
+                  >
+                    <span
+                      className="
+                      text-[10px]
+                      font-medium
+                      uppercase
+                      tracking-wide
+                      text-dashboard-text-light dark:text-dashboard-text-dark
+                      select-none
+                    "
+                    >
+                      No image
+                    </span>
                   </div>
                 )}
               </div>

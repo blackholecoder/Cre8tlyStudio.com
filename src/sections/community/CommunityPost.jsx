@@ -11,6 +11,7 @@ import {
   Share2,
   Check,
   DollarSign,
+  Bookmark,
 } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
@@ -54,6 +55,7 @@ export default function CommunityPost() {
   const [tipOpen, setTipOpen] = useState(false);
   const [tipLoading, setTipLoading] = useState(false);
   const [expandedComments, setExpandedComments] = useState({});
+  const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
 
   useEffect(() => {
     if (!comments.length) return;
@@ -225,6 +227,60 @@ export default function CommunityPost() {
     } catch (err) {
       console.error("Failed to toggle post like:", err);
       toast.error("Failed to update like");
+    }
+  };
+
+  const toggleBookmark = async () => {
+    if (!user) {
+      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      return;
+    }
+
+    // optimistic update
+    setPost((prev) => {
+      const wasBookmarked = prev.is_bookmarked;
+
+      return {
+        ...prev,
+        is_bookmarked: !wasBookmarked,
+        save_count: Math.max(
+          (prev.save_count || 0) + (wasBookmarked ? -1 : 1),
+          0,
+        ),
+      };
+    });
+
+    try {
+      const res = await axiosInstance.post(`/community/bookmark/${post.id}`);
+
+      // reconcile with server truth
+      setPost((prev) => ({
+        ...prev,
+        is_bookmarked: res.data.bookmarked,
+      }));
+
+      if (res.data.bookmarked) {
+        setBookmarkSuccess(true);
+        setTimeout(() => setBookmarkSuccess(false), 1200);
+      }
+    } catch (err) {
+      console.error("Bookmark toggle failed:", err);
+
+      // rollback on failure
+      setPost((prev) => {
+        const wasBookmarked = prev.is_bookmarked;
+
+        return {
+          ...prev,
+          is_bookmarked: !wasBookmarked,
+          save_count: Math.max(
+            (prev.save_count || 0) + (wasBookmarked ? -1 : 1),
+            0,
+          ),
+        };
+      });
+
+      toast.error("Failed to save bookmark");
     }
   };
 
@@ -648,10 +704,18 @@ export default function CommunityPost() {
                   )}
                 </div>
 
-                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm mt-1">
+                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm mt-1 flex items-center flex-wrap gap-1">
                   <span>{formatPostDate(post.created_at)}</span>
                   <span className="mx-1">·</span>
                   <span className="opacity-80">{timeAgo(post.created_at)}</span>
+                  <span className="mx-1">·</span>
+                  <span className="flex items-center gap-1 opacity-80">
+                    <Bookmark
+                      size={12}
+                      className="text-dashboard-muted-light dark:text-dashboard-muted-dark stroke-[2]"
+                    />
+                    {post.save_count}
+                  </span>
                 </p>
 
                 {/* Mobile meta + actions */}
@@ -827,21 +891,52 @@ export default function CommunityPost() {
               </div>
             </div>
 
-            <h2
-              className="
-    not-prose
-    text-3xl sm:text-3xl
-    font-bold
-    mb-1
-    tracking-tight
-    leading-tight
-    text-left
-    text-dashboard-text-light
-    dark:text-dashboard-text-dark
-  "
-            >
-              {post.title}
-            </h2>
+            <div className="flex items-start justify-between gap-4">
+              <h2
+                className="
+                not-prose
+                text-3xl sm:text-3xl
+                font-bold
+                tracking-tight
+                leading-tight
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+              "
+              >
+                {post.title}
+              </h2>
+
+              {user && (
+                <button
+                  onClick={toggleBookmark}
+                  className="
+                  mt-1
+                  p-2
+                  rounded-lg
+                  text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                  hover:bg-dashboard-hover-light
+                  dark:hover:bg-dashboard-hover-dark
+                  active:scale-95
+                  transition
+                "
+                  title={post.is_bookmarked ? "Saved" : "Save for later"}
+                >
+                  {bookmarkSuccess ? (
+                    <Check size={18} className="text-green" />
+                  ) : (
+                    <Bookmark
+                      size={18}
+                      className={
+                        post.is_bookmarked
+                          ? "text-green stroke-[2.2]"
+                          : "opacity-80"
+                      }
+                    />
+                  )}
+                </button>
+              )}
+            </div>
 
             {post.subtitle && (
               <p

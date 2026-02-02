@@ -460,6 +460,7 @@ Please split the file into multiple chapters.`,
       font_name: fontName,
       font_file: fontFile,
       partNumber,
+      isEditing: isAiGenerated === true,
     };
 
     try {

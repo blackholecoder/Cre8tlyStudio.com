@@ -77,6 +77,7 @@ import InviteAccept from "./sections/community/subscriptions/InviteAccept.jsx";
 import EmailTemplates from "./sections/community/templates/EmailTemplates.jsx";
 import CreatePostPage from "./sections/community/CreatePostPage.jsx";
 import CommunitySubscribers from "./sections/community/subscriptions/CommunitySubscribers.jsx";
+import Saved from "./sections/community/posts/Saved.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -344,6 +345,16 @@ const AnimatedRoutes = () => {
             <PrivateRoute role={["customer", "admin", "marketer"]}>
               <DashboardLayout>
                 <Profile />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/bookmarks"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <Saved />
               </DashboardLayout>
             </PrivateRoute>
           }

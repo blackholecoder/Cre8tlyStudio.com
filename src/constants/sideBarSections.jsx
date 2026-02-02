@@ -3,7 +3,6 @@ import {
   Settings,
   SquareTerminal,
   Package,
-  DollarSign,
   Inbox,
   BarChart2,
   MessagesSquare,
@@ -18,6 +17,7 @@ import {
   BellRing,
   MailCheck,
   CircleQuestionMark,
+  Bookmark,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -44,6 +44,14 @@ export const SIDEBAR_SECTIONS = [
         label: "My Posts",
         path: "/community/posts",
         icon: FileText,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "saved",
+        label: "Saved",
+        path: "/community/bookmarks",
+        icon: Bookmark,
         allowCommunity: true,
         isSubItem: true,
       },

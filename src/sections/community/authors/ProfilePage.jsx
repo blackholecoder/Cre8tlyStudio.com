@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../../admin/AuthContext";
 import { ProfilePostCarousel } from "../posts/ProfilePostCarousel";
 import { ButtonSpinner } from "../../../helpers/buttonSpinner";
+import { BADGE_DEFS } from "../badges";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,7 @@ export default function Profile() {
 
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
+  const [badges, setBadges] = useState([]);
 
   const isOwnProfile = !userId || user?.id === userId;
 
@@ -41,6 +43,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
+    fetchBadges();
   }, [userId]);
 
   async function fetchProfile() {
@@ -54,6 +57,20 @@ export default function Profile() {
       console.error("Failed to load author profile");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchBadges() {
+    try {
+      const url =
+        isOwnProfile || !userId
+          ? "/badges/my-badges"
+          : `/badges/user-badges/${userId}`;
+
+      const res = await axiosInstance.get(url);
+      setBadges(res.data.badges || []);
+    } catch (err) {
+      console.error("Failed to load badges", err);
     }
   }
 
@@ -178,6 +195,15 @@ export default function Profile() {
                     subscriber{profile.subscriber_count === 1 ? "" : "s"}
                   </span>
                 </button>
+                {badges.length > 0 && (
+                  <div className="mt-4 w-full">
+                    <div className="flex flex-wrap justify-center gap-3">
+                      {badges.map((badge) => (
+                        <ProfileBadge key={badge.key_name} badge={badge} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -263,12 +289,49 @@ export default function Profile() {
 }
 
 /* ---------- UI helpers ---------- */
-
 function Section({ title, children }) {
   return (
     <div className="rounded-2xl p-6 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
       <h2 className="text-sm font-semibold mb-3">{title}</h2>
       {children}
+    </div>
+  );
+}
+
+function ProfileBadge({ badge }) {
+  const def = BADGE_DEFS[badge.key_name];
+
+  // Safety guard (never crash profile)
+  if (!def) return null;
+
+  const earned = Boolean(badge.earned);
+  const Icon = def.icon;
+
+  return (
+    <div
+      title={badge.description}
+      className={`
+        flex flex-col items-center
+        w-16
+        text-center
+        transition
+        ${earned ? "opacity-100" : "opacity-40 grayscale"}
+      `}
+    >
+      <div
+        className={`
+          w-10 h-10 rounded-full
+          flex items-center justify-center
+          border
+          ${def.bg}
+          ${earned ? def.color : ""}
+          border-dashboard-border-light dark:border-dashboard-border-dark
+        `}
+      >
+        <Icon size={18} />
+      </div>
+
+      <span className="mt-1 text-[10px] leading-tight">{def.label}</span>
     </div>
   );
 }

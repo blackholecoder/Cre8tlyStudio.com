@@ -349,6 +349,7 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/community/bookmarks"
           element={

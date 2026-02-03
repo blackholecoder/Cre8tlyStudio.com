@@ -40,6 +40,8 @@ export default function BookEditor({ bookId, content, setContent }) {
   const [savedAt, setSavedAt] = useState(null);
   const [theme, setTheme] = useState("dark");
   const hasInitialized = useRef(false);
+  const [spellIssues, setSpellIssues] = useState([]);
+  const [showIssues, setShowIssues] = useState(false);
 
   const isDark = theme === "dark";
 
@@ -101,6 +103,9 @@ export default function BookEditor({ bookId, content, setContent }) {
     ],
     editorProps: {
       attributes: {
+        spellcheck: "true",
+        autocorrect: "on",
+        autocomplete: "on",
         class: "focus:outline-none prose prose-lg max-w-none leading-relaxed",
       },
     },
@@ -116,6 +121,38 @@ export default function BookEditor({ bookId, content, setContent }) {
 
     hasInitialized.current = true;
   }, [editor]);
+
+  const addToDictionary = async (word) => {
+    await axiosInstance.post("/dictionary/add", { word });
+
+    setSpellIssues((prev) => {
+      const next = prev.filter((i) => i.word !== word);
+
+      if (next.length === 0) {
+        setShowIssues(false);
+      }
+
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (!editor || spellIssues.length === 0) return;
+
+    const text = editor.getText().toLowerCase();
+
+    setSpellIssues((prev) => {
+      const next = prev.filter((issue) =>
+        text.includes(issue.word.toLowerCase()),
+      );
+
+      if (next.length === 0) {
+        setShowIssues(false);
+      }
+
+      return next;
+    });
+  }, [editor?.getText()]);
 
   if (editor) window.__EDITOR = editor;
 
@@ -141,7 +178,12 @@ export default function BookEditor({ bookId, content, setContent }) {
           <button
             type="button"
             onClick={async () => {
+              if (!editor) return;
+
               const html = editor.getHTML();
+              const plainText = editor.getText();
+
+              setIsSaving(true);
               setContent(html);
               localStorage.setItem(DRAFT_KEY, html);
 
@@ -151,6 +193,27 @@ export default function BookEditor({ bookId, content, setContent }) {
                 draftText: html,
               });
 
+              // 🔍 spellcheck AFTER save
+              try {
+                const spellcheckRes = await axiosInstance.post(
+                  "/books/spellcheck",
+                  {
+                    text: plainText,
+                  },
+                );
+
+                const issues = spellcheckRes.data.issues;
+
+                if (issues.length > 0) {
+                  setSpellIssues(issues);
+                } else {
+                  setSpellIssues([]);
+                }
+              } catch (err) {
+                console.warn("Spellcheck failed, save still succeeded", err);
+              }
+
+              setIsSaving(false);
               setSavedAt(Date.now());
             }}
             className="px-3 py-1 text-xs rounded bg-green text-black"
@@ -181,6 +244,55 @@ export default function BookEditor({ bookId, content, setContent }) {
           {isDark ? "Light Mode" : "Dark Mode"}
         </button>
       </div>
+
+      {spellIssues.length > 0 && (
+        <div className="px-4 py-2 border-b border-gray-800 bg-[#0b0b0b]">
+          <button
+            type="button"
+            onClick={() => setShowIssues((v) => !v)}
+            className="flex items-center gap-1 text-xs text-yellow-400 hover:underline"
+          >
+            ⚠ {spellIssues.length} issue{spellIssues.length > 1 ? "s" : ""}
+          </button>
+
+          {showIssues && (
+            <div className="mt-2 w-full rounded-none border border-gray-700 bg-[#111] px-4 py-3 text-sm">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs uppercase text-gray-400">
+                  Spelling issues
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowIssues(false)}
+                  className="text-xs text-gray-400 hover:text-white"
+                >
+                  Close
+                </button>
+              </div>
+
+              <ul className="space-y-2">
+                {spellIssues.map((issue, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <span className="text-white">{issue.word}</span>
+
+                    <button
+                      type="button"
+                      onClick={() => addToDictionary(issue.word)}
+                      className="text-xs text-green hover:underline"
+                    >
+                      Add to dictionary
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* --- Toolbar --- */}
       <div
         className={`sticky top-0 z-10 ${toolbarClasses}

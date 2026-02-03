@@ -154,6 +154,28 @@
   opacity: 0.9;
 }
 
+.prose [data-spell-error] {
+  text-decoration: underline;
+  text-decoration-color: #e11d48;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.prose ::-webkit-spelling-error {
+  text-decoration: underline;
+  text-decoration-color: #e11d48;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* Firefox */
+.prose ::spelling-error {
+  text-decoration: underline;
+  text-decoration-color: #e11d48;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 h1 {
   font-variation-settings:
     "wght" 900,

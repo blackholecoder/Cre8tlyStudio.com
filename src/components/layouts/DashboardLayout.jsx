@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
@@ -30,6 +30,8 @@ function useIsDesktop() {
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
+  const mainRef = useRef(null);
+
   const location = useLocation();
   const { user, logout, updateTheme } = useAuth();
 
@@ -120,6 +122,13 @@ export default function DashboardLayout({ children }) {
       // ignore write failures
     }
   }, [isCollapsed]);
+
+  useEffect(() => {
+    document.scrollingElement?.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
+  }, [location.pathname]);
 
   function hasAccess(item) {
     if (item.access === "books") {
@@ -540,6 +549,7 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
       )}
 
       <main
+        ref={mainRef}
         className={`
     flex-1
     ${isDesktop ? (isCollapsed ? "ml-[72px]" : "ml-[260px]") : ""}

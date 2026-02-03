@@ -110,7 +110,7 @@ export default function Saved() {
       </div>
 
       {/* List */}
-      <div className="px-4 py-4 pb-24 max-w-3xl mx-auto space-y-2">
+      <div className="px-0 py-4 pb-24 max-w-3xl mx-auto space-y-2">
         {loading && posts.length === 0 && (
           <p className="text-sm opacity-60">Loading saved posts…</p>
         )}
@@ -125,15 +125,15 @@ export default function Saved() {
           <div
             key={post.id}
             className="
-    w-full
-    px-4 py-3
-    sm:px-6 sm:py-4
-    border-b border-dashboard-border-light
-    dark:border-dashboard-border-dark
-    hover:bg-dashboard-hover-light
-    dark:hover:bg-dashboard-hover-dark
-    transition
-  "
+            w-full
+            px-4 py-3
+            sm:px-6 sm:py-4
+            border-b border-dashboard-border-light
+            dark:border-dashboard-border-dark
+            hover:bg-dashboard-hover-light
+            dark:hover:bg-dashboard-hover-dark
+            transition
+          "
           >
             <div className="grid grid-cols-[1fr_auto] gap-4 items-start">
               {/* TEXT BLOCK */}
@@ -143,11 +143,11 @@ export default function Saved() {
               >
                 <h3
                   className="
-          text-base sm:text-lg font-semibold
-          text-dashboard-text-light dark:text-dashboard-text-dark
-          line-clamp-1 sm:line-clamp-2
-          group-hover:underline
-        "
+                  text-base sm:text-lg font-semibold
+                  text-dashboard-text-light dark:text-dashboard-text-dark
+                  line-clamp-1 sm:line-clamp-2
+                  group-hover:underline
+                "
                 >
                   {post.title}
                 </h3>

@@ -16,6 +16,15 @@ export default function CommunityHome() {
   const [topicsOpen, setTopicsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [copiedPostId, setCopiedPostId] = useState(null);
+  const [recap, setRecap] = useState({
+    hasActivity: false,
+    summary: {
+      commentsOnYourPosts: 0,
+      repliesToYourComments: 0,
+      mentions: 0,
+    },
+  });
+  const [recapDismissed, setRecapDismissed] = useState(false);
 
   async function handlePostClick(postId) {
     try {
@@ -33,6 +42,33 @@ export default function CommunityHome() {
       setPosts(res.data.posts || []);
     } catch (err) {
       console.error("Failed to load posts:", err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchRecap = async () => {
+      try {
+        const res = await axiosInstance.get("/community/recap");
+
+        if (res.data?.hasActivity) {
+          setRecap(res.data);
+        }
+      } catch (err) {
+        // recap should never block the page
+        console.error("Failed to fetch recap:", err);
+      }
+    };
+
+    fetchRecap();
+  }, []);
+
+  const dismissRecap = async () => {
+    setRecapDismissed(true);
+
+    try {
+      await axiosInstance.post("/community/mark-seen");
+    } catch {
+      // ignore, UI already updated
     }
   };
 
@@ -235,6 +271,79 @@ export default function CommunityHome() {
               Write a post
             </button>
           </div>
+
+          {recap.hasActivity && !recapDismissed && (
+            <div className="mb-6">
+              <div
+                className="
+                max-w-4xl mx-auto
+                rounded-xl
+                border border-dashboard-border-light dark:border-dashboard-border-dark
+                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                p-5
+                shadow-sm
+                flex flex-col gap-3
+              "
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
+                      Welcome back
+                    </h3>
+                    <p className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1">
+                      Here’s what’s happened since your last visit.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={dismissRecap}
+                    className="
+            text-xs
+            text-dashboard-muted-light
+            dark:text-dashboard-muted-dark
+            hover:opacity-80
+          "
+                  >
+                    Dismiss
+                  </button>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  {recap.summary.commentsOnYourPosts > 0 && (
+                    <button
+                      onClick={dismissRecap}
+                      className="block text-left hover:underline"
+                    >
+                      💬 {recap.summary.commentsOnYourPosts} new comment
+                      {recap.summary.commentsOnYourPosts > 1 ? "s" : ""} on your
+                      posts
+                    </button>
+                  )}
+
+                  {recap.summary.repliesToYourComments > 0 && (
+                    <button
+                      onClick={dismissRecap}
+                      className="block text-left hover:underline"
+                    >
+                      ↩️ {recap.summary.repliesToYourComments} repl
+                      {recap.summary.repliesToYourComments > 1 ? "ies" : "y"} to
+                      your comments
+                    </button>
+                  )}
+
+                  {recap.summary.mentions > 0 && (
+                    <button
+                      onClick={dismissRecap}
+                      className="block text-left hover:underline"
+                    >
+                      🔔 You were mentioned {recap.summary.mentions} time
+                      {recap.summary.mentions > 1 ? "s" : ""}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Scrollable Topics */}
           <div

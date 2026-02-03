@@ -55,6 +55,28 @@
   margin-bottom: 1rem;
 }
 
+/* Fragment Post Body CSS */
+.post-body-frag {
+  font-family: "PT Serif", sans-serif;
+}
+
+.post-body-frag {
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  color: var(--post-text);
+}
+.dark .post-body-frag {
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  color: #e5e7eb;
+}
+
+.post-body-frag p {
+  margin-bottom: 1rem;
+}
+
 .post-body strong {
   font-weight: 600;
 }

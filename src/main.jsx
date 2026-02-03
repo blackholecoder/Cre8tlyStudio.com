@@ -78,6 +78,9 @@ import EmailTemplates from "./sections/community/templates/EmailTemplates.jsx";
 import CreatePostPage from "./sections/community/CreatePostPage.jsx";
 import CommunitySubscribers from "./sections/community/subscriptions/CommunitySubscribers.jsx";
 import Saved from "./sections/community/posts/Saved.jsx";
+import FragmentFeed from "./sections/community/fragments/FragmentFeed.jsx";
+import CreateFragment from "./sections/community/CreateFragmentPage.jsx";
+import MyFragments from "./sections/community/fragments/MyFragments.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -356,6 +359,56 @@ const AnimatedRoutes = () => {
             <PrivateRoute role={["customer", "admin", "marketer"]}>
               <DashboardLayout>
                 <Saved />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/fragments"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <FragmentFeed />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/my-fragments"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <MyFragments />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/fragments/edit/:fragmentId"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <CreateFragment />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/fragments/create"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <CreateFragment />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/fragments/:id"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <CommunityPost targetType="fragment" />
               </DashboardLayout>
             </PrivateRoute>
           }

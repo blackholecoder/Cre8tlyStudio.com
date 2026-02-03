@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
 
-export default function CreateCommentBox({ postId, onComment }) {
+export default function CreateCommentBox({
+  targetType = "post",
+  targetId,
+  onComment,
+}) {
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,10 +61,11 @@ export default function CreateCommentBox({ postId, onComment }) {
     setSubmitting(true);
 
     try {
-      const res = await axiosInstance.post(
-        `/community/posts/${postId}/comments`,
-        { body },
-      );
+      const res = await axiosInstance.post(`/community/comments`, {
+        targetType,
+        targetId,
+        body,
+      });
 
       const newComment = res.data.comment;
 

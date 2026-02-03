@@ -2,7 +2,7 @@ import { useState } from "react";
 import axiosInstance from "../../api/axios";
 import { ButtonSpinner } from "../../helpers/buttonSpinner";
 
-export default function ReplyBox({ parentComment, postId, onReply, onCancel }) {
+export default function ReplyBox({ parentComment, onReply, onCancel }) {
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +55,6 @@ export default function ReplyBox({ parentComment, postId, onReply, onCancel }) {
 
     const payload = {
       body,
-      postId,
     };
 
     try {

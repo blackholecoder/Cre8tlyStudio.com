@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { headerLogo } from "../../assets/images";
@@ -6,11 +6,16 @@ import { Check, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function CommunityHome() {
+  const PAGE_SIZE = 20;
+  const loadMoreRef = useRef(null);
   const [topics, setTopics] = useState([]);
   const navigate = useNavigate();
   const [viewedTopics, setViewedTopics] = useState(new Set());
 
   const [posts, setPosts] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(false);
   const [activeTopic, setActiveTopic] = useState("all");
 
   const [topicsOpen, setTopicsOpen] = useState(false);
@@ -36,14 +41,41 @@ export default function CommunityHome() {
     navigate(`/community/post/${postId}`);
   }
 
-  const fetchPosts = async () => {
-    try {
-      const res = await axiosInstance.get("/community/posts");
-      setPosts(res.data.posts || []);
-    } catch (err) {
-      console.error("Failed to load posts:", err);
-    }
-  };
+  const fetchPosts = useCallback(
+    async (reset = false) => {
+      if (loadingPosts) return;
+      if (!reset && !hasMore) return;
+
+      try {
+        setLoadingPosts(true);
+
+        if (reset) {
+          setHasMore(true);
+        }
+
+        const res = await axiosInstance.get("/community/posts", {
+          params: {
+            limit: PAGE_SIZE,
+            offset: reset ? 0 : offset,
+          },
+        });
+
+        const newPosts = res.data.posts || [];
+
+        setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]));
+        setOffset((prev) => (reset ? PAGE_SIZE : prev + PAGE_SIZE));
+
+        if (newPosts.length < PAGE_SIZE) {
+          setHasMore(false);
+        }
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+      } finally {
+        setLoadingPosts(false);
+      }
+    },
+    [PAGE_SIZE, offset, hasMore, loadingPosts],
+  );
 
   useEffect(() => {
     const fetchRecap = async () => {
@@ -62,6 +94,29 @@ export default function CommunityHome() {
     fetchRecap();
   }, []);
 
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+
+        if (first.isIntersecting && hasMore && !loadingPosts) {
+          fetchPosts();
+        }
+      },
+      {
+        root: null, // viewport
+        rootMargin: "200px", // preload before bottom
+        threshold: 0,
+      },
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore, loadingPosts, fetchPosts]);
+
   const dismissRecap = async () => {
     setRecapDismissed(true);
 
@@ -73,7 +128,7 @@ export default function CommunityHome() {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(true);
   }, []);
 
   useEffect(() => {
@@ -611,6 +666,12 @@ export default function CommunityHome() {
                 </div>
               ))}
             </div>
+            {loadingPosts && hasMore && (
+              <div className="py-4 text-center text-xs opacity-60 text-dashboard-text-light dark:text-dashboard-text-dark">
+                Loading more…
+              </div>
+            )}
+            <div ref={loadMoreRef} className="h-10" />
           </div>
         </div>
       </div>

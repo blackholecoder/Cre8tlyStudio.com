@@ -25,9 +25,11 @@ import { ButtonSpinner } from "../../helpers/buttonSpinner";
 import { toast } from "react-toastify";
 import TipModal from "./modals/TipModal";
 
-export default function CommunityPost() {
+export default function CommunityPost({ targetType = "post" }) {
+  const isFragment = targetType === "fragment";
   const { user, authLoading } = useAuth();
-  const { slug } = useParams();
+  const { slug, id } = useParams();
+  const targetId = isFragment ? id : slug;
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
@@ -57,6 +59,50 @@ export default function CommunityPost() {
   const [expandedComments, setExpandedComments] = useState({});
   const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
 
+  const fragmentClasses = `
+  post-body-frag
+  max-w-none
+  text-sm leading-relaxed
+  text-dashboard-text-light dark:text-dashboard-text-dark
+  whitespace-pre-wrap
+`;
+
+  const htmlClasses = `
+  post-body
+  prose prose-md max-w-none
+  prose-pre:bg-zinc-900 dark:prose-pre:bg-zinc-800
+  prose-pre:text-gray-100
+  prose-pre:overflow-x-auto
+  prose-code:text-[#e5e7eb]
+  dark:prose-invert
+  text-dashboard-text-light dark:text-dashboard-text-dark
+`;
+
+  const targetConfig = {
+    post: {
+      fetch: (slug) => axiosInstance.get(`/community/posts/${slug}`),
+      fetchComments: (id, page, limit) =>
+        axiosInstance.get(
+          `/community/posts/${id}/comments?page=${page}&limit=${limit}`,
+        ),
+      idKey: "id",
+      redirectBase: "/community/post",
+    },
+    fragment: {
+      fetch: (id) => axiosInstance.get(`/fragments/${id}`),
+      fetchComments: (id, page, limit) =>
+        axiosInstance.get(
+          `/community/comments?targetType=fragment&targetId=${id}&page=${page}&limit=${limit}`,
+        ),
+      idKey: "id",
+      redirectBase: "/community/fragments",
+    },
+  };
+
+  const redirectPath = isFragment
+    ? `/community/fragments/${post?.id}`
+    : `/community/post/${post?.slug}`;
+
   useEffect(() => {
     if (!comments.length) return;
 
@@ -75,7 +121,7 @@ export default function CommunityPost() {
 
   const openTipModal = () => {
     if (!user) {
-      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      navigate(`/signup-community?redirect=${redirectPath}`);
       return;
     }
     setTipOpen(true);
@@ -117,14 +163,14 @@ export default function CommunityPost() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!post || !post.slug) return;
+    if (!post) return;
 
     if (!user) {
-      navigate(`/signup-community?redirect=/community/post/${post.slug}`, {
+      navigate(`/signup-community?redirect=${redirectPath}`, {
         replace: true,
       });
     }
-  }, [user, authLoading, post]);
+  }, [user, authLoading, post, redirectPath]);
 
   useEffect(() => {
     // Always restore scrolling when this page mounts
@@ -143,9 +189,14 @@ export default function CommunityPost() {
   // Load post + first page of comments
   const load = async () => {
     try {
-      const res = await axiosInstance.get(`/community/posts/${slug}`);
-      const postData = res.data.post;
+      const res = await targetConfig[targetType].fetch(targetId);
+      const postData =
+        targetType === "fragment" ? res.data.fragment : res.data.post;
 
+      if (!postData) {
+        console.error("Missing post data:", res.data);
+        return;
+      }
       setPost(postData);
 
       if (user?.id && postData?.user_id && user.id !== postData.user_id) {
@@ -159,8 +210,10 @@ export default function CommunityPost() {
         }
       }
 
-      const res2 = await axiosInstance.get(
-        `/community/posts/${postData.id}/comments?page=1&limit=10`,
+      const res2 = await targetConfig[targetType].fetchComments(
+        postData.id,
+        1,
+        10,
       );
 
       setComments(res2.data.comments || []);
@@ -175,7 +228,7 @@ export default function CommunityPost() {
     if (subLoading) return;
 
     if (!user) {
-      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      navigate(`/signup-community?redirect=${redirectPath}`);
       return;
     }
 
@@ -202,37 +255,41 @@ export default function CommunityPost() {
 
   const togglePostLike = async () => {
     if (!user) {
-      navigate(`/signup-community?redirect=/community/${post.slug}`);
+      navigate(`/signup-community?redirect=${redirectPath}`);
       return;
     }
 
+    const payload = {
+      targetType,
+      targetId: post.id,
+    };
+
     try {
       if (post.has_liked) {
-        await axiosInstance.delete(`/community/${post.id}/like`);
+        await axiosInstance.delete("/community/delete-like", { data: payload });
 
         setPost((prev) => ({
           ...prev,
           has_liked: 0,
-          like_count: Math.max((prev.like_count || 1) - 1, 0),
+          like_count: Math.max(prev.like_count - 1, 0),
         }));
       } else {
-        await axiosInstance.post(`/community/${post.id}/like`);
+        await axiosInstance.post("/community/likes", payload);
 
         setPost((prev) => ({
           ...prev,
           has_liked: 1,
-          like_count: (prev.like_count || 0) + 1,
+          like_count: prev.like_count + 1,
         }));
       }
     } catch (err) {
-      console.error("Failed to toggle post like:", err);
       toast.error("Failed to update like");
     }
   };
 
   const toggleBookmark = async () => {
     if (!user) {
-      navigate(`/signup-community?redirect=/community/post/${post.slug}`);
+      navigate(`/signup-community?redirect=${redirectPath}`);
       return;
     }
 
@@ -300,9 +357,9 @@ export default function CommunityPost() {
   }, []);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!targetId) return;
     load();
-  }, [slug, user]);
+  }, [targetId, user]);
 
   // Infinite scroll load
   const loadMore = async () => {
@@ -311,8 +368,10 @@ export default function CommunityPost() {
     setLoadingMore(true);
 
     try {
-      const res = await axiosInstance.get(
-        `/community/posts/${post.id}/comments?page=${page}&limit=10`,
+      const res = await targetConfig[targetType].fetchComments(
+        post.id,
+        page,
+        10,
       );
 
       setComments((prev) => [...prev, ...(res.data.comments || [])]);
@@ -484,7 +543,9 @@ export default function CommunityPost() {
     return <div className="p-10 text-center opacity-60">Loading post…</div>;
   }
 
-  const backTo = location.state?.from || `/community/topic/${post.topic_id}`;
+  const backTo =
+    location.state?.from ||
+    (isFragment ? "/community/fragments" : `/community/topic/${post.topic_id}`);
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
   const isStudioPost = post.is_admin_post === 1;
@@ -502,11 +563,9 @@ export default function CommunityPost() {
 
   const isAdmin = post.author_role === "admin";
 
-  if (!post) {
-    return <div className="p-10 text-center opacity-60">Loading post…</div>;
-  }
-
-  const shareUrl = `${window.location.origin}/p/${post.slug}`;
+  const shareUrl = isFragment
+    ? `${window.location.origin}/community/fragments/${post.id}`
+    : `${window.location.origin}/p/${post.slug}`;
 
   const handleShare = async () => {
     try {
@@ -734,10 +793,12 @@ export default function CommunityPost() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Eye size={18} className="opacity-70" />
-                      <span>{post.views ?? 0}</span>
-                    </div>
+                    {!isFragment && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Eye size={18} className="opacity-70" />
+                        <span>{post.views ?? 0}</span>
+                      </div>
+                    )}
                     {/* Like */}
                     <button
                       onClick={togglePostLike}
@@ -823,10 +884,12 @@ export default function CommunityPost() {
 
                 {/* Desktop Menu */}
                 <div className="hidden sm:flex items-center gap-6 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  <div className="flex items-center gap-[3px]">
-                    <Eye size={16} className="opacity-70" />
-                    <span>{post.views ?? 0}</span>
-                  </div>
+                  {!isFragment && (
+                    <div className="flex items-center gap-[3px]">
+                      <Eye size={16} />
+                      <span>{post.views ?? 0}</span>
+                    </div>
+                  )}
                   <button
                     onClick={togglePostLike}
                     className={`
@@ -892,8 +955,9 @@ export default function CommunityPost() {
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <h2
-                className="
+              {!isFragment && (
+                <h2
+                  className="
                 not-prose
                 text-3xl sm:text-3xl
                 font-bold
@@ -902,11 +966,12 @@ export default function CommunityPost() {
                 text-dashboard-text-light
                 dark:text-dashboard-text-dark
               "
-              >
-                {post.title}
-              </h2>
+                >
+                  {post.title}
+                </h2>
+              )}
 
-              {user && (
+              {!isFragment && user && (
                 <button
                   onClick={toggleBookmark}
                   className="
@@ -938,7 +1003,7 @@ export default function CommunityPost() {
               )}
             </div>
 
-            {post.subtitle && (
+            {!isFragment && post.subtitle && (
               <p
                 className="
                 text-base sm:text-lg
@@ -970,20 +1035,13 @@ export default function CommunityPost() {
                 />
               </div>
             )}
-            <div
-              className="
-              post-body
-              prose prose-md max-w-none
-              prose-pre:bg-zinc-900
-              dark:prose-pre:bg-zinc-800
-              prose-pre:text-gray-100
-              prose-pre:overflow-x-auto
-              prose-code:text-[#e5e7eb]
-              dark:prose-invert
-               text-dashboard-text-light dark:text-dashboard-text-dark
-            "
-              dangerouslySetInnerHTML={{ __html: post.body }}
-            />
+            <div className={isFragment ? fragmentClasses : htmlClasses}>
+              {isFragment ? (
+                <p>{post.body}</p>
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: post.body }} />
+              )}
+            </div>
           </div>
 
           {/* Comments */}
@@ -1292,7 +1350,6 @@ export default function CommunityPost() {
                           <div className="mt-3 ml-6">
                             <ReplyBox
                               parentComment={c}
-                              postId={post.id}
                               onReply={async (newReply) => {
                                 // 1️⃣ add reply locally
                                 setReplies((prev) => ({
@@ -1340,7 +1397,6 @@ export default function CommunityPost() {
                               setReplies={setReplies}
                               replyPages={replyPages}
                               timeAgo={timeAgo}
-                              postId={post.id}
                               toggleLike={toggleLike}
                               activeReplyBox={activeReplyBox}
                               setActiveReplyBox={setActiveReplyBox}
@@ -1366,7 +1422,8 @@ export default function CommunityPost() {
             </div>
 
             <CreateCommentBox
-              postId={post.id}
+              targetType={targetType}
+              targetId={post.id}
               onComment={(newComment) => {
                 setComments((prev) => [newComment, ...prev]);
 

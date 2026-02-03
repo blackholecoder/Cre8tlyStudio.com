@@ -18,6 +18,7 @@ import {
   MailCheck,
   CircleQuestionMark,
   Bookmark,
+  Feather,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -44,6 +45,22 @@ export const SIDEBAR_SECTIONS = [
         label: "My Posts",
         path: "/community/posts",
         icon: FileText,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "fragments",
+        label: "Fragments",
+        path: "/community/fragments",
+        icon: Feather,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "my-fragments",
+        label: "My Fragments",
+        path: "/community/my-fragments",
+        icon: Feather,
         allowCommunity: true,
         isSubItem: true,
       },

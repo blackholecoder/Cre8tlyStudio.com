@@ -14,7 +14,6 @@ export default function CommentThread({
   setReplies,
   replyPages,
   timeAgo,
-  postId,
   toggleLike,
   setActiveReplyBox,
   activeReplyBox,
@@ -324,7 +323,6 @@ export default function CommentThread({
                 <div className="mt-2">
                   <ReplyBox
                     parentComment={comment}
-                    postId={postId}
                     onReply={async (newReply) => {
                       setActiveReplyBox(null);
 
@@ -373,7 +371,6 @@ export default function CommentThread({
                 replies={replies}
                 replyPages={replyPages}
                 timeAgo={timeAgo}
-                postId={postId}
                 toggleLike={toggleLike}
                 activeReplyBox={activeReplyBox}
                 setActiveReplyBox={setActiveReplyBox}

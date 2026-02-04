@@ -1,34 +1,43 @@
-import { Heart, MessageCircle, Repeat } from "lucide-react";
+import { Eye, Heart, MessageCircle, Repeat, ShieldCheck } from "lucide-react";
 import { timeAgo, formatDate } from "../../../helpers/date";
 
 export function FragmentItem({ fragment, onOpen, onToggleLike }) {
   const {
     body,
     created_at,
+    updated_at,
+    views,
     like_count,
     has_liked,
     comment_count,
     reshare_count,
     author,
     author_image,
+    author_is_verified,
     reshared_id,
     reshared_body,
     reshared_author,
   } = fragment;
 
+  const isVerified = author_is_verified === 1;
+
   return (
     <div
       onClick={onOpen}
       className="
-        px-4 py-4
-        sm:px-6
-        border-b border-dashboard-border-light
-        dark:border-dashboard-border-dark
-        hover:bg-dashboard-hover-light
-        dark:hover:bg-dashboard-hover-dark
-        transition
-        cursor-pointer
-      "
+      px-4 py-4
+      sm:px-6
+      rounded-lg
+      border
+      border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      hover:bg-dashboard-hover-light
+      dark:hover:bg-dashboard-hover-dark
+      transition
+      cursor-pointer
+    "
     >
       {/* Author */}
       <div className="flex items-center gap-2 mb-2">
@@ -42,9 +51,18 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
           <div className="w-6 h-6 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark" />
         )}
 
-        <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-          {author}
-        </span>
+        <div className="flex items-center gap-[2px]">
+          <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+            {author}
+          </span>
+
+          {isVerified && (
+            <ShieldCheck
+              size={12}
+              className="text-dashboard-muted-light dark:text-green"
+            />
+          )}
+        </div>
       </div>
 
       {/* Body */}
@@ -55,6 +73,13 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
         <span>{formatDate(created_at)}</span>
         <span>·</span>
         <span>{timeAgo(created_at)}</span>
+
+        {updated_at && new Date(updated_at) > new Date(created_at) && (
+          <>
+            <span>·</span>
+            <span className="italic opacity-70">edited</span>
+          </>
+        )}
       </div>
 
       {/* Reshare */}
@@ -76,31 +101,40 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-6 mt-3 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+      <div className="grid grid-cols-4 mt-3 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+        {/* Views */}
+        <div className="flex items-center justify-center gap-[3px]">
+          <Eye size={14} className="opacity-70" />
+          <span>{views ?? 0}</span>
+        </div>
+
+        {/* Like */}
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onToggleLike(fragment.id, has_liked);
           }}
-          className="flex items-center gap-1"
+          className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
         >
           <Heart
             size={14}
             className={has_liked ? "text-red-500 fill-red-500" : "opacity-70"}
           />
-          {like_count}
+          <span>{like_count}</span>
         </button>
 
-        <span className="flex items-center gap-1">
-          <MessageCircle size={14} />
-          {comment_count}
-        </span>
+        {/* Comments */}
+        <div className="flex items-center justify-center gap-[3px]">
+          <MessageCircle size={14} className="opacity-70" />
+          <span>{comment_count}</span>
+        </div>
 
-        <span className="flex items-center gap-1">
-          <Repeat size={14} />
-          {reshare_count}
-        </span>
+        {/* Reshares */}
+        <div className="flex items-center justify-center gap-[3px]">
+          <Repeat size={14} className="opacity-70" />
+          <span>{reshare_count}</span>
+        </div>
       </div>
     </div>
   );

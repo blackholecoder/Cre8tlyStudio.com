@@ -1,27 +1,81 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axios";
 import { FragmentItem } from "./FragmentItem";
 
 export default function FragmentFeed() {
   const navigate = useNavigate();
+
+  const LIMIT = 20;
+
   const [fragments, setFragments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef(null);
+  const didInitRef = useRef(false);
+  const didInitialLoadRef = useRef(false);
 
   useEffect(() => {
-    const fetchFragments = async () => {
-      try {
-        const res = await axiosInstance.get("/fragments/feed");
-        setFragments(res.data.fragments || []);
-      } catch (err) {
-        console.error("Failed to load fragments:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (didInitRef.current) return;
+    didInitRef.current = true;
 
-    fetchFragments();
+    loadMoreFragments(true);
   }, []);
+
+  const loadMoreFragments = async (initial = false) => {
+    if (loadingMore || (!hasMore && !initial)) return;
+
+    if (initial) {
+      setLoading(true);
+      setOffset(0);
+      setHasMore(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const res = await axiosInstance.get("/fragments/feed", {
+        params: {
+          limit: LIMIT,
+          offset: initial ? 0 : offset,
+        },
+      });
+
+      console.log("📦 API response", {
+        initial,
+        offsetUsed: initial ? 0 : offset,
+        count: res.data.fragments?.length,
+        ids: res.data.fragments?.map((f) => f.id),
+      });
+
+      const newFragments = res.data.fragments || [];
+
+      console.log("🧠 before setFragments", {
+        existingCount: fragments.length,
+        existingIds: fragments.map((f) => f.id),
+      });
+
+      setFragments((prev) =>
+        initial ? newFragments : [...prev, ...newFragments],
+      );
+
+      setOffset((prev) => prev + newFragments.length);
+
+      if (newFragments.length < LIMIT) {
+        setHasMore(false);
+      }
+      if (initial) {
+        didInitialLoadRef.current = true;
+      }
+    } catch (err) {
+      console.error("Failed to load fragments:", err);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   const toggleFragmentLike = async (fragmentId, hasLiked) => {
     try {
@@ -55,6 +109,35 @@ export default function FragmentFeed() {
       toast.error("Failed to update like");
     }
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        console.log("👀 observer fired", {
+          isIntersecting: entries[0].isIntersecting,
+          hasMore,
+          loadingMore,
+          offset,
+        });
+
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !loadingMore &&
+          didInitialLoadRef.current
+        ) {
+          loadMoreFragments();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore]);
 
   return (
     <div
@@ -140,6 +223,14 @@ export default function FragmentFeed() {
               />
             ))}
           </div>
+          {hasMore && (
+            <div
+              ref={observerRef}
+              className="h-10 flex items-center justify-center text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark"
+            >
+              {loadingMore && "Loading more…"}
+            </div>
+          )}
         </div>
       </div>
     </div>

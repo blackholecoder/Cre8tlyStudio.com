@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, Ellipsis, Trash2, Heart, Pencil } from "lucide-react";
+import {
+  MessageCircle,
+  Ellipsis,
+  Trash2,
+  Heart,
+  Pencil,
+  Eye,
+  Repeat,
+} from "lucide-react";
 import axiosInstance from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
+import { formatDate, timeAgo } from "../../../helpers/date";
 
 export default function MyFragments() {
   const navigate = useNavigate();
@@ -79,7 +88,7 @@ export default function MyFragments() {
 
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-      <div className="sticky top-0 z-20 px-4 py-3 border-b">
+      <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
         <div className="flex items-center justify-between max-w-3xl mx-auto">
           <h1 className="text-lg font-semibold">My Fragments</h1>
 
@@ -97,7 +106,7 @@ export default function MyFragments() {
         </div>
       </div>
 
-      <div className="md:hidden px-4 py-3 border-b">
+      <div className="md:hidden px-4 py-3">
         <button
           onClick={() => navigate("/community/fragments/create")}
           className="
@@ -125,6 +134,7 @@ export default function MyFragments() {
             onClick={() => navigate(`/community/fragments/${fragment.id}`)}
             className="
             p-4 rounded-xl
+            border border-dashboard-border-light dark:border-dashboard-border-dark
             bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
             flex justify-between gap-4
             hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
@@ -162,23 +172,44 @@ export default function MyFragments() {
               <p className="text-sm leading-relaxed line-clamp-3">
                 {fragment.body}
               </p>
-              <p className="mt-1 text-xs opacity-60">
-                {new Date(fragment.created_at).toLocaleDateString()}
-              </p>
+              <div className="mt-1 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark flex items-center gap-1">
+                <span>{formatDate(fragment.created_at)}</span>
+                <span>·</span>
+                <span>{timeAgo(fragment.created_at)}</span>
 
-              <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                <div className="flex items-center gap-1.5">
+                {fragment.updated_at &&
+                  new Date(fragment.updated_at).getTime() -
+                    new Date(fragment.created_at).getTime() >
+                    60_000 && (
+                    <>
+                      <span>·</span>
+                      <span className="italic opacity-50">edited</span>
+                    </>
+                  )}
+              </div>
+
+              <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                {/* Views */}
+                <div className="flex items-center justify-center gap-[3px]">
+                  <Eye size={14} className="opacity-70" />
+                  <span>{fragment.views ?? 0}</span>
+                </div>
+
+                {/* Likes */}
+                <div className="flex items-center justify-center gap-[3px]">
                   <Heart size={14} className="opacity-70" />
                   <span>{fragment.like_count ?? 0}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                {/* Comments */}
+                <div className="flex items-center justify-center gap-[3px]">
                   <MessageCircle size={14} className="opacity-70" />
                   <span>{fragment.comment_count ?? 0}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                  <span className="opacity-70">↻</span>
+                {/* Reshares */}
+                <div className="flex items-center justify-center gap-[3px]">
+                  <Repeat size={14} className="opacity-70" />
                   <span>{fragment.reshare_count ?? 0}</span>
                 </div>
               </div>

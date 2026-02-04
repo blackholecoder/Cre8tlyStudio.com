@@ -25,18 +25,38 @@ export default function Notifications() {
       await markRead(notif.id);
     }
 
-    if (!notif.post_id) return;
-
-    // 🔹 Post likes → just open the post
-    if (notif.type === "post_like") {
-      navigate(`/community/post/${notif.post_id}`);
+    if (notif.type === "subscription") {
+      navigate(`/community/authors/${notif.actor_id}`);
       return;
     }
 
-    // 🔹 Comments / replies → highlight target
-    navigate(
-      `/community/post/${notif.post_id}?highlight=${notif.reference_id}`,
-    );
+    // 🔹 POSTS
+    if (notif.target_type === "post") {
+      if (notif.type === "post_like") {
+        navigate(`/community/post/${notif.target_id}`);
+        return;
+      }
+
+      navigate(
+        `/community/post/${notif.target_id}${
+          notif.reference_id ? `?highlight=${notif.reference_id}` : ""
+        }`,
+      );
+      return;
+    }
+
+    // 🔹 FRAGMENTS
+    if (notif.target_type === "fragment") {
+      navigate(
+        `/community/fragments/${notif.target_id}${
+          notif.reference_id ? `?highlight=${notif.reference_id}` : ""
+        }`,
+      );
+      return;
+    }
+
+    // fallback (optional)
+    console.warn("Unknown notification target:", notif);
   };
 
   const markRead = useCallback(async (id) => {

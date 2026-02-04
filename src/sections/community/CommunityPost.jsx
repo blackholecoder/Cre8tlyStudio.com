@@ -136,8 +136,8 @@ export default function CommunityPost({ targetType = "post" }) {
         "/seller-checkout/create-checkout-session",
         {
           checkoutType: "tip",
-          postId: post.id,
-          writerUserId: post.user_id,
+          targetType, // 👈 already "post" or "fragment"
+          targetId: post.id, // 👈 ALWAYS post.id (fragment ids are also ids)
           tipAmountInCents: amountInCents,
         },
       );
@@ -146,7 +146,7 @@ export default function CommunityPost({ targetType = "post" }) {
     } catch (err) {
       const message = err.response?.data?.message;
 
-      if (message === "Writer is not set up to receive tips") {
+      if (message === "Recipient cannot receive tips") {
         toast.info(
           "This writer hasn’t enabled tips yet. You’ll be able to support them once they do.",
         );
@@ -793,12 +793,11 @@ export default function CommunityPost({ targetType = "post" }) {
 
                   {/* Actions */}
                   <div className="flex items-center gap-6">
-                    {!isFragment && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Eye size={18} className="opacity-70" />
-                        <span>{post.views ?? 0}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 text-sm">
+                      <Eye size={18} className="opacity-70" />
+                      <span>{post.views ?? 0}</span>
+                    </div>
+
                     {/* Like */}
                     <button
                       onClick={togglePostLike}
@@ -884,12 +883,11 @@ export default function CommunityPost({ targetType = "post" }) {
 
                 {/* Desktop Menu */}
                 <div className="hidden sm:flex items-center gap-6 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  {!isFragment && (
-                    <div className="flex items-center gap-[3px]">
-                      <Eye size={16} />
-                      <span>{post.views ?? 0}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-[3px]">
+                    <Eye size={16} />
+                    <span>{post.views ?? 0}</span>
+                  </div>
+
                   <button
                     onClick={togglePostLike}
                     className={`

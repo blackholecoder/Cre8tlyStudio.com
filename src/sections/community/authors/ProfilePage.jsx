@@ -19,6 +19,7 @@ export default function Profile() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
   const [badges, setBadges] = useState([]);
+  const [hasPaidSubscription, setHasPaidSubscription] = useState(false);
 
   const isOwnProfile = !userId || user?.id === userId;
 
@@ -35,7 +36,9 @@ export default function Profile() {
       const res = await axiosInstance.get(
         `/community/subscriptions/${profile.id}/status`,
       );
+
       setIsSubscribed(res.data.subscribed);
+      setHasPaidSubscription(res.data.has_paid_subscription);
     } catch (err) {
       console.error("Failed to load subscription status", err);
     }
@@ -77,30 +80,51 @@ export default function Profile() {
   async function toggleSubscribe() {
     if (!profile?.id) return;
 
+    // not logged in → signup
     if (!user) {
       navigate(`/signup-community?redirect=/community/authors/${profile.id}`);
       return;
     }
 
-    setSubLoading(true);
-
-    try {
-      if (isSubscribed) {
+    // already subscribed → unsubscribe
+    if (isSubscribed) {
+      setSubLoading(true);
+      try {
         await axiosInstance.delete(
           `/community/subscriptions/${profile.id}/subscribe`,
         );
         setIsSubscribed(false);
-      } else {
+      } catch (err) {
+        toast.error("Failed to unsubscribe");
+      } finally {
+        setSubLoading(false);
+      }
+      return;
+    }
+
+    // NOT subscribed yet
+    if (!hasPaidSubscription) {
+      // free subscribe
+      setSubLoading(true);
+      try {
         await axiosInstance.post(
           `/community/subscriptions/${profile.id}/subscribe`,
         );
         setIsSubscribed(true);
+      } catch (err) {
+        toast.error("Subscription failed");
+      } finally {
+        setSubLoading(false);
       }
-    } catch (err) {
-      toast.error("Subscription failed");
-    } finally {
-      setSubLoading(false);
+      return;
     }
+
+    // paid subscription exists → choose page
+    navigate(`/community/subscribe/${profile.id}/choose`, {
+      state: {
+        from: `/community/authors/${profile.id}`,
+      },
+    });
   }
 
   if (loading) {
@@ -197,7 +221,12 @@ export default function Profile() {
                 </button>
                 {badges.length > 0 && (
                   <div className="mt-4 w-full">
-                    <div className="flex flex-wrap justify-center gap-3">
+                    <div
+                      className="
+                      grid grid-cols-3 gap-3 justify-items-center
+                      sm:flex sm:flex-wrap sm:justify-center
+                    "
+                    >
                       {badges.map((badge) => (
                         <ProfileBadge key={badge.key_name} badge={badge} />
                       ))}

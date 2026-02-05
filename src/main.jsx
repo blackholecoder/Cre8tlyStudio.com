@@ -81,6 +81,7 @@ import Saved from "./sections/community/posts/Saved.jsx";
 import FragmentFeed from "./sections/community/fragments/FragmentFeed.jsx";
 import CreateFragment from "./sections/community/CreateFragmentPage.jsx";
 import MyFragments from "./sections/community/fragments/MyFragments.jsx";
+import SubscribeChoicePage from "./sections/community/subscriptions/SubscribeChoicePage.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -289,20 +290,22 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/community/authors/:authorUserId/subscribers"
+          path="/community/subscribe/:authorId/choose"
           element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CommunitySubscribers />
-                </DashboardLayout>
-              </motion.div>
+              <DashboardLayout>
+                <SubscribeChoicePage />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/authors/:userId/subscribers"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <DashboardLayout>
+                <CommunitySubscribers />
+              </DashboardLayout>
             </PrivateRoute>
           }
         />
@@ -423,6 +426,7 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/community/posts"
           element={

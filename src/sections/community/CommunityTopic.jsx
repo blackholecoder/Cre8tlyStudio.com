@@ -289,7 +289,29 @@ export default function CommunityTopic() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full opacity-40" />
+                    <div
+                      className="
+                      w-full h-full
+                      flex items-center justify-center
+                      bg-gradient-to-br
+                      from-sky-400/80
+                      via-sky-300/90
+                      to-blue/80
+                    "
+                    >
+                      <span
+                        className="
+                        text-[10px] sm:text-xs
+                        font-medium
+                        uppercase
+                        tracking-wide
+                       text-dashboard-text-light dark:text-dashboard-text-dark
+                        select-none
+                      "
+                      >
+                        No image
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

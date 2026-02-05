@@ -2,26 +2,30 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axios";
 import { toast } from "react-toastify";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Crown } from "lucide-react";
+import { useAuth } from "../../../admin/AuthContext";
 
 export default function CommunitySubscribers() {
   const navigate = useNavigate();
+  const { userId } = useParams();
+  const { user: authUser } = useAuth();
+
+  const authorId = userId ?? authUser.id;
   const [loading, setLoading] = useState(true);
   const [subscribers, setSubscribers] = useState([]);
-  const { authorUserId } = useParams();
 
   useEffect(() => {
+    setLoading(true);
     loadSubscribers();
-  }, []);
+  }, [userId]);
 
   async function loadSubscribers() {
     try {
-      const url = authorUserId
-        ? `/community/subscriptions/authors/${authorUserId}/subscribers`
+      const url = userId
+        ? `/community/subscriptions/authors/${authorId}/subscribers`
         : "/community/subscriptions/all-user-subscribers";
 
       const res = await axiosInstance.get(url);
-
       setSubscribers(res.data.subscribers || []);
     } catch (err) {
       console.error("Failed to load subscribers", err);
@@ -41,7 +45,13 @@ export default function CommunitySubscribers() {
         {/* Header */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (userId) {
+                navigate(`/community/authors/${userId}`);
+              } else {
+                navigate("/community/profile");
+              }
+            }}
             className="flex items-center gap-1 text-sm opacity-70 hover:opacity-100 transition"
           >
             <ArrowLeft size={16} />
@@ -54,7 +64,9 @@ export default function CommunitySubscribers() {
         {/* Empty state */}
         {subscribers.length === 0 && (
           <div className="opacity-60 text-sm">
-            You don’t have any subscribers yet.
+            {userId
+              ? "This author doesn’t have any subscribers yet."
+              : "You don’t have any subscribers yet."}
           </div>
         )}
 
@@ -103,7 +115,29 @@ export default function CommunitySubscribers() {
 
               {/* Info */}
               <div className="flex flex-col">
-                <span className="text-sm font-medium">{s.name}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-medium">{s.name}</span>
+
+                  {s.has_subscription === 1 && (
+                    <span
+                      title="Paid supporter"
+                      className="
+                      inline-flex items-center gap-1
+                      px-2 py-0.5
+                      rounded-full
+                      text-[10px]
+                      font-semibold
+                      bg-green/10
+                      text-green
+                      border border-green/30
+                      tracking-wide
+                    "
+                    >
+                      <Crown size={12} />
+                      Paid
+                    </span>
+                  )}
+                </div>
 
                 {s.username && (
                   <span className="text-xs opacity-60">@{s.username}</span>

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import { Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import PreviewSubscribeModal from "./modals/PreviewSubscribeModal";
 
 const inputClass = `
   w-full rounded-xl px-4 py-3 text-sm
@@ -29,6 +30,7 @@ export default function ProfileSettings() {
   const [newService, setNewService] = useState("");
   const [newMediaLabel, setNewMediaLabel] = useState("");
   const [newMediaUrl, setNewMediaUrl] = useState("");
+  const [authorId, setAuthorId] = useState(null);
 
   const [notificationPrefs, setNotificationPrefs] = useState({
     new_free_subscriber: true,
@@ -38,6 +40,20 @@ export default function ProfileSettings() {
 
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [hasUsername, setHasUsername] = useState(false);
+
+  const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
+
+  const [monthlyPrice, setMonthlyPrice] = useState("");
+  const [annualPrice, setAnnualPrice] = useState("");
+
+  const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
+  const [monthlyBenefits, setMonthlyBenefits] = useState([]);
+  const [annualBenefits, setAnnualBenefits] = useState([]);
+
+  const [newMonthlyBenefit, setNewMonthlyBenefit] = useState("");
+  const [newAnnualBenefit, setNewAnnualBenefit] = useState("");
+
+  const [showPreviewWarning, setShowPreviewWarning] = useState(false);
 
   function togglePref(key) {
     setNotificationPrefs((prev) => ({
@@ -55,7 +71,9 @@ export default function ProfileSettings() {
     try {
       setLoading(true);
       const res = await axiosInstance.get("/community/authors/me");
+
       const p = res.data.profile || {};
+      setSubscriptionsEnabled(!!p.subscriptions_enabled);
       setUsername(p.username || "");
       setBio(p.bio || "");
       setAbout(p.about || "");
@@ -63,12 +81,25 @@ export default function ProfileSettings() {
       setInterests(p.interests || []);
       setServices(p.services || []);
       setMediaLinks(p.media_links || []);
+      setAuthorId(p.id);
+      setHasStripeCustomer(!!p.stripe_connect_account_id);
+      setSubscriptionsEnabled(!!p.subscriptions_enabled);
+      setMonthlyPrice(
+        typeof p.monthly_price === "number" ? p.monthly_price.toFixed(2) : "",
+      );
+      setAnnualPrice(
+        typeof p.annual_price === "number" ? p.annual_price.toFixed(2) : "",
+      );
+      setMonthlyBenefits(p.monthly_benefits || []);
+      setAnnualBenefits(p.annual_benefits || []);
     } catch {
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
   }
+
+  const canToggleSubscriptions = hasStripeCustomer || subscriptionsEnabled;
 
   async function fetchNotificationPrefs() {
     try {
@@ -108,6 +139,20 @@ export default function ProfileSettings() {
         interests,
         services,
         media_links: mediaLinks,
+        monthly_benefits: monthlyBenefits,
+        annual_benefits: annualBenefits,
+      });
+
+      await axiosInstance.post("/community/authors/me/subscription-pricing", {
+        subscriptions_enabled: subscriptionsEnabled,
+        monthly_price_cents:
+          subscriptionsEnabled && monthlyPrice
+            ? Math.round(Number(monthlyPrice) * 100)
+            : undefined,
+        annual_price_cents:
+          subscriptionsEnabled && annualPrice
+            ? Math.round(Number(annualPrice) * 100)
+            : undefined,
       });
 
       await axiosInstance.post(
@@ -188,7 +233,7 @@ export default function ProfileSettings() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-4xl mx-auto space-y-6 sm:space-y-8">
+        <div className="px-0 sm:px-4 py-4 sm:py-6 max-w-4xl mx-auto space-y-6 sm:space-y-8">
           <Section
             title="Username"
             description="Your public @username. This will appear on your posts and profile."
@@ -295,6 +340,117 @@ export default function ProfileSettings() {
               ))}
             </div>
           </Section>
+          <Section
+            title="Paid subscriptions"
+            description={
+              <div className="space-y-1">
+                <p>Let readers support you with a recurring subscription.</p>
+
+                {!hasStripeCustomer && (
+                  <p className="text-xs text-yellow-500">
+                    You’ll need to{" "}
+                    <Link to="/settings" className="underline hover:opacity-80">
+                      set up billing
+                    </Link>{" "}
+                    before enabling paid subscriptions.
+                  </p>
+                )}
+              </div>
+            }
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-semibold">Paid subscriptions</h2>
+                <p className="text-xs opacity-60 mt-1">
+                  Let readers support you with a recurring subscription.
+                </p>
+              </div>
+              {subscriptionsEnabled && authorId && (
+                <button
+                  type="button"
+                  onClick={() => setShowPreviewWarning(true)}
+                  className="
+                  text-xs
+                  px-3 py-2
+                  rounded-lg
+                  border
+                  hover:bg-dashboard-hover-light
+                  dark:hover:bg-dashboard-hover-dark
+                  transition
+                "
+                >
+                  Preview page
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-5">
+              {/* Enable toggle */}
+              <label className="flex items-center gap-3 text-sm text-green">
+                <input
+                  type="checkbox"
+                  disabled={!canToggleSubscriptions}
+                  checked={subscriptionsEnabled}
+                  onChange={(e) => setSubscriptionsEnabled(e.target.checked)}
+                />
+                Enable paid subscriptions
+              </label>
+
+              {subscriptionsEnabled && (
+                <>
+                  <div>
+                    <label className="text-xs opacity-60">
+                      Monthly price (USD)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={monthlyPrice}
+                      onChange={(e) => setMonthlyPrice(e.target.value)}
+                      className={inputClass}
+                      placeholder="7.50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs opacity-60">
+                      Annual price (USD)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={annualPrice}
+                      onChange={(e) => setAnnualPrice(e.target.value)}
+                      className={inputClass}
+                      placeholder="50"
+                    />
+                  </div>
+                </>
+              )}
+
+              {subscriptionsEnabled && (
+                <>
+                  <BenefitEditor
+                    title="Monthly subscription benefits"
+                    benefits={monthlyBenefits}
+                    setBenefits={setMonthlyBenefits}
+                    newValue={newMonthlyBenefit}
+                    setNewValue={setNewMonthlyBenefit}
+                  />
+
+                  <BenefitEditor
+                    title="Annual subscription benefits"
+                    benefits={annualBenefits}
+                    setBenefits={setAnnualBenefits}
+                    newValue={newAnnualBenefit}
+                    setNewValue={setNewAnnualBenefit}
+                  />
+                </>
+              )}
+            </div>
+          </Section>
 
           <Section
             title="Unlock more tools"
@@ -389,6 +545,17 @@ export default function ProfileSettings() {
           </Section>
         </div>
       </div>
+      <PreviewSubscribeModal
+        open={showPreviewWarning}
+        onClose={() => setShowPreviewWarning(false)}
+        onConfirm={() => {
+          setShowPreviewWarning(false);
+          window.open(
+            `/community/subscribe/${authorId}/choose?preview=1`,
+            "_blank",
+          );
+        }}
+      />
     </div>
   );
 }
@@ -420,7 +587,7 @@ function Section({ title, description, children }) {
       <div className="mb-4">
         <h2 className="text-sm font-semibold">{title}</h2>
         {description && (
-          <p className="text-xs opacity-60 mt-1">{description}</p>
+          <div className="text-xs opacity-60 mt-1">{description}</div>
         )}
       </div>
       {children}
@@ -523,5 +690,112 @@ function TagSection({ title, value, setValue, list, setList }) {
         ))}
       </div>
     </Section>
+  );
+}
+
+function BenefitEditor({
+  title,
+  benefits,
+  setBenefits,
+  newValue,
+  setNewValue,
+}) {
+  const MAX_BENEFITS = 10;
+  const isAtLimit = benefits.length >= MAX_BENEFITS;
+
+  const [dragIndex, setDragIndex] = useState(null);
+
+  function handleDragStart(index) {
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
+
+  function handleDrop(dropIndex) {
+    if (dragIndex === null || dragIndex === dropIndex) return;
+
+    const updated = [...benefits];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(dropIndex, 0, moved);
+
+    setBenefits(updated);
+    setDragIndex(null);
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">{title}</label>
+        <span className="text-xs opacity-60">
+          {benefits.length}/{MAX_BENEFITS}
+        </span>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          value={newValue}
+          onChange={(e) => setNewValue(e.target.value)}
+          placeholder={isAtLimit ? "Maximum benefits reached" : "Add a benefit"}
+          disabled={isAtLimit}
+          className={`${inputClass} ${isAtLimit ? "opacity-60" : ""}`}
+        />
+
+        <button
+          disabled={isAtLimit}
+          onClick={() => {
+            if (!newValue.trim() || isAtLimit) return;
+            setBenefits([...benefits, newValue.trim()]);
+            setNewValue("");
+          }}
+          className="
+            px-4 rounded-xl
+            bg-dashboard-hover-light dark:bg-[#1b1f27]
+            disabled:opacity-50
+          "
+        >
+          <Plus size={16} />
+        </button>
+      </div>
+
+      {isAtLimit && (
+        <p className="text-xs text-yellow-500">
+          You can add up to 10 benefits per subscription tier.
+        </p>
+      )}
+
+      <ul className="space-y-2">
+        {benefits.map((b, i) => (
+          <li
+            key={i}
+            draggable
+            onDragStart={() => handleDragStart(i)}
+            onDragOver={handleDragOver}
+            onDrop={() => handleDrop(i)}
+            className="
+              flex items-center justify-between gap-3
+              rounded-xl p-3
+              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              cursor-move
+            "
+          >
+            <div className="flex items-center gap-2">
+              <span className="opacity-50 cursor-grab">☰</span>
+              <span className="text-sm">{b}</span>
+            </div>
+
+            <button
+              onClick={() =>
+                setBenefits(benefits.filter((_, idx) => idx !== i))
+              }
+            >
+              <X size={14} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

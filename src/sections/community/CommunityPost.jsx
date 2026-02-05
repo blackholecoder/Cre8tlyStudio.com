@@ -59,6 +59,9 @@ export default function CommunityPost({ targetType = "post" }) {
   const [expandedComments, setExpandedComments] = useState({});
   const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
 
+  // paid subs state
+  const [hasPaidSubscription, setHasPaidSubscription] = useState(false);
+
   const fragmentClasses = `
   post-body-frag
   max-w-none
@@ -204,7 +207,9 @@ export default function CommunityPost({ targetType = "post" }) {
           const subRes = await axiosInstance.get(
             `/community/subscriptions/${postData.user_id}/status`,
           );
+
           setIsSubscribed(subRes.data.subscribed);
+          setHasPaidSubscription(subRes.data.has_paid_subscription);
         } catch (err) {
           console.error("Failed to load subscription status", err);
         }
@@ -232,25 +237,43 @@ export default function CommunityPost({ targetType = "post" }) {
       return;
     }
 
-    setSubLoading(true);
-
-    try {
-      if (isSubscribed) {
+    // already subscribed → unsubscribe directly
+    if (isSubscribed) {
+      setSubLoading(true);
+      try {
         await axiosInstance.delete(
           `/community/subscriptions/${post.user_id}/subscribe`,
         );
         setIsSubscribed(false);
-      } else {
+      } catch (err) {
+        console.error("Unsubscribe failed", err);
+      }
+      setSubLoading(false);
+      return;
+    }
+
+    // NOT subscribed yet
+    if (!hasPaidSubscription) {
+      // 👉 free subscribe immediately
+      setSubLoading(true);
+      try {
         await axiosInstance.post(
           `/community/subscriptions/${post.user_id}/subscribe`,
         );
         setIsSubscribed(true);
+      } catch (err) {
+        console.error("Subscribe failed", err);
       }
-    } catch (err) {
-      console.error("Subscription toggle failed", err);
+      setSubLoading(false);
+      return;
     }
 
-    setSubLoading(false);
+    // 👉 paid subscription exists → go to choice page
+    navigate(`/community/subscribe/${post.user_id}/choose`, {
+      state: {
+        from: redirectPath,
+      },
+    });
   };
 
   const togglePostLike = async () => {

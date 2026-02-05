@@ -366,16 +366,7 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/community/fragments"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <DashboardLayout>
-                <FragmentFeed />
-              </DashboardLayout>
-            </PrivateRoute>
-          }
-        />
+
         <Route
           path="/community/my-fragments"
           element={

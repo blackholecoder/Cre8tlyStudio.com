@@ -49,14 +49,6 @@ export const SIDEBAR_SECTIONS = [
         isSubItem: true,
       },
       {
-        key: "fragments",
-        label: "Fragments",
-        path: "/community/fragments",
-        icon: Feather,
-        allowCommunity: true,
-        isSubItem: true,
-      },
-      {
         key: "my-fragments",
         label: "My Fragments",
         path: "/community/my-fragments",

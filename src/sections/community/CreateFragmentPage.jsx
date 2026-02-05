@@ -58,7 +58,7 @@ export default function CreateFragment() {
       }
 
       toast.success("Fragment published");
-      navigate("/community/fragments");
+      navigate("/community");
     } catch (err) {
       console.error("Failed to create fragment:", err);
       toast.error("Failed to publish fragment");
@@ -71,7 +71,7 @@ export default function CreateFragment() {
     if (isEdit) {
       navigate("/community/my-fragments");
     } else {
-      navigate("/community/fragments"); // or fragments feed
+      navigate("/community"); // or fragments feed
     }
   };
 

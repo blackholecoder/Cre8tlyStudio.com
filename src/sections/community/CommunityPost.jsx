@@ -98,12 +98,12 @@ export default function CommunityPost({ targetType = "post" }) {
           `/community/comments?targetType=fragment&targetId=${id}&page=${page}&limit=${limit}`,
         ),
       idKey: "id",
-      redirectBase: "/community/fragments",
+      redirectBase: "/community",
     },
   };
 
   const redirectPath = isFragment
-    ? `/community/fragments/${post?.id}`
+    ? `/community`
     : `/community/post/${post?.slug}`;
 
   useEffect(() => {
@@ -568,7 +568,7 @@ export default function CommunityPost({ targetType = "post" }) {
 
   const backTo =
     location.state?.from ||
-    (isFragment ? "/community/fragments" : `/community/topic/${post.topic_id}`);
+    (isFragment ? "/community" : `/community/topic/${post.topic_id}`);
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
   const isStudioPost = post.is_admin_post === 1;

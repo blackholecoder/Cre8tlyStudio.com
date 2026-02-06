@@ -7,11 +7,12 @@ import {
   ShieldCheck,
   Heart,
   Eye,
-  MessageCircle,
   Share2,
   Check,
   DollarSign,
   Bookmark,
+  MessageSquareLock,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
@@ -222,6 +223,12 @@ export default function CommunityPost({ targetType = "post" }) {
       );
 
       setComments(res2.data.comments || []);
+      console.log("🧪 COMMENTS FETCH RESULT", {
+        targetType,
+        targetId: postData.id,
+        count: res2.data.comments?.length,
+        comments: res2.data.comments,
+      });
       setPage(res2.data.nextPage || null);
       setHasMore(!!res2.data.nextPage);
     } catch (err) {
@@ -566,6 +573,60 @@ export default function CommunityPost({ targetType = "post" }) {
     return <div className="p-10 text-center opacity-60">Loading post…</div>;
   }
 
+  const COMMENTS_VISIBILITY = {
+    PUBLIC: "public",
+    PAID: "paid",
+    PRIVATE: "private",
+  };
+
+  const isCommentsPaid = post.comments_visibility === COMMENTS_VISIBILITY.PAID;
+
+  const isCommentsPrivate =
+    post.comments_visibility === COMMENTS_VISIBILITY.PRIVATE;
+
+  // locked if:
+  // - explicitly locked by admin
+  // - paid comments and user does not have paid subscription
+  // - private comments and user is not subscribed
+
+  console.log("🧠 COMMENTS DEBUG", {
+    authLoading,
+    userId: user?.id,
+    postUserId: post?.user_id,
+    isOwner: user?.id === post?.user_id,
+    comments_visibility: post?.comments_visibility,
+    comments_locked: post?.comments_locked,
+    isSubscribed,
+    hasPaidSubscription,
+  });
+
+  const commentsLocked = (() => {
+    // 1️⃣ Owner always allowed
+    if (user?.id === post.user_id) return false;
+
+    // 2️⃣ Admin hard lock always wins
+    if (post.comments_locked === 1) return true;
+
+    // 3️⃣ Paid comments require paid subscription
+    if (isCommentsPaid && !hasPaidSubscription) return true;
+
+    // 4️⃣ Private comments require ANY subscription
+    if (isCommentsPrivate && !isSubscribed) return true;
+
+    return false;
+  })();
+
+  console.log("🔒 COMMENTS LOCK RESULT", {
+    commentsLocked,
+    reason: {
+      adminLock: post.comments_locked === 1,
+      paidBlocked: isCommentsPaid && !hasPaidSubscription,
+      privateBlocked: isCommentsPrivate && !isSubscribed,
+      ownerBypass: user?.id === post.user_id,
+      authLoading,
+    },
+  });
+
   const backTo =
     location.state?.from ||
     (isFragment ? "/community" : `/community/topic/${post.topic_id}`);
@@ -856,7 +917,11 @@ export default function CommunityPost({ targetType = "post" }) {
                       transition
                     "
                     >
-                      <MessageCircle size={18} className="opacity-80" />
+                      {commentsLocked ? (
+                        <MessageSquareLock size={15} className="opacity-80" />
+                      ) : (
+                        <MessageSquare size={15} className="opacity-80" />
+                      )}
                       <span>{post.comment_count ?? 0}</span>
                     </button>
 
@@ -927,7 +992,11 @@ export default function CommunityPost({ targetType = "post" }) {
                   </button>
 
                   <div className="flex items-center gap-[3px]">
-                    <MessageCircle size={16} className="opacity-70" />
+                    {commentsLocked ? (
+                      <MessageSquareLock size={15} className="opacity-80" />
+                    ) : (
+                      <MessageSquare size={15} className="opacity-80" />
+                    )}
                     <span>{post.comment_count ?? 0}</span>
                   </div>
                   <button
@@ -1074,31 +1143,59 @@ export default function CommunityPost({ targetType = "post" }) {
               Comments
             </h2>
 
-            {comments.length === 0 && (
+            {commentsLocked ? (
+              <div className="mb-10 p-4 rounded-lg border border-dashboard-border-light dark:border-dashboard-border-dark text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark flex items-center gap-2">
+                <MessageSquareLock size={16} />
+                <span>
+                  {isCommentsPaid
+                    ? "Comments are for paid subscribers only."
+                    : "Comments are private."}
+                </span>
+                {isCommentsPaid && user?.id !== post.user_id && (
+                  <button
+                    onClick={() =>
+                      navigate(`/community/subscribe/${post.user_id}/choose`, {
+                        state: { from: redirectPath },
+                      })
+                    }
+                    className="
+                    text-green
+                    text-sm
+                    font-medium
+                    w-fit
+                    hover:underline
+                  "
+                  >
+                    Become a paid subscriber →
+                  </button>
+                )}
+              </div>
+            ) : comments.length === 0 ? (
               <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark mb-6">
                 No comments yet.
               </p>
-            )}
+            ) : null}
+            {!commentsLocked && (
+              <div className="space-y-4 mb-10">
+                {comments.map((c) => {
+                  const commentAvatar =
+                    c.author?.charAt(0).toUpperCase() ?? "U";
+                  const commentAdmin = c.author_role === "admin";
 
-            <div className="space-y-4 mb-10">
-              {comments.map((c) => {
-                const commentAvatar = c.author?.charAt(0).toUpperCase() ?? "U";
-                const commentAdmin = c.author_role === "admin";
+                  const MAX_LENGTH = 420;
 
-                const MAX_LENGTH = 420;
+                  const isExpanded = expandedComments[c.id] !== false;
+                  const isLong = c.body.length > MAX_LENGTH;
 
-                const isExpanded = expandedComments[c.id] !== false;
-                const isLong = c.body.length > MAX_LENGTH;
+                  const displayText =
+                    !isExpanded && isLong
+                      ? c.body.slice(0, MAX_LENGTH).trim() + "…"
+                      : c.body;
 
-                const displayText =
-                  !isExpanded && isLong
-                    ? c.body.slice(0, MAX_LENGTH).trim() + "…"
-                    : c.body;
-
-                return (
-                  <div
-                    key={c.id}
-                    className="
+                  return (
+                    <div
+                      key={c.id}
+                      className="
                     /* mobile */
                     bg-transparent
                     border-b border-dashboard-border-light/50 dark:border-dashboard-border-dark/50
@@ -1115,44 +1212,44 @@ export default function CommunityPost({ targetType = "post" }) {
                     lg:p-6
                     sm:shadow-inner
                   "
-                  >
-                    <div className="flex items-start gap-4">
-                      <button
-                        title={
-                          !c.author_has_profile
-                            ? "Profile coming soon"
-                            : undefined
-                        }
-                        onClick={() => {
-                          // own comment → no navigation
-                          if (user?.id === c.user_id) return;
-
-                          // no profile → block
-                          if (!c.author_has_profile) {
-                            toast.info(
-                              "This author hasn’t set up their profile yet",
-                            );
-                            return;
+                    >
+                      <div className="flex items-start gap-4">
+                        <button
+                          title={
+                            !c.author_has_profile
+                              ? "Profile coming soon"
+                              : undefined
                           }
+                          onClick={() => {
+                            // own comment → no navigation
+                            if (user?.id === c.user_id) return;
 
-                          // navigate
-                          navigate(`/community/authors/${c.user_id}`);
-                        }}
-                        className={`flex-shrink-0 ${
-                          !c.author_has_profile
-                            ? "cursor-default"
-                            : "cursor-pointer"
-                        }`}
-                      >
-                        {c.author_image ? (
-                          <Img
-                            src={c.author_image}
-                            loader={
-                              <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                            // no profile → block
+                            if (!c.author_has_profile) {
+                              toast.info(
+                                "This author hasn’t set up their profile yet",
+                              );
+                              return;
                             }
-                            unloader={
-                              <div
-                                className="
+
+                            // navigate
+                            navigate(`/community/authors/${c.user_id}`);
+                          }}
+                          className={`flex-shrink-0 ${
+                            !c.author_has_profile
+                              ? "cursor-default"
+                              : "cursor-pointer"
+                          }`}
+                        >
+                          {c.author_image ? (
+                            <Img
+                              src={c.author_image}
+                              loader={
+                                <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
+                              }
+                              unloader={
+                                <div
+                                  className="
                                 w-10 h-10 rounded-full
                                 flex items-center justify-center
                                 text-sm font-semibold
@@ -1160,57 +1257,57 @@ export default function CommunityPost({ targetType = "post" }) {
                                 border border-dashboard-border-light dark:border-dashboard-border-dark
                                 text-dashboard-muted-light dark:text-dashboard-muted-dark
                               "
-                              >
-                                {commentAvatar}
-                              </div>
-                            }
-                            decode
-                            alt="Comment avatar"
-                            className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
-                            {commentAvatar}
-                          </div>
-                        )}
-                      </button>
+                                >
+                                  {commentAvatar}
+                                </div>
+                              }
+                              decode
+                              alt="Comment avatar"
+                              className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+                              {commentAvatar}
+                            </div>
+                          )}
+                        </button>
 
-                      <div className="flex-1">
-                        <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
-                          <div className="flex items-center gap-0">
-                            <span
-                              className="
+                        <div className="flex-1">
+                          <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
+                            <div className="flex items-center gap-0">
+                              <span
+                                className="
                               font-medium
                               text-dashboard-muted-light
                               dark:text-dashboard-muted-dark
                             "
-                            >
-                              {c.author}
-                            </span>
+                              >
+                                {c.author}
+                              </span>
 
-                            {commentAdmin && (
-                              <span
-                                className="
+                              {commentAdmin && (
+                                <span
+                                  className="
                                 flex items-center gap-1
                                 text-dashboard-muted-light dark:text-dashboard-muted-dark
                                 text-xs
                                 px-1
                                 rounded-full
                               "
-                              >
-                                <ShieldCheck
-                                  className="text-dashboard-muted-light dark:text-green"
-                                  size={12}
-                                />
-                              </span>
-                            )}
+                                >
+                                  <ShieldCheck
+                                    className="text-dashboard-muted-light dark:text-green"
+                                    size={12}
+                                  />
+                                </span>
+                              )}
+                            </div>
+                            <span>{timeAgo(c.created_at)}</span>
                           </div>
-                          <span>{timeAgo(c.created_at)}</span>
-                        </div>
-                        {editCommentId !== c.id && (
-                          <>
-                            <div
-                              className="
+                          {editCommentId !== c.id && (
+                            <>
+                              <div
+                                className="
                               prose prose-sm max-w-none
                               my-1
                               text-dashboard-text-light dark:text-dashboard-text-dark
@@ -1219,46 +1316,46 @@ export default function CommunityPost({ targetType = "post" }) {
                               dark:prose-a:text-sky-400
                               dark:prose-a:decoration-sky-400
                             "
-                            >
-                              {renderTextWithLinks(displayText)}
-                            </div>
-
-                            {!isExpanded && isLong && (
-                              <button
-                                onClick={() =>
-                                  setExpandedComments((prev) => ({
-                                    ...prev,
-                                    [c.id]: true,
-                                  }))
-                                }
-                                className="text-xs text-sky-400 mt-1 hover:underline"
                               >
-                                See more
-                              </button>
-                            )}
+                                {renderTextWithLinks(displayText)}
+                              </div>
 
-                            {isExpanded && isLong && (
-                              <button
-                                onClick={() =>
-                                  setExpandedComments((prev) => ({
-                                    ...prev,
-                                    [c.id]: false,
-                                  }))
-                                }
-                                className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1 hover:underline"
-                              >
-                                See less
-                              </button>
-                            )}
-                          </>
-                        )}
+                              {!isExpanded && isLong && (
+                                <button
+                                  onClick={() =>
+                                    setExpandedComments((prev) => ({
+                                      ...prev,
+                                      [c.id]: true,
+                                    }))
+                                  }
+                                  className="text-xs text-sky-400 mt-1 hover:underline"
+                                >
+                                  See more
+                                </button>
+                              )}
 
-                        {editCommentId === c.id && (
-                          <div className="mt-3">
-                            <textarea
-                              value={editBody}
-                              onChange={(e) => setEditBody(e.target.value)}
-                              className="
+                              {isExpanded && isLong && (
+                                <button
+                                  onClick={() =>
+                                    setExpandedComments((prev) => ({
+                                      ...prev,
+                                      [c.id]: false,
+                                    }))
+                                  }
+                                  className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1 hover:underline"
+                                >
+                                  See less
+                                </button>
+                              )}
+                            </>
+                          )}
+
+                          {editCommentId === c.id && (
+                            <div className="mt-3">
+                              <textarea
+                                value={editBody}
+                                onChange={(e) => setEditBody(e.target.value)}
+                                className="
                               w-full
                               bg-dashboard-bg-light dark:bg-dashboard-bg-dark
                               border border-dashboard-border-light dark:border-dashboard-border-dark
@@ -1266,23 +1363,23 @@ export default function CommunityPost({ targetType = "post" }) {
                               text-dashboard-text-light dark:text-dashboard-text-dark
                               text-sm
                             "
-                              rows={3}
-                            />
+                                rows={3}
+                              />
 
-                            <div className="flex gap-3 mt-2">
-                              <button
-                                onClick={() => saveEditedComment(c.id)}
-                                className="px-3 py-1 bg-blue text-white text-xs rounded hover:bg-blue/90"
-                              >
-                                Save
-                              </button>
+                              <div className="flex gap-3 mt-2">
+                                <button
+                                  onClick={() => saveEditedComment(c.id)}
+                                  className="px-3 py-1 bg-blue text-white text-xs rounded hover:bg-blue/90"
+                                >
+                                  Save
+                                </button>
 
-                              <button
-                                onClick={() => {
-                                  setEditCommentId(null);
-                                  setEditBody("");
-                                }}
-                                className="
+                                <button
+                                  onClick={() => {
+                                    setEditCommentId(null);
+                                    setEditBody("");
+                                  }}
+                                  className="
                                 px-3 py-1
                                 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
                                 text-dashboard-muted-light dark:text-dashboard-muted-dark
@@ -1290,170 +1387,179 @@ export default function CommunityPost({ targetType = "post" }) {
                                 text-xs rounded
                                 hover:opacity-80
 "
-                              >
-                                Cancel
-                              </button>
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Action Row */}
-                        {editCommentId !== c.id && (
-                          <div className="flex items-center gap-3 mt-1.5">
-                            <button
-                              onClick={() => toggleLike(c)}
-                              className={`text-xs ${
-                                c.user_liked
-                                  ? "text-red-600"
-                                  : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                              } hover:opacity-80`}
-                            >
-                              <Heart
-                                size={12}
-                                fill={
-                                  c.user_liked ? "currentColor" : "transparent"
-                                }
-                                className="inline-block mr-1"
-                              />
-                              {c.like_count}
-                            </button>
-                            {/* Reply is ALWAYS available */}
-                            <button
-                              onClick={() => setActiveReplyBox(c.id)}
-                              className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
-                            >
-                              Reply
-                            </button>
-
-                            {/* View / Hide replies only if replies exist */}
-                            {c.reply_count > 0 && (
+                          {/* Action Row */}
+                          {editCommentId !== c.id && (
+                            <div className="flex items-center gap-3 mt-1.5">
                               <button
-                                onClick={() => toggleReplies(c.id)}
-                                className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
+                                onClick={() => toggleLike(c)}
+                                className={`text-xs ${
+                                  c.user_liked
+                                    ? "text-red-600"
+                                    : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+                                } hover:opacity-80`}
                               >
-                                {openReplies[c.id]
-                                  ? "Hide replies"
-                                  : `View replies (${c.reply_count})`}
+                                <Heart
+                                  size={12}
+                                  fill={
+                                    c.user_liked
+                                      ? "currentColor"
+                                      : "transparent"
+                                  }
+                                  className="inline-block mr-1"
+                                />
+                                {c.like_count}
                               </button>
-                            )}
-
-                            {/* Edit */}
-                            {!openReplies[c.id] &&
-                              user &&
-                              c.user_id === user.id && (
+                              {/* Reply is ALWAYS available */}
+                              {!commentsLocked && (
                                 <button
-                                  onClick={() => {
-                                    setEditCommentId(c.id);
-                                    setEditBody(c.body);
-                                  }}
+                                  onClick={() => setActiveReplyBox(c.id)}
                                   className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
                                 >
-                                  Edit
+                                  Reply
                                 </button>
                               )}
 
-                            {/* Delete */}
-                            {!openReplies[c.id] &&
-                              user &&
-                              (c.user_id === user.id ||
-                                post.user_id === user.id) && (
+                              {/* View / Hide replies only if replies exist */}
+                              {c.reply_count > 0 && (
                                 <button
-                                  onClick={() => handleDelete(c.id)}
+                                  onClick={() => toggleReplies(c.id)}
                                   className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
                                 >
-                                  Delete
+                                  {openReplies[c.id]
+                                    ? "Hide replies"
+                                    : `View replies (${c.reply_count})`}
                                 </button>
                               )}
-                          </div>
-                        )}
 
-                        {activeReplyBox === c.id && (
-                          <div className="mt-3 ml-6">
-                            <ReplyBox
-                              parentComment={c}
-                              onReply={async (newReply) => {
-                                // 1️⃣ add reply locally
-                                setReplies((prev) => ({
-                                  ...prev,
-                                  [c.id]: [...(prev[c.id] || []), newReply],
-                                }));
+                              {/* Edit */}
+                              {!openReplies[c.id] &&
+                                user &&
+                                c.user_id === user.id && (
+                                  <button
+                                    onClick={() => {
+                                      setEditCommentId(c.id);
+                                      setEditBody(c.body);
+                                    }}
+                                    className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
+                                  >
+                                    Edit
+                                  </button>
+                                )}
 
-                                // 2️⃣ increment reply_count on the parent comment
-                                setComments((prev) =>
-                                  prev.map((comment) =>
-                                    comment.id === c.id
-                                      ? {
-                                          ...comment,
-                                          reply_count:
-                                            (comment.reply_count || 0) + 1,
-                                        }
-                                      : comment,
-                                  ),
-                                );
+                              {/* Delete */}
+                              {!openReplies[c.id] &&
+                                user &&
+                                (c.user_id === user.id ||
+                                  post.user_id === user.id) && (
+                                  <button
+                                    onClick={() => handleDelete(c.id)}
+                                    className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
+                                  >
+                                    Delete
+                                  </button>
+                                )}
+                            </div>
+                          )}
 
-                                // 3️⃣ open replies immediately
-                                setOpenReplies((prev) => ({
-                                  ...prev,
-                                  [c.id]: true,
-                                }));
+                          {activeReplyBox === c.id && (
+                            <div className="mt-3 ml-6">
+                              <ReplyBox
+                                parentComment={c}
+                                onReply={async (newReply) => {
+                                  // 1️⃣ add reply locally
+                                  setReplies((prev) => ({
+                                    ...prev,
+                                    [c.id]: [...(prev[c.id] || []), newReply],
+                                  }));
 
-                                // 4️⃣ close reply box
-                                setTimeout(() => setActiveReplyBox(null), 100);
-                              }}
-                              onCancel={() => setActiveReplyBox(null)}
-                            />
-                          </div>
-                        )}
+                                  // 2️⃣ increment reply_count on the parent comment
+                                  setComments((prev) =>
+                                    prev.map((comment) =>
+                                      comment.id === c.id
+                                        ? {
+                                            ...comment,
+                                            reply_count:
+                                              (comment.reply_count || 0) + 1,
+                                          }
+                                        : comment,
+                                    ),
+                                  );
 
-                        {/* Replies */}
-                        {openReplies[c.id] &&
-                          (replies[c.id] || []).map((reply) => (
-                            <CommentThread
-                              key={reply.id}
-                              postOwnerId={post.user_id}
-                              comment={reply}
-                              depth={1}
-                              loadReplies={loadReplies}
-                              replies={replies}
-                              setReplies={setReplies}
-                              replyPages={replyPages}
-                              timeAgo={timeAgo}
-                              toggleLike={toggleLike}
-                              activeReplyBox={activeReplyBox}
-                              setActiveReplyBox={setActiveReplyBox}
-                              editCommentId={editCommentId}
-                              editBody={editBody}
-                              setEditBody={setEditBody}
-                              setEditCommentId={setEditCommentId}
-                              handleDelete={handleDelete}
-                              onReplySubmit={saveEditedComment}
-                              openReplies={openReplies}
-                              toggleReplyVisibility={toggleReplies}
-                              expandedComments={expandedComments}
-                              setExpandedComments={setExpandedComments}
-                            />
-                          ))}
+                                  // 3️⃣ open replies immediately
+                                  setOpenReplies((prev) => ({
+                                    ...prev,
+                                    [c.id]: true,
+                                  }));
+
+                                  // 4️⃣ close reply box
+                                  setTimeout(
+                                    () => setActiveReplyBox(null),
+                                    100,
+                                  );
+                                }}
+                                onCancel={() => setActiveReplyBox(null)}
+                              />
+                            </div>
+                          )}
+
+                          {/* Replies */}
+                          {openReplies[c.id] &&
+                            (replies[c.id] || []).map((reply) => (
+                              <CommentThread
+                                key={reply.id}
+                                postOwnerId={post.user_id}
+                                comment={reply}
+                                depth={1}
+                                loadReplies={loadReplies}
+                                replies={replies}
+                                setReplies={setReplies}
+                                replyPages={replyPages}
+                                timeAgo={timeAgo}
+                                toggleLike={toggleLike}
+                                activeReplyBox={activeReplyBox}
+                                setActiveReplyBox={setActiveReplyBox}
+                                editCommentId={editCommentId}
+                                editBody={editBody}
+                                setEditBody={setEditBody}
+                                setEditCommentId={setEditCommentId}
+                                handleDelete={handleDelete}
+                                onReplySubmit={saveEditedComment}
+                                openReplies={openReplies}
+                                toggleReplyVisibility={toggleReplies}
+                                expandedComments={expandedComments}
+                                setExpandedComments={setExpandedComments}
+                              />
+                            ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
-              <div ref={observerRef} className="h-10"></div>
-            </div>
+                <div ref={observerRef} className="h-10"></div>
+              </div>
+            )}
+            {!commentsLocked && (
+              <CreateCommentBox
+                targetType={targetType}
+                targetId={post.id}
+                onComment={(newComment) => {
+                  setComments((prev) => [newComment, ...prev]);
 
-            <CreateCommentBox
-              targetType={targetType}
-              targetId={post.id}
-              onComment={(newComment) => {
-                setComments((prev) => [newComment, ...prev]);
-
-                setPost((prev) => ({
-                  ...prev,
-                  comment_count: (prev.comment_count || 0) + 1,
-                }));
-              }}
-            />
+                  setPost((prev) => ({
+                    ...prev,
+                    comment_count: (prev.comment_count || 0) + 1,
+                  }));
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -2,9 +2,19 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { headerLogo } from "../../assets/images";
-import { Check, Eye, Heart, MessageCircle, Plus, Share2 } from "lucide-react";
+import {
+  Check,
+  Eye,
+  Heart,
+  MessageSquare,
+  MessageSquareLock,
+  Plus,
+  Share2,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { FragmentItem } from "./fragments/FragmentItem";
+import { MobilePostCard } from "./posts/MobilePostCard";
+import MobileCreateFAB from "./posts/MobileCreateFAB";
 
 export default function CommunityHome() {
   const PAGE_SIZE = 20;
@@ -80,6 +90,24 @@ export default function CommunityHome() {
     },
     [PAGE_SIZE, offset, hasMore, loadingFeed],
   );
+
+  function isFeedCommentsLocked(post) {
+    // owner always sees comments
+    if (post.is_owner === 1) return false;
+
+    // admin hard lock always wins
+    if (post.comments_locked === 1) return true;
+
+    // paid comments are locked in feed
+    if (post.comments_visibility === "paid") return true;
+
+    // private comments: lock ONLY if viewer is NOT subscribed
+    if (post.comments_visibility === "private" && post.is_subscribed !== 1) {
+      return true;
+    }
+
+    return false;
+  }
 
   useEffect(() => {
     const fetchRecap = async () => {
@@ -372,7 +400,7 @@ export default function CommunityHome() {
 
           <div
             ref={createMenuRef}
-            className="flex justify-center mb-8 relative"
+            className="hidden sm:flex justify-center mb-8 relative"
           >
             <button
               type="button"
@@ -627,168 +655,181 @@ export default function CommunityHome() {
                   const post = item.data;
 
                   return (
-                    <div
-                      key={post.id}
-                      className="
-          w-full
-          px-4 py-3
-          sm:px-6 sm:py-4
-          lg:px-8 lg:py-6
-          border-b border-dashboard-border-light
-          dark:border-dashboard-border-dark
-          hover:bg-dashboard-hover-light
-          dark:hover:bg-dashboard-hover-dark
-          transition
-        "
-                    >
-                      <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
-                        <div
-                          onClick={() => handlePostClick(post.id)}
-                          className="min-w-0 cursor-pointer group"
-                        >
-                          <h3
-                            className="
-                text-base sm:text-lg font-semibold
-                text-dashboard-text-light dark:text-dashboard-text-dark
-                line-clamp-1 lg:line-clamp-2
-                group-hover:underline
-              "
+                    <div key={post.id} className="space-y-2">
+                      {/* MOBILE ONLY */}
+                      <div className="md:hidden">
+                        <MobilePostCard
+                          post={post}
+                          onOpen={() => handlePostClick(post.id)}
+                          onLike={(e) => togglePostLike(e, post)}
+                          onShare={(e) => handleShare(e, post)}
+                          isCommentsLocked={isFeedCommentsLocked(post)}
+                          copiedPostId={copiedPostId}
+                        />
+                      </div>
+
+                      {/* DESKTOP ONLY */}
+                      <div
+                        className="
+                        hidden md:block
+                        px-4 py-4
+                        sm:px-6
+                        rounded-lg
+                        border
+                        border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                        bg-dashboard-sidebar-light
+                        dark:bg-dashboard-sidebar-dark
+                        hover:bg-dashboard-hover-light
+                        dark:hover:bg-dashboard-hover-dark
+                        transition
+                        cursor-pointer
+                      "
+                      >
+                        <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
+                          <div
+                            onClick={() => handlePostClick(post.id)}
+                            className="min-w-0 cursor-pointer group"
                           >
-                            {post.title}
-                          </h3>
-
-                          {post.subtitle && (
-                            <p
+                            <h3
                               className="
-                  mt-1 text-sm
-                  text-dashboard-muted-light dark:text-dashboard-muted-dark
-                  line-clamp-1 lg:line-clamp-2
-                "
+                              text-base sm:text-lg font-semibold
+                              text-dashboard-text-light dark:text-dashboard-text-dark
+                              line-clamp-1 lg:line-clamp-2
+                              group-hover:underline
+                            "
                             >
-                              {post.subtitle}
-                            </p>
-                          )}
+                              {post.title}
+                            </h3>
 
-                          <div className="flex items-center gap-2 mt-2">
-                            {post.author_image ? (
-                              <img
-                                src={post.author_image}
-                                alt=""
+                            {post.subtitle && (
+                              <p
                                 className="
-                    w-6 h-6 rounded-full object-cover
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-                  "
-                              />
-                            ) : (
-                              <div
-                                className="
-                    w-6 h-6 rounded-full
-                    bg-dashboard-hover-light
-                    dark:bg-dashboard-hover-dark
-                  "
-                              />
+                                mt-1 text-sm
+                                text-dashboard-muted-light dark:text-dashboard-muted-dark
+                                line-clamp-1 lg:line-clamp-2
+                              "
+                              >
+                                {post.subtitle}
+                              </p>
                             )}
 
-                            <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                              {post.author} · {post.topic_name}
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                            <div className="flex items-center justify-center gap-[3px]">
-                              <Eye size={14} className="opacity-70" />
-                              <span>{post.views ?? 0}</span>
-                            </div>
-
-                            <button
-                              onClick={(e) => togglePostLike(e, post)}
-                              className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                            >
-                              <Heart
-                                size={14}
-                                className={`${
-                                  post.has_liked
-                                    ? "text-red-500 fill-red-500"
-                                    : "opacity-70"
-                                }`}
-                              />
-                              <span>{post.like_count ?? 0}</span>
-                            </button>
-
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePostClick(post.id);
-                              }}
-                              className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                            >
-                              <MessageCircle size={14} className="opacity-70" />
-                              <span>{post.comment_count ?? 0}</span>
-                            </button>
-
-                            <button
-                              onClick={(e) => handleShare(e, post)}
-                              className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
-                            >
-                              {copiedPostId === post.id ? (
-                                <>
-                                  <Check size={14} className="text-green-500" />
-                                  <span className="text-green-500">Copied</span>
-                                </>
+                            <div className="flex items-center gap-2 mt-2">
+                              {post.author_image ? (
+                                <img
+                                  src={post.author_image}
+                                  alt=""
+                                  className="
+                                  w-6 h-6 rounded-full object-cover
+                                  border border-dashboard-border-light
+                                  dark:border-dashboard-border-dark
+                                "
+                                />
                               ) : (
-                                <Share2 size={14} className="opacity-70" />
+                                <div
+                                  className="
+                                  w-6 h-6 rounded-full
+                                  bg-dashboard-hover-light
+                                  dark:bg-dashboard-hover-dark
+                                "
+                                />
                               )}
-                            </button>
-                          </div>
-                        </div>
 
-                        <div
-                          className="
-              w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
-              rounded-lg
-              flex-shrink-0
-              border border-dashboard-border-light
-              dark:border-dashboard-border-dark
-              overflow-hidden
-              bg-dashboard-hover-light
-              dark:bg-dashboard-hover-dark
-            "
-                        >
-                          {post.image_url ? (
-                            <img
-                              src={post.image_url}
-                              alt=""
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div
-                              className="
-                  w-full h-full
-                  flex items-center justify-center
-                  bg-gradient-to-br
-                  from-sky-400/80
-                  via-sky-300/90
-                  to-blue/80
-                "
-                            >
-                              <span
-                                className="
-                    text-[10px] sm:text-xs
-                    font-medium
-                    uppercase
-                    tracking-wide
-                    text-dashboard-text-light
-                    dark:text-dashboard-text-dark
-                    select-none
-                  "
-                              >
-                                No image
+                              <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                                {post.author} · {post.topic_name}
                               </span>
                             </div>
-                          )}
+
+                            <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                              <div className="flex items-center justify-center gap-[3px]">
+                                <Eye size={14} className="opacity-70" />
+                                <span>{post.views ?? 0}</span>
+                              </div>
+
+                              <button
+                                onClick={(e) => togglePostLike(e, post)}
+                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                              >
+                                <Heart
+                                  size={14}
+                                  className={
+                                    post.has_liked
+                                      ? "text-red-500 fill-red-500"
+                                      : "opacity-70"
+                                  }
+                                />
+                                <span>{post.like_count ?? 0}</span>
+                              </button>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePostClick(post.id);
+                                }}
+                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                              >
+                                {isFeedCommentsLocked(post) ? (
+                                  <MessageSquareLock
+                                    size={14}
+                                    className="opacity-70"
+                                  />
+                                ) : (
+                                  <MessageSquare
+                                    size={14}
+                                    className="opacity-70"
+                                  />
+                                )}
+
+                                <span
+                                  className={
+                                    isFeedCommentsLocked(post)
+                                      ? "opacity-60"
+                                      : undefined
+                                  }
+                                >
+                                  {post.comment_count ?? 0}
+                                </span>
+                              </button>
+
+                              <button
+                                onClick={(e) => handleShare(e, post)}
+                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                              >
+                                {copiedPostId === post.id ? (
+                                  <Check size={14} className="text-green-500" />
+                                ) : (
+                                  <Share2 size={14} className="opacity-70" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div
+                            className="
+                            w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
+                            rounded-lg
+                            flex-shrink-0
+                            border border-dashboard-border-light
+                            dark:border-dashboard-border-dark
+                            overflow-hidden
+                            bg-dashboard-hover-light
+                            dark:bg-dashboard-hover-dark
+                          "
+                          >
+                            {post.image_url ? (
+                              <img
+                                src={post.image_url}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-[10px] uppercase opacity-70">
+                                  No image
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -820,6 +861,13 @@ export default function CommunityHome() {
           </div>
         </div>
       </div>
+      <MobileCreateFAB
+        open={createOpen}
+        setOpen={setCreateOpen}
+        containerRef={createMenuRef}
+        onCreatePost={() => navigate("/community/create-post")}
+        onCreateFragment={() => navigate("/community/fragments/create")}
+      />
     </div>
   );
 }

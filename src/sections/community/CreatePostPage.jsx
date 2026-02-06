@@ -4,6 +4,7 @@ import { X, Image as ImageIcon } from "lucide-react";
 import CommunityPostEditor from "./posts/CommunityPostEditor";
 import { toast } from "react-toastify";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import CommentVisibilityDropdown from "./CommentVisibilityDropdown";
 
 export default function CreatePostPage({ post = null, topicId }) {
   const navigate = useNavigate();
@@ -26,6 +27,10 @@ export default function CreatePostPage({ post = null, topicId }) {
 
   const MAX_RELATED_TOPICS = 3;
   const [relatedTopicIds, setRelatedTopicIds] = useState([]);
+
+  const [commentsVisibility, setCommentsVisibility] = useState(
+    post?.comments_visibility || "public",
+  );
 
   const activeTopic = useMemo(() => {
     if (topicId) {
@@ -78,6 +83,7 @@ export default function CreatePostPage({ post = null, topicId }) {
           title,
           subtitle,
           body,
+          comments_visibility: commentsVisibility,
         };
 
         // 👇 ONLY include image_url if it changed
@@ -95,6 +101,7 @@ export default function CreatePostPage({ post = null, topicId }) {
           body,
           image_url: imageUrl,
           relatedTopicIds: relatedTopicIds,
+          comments_visibility: commentsVisibility,
         });
       }
 
@@ -233,6 +240,10 @@ export default function CreatePostPage({ post = null, topicId }) {
               </div>
             </div>
           )}
+          <CommentVisibilityDropdown
+            value={commentsVisibility}
+            onChange={setCommentsVisibility}
+          />
 
           {/* Post title */}
 

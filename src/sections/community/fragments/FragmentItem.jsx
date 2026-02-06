@@ -1,4 +1,4 @@
-import { Eye, Heart, MessageCircle, Repeat, ShieldCheck } from "lucide-react";
+import { Eye, Heart, MessageSquare, Repeat, ShieldCheck } from "lucide-react";
 import { timeAgo, formatDate } from "../../../helpers/date";
 
 export function FragmentItem({ fragment, onOpen, onToggleLike }) {
@@ -126,7 +126,7 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
 
         {/* Comments */}
         <div className="flex items-center justify-center gap-[3px]">
-          <MessageCircle size={14} className="opacity-70" />
+          <MessageSquare size={14} className="opacity-70" />
           <span>{comment_count}</span>
         </div>
 

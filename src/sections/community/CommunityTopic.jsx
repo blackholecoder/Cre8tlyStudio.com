@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import { Eye, Heart, MessageCircle, Plus } from "lucide-react";
+import {
+  Eye,
+  Heart,
+  MessageSquare,
+  MessageSquareLock,
+  Plus,
+} from "lucide-react";
+import { MobilePostCard } from "./posts/MobilePostCard";
 // import CreatePostModal from "./CreatePostModal";
 
 export default function CommunityTopic() {
@@ -10,6 +17,26 @@ export default function CommunityTopic() {
   const location = useLocation();
   const [topic, setTopic] = useState(null);
   const [posts, setPosts] = useState([]);
+
+  function isTopicCommentsLocked(post) {
+    // admin hard lock always wins
+    if (post.comments_locked === 1) return true;
+
+    // paid comments → locked only if NOT paid subscriber
+    if (
+      post.comments_visibility === "paid" &&
+      post.has_paid_subscription !== 1
+    ) {
+      return true;
+    }
+
+    // private comments → locked only if NOT subscribed
+    if (post.comments_visibility === "private" && post.is_subscribed !== 1) {
+      return true;
+    }
+
+    return false;
+  }
 
   const load = async () => {
     try {
@@ -163,156 +190,150 @@ export default function CommunityTopic() {
           </div>
         )}
         {posts.map((post) => {
+          const handleOpen = async () => {
+            try {
+              await axiosInstance.post(`/community/${topicId}/mark-viewed`);
+            } catch (err) {}
+
+            navigate(`/community/post/${post.id}`, {
+              state: { from: location.pathname },
+            });
+          };
+
           return (
-            <div
-              key={post.id}
-              onClick={async () => {
-                try {
-                  await axiosInstance.post(`/community/${topicId}/mark-viewed`);
-                } catch (err) {}
-                navigate(`/community/post/${post.id}`, {
-                  state: { from: location.pathname },
-                });
-              }}
-              className="
-              w-full
-              px-4 py-3
-              sm:px-6 sm:py-4
-              lg:px-8 lg:py-6
-              border-b border-dashboard-border-light
-              dark:border-dashboard-border-dark
-              hover:bg-dashboard-hover-light
-              dark:hover:bg-dashboard-hover-dark
-              transition
-              cursor-pointer
-            "
-            >
-              <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
-                {/* Left image */}
+            <div key={post.id}>
+              {/* 📱 MOBILE */}
+              <div className="md:hidden">
+                <MobilePostCard
+                  post={post}
+                  onOpen={handleOpen}
+                  onLike={() => {}}
+                  onShare={() => {}}
+                  isCommentsLocked={isTopicCommentsLocked(post)}
+                  copiedPostId={null}
+                />
+              </div>
 
-                {/* Right content */}
-                <div className="min-w-0">
-                  <h3
-                    className="
-                    text-base sm:text-lg font-semibold line-clamp-1 lg:line-clamp-2
-                    text-dashboard-text-light dark:text-dashboard-text-dark
-                  "
-                  >
-                    {post.title}
-                  </h3>
-                  {post.subtitle && (
-                    <p
+              {/* 🖥 DESKTOP */}
+              <div
+                onClick={handleOpen}
+                className="
+          hidden md:block
+          px-4 py-4
+          sm:px-6
+          rounded-lg
+          border
+          border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          hover:bg-dashboard-hover-light
+          dark:hover:bg-dashboard-hover-dark
+          transition
+          cursor-pointer
+        "
+              >
+                <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
+                  <div className="min-w-0">
+                    <h3
                       className="
-                      mt-1
-                      text-sm sm:text-base
-                      font-medium
-                      leading-snug
-                      line-clamp-1 lg:line-clamp-2
-                      text-dashboard-muted-light
-                      dark:text-dashboard-muted-dark
-                    "
+                text-base sm:text-lg font-semibold
+                line-clamp-1 lg:line-clamp-2
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+              "
                     >
-                      {post.subtitle}
-                    </p>
-                  )}
+                      {post.title}
+                    </h3>
 
-                  <p
-                    className="
-                    text-sm mt-1
-                    text-dashboard-muted-light dark:text-dashboard-muted-dark
-                  "
-                  >
-                    By {post.author}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    {post.author_image ? (
-                      <img
-                        src={post.author_image}
-                        alt=""
+                    {post.subtitle && (
+                      <p
                         className="
-                        w-6 h-6 rounded-full object-cover
-                        border border-dashboard-border-light
-                        dark:border-dashboard-border-dark
-                      "
-                      />
-                    ) : (
-                      <div
-                        className="
-                        w-6 h-6 rounded-full
-                        bg-dashboard-hover-light
-                        dark:bg-dashboard-hover-dark
-                      "
-                      />
+                  mt-1
+                  text-sm sm:text-base
+                  line-clamp-1 lg:line-clamp-2
+                  text-dashboard-muted-light
+                  dark:text-dashboard-muted-dark
+                "
+                      >
+                        {post.subtitle}
+                      </p>
                     )}
 
-                    <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                      {post.author} · {post.topic_name}
-                    </span>
-                  </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      {post.author_image ? (
+                        <img
+                          src={post.author_image}
+                          alt=""
+                          className="
+                    w-6 h-6 rounded-full object-cover
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                  "
+                        />
+                      ) : (
+                        <div
+                          className="
+                    w-6 h-6 rounded-full
+                    bg-dashboard-hover-light
+                    dark:bg-dashboard-hover-dark
+                  "
+                        />
+                      )}
 
-                  <div className="flex items-center gap-6 sm:gap-8 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                    <div className="flex items-center gap-1.5">
-                      <Eye size={14} className="opacity-70" />
-                      <span>{post.views ?? 0}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Heart size={14} className="opacity-70" />
-                      <span>{post.like_count ?? 0}</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <MessageCircle size={14} className="opacity-70" />
-                      <span>{post.comment_count ?? 0}</span>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="
-                  w-14 h-14
-                  sm:w-16 sm:h-16
-                  lg:w-20 lg:h-20
-                  rounded-lg
-                  flex-shrink-0
-                  border border-dashboard-border-light
-                  dark:border-dashboard-border-dark
-                  overflow-hidden
-                  bg-dashboard-hover-light
-                  dark:bg-dashboard-hover-dark
-                "
-                >
-                  {post.image_url ? (
-                    <img
-                      src={post.image_url}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="
-                      w-full h-full
-                      flex items-center justify-center
-                      bg-gradient-to-br
-                      from-sky-400/80
-                      via-sky-300/90
-                      to-blue/80
-                    "
-                    >
-                      <span
-                        className="
-                        text-[10px] sm:text-xs
-                        font-medium
-                        uppercase
-                        tracking-wide
-                       text-dashboard-text-light dark:text-dashboard-text-dark
-                        select-none
-                      "
-                      >
-                        No image
+                      <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                        {post.author} · {post.topic_name}
                       </span>
                     </div>
-                  )}
+
+                    <div className="grid grid-cols-3 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      <div className="flex items-center justify-center gap-[3px]">
+                        <Eye size={14} className="opacity-70" />
+                        <span>{post.views ?? 0}</span>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-[3px]">
+                        <Heart size={14} className="opacity-70" />
+                        <span>{post.like_count ?? 0}</span>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-[3px]">
+                        {isTopicCommentsLocked(post) ? (
+                          <MessageSquareLock size={14} className="opacity-70" />
+                        ) : (
+                          <MessageSquare size={14} className="opacity-70" />
+                        )}
+                        <span>{post.comment_count ?? 0}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="
+              w-14 h-14
+              sm:w-16 sm:h-16
+              lg:w-20 lg:h-20
+              rounded-lg
+              flex-shrink-0
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              overflow-hidden
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+            "
+                  >
+                    {post.image_url ? (
+                      <img
+                        src={post.image_url}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs opacity-60">
+                        No image
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

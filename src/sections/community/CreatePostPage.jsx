@@ -42,6 +42,21 @@ export default function CreatePostPage({ post = null, topicId }) {
     return null;
   }, [topicId, selectedTopicId, topics]);
 
+  const wordCount = useMemo(() => {
+    const text = body
+      ?.replace(/<[^>]*>/g, " ")
+      ?.replace(/\s+/g, " ")
+      ?.trim();
+
+    if (!text) return 0;
+    return text.split(" ").length;
+  }, [body]);
+
+  const MIN_POST_WORDS = 501;
+  const isBelowPostThreshold = wordCount < MIN_POST_WORDS;
+
+  const hasStartedWriting = wordCount > 0;
+
   const submit = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -57,6 +72,13 @@ export default function CreatePostPage({ post = null, topicId }) {
 
     if (!isEdit && !topicId && !selectedTopicId) {
       toast.error("Please select a topic");
+      return;
+    }
+
+    if (!isEdit && wordCount < MIN_POST_WORDS) {
+      toast.error(
+        `Posts require at least ${MIN_POST_WORDS} words. This looks like a fragment.`,
+      );
       return;
     }
 
@@ -181,7 +203,9 @@ export default function CreatePostPage({ post = null, topicId }) {
 
         <button
           onClick={submit}
-          disabled={uploading}
+          disabled={
+            uploading || (!isEdit && hasStartedWriting && isBelowPostThreshold)
+          }
           className="
       px-3 py-1.5 rounded-md text-sm font-medium
       bg-green text-black
@@ -394,6 +418,39 @@ export default function CreatePostPage({ post = null, topicId }) {
             value={body}
             onChange={setBody}
           />
+          {!isEdit && hasStartedWriting && isBelowPostThreshold && (
+            <div
+              className="
+              mt-3
+              rounded-lg
+              border border-dashboard-border-light
+              dark:border-dashboard-border-dark
+              bg-dashboard-hover-light
+              dark:bg-dashboard-hover-dark
+              px-4 py-3
+              text-sm
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+            "
+            >
+              <p className="font-medium">
+                Keep going — longer posts work best here.
+              </p>
+              <p className="mt-1 opacity-80">
+                Posts need at least {MIN_POST_WORDS} words. Short pieces belong
+                as fragments.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => navigate("/community/fragments/create")}
+                className="mt-2 text-green text-sm font-medium hover:underline"
+              >
+                Post a fragment →
+              </button>
+            </div>
+          )}
+
           {relatedTopicIds.length > 0 && (
             <div className="space-y-1">
               <span className="text-xs uppercase tracking-wide text-dashboard-muted-light dark:text-dashboard-muted-dark">

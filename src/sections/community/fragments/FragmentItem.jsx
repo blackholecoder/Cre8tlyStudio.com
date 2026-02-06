@@ -40,6 +40,7 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
     "
     >
       {/* Author */}
+      {/* Author */}
       <div className="flex items-center gap-2 mb-2">
         {author_image ? (
           <img
@@ -51,17 +52,31 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
           <div className="w-6 h-6 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark" />
         )}
 
-        <div className="flex items-center gap-[2px]">
-          <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-            {author}
-          </span>
+        {/* Name + meta */}
+        <div className="flex flex-col leading-tight">
+          <div className="flex items-center gap-[2px]">
+            <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              {author}
+            </span>
 
-          {isVerified && (
-            <ShieldCheck
-              size={12}
-              className="text-dashboard-muted-light dark:text-green"
-            />
-          )}
+            {isVerified && (
+              <ShieldCheck
+                size={12}
+                className="text-dashboard-muted-light dark:text-green"
+              />
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+            <span>{timeAgo(created_at)}</span>
+
+            {updated_at && new Date(updated_at) > new Date(created_at) && (
+              <>
+                <span>·</span>
+                <span className="italic opacity-70">edited</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -69,18 +84,6 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
       <p className="text-sm leading-relaxed text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
         {body}
       </p>
-      <div className="mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark flex items-center gap-1">
-        <span>{formatDate(created_at)}</span>
-        <span>·</span>
-        <span>{timeAgo(created_at)}</span>
-
-        {updated_at && new Date(updated_at) > new Date(created_at) && (
-          <>
-            <span>·</span>
-            <span className="italic opacity-70">edited</span>
-          </>
-        )}
-      </div>
 
       {/* Reshare */}
       {reshared_id && (
@@ -101,9 +104,9 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
       )}
 
       {/* Actions */}
-      <div className="grid grid-cols-4 mt-3 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+      <div className="mt-3 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
         {/* Views */}
-        <div className="flex items-center justify-center gap-[3px]">
+        <div className="flex items-center gap-[3px]">
           <Eye size={14} className="opacity-70" />
           <span>{views ?? 0}</span>
         </div>
@@ -115,7 +118,7 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             e.stopPropagation();
             onToggleLike(fragment.id, has_liked);
           }}
-          className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+          className="flex items-center gap-[3px] hover:opacity-80 transition"
         >
           <Heart
             size={14}
@@ -125,13 +128,13 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
         </button>
 
         {/* Comments */}
-        <div className="flex items-center justify-center gap-[3px]">
+        <div className="flex items-center gap-[3px]">
           <MessageSquare size={14} className="opacity-70" />
           <span>{comment_count}</span>
         </div>
 
         {/* Reshares */}
-        <div className="flex items-center justify-center gap-[3px]">
+        <div className="flex items-center gap-[3px]">
           <Repeat size={14} className="opacity-70" />
           <span>{reshare_count}</span>
         </div>

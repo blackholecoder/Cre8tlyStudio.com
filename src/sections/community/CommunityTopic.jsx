@@ -9,7 +9,7 @@ import {
   Plus,
 } from "lucide-react";
 import { MobilePostCard } from "./posts/MobilePostCard";
-// import CreatePostModal from "./CreatePostModal";
+import { formatDate, timeAgo } from "../../helpers/date";
 
 export default function CommunityTopic() {
   const { topicId } = useParams();
@@ -260,44 +260,52 @@ export default function CommunityTopic() {
                       </p>
                     )}
 
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-start gap-2 mt-2">
                       {post.author_image ? (
                         <img
                           src={post.author_image}
                           alt=""
                           className="
-                    w-6 h-6 rounded-full object-cover
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-                  "
+        w-6 h-6 rounded-full object-cover
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+      "
                         />
                       ) : (
                         <div
                           className="
-                    w-6 h-6 rounded-full
-                    bg-dashboard-hover-light
-                    dark:bg-dashboard-hover-dark
-                  "
+        w-6 h-6 rounded-full
+        bg-dashboard-hover-light
+        dark:bg-dashboard-hover-dark
+      "
                         />
                       )}
 
-                      <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                        {post.author} · {post.topic_name}
-                      </span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                          {post.author}
+                        </span>
+
+                        <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                          <span>{timeAgo(post.created_at)}</span>
+                          <span>·</span>
+                          <span>{formatDate(post.created_at)}</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-3 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                      <div className="flex items-center justify-center gap-[3px]">
+                    <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      <div className="flex items-center gap-[3px]">
                         <Eye size={14} className="opacity-70" />
                         <span>{post.views ?? 0}</span>
                       </div>
 
-                      <div className="flex items-center justify-center gap-[3px]">
+                      <div className="flex items-center gap-[3px]">
                         <Heart size={14} className="opacity-70" />
                         <span>{post.like_count ?? 0}</span>
                       </div>
 
-                      <div className="flex items-center justify-center gap-[3px]">
+                      <div className="flex items-center gap-[3px]">
                         {isTopicCommentsLocked(post) ? (
                           <MessageSquareLock size={14} className="opacity-70" />
                         ) : (

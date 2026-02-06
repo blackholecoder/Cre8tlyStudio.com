@@ -188,27 +188,27 @@ export default function MyFragments() {
                   )}
               </div>
 
-              <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                 {/* Views */}
-                <div className="flex items-center justify-center gap-[3px]">
+                <div className="flex items-center gap-[3px]">
                   <Eye size={14} className="opacity-70" />
                   <span>{fragment.views ?? 0}</span>
                 </div>
 
                 {/* Likes */}
-                <div className="flex items-center justify-center gap-[3px]">
+                <div className="flex items-center gap-[3px]">
                   <Heart size={14} className="opacity-70" />
                   <span>{fragment.like_count ?? 0}</span>
                 </div>
 
                 {/* Comments */}
-                <div className="flex items-center justify-center gap-[3px]">
+                <div className="flex items-center gap-[3px]">
                   <MessageCircle size={14} className="opacity-70" />
                   <span>{fragment.comment_count ?? 0}</span>
                 </div>
 
                 {/* Reshares */}
-                <div className="flex items-center justify-center gap-[3px]">
+                <div className="flex items-center gap-[3px]">
                   <Repeat size={14} className="opacity-70" />
                   <span>{fragment.reshare_count ?? 0}</span>
                 </div>

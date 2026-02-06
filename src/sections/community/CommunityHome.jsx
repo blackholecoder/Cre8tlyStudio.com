@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { FragmentItem } from "./fragments/FragmentItem";
 import { MobilePostCard } from "./posts/MobilePostCard";
 import MobileCreateFAB from "./posts/MobileCreateFAB";
+import { formatDate, timeAgo } from "../../helpers/date";
 
 export default function CommunityHome() {
   const PAGE_SIZE = 20;
@@ -170,14 +171,12 @@ export default function CommunityHome() {
       }
     }
 
-    if (topicsOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [topicsOpen]);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -187,11 +186,11 @@ export default function CommunityHome() {
     }
 
     if (createOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [createOpen]);
 
@@ -404,7 +403,10 @@ export default function CommunityHome() {
           >
             <button
               type="button"
-              onClick={() => setCreateOpen((v) => !v)}
+              onClick={(e) => {
+                e.stopPropagation(); // 👈 THIS IS THE KEY
+                setCreateOpen((v) => !v);
+              }}
               className="
               w-full
               px-6 py-4
@@ -598,8 +600,13 @@ export default function CommunityHome() {
 
             {/* Menu */}
             {topicsOpen && (
-              <div
-                className="
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setTopicsOpen(false)}
+                />
+                <div
+                  className="
                 absolute z-50 mt-2 w-full sm:w-64
                 rounded-lg
                 border border-dashboard-border-light dark:border-dashboard-border-dark
@@ -607,39 +614,40 @@ export default function CommunityHome() {
                 shadow-xl
                 max-h-[400px] overflow-y-auto
               "
-              >
-                {/* All */}
-                <button
-                  onClick={() => {
-                    setActiveTopic("all");
-                    setTopicsOpen(false);
-                  }}
-                  className="
-                  w-full px-4 py-2 text-left text-sm
-                  hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-                "
                 >
-                  All topics
-                </button>
-
-                {/* Topics */}
-                {topics.map((t) => (
+                  {/* All */}
                   <button
-                    key={t.id}
                     onClick={() => {
-                      setActiveTopic(t.id);
-                      navigate(`/community/topic/${t.id}`);
+                      setActiveTopic("all");
                       setTopicsOpen(false);
                     }}
                     className="
+                  w-full px-4 py-2 text-left text-sm
+                  hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+                "
+                  >
+                    All topics
+                  </button>
+
+                  {/* Topics */}
+                  {topics.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setActiveTopic(t.id);
+                        navigate(`/community/topic/${t.id}`);
+                        setTopicsOpen(false);
+                      }}
+                      className="
                     w-full px-4 py-2 text-left text-sm
                     hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
                   "
-                  >
-                    {t.name}
-                  </button>
-                ))}
-              </div>
+                    >
+                      {t.name}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
           <div className="w-full mt-4">
@@ -714,7 +722,7 @@ export default function CommunityHome() {
                               </p>
                             )}
 
-                            <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-start gap-2 mt-2">
                               {post.author_image ? (
                                 <img
                                   src={post.author_image}
@@ -735,20 +743,32 @@ export default function CommunityHome() {
                                 />
                               )}
 
-                              <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                                {post.author} · {post.topic_name}
-                              </span>
+                              <div className="flex flex-col leading-tight">
+                                <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                                  {post.author}
+                                </span>
+
+                                <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                                  <span>{timeAgo(post.created_at)}</span>
+                                  <span>·</span>
+                                  <span>{formatDate(post.created_at)}</span>
+                                  <span>·</span>
+                                  <span>{post.topic_name}</span>
+                                </div>
+                              </div>
                             </div>
 
-                            <div className="grid grid-cols-4 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                              <div className="flex items-center justify-center gap-[3px]">
+                            <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                              {/* Views */}
+                              <div className="flex items-center gap-[3px]">
                                 <Eye size={14} className="opacity-70" />
                                 <span>{post.views ?? 0}</span>
                               </div>
 
+                              {/* Like */}
                               <button
                                 onClick={(e) => togglePostLike(e, post)}
-                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                                className="flex items-center gap-[3px] hover:opacity-80 transition"
                               >
                                 <Heart
                                   size={14}
@@ -761,12 +781,13 @@ export default function CommunityHome() {
                                 <span>{post.like_count ?? 0}</span>
                               </button>
 
+                              {/* Comments */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handlePostClick(post.id);
                                 }}
-                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                                className="flex items-center gap-[3px] hover:opacity-80 transition"
                               >
                                 {isFeedCommentsLocked(post) ? (
                                   <MessageSquareLock
@@ -791,9 +812,10 @@ export default function CommunityHome() {
                                 </span>
                               </button>
 
+                              {/* Share */}
                               <button
                                 onClick={(e) => handleShare(e, post)}
-                                className="flex items-center justify-center gap-[3px] hover:opacity-80 transition"
+                                className="flex items-center gap-[3px] hover:opacity-80 transition"
                               >
                                 {copiedPostId === post.id ? (
                                   <Check size={14} className="text-green-500" />

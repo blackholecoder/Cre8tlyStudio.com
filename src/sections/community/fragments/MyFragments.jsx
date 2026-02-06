@@ -133,107 +133,84 @@ export default function MyFragments() {
             key={fragment.id}
             onClick={() => navigate(`/community/fragments/${fragment.id}`)}
             className="
-            p-4 rounded-xl
-            border border-dashboard-border-light dark:border-dashboard-border-dark
-            bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-            flex justify-between gap-4
-            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-            transition
-            cursor-pointer
-          "
+      px-4 py-4 sm:px-6
+      rounded-lg
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+      transition
+      cursor-pointer
+    "
           >
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                {fragment.author_image ? (
-                  <img
-                    src={fragment.author_image}
-                    alt=""
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="
-                    w-6 h-6 rounded-full
-                    bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-                    flex items-center justify-center
-                    text-xs font-semibold
-                    text-dashboard-muted-light dark:text-dashboard-muted-dark
-                  "
-                  >
-                    {fragment.author?.charAt(0)?.toUpperCase()}
-                  </div>
-                )}
-
-                <span className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  {fragment.author}
-                </span>
-              </div>
-
-              <p className="text-sm leading-relaxed line-clamp-3">
-                {fragment.body}
-              </p>
-              <div className="mt-1 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark flex items-center gap-1">
-                <span>{formatDate(fragment.created_at)}</span>
-                <span>·</span>
-                <span>{timeAgo(fragment.created_at)}</span>
-
-                {fragment.updated_at &&
-                  new Date(fragment.updated_at).getTime() -
-                    new Date(fragment.created_at).getTime() >
-                    60_000 && (
-                    <>
-                      <span>·</span>
-                      <span className="italic opacity-50">edited</span>
-                    </>
-                  )}
-              </div>
-
-              <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                {/* Views */}
-                <div className="flex items-center gap-[3px]">
-                  <Eye size={14} className="opacity-70" />
-                  <span>{fragment.views ?? 0}</span>
-                </div>
-
-                {/* Likes */}
-                <div className="flex items-center gap-[3px]">
-                  <Heart size={14} className="opacity-70" />
-                  <span>{fragment.like_count ?? 0}</span>
-                </div>
-
-                {/* Comments */}
-                <div className="flex items-center gap-[3px]">
-                  <MessageCircle size={14} className="opacity-70" />
-                  <span>{fragment.comment_count ?? 0}</span>
-                </div>
-
-                {/* Reshares */}
-                <div className="flex items-center gap-[3px]">
-                  <Repeat size={14} className="opacity-70" />
-                  <span>{fragment.reshare_count ?? 0}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenMenuId(
-                    openMenuId === fragment.id ? null : fragment.id,
-                  );
-                }}
-                className="p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-              >
-                <Ellipsis size={18} />
-              </button>
-
-              {openMenuId === fragment.id && (
+            {/* TWO COLUMN LAYOUT */}
+            <div className="grid grid-cols-[40px_1fr] gap-3">
+              {/* AVATAR */}
+              {fragment.author_image ? (
+                <img
+                  src={fragment.author_image}
+                  alt=""
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
                 <div
-                  onClick={(e) => e.stopPropagation()}
                   className="
-                  absolute left-1/2 mt-2 -translate-x-1/2 z-30
+            w-8 h-8 rounded-full
+            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            flex items-center justify-center
+            text-xs font-semibold
+            text-dashboard-muted-light dark:text-dashboard-muted-dark
+          "
+                >
+                  {fragment.author?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
+
+              {/* CONTENT */}
+              <div className="min-w-0">
+                {/* TOP ROW: NAME + DATE + MENU */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      {fragment.author}
+                    </span>
+
+                    <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      <span>{formatDate(fragment.created_at)}</span>
+                      <span>·</span>
+                      <span>{timeAgo(fragment.created_at)}</span>
+
+                      {fragment.updated_at &&
+                        new Date(fragment.updated_at).getTime() -
+                          new Date(fragment.created_at).getTime() >
+                          60_000 && (
+                          <>
+                            <span>·</span>
+                            <span className="italic opacity-50">edited</span>
+                          </>
+                        )}
+                    </div>
+                  </div>
+
+                  {/* ELLIPSIS MENU — UNCHANGED */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(
+                          openMenuId === fragment.id ? null : fragment.id,
+                        );
+                      }}
+                      className="p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+                    >
+                      <Ellipsis size={18} />
+                    </button>
+
+                    {openMenuId === fragment.id && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="
+                  absolute right-0 mt-2 z-30
                   w-56
                   rounded-xl
                   bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
@@ -241,34 +218,67 @@ export default function MyFragments() {
                   shadow-xl
                   overflow-hidden
                 "
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(null);
-                      navigate(`/community/fragments/edit/${fragment.id}`);
-                    }}
-                    className={`${menuItem} hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark text-sm`}
-                  >
-                    <Pencil size={16} className="opacity-80" />
-                    Edit
-                  </button>
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            navigate(
+                              `/community/fragments/edit/${fragment.id}`,
+                            );
+                          }}
+                          className={`${menuItem} hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark`}
+                        >
+                          <Pencil size={16} className="opacity-80" />
+                          Edit
+                        </button>
 
-                  <div className="h-px bg-dashboard-border-light dark:bg-dashboard-border-dark my-1" />
+                        <div className="h-px bg-dashboard-border-light dark:bg-dashboard-border-dark my-1" />
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(null);
-                      confirmDeleteFragment(fragment.id);
-                    }}
-                    className={`${menuItem} text-red-500 hover:bg-red-500/10 text-sm`}
-                  >
-                    <Trash2 size={16} />
-                    Delete
-                  </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            confirmDeleteFragment(fragment.id);
+                          }}
+                          className={`${menuItem} text-red-500 hover:bg-red-500/10`}
+                        >
+                          <Trash2 size={16} />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+
+                {/* BODY */}
+                <p className="mt-2 text-sm leading-relaxed line-clamp-3 text-dashboard-text-light dark:text-dashboard-text-dark">
+                  {fragment.body}
+                </p>
+
+                {/* ICONS — NOW PERFECTLY ALIGNED */}
+                <div className="mt-3 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  <div className="flex items-center gap-[3px]">
+                    <Eye size={14} className="opacity-70" />
+                    <span>{fragment.views ?? 0}</span>
+                  </div>
+
+                  <div className="flex items-center gap-[3px]">
+                    <Heart size={14} className="opacity-70" />
+                    <span>{fragment.like_count ?? 0}</span>
+                  </div>
+
+                  <div className="flex items-center gap-[3px]">
+                    <MessageCircle size={14} className="opacity-70" />
+                    <span>{fragment.comment_count ?? 0}</span>
+                  </div>
+
+                  <div className="flex items-center gap-[3px]">
+                    <Repeat size={14} className="opacity-70" />
+                    <span>{fragment.reshare_count ?? 0}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}

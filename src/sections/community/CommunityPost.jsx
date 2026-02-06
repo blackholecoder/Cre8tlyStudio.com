@@ -13,6 +13,7 @@ import {
   Bookmark,
   MessageSquareLock,
   MessageSquare,
+  ChevronLeft,
 } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
@@ -703,10 +704,17 @@ export default function CommunityPost({ targetType = "post" }) {
         >
           <button
             onClick={() => navigate(backTo)}
-            className="flex items-center gap-1 opacity-70 hover:opacity-100 transition"
+            className="
+            w-10 h-10
+            flex items-center justify-center
+            rounded-xl
+            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            hover:opacity-90
+            transition
+          "
+            aria-label="Back"
           >
-            <ArrowLeft size={16} />
-            Back
+            <ChevronLeft size={21} />
           </button>
         </div>
 

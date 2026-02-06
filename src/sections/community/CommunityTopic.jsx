@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
+  ChevronLeft,
   Eye,
   Heart,
   MessageSquare,
@@ -83,9 +84,16 @@ export default function CommunityTopic() {
       >
         <button
           onClick={() => navigate("/community")}
-          className="opacity-70 hover:opacity-100 transition"
+          className="
+            w-10 h-10
+            flex items-center justify-center
+            rounded-xl
+            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            hover:opacity-90
+            transition
+          "
         >
-          ← Back
+          <ChevronLeft size={21} />
         </button>
       </div>
 
@@ -218,117 +226,121 @@ export default function CommunityTopic() {
               <div
                 onClick={handleOpen}
                 className="
-          hidden md:block
-          px-4 py-4
-          sm:px-6
-          rounded-lg
-          border
-          border-dashboard-border-light
-          dark:border-dashboard-border-dark
-          bg-dashboard-sidebar-light
-          dark:bg-dashboard-sidebar-dark
-          hover:bg-dashboard-hover-light
-          dark:hover:bg-dashboard-hover-dark
-          transition
-          cursor-pointer
-        "
-              >
-                <div className="grid grid-cols-[1fr_auto] gap-3 sm:gap-4 lg:gap-6 items-start">
-                  <div className="min-w-0">
-                    <h3
-                      className="
-                text-base sm:text-lg font-semibold
-                line-clamp-1 lg:line-clamp-2
-                text-dashboard-text-light
-                dark:text-dashboard-text-dark
+                hidden md:block
+                px-4 py-4 sm:px-6
+                rounded-lg
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                hover:bg-dashboard-hover-light
+                dark:hover:bg-dashboard-hover-dark
+                transition
+                cursor-pointer
               "
-                    >
-                      {post.title}
-                    </h3>
-
-                    {post.subtitle && (
-                      <p
-                        className="
-                  mt-1
-                  text-sm sm:text-base
-                  line-clamp-1 lg:line-clamp-2
-                  text-dashboard-muted-light
-                  dark:text-dashboard-muted-dark
-                "
-                      >
-                        {post.subtitle}
-                      </p>
-                    )}
-
-                    <div className="flex items-start gap-2 mt-2">
+              >
+                <div className="grid grid-cols-[1fr_auto] gap-6 items-start">
+                  {/* LEFT COLUMN */}
+                  <div className="min-w-0">
+                    <div className="grid grid-cols-[32px_1fr] gap-3">
+                      {/* AVATAR */}
                       {post.author_image ? (
                         <img
                           src={post.author_image}
                           alt=""
                           className="
-        w-6 h-6 rounded-full object-cover
-        border border-dashboard-border-light
-        dark:border-dashboard-border-dark
-      "
+                          w-8 h-8 rounded-full object-cover
+                          border border-dashboard-border-light
+                          dark:border-dashboard-border-dark
+                        "
                         />
                       ) : (
-                        <div
-                          className="
-        w-6 h-6 rounded-full
-        bg-dashboard-hover-light
-        dark:bg-dashboard-hover-dark
-      "
-                        />
+                        <div className="w-8 h-8 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark" />
                       )}
 
-                      <div className="flex flex-col leading-tight">
-                        <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                          {post.author}
-                        </span>
+                      {/* TEXT COLUMN */}
+                      <div className="min-w-0">
+                        {/* AUTHOR + DATE */}
+                        <div className="mb-2">
+                          <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                            {post.author}
+                          </span>
 
-                        <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                          <span>{timeAgo(post.created_at)}</span>
-                          <span>·</span>
-                          <span>{formatDate(post.created_at)}</span>
+                          <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                            <span>{timeAgo(post.created_at)}</span>
+                            <span>·</span>
+                            <span>{formatDate(post.created_at)}</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                      <div className="flex items-center gap-[3px]">
-                        <Eye size={14} className="opacity-70" />
-                        <span>{post.views ?? 0}</span>
-                      </div>
+                        {/* TITLE */}
+                        <h3
+                          className="
+                          text-base sm:text-lg font-semibold
+                          line-clamp-2
+                          text-dashboard-text-light
+                          dark:text-dashboard-text-dark
+                          mb-1
+                        "
+                        >
+                          {post.title}
+                        </h3>
 
-                      <div className="flex items-center gap-[3px]">
-                        <Heart size={14} className="opacity-70" />
-                        <span>{post.like_count ?? 0}</span>
-                      </div>
-
-                      <div className="flex items-center gap-[3px]">
-                        {isTopicCommentsLocked(post) ? (
-                          <MessageSquareLock size={14} className="opacity-70" />
-                        ) : (
-                          <MessageSquare size={14} className="opacity-70" />
+                        {/* SUBTITLE */}
+                        {post.subtitle && (
+                          <p
+                            className="
+                            text-sm sm:text-base
+                            line-clamp-2
+                            text-dashboard-muted-light
+                            dark:text-dashboard-muted-dark
+                            mb-2
+                          "
+                          >
+                            {post.subtitle}
+                          </p>
                         )}
-                        <span>{post.comment_count ?? 0}</span>
+
+                        {/* ACTIONS */}
+                        <div className="flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                          <div className="flex items-center gap-[3px]">
+                            <Eye size={14} className="opacity-70" />
+                            <span>{post.views ?? 0}</span>
+                          </div>
+
+                          <div className="flex items-center gap-[3px]">
+                            <Heart size={14} className="opacity-70" />
+                            <span>{post.like_count ?? 0}</span>
+                          </div>
+
+                          <div className="flex items-center gap-[3px]">
+                            {isTopicCommentsLocked(post) ? (
+                              <MessageSquareLock
+                                size={14}
+                                className="opacity-70"
+                              />
+                            ) : (
+                              <MessageSquare size={14} className="opacity-70" />
+                            )}
+                            <span>{post.comment_count ?? 0}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* RIGHT IMAGE COLUMN */}
                   <div
                     className="
-              w-14 h-14
-              sm:w-16 sm:h-16
-              lg:w-20 lg:h-20
-              rounded-lg
-              flex-shrink-0
-              border border-dashboard-border-light
-              dark:border-dashboard-border-dark
-              overflow-hidden
-              bg-dashboard-hover-light
-              dark:bg-dashboard-hover-dark
-            "
+                    w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
+                    rounded-lg
+                    flex-shrink-0
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    overflow-hidden
+                    bg-dashboard-hover-light
+                    dark:bg-dashboard-hover-dark
+                  "
                   >
                     {post.image_url ? (
                       <img

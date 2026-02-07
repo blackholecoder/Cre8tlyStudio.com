@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { MobilePostCard } from "./posts/MobilePostCard";
 import { formatDate, timeAgo } from "../../helpers/date";
+import MobileCreateFAB from "./posts/MobileCreateFAB";
 
 export default function CommunityTopic() {
   const { topicId } = useParams();
@@ -18,6 +19,11 @@ export default function CommunityTopic() {
   const location = useLocation();
   const [topic, setTopic] = useState(null);
   const [posts, setPosts] = useState([]);
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const createMenuRef = useRef(null);
+  const [showFab, setShowFab] = useState(true);
+  const lastScrollY = useRef(0);
 
   function isTopicCommentsLocked(post) {
     // admin hard lock always wins
@@ -44,6 +50,7 @@ export default function CommunityTopic() {
       // Get topic details
       const res = await axiosInstance.get(`/community/topics/${topicId}`);
       setTopic(res.data.topic);
+      console.log("topic", topic);
 
       // Get posts in this topic
       const res2 = await axiosInstance.get(
@@ -58,6 +65,34 @@ export default function CommunityTopic() {
   useEffect(() => {
     load();
   }, [topicId]);
+
+  useEffect(() => {
+    setCreateOpen(false);
+  }, [topicId]);
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentY = window.scrollY;
+
+      // scrolling down → hide
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setShowFab(false);
+      }
+
+      // scrolling up → show
+      if (currentY < lastScrollY.current) {
+        setShowFab(true);
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     // Always restore scrolling when this page mounts
@@ -98,13 +133,40 @@ export default function CommunityTopic() {
       </div>
 
       {/* Header + Create Button */}
-      <div className="flex items-center justify-between mb-8">
-        <h1
-          className="text-2xl font-semibold
-          text-dashboard-text-light dark:text-dashboard-text-dark"
-        >
-          {topic.name}
-        </h1>
+      <div
+        className="
+        flex items-start justify-between mb-6
+        px-4             
+        sm:px-0           
+      "
+      >
+        {/* Left side: title + description */}
+        <div>
+          <h1
+            className="
+        text-2xl font-semibold
+        text-dashboard-text-light dark:text-dashboard-text-dark
+      "
+          >
+            {topic.name}
+          </h1>
+
+          {topic.description && (
+            <p
+              className="
+          mt-1
+          text-sm
+          text-dashboard-muted-light
+          dark:text-dashboard-muted-dark
+          max-w-2xl
+        "
+            >
+              {topic.description}
+            </p>
+          )}
+        </div>
+
+        {/* Right side: button */}
         {posts.length > 0 && (
           <button
             onClick={() =>
@@ -116,15 +178,15 @@ export default function CommunityTopic() {
               })
             }
             className="
-          flex items-center gap-2
-          px-3 py-1.5
-          rounded-md text-sm
-          border border-dashboard-border-light dark:border-dashboard-border-dark
-          text-dashboard-text-light dark:text-dashboard-text-dark
-          hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-          transition
-          focus:outline-none focus:ring-2 focus:ring-green/30
-        "
+      hidden md:flex
+      items-center gap-2
+      px-3 py-1.5
+      rounded-md text-sm
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      text-dashboard-text-light dark:text-dashboard-text-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+      transition
+    "
           >
             <Plus size={18} />
             New Post
@@ -332,15 +394,15 @@ export default function CommunityTopic() {
                   {/* RIGHT IMAGE COLUMN */}
                   <div
                     className="
-                    w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
-                    rounded-lg
-                    flex-shrink-0
-                    border border-dashboard-border-light
-                    dark:border-dashboard-border-dark
-                    overflow-hidden
-                    bg-dashboard-hover-light
-                    dark:bg-dashboard-hover-dark
-                  "
+                  w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20
+                  rounded-lg
+                  flex-shrink-0
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  overflow-hidden
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                "
                   >
                     {post.image_url ? (
                       <img
@@ -360,6 +422,32 @@ export default function CommunityTopic() {
           );
         })}
       </div>
+
+      <MobileCreateFAB
+        className={`
+    transition-all duration-200 ease-out
+    ${showFab ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}
+  `}
+        open={createOpen}
+        setOpen={setCreateOpen}
+        containerRef={createMenuRef}
+        onCreatePost={() =>
+          navigate("/community/create-post", {
+            state: {
+              topicId: topic.id,
+              topicName: topic.name,
+            },
+          })
+        }
+        onCreateFragment={() =>
+          navigate("/community/fragments/create", {
+            state: {
+              topicId: topic.id,
+              topicName: topic.name,
+            },
+          })
+        }
+      />
     </div>
   );
 }

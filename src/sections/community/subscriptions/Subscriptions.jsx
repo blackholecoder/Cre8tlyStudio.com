@@ -44,6 +44,9 @@ export default function Subscriptions() {
 
       const res = await axiosInstance.get("/community/subscriptions/me");
 
+      console.log("RAW API RESPONSE:", res.data);
+      console.log("RAW SUBSCRIBERS:", res.data.subscribers);
+
       setSubscribers(res.data.subscribers || []);
       setCount(res.data.count || 0);
     } catch (err) {
@@ -60,6 +63,24 @@ export default function Subscriptions() {
   const filtered = subscribers.filter((s) =>
     s.email.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const grossARR = subscribers.reduce((sum, s) => {
+    if (s.type === "monthly") {
+      return sum + (s.revenue || 0) * 12;
+    }
+
+    if (s.type === "annual") {
+      return sum + (s.revenue || 0);
+    }
+
+    if (s.type === "vip") {
+      return sum + (s.revenue || 0);
+    }
+
+    return sum;
+  }, 0);
+
+  const grossMonthly = grossARR / 12;
 
   function copyEmail(email) {
     navigator.clipboard.writeText(email);
@@ -108,6 +129,47 @@ export default function Subscriptions() {
           </button>
         </div>
       </div>
+
+      {/* Revenue summary */}
+      <div className="px-4 pt-4 max-w-6xl mx-auto">
+        <div
+          className="
+          grid grid-cols-1 sm:grid-cols-2 gap-3
+          rounded-xl
+          border
+          border-dashboard-border-light
+          dark:border-dashboard-border-dark
+          bg-dashboard-sidebar-light
+          dark:bg-dashboard-sidebar-dark
+          p-4
+        "
+        >
+          <div>
+            <p className="text-xs uppercase tracking-wide opacity-60">
+              Gross ARR
+            </p>
+            <p className="text-lg text-green font-semibold tabular-nums">
+              ${grossARR.toFixed(2)}
+            </p>
+            <p className="text-xs opacity-50 mt-1">
+              Annualized recurring revenue before fees
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-wide opacity-60">
+              Gross monthly
+            </p>
+            <p className="text-lg font-semibold tabular-nums">
+              ${grossMonthly.toFixed(2)}
+            </p>
+            <p className="text-xs opacity-50 mt-1">
+              Derived from active subscriptions
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Mobile action bar */}
       <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
         <button
@@ -265,15 +327,31 @@ export default function Subscriptions() {
 
               {/* Type */}
               <div>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs ${
-                    s.type === "Monthly Paid"
-                      ? "bg-green/20 text-green"
-                      : "bg-gray-500/20"
-                  }`}
-                >
-                  {s.type}
-                </span>
+                {s.paid ? (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs ${
+                      s.type === "monthly"
+                        ? "bg-green/20 text-green"
+                        : s.type === "annual"
+                          ? "bg-blue/20 text-blue"
+                          : s.type === "vip"
+                            ? "bg-purple/20 text-purple"
+                            : "bg-gray-500/20"
+                    }`}
+                  >
+                    {s.type === "monthly"
+                      ? "Monthly Paid"
+                      : s.type === "annual"
+                        ? "Annual Paid"
+                        : s.type === "vip"
+                          ? "VIP"
+                          : "Paid"}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-xs bg-gray-500/20 text-gray-400">
+                    Free
+                  </span>
+                )}
               </div>
 
               {/* Activity */}

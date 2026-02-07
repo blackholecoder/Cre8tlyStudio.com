@@ -31,6 +31,9 @@ export default function CommunityHome() {
   const [createOpen, setCreateOpen] = useState(false);
   const createMenuRef = useRef(null);
 
+  const [showFab, setShowFab] = useState(true);
+  const lastScrollY = useRef(0);
+
   const [topicsOpen, setTopicsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [copiedPostId, setCopiedPostId] = useState(null);
@@ -109,6 +112,30 @@ export default function CommunityHome() {
 
     return false;
   }
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentY = window.scrollY;
+
+      // scrolling down → hide
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setShowFab(false);
+      }
+
+      // scrolling up → show
+      if (currentY < lastScrollY.current) {
+        setShowFab(true);
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchRecap = async () => {
@@ -399,7 +426,7 @@ export default function CommunityHome() {
 
           <div
             ref={createMenuRef}
-            className="hidden sm:flex justify-center mb-8 relative"
+            className="hidden md:flex justify-center mb-8 relative"
           >
             <button
               type="button"
@@ -878,6 +905,10 @@ export default function CommunityHome() {
         </div>
       </div>
       <MobileCreateFAB
+        className={`
+    transition-all duration-200 ease-out
+    ${showFab ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}
+  `}
         open={createOpen}
         setOpen={setCreateOpen}
         containerRef={createMenuRef}

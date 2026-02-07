@@ -36,6 +36,7 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
   const [videoOpen, setVideoOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+  const [dropdownPos, setDropdownPos] = useState(null);
 
   const editor = useEditor({
     autofocus: false,
@@ -178,7 +179,8 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           px-3 py-2
           border-b border-dashboard-border-light dark:border-dashboard-border-dark
 
-          overflow-x-auto
+          overflow-x-auto  
+          overflow-y-visible
           whitespace-nowrap
 
           md:overflow-visible
@@ -186,8 +188,8 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           no-scrollbar
         "
         >
-          {/* NEW: text style dropdown */}
-          <div ref={formatRef} className="shrink-0 relative">
+          {/* NEW: text style dropdown DESKTOP ONLY */}
+          <div ref={formatRef} className="shrink-0 relative hidden md:block">
             {/* Trigger */}
             <button
               type="button"
@@ -244,6 +246,38 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
             )}
           </div>
 
+          {/* Mobile heading buttons */}
+          <div className="flex gap-1 shrink-0 md:hidden">
+            <button
+              onClick={setParagraph}
+              className="
+      px-3 py-2 text-sm rounded
+      border border-dashboard-border-light dark:border-dashboard-border-dark
+      bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+      text-dashboard-text-light dark:text-dashboard-text-dark
+      hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+    "
+            >
+              Body
+            </button>
+
+            {[1, 2, 3, 4, 5, 6].map((level) => (
+              <button
+                key={level}
+                onClick={() => setHeading(level)}
+                className="
+        px-3 py-2 text-sm rounded shrink-0
+        border border-dashboard-border-light dark:border-dashboard-border-dark
+        bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+        text-dashboard-text-light dark:text-dashboard-text-dark
+        hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+      "
+              >
+                H{level}
+              </button>
+            ))}
+          </div>
+
           {/* existing buttons */}
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -259,11 +293,11 @@ const CommunityPostEditor = forwardRef(({ value, onChange }, ref) => {
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={`
-    shrink-0
-    p-2 rounded
-    hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
-    ${editor.isActive("italic") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
-  `}
+            shrink-0
+            p-2 rounded
+            hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+            ${editor.isActive("italic") ? "bg-dashboard-hover-light dark:bg-dashboard-hover-dark" : ""}
+          `}
           >
             <Italic size={16} />
           </button>

@@ -46,6 +46,10 @@ export default function ProfileSettings() {
   const [monthlyPrice, setMonthlyPrice] = useState("");
   const [annualPrice, setAnnualPrice] = useState("");
 
+  const [vipPrice, setVipPrice] = useState("");
+  const [vipBenefits, setVipBenefits] = useState([]);
+  const [newVipBenefit, setNewVipBenefit] = useState("");
+
   const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
   const [monthlyBenefits, setMonthlyBenefits] = useState([]);
   const [annualBenefits, setAnnualBenefits] = useState([]);
@@ -92,6 +96,10 @@ export default function ProfileSettings() {
       );
       setMonthlyBenefits(p.monthly_benefits || []);
       setAnnualBenefits(p.annual_benefits || []);
+      setVipPrice(
+        typeof p.vip_price === "number" ? p.vip_price.toFixed(2) : "",
+      );
+      setVipBenefits(p.vip_benefits || []);
     } catch {
       toast.error("Failed to load profile");
     } finally {
@@ -141,6 +149,7 @@ export default function ProfileSettings() {
         media_links: mediaLinks,
         monthly_benefits: monthlyBenefits,
         annual_benefits: annualBenefits,
+        vip_benefits: vipBenefits,
       });
 
       await axiosInstance.post("/community/authors/me/subscription-pricing", {
@@ -153,6 +162,9 @@ export default function ProfileSettings() {
           subscriptionsEnabled && annualPrice
             ? Math.round(Number(annualPrice) * 100)
             : undefined,
+        vip_price_cents: vipPrice
+          ? Math.round(Number(vipPrice) * 100)
+          : undefined,
       });
 
       await axiosInstance.post(
@@ -358,22 +370,21 @@ export default function ProfileSettings() {
               </div>
             }
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-semibold">Paid subscriptions</h2>
-                <p className="text-xs opacity-60 mt-1">
-                  Let readers support you with a recurring subscription.
-                </p>
-              </div>
+            <div className="w-full mb-6 sm:flex sm:justify-end">
               {subscriptionsEnabled && authorId && (
                 <button
                   type="button"
                   onClick={() => setShowPreviewWarning(true)}
                   className="
+                  w-full
+                  sm:w-auto
                   text-xs
-                  px-3 py-2
+                  px-4
+                  py-3
+                  sm:py-2
                   rounded-lg
                   border
+                  text-center
                   hover:bg-dashboard-hover-light
                   dark:hover:bg-dashboard-hover-dark
                   transition
@@ -397,57 +408,139 @@ export default function ProfileSettings() {
               </label>
 
               {subscriptionsEnabled && (
-                <>
-                  <div>
-                    <label className="text-xs opacity-60">
-                      Monthly price (USD)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      step="0.01"
-                      value={monthlyPrice}
-                      onChange={(e) => setMonthlyPrice(e.target.value)}
-                      className={inputClass}
-                      placeholder="7.50"
+                <div
+                  className="
+                  rounded-xl
+                  p-4
+                  sm:p-5
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  border
+                  border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  space-y-5
+                "
+                >
+                  {/* Header */}
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-blue/20 text-mediaBlue">
+                      Standard
+                    </span>
+                    <span className="text-xs opacity-60">
+                      Monthly and annual subscriptions
+                    </span>
+                  </div>
+
+                  {/* Monthly */}
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs opacity-60">
+                        Monthly price (USD)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        step="0.01"
+                        value={monthlyPrice}
+                        onChange={(e) => setMonthlyPrice(e.target.value)}
+                        className={inputClass}
+                        placeholder="7.50"
+                      />
+                    </div>
+
+                    <BenefitEditor
+                      title="Monthly subscription benefits"
+                      benefits={monthlyBenefits}
+                      setBenefits={setMonthlyBenefits}
+                      newValue={newMonthlyBenefit}
+                      setNewValue={setNewMonthlyBenefit}
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs opacity-60">
-                      Annual price (USD)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      step="0.01"
-                      value={annualPrice}
-                      onChange={(e) => setAnnualPrice(e.target.value)}
-                      className={inputClass}
-                      placeholder="50"
+                  {/* Divider */}
+                  <div className="border-t border-dashboard-border-light dark:border-dashboard-border-dark" />
+
+                  {/* Annual */}
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs opacity-60">
+                        Annual price (USD)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        step="0.01"
+                        value={annualPrice}
+                        onChange={(e) => setAnnualPrice(e.target.value)}
+                        className={inputClass}
+                        placeholder="50.00"
+                      />
+                    </div>
+
+                    <BenefitEditor
+                      title="Annual subscription benefits"
+                      benefits={annualBenefits}
+                      setBenefits={setAnnualBenefits}
+                      newValue={newAnnualBenefit}
+                      setNewValue={setNewAnnualBenefit}
                     />
                   </div>
-                </>
+                </div>
               )}
 
               {subscriptionsEnabled && (
-                <>
-                  <BenefitEditor
-                    title="Monthly subscription benefits"
-                    benefits={monthlyBenefits}
-                    setBenefits={setMonthlyBenefits}
-                    newValue={newMonthlyBenefit}
-                    setNewValue={setNewMonthlyBenefit}
-                  />
+                <div
+                  className="
+      rounded-xl
+      p-4
+      sm:p-5
+      bg-dashboard-hover-light
+      dark:bg-dashboard-hover-dark
+      border
+      border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      space-y-4
+    "
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full text-xs bg-purple/20 text-purple">
+                        VIP Founder
+                      </span>
+                      <span className="text-xs opacity-60">
+                        Premium, limited tier
+                      </span>
+                    </div>
 
+                    <span className="text-xs opacity-50">Annual only</span>
+                  </div>
+
+                  {/* Price */}
+                  <div>
+                    <label className="text-xs opacity-60">
+                      Price (USD / year)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={vipPrice}
+                      onChange={(e) => setVipPrice(e.target.value)}
+                      className={inputClass}
+                      placeholder="240.00"
+                    />
+                  </div>
+
+                  {/* Benefits */}
                   <BenefitEditor
-                    title="Annual subscription benefits"
-                    benefits={annualBenefits}
-                    setBenefits={setAnnualBenefits}
-                    newValue={newAnnualBenefit}
-                    setNewValue={setNewAnnualBenefit}
+                    title="VIP Founder benefits"
+                    benefits={vipBenefits}
+                    setBenefits={setVipBenefits}
+                    newValue={newVipBenefit}
+                    setNewValue={setNewVipBenefit}
                   />
-                </>
+                </div>
               )}
             </div>
           </Section>
@@ -479,14 +572,14 @@ export default function ProfileSettings() {
               <Link to="/plans">
                 <button
                   className="
-          px-4 py-2
-          rounded-lg
-          text-sm font-medium
-          bg-blue
-          text-white
-          hover:opacity-90
-          whitespace-nowrap
-        "
+                  px-4 py-2
+                  rounded-lg
+                  text-sm font-medium
+                  bg-blue
+                  text-white
+                  hover:opacity-90
+                  whitespace-nowrap
+                "
                 >
                   View plans
                 </button>

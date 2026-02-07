@@ -50,6 +50,11 @@ export default function SubscribeChoicePage() {
   const hasMonthly = !!author?.monthly_price;
   const hasAnnual = !!author?.annual_price;
 
+  const hasVIP = typeof author?.vip_price === "number";
+
+  const vipPrice =
+    typeof author?.vip_price === "number" ? author.vip_price : null;
+
   const monthlyPrice =
     typeof author?.monthly_price === "number" ? author.monthly_price : null;
 
@@ -281,6 +286,52 @@ export default function SubscribeChoicePage() {
             "
             >
               Subscribe – ${author.annual_price.toFixed(2)}
+            </button>
+          </div>
+        )}
+        {hasVIP && (
+          <div className="rounded-xl border p-6 space-y-4 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              VIP Founder
+              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-brightPurple">
+                Limited
+              </span>
+            </h3>
+
+            <ul className="text-sm space-y-2 opacity-80">
+              {author.vip_benefits?.length > 0 ? (
+                author.vip_benefits.map((b, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check size={14} className="mt-[2px] shrink-0" />
+                    {b}
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} /> Founder level access
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} /> Direct support of the writer
+                  </li>
+                </>
+              )}
+            </ul>
+
+            <p className="text-xs opacity-70">Billed annually</p>
+
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => handlePaidSubscribe("vip")}
+              className="
+        w-full mt-4 py-3 rounded-lg
+        bg-brightPurple text-white
+        hover:opacity-90
+        transition
+      "
+            >
+              Subscribe – ${vipPrice.toFixed(2)}
             </button>
           </div>
         )}

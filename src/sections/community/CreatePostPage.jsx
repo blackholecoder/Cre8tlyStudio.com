@@ -365,7 +365,7 @@ export default function CreatePostPage({ post = null, topicId }) {
               >
                 <ImageIcon size={28} className="opacity-70" />
 
-                <span className="text-sm font-medium">Add image</span>
+                <span className="text-sm font-medium">Add Image</span>
 
                 <input
                   type="file"

@@ -6,9 +6,18 @@ export default function MobileCreateFAB({
   onCreatePost,
   onCreateFragment,
   containerRef,
+  className = "",
 }) {
   return (
-    <div ref={containerRef} className="sm:hidden fixed bottom-6 right-6 z-50">
+    <div
+      ref={containerRef}
+      className={`
+    md:hidden
+    fixed bottom-6 right-6 z-50
+    transition-all duration-200 ease-out
+    ${className}
+  `}
+    >
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

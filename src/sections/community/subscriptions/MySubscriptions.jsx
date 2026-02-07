@@ -13,6 +13,9 @@ export default function MySubscriptions() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [cancelTarget, setCancelTarget] = useState(null);
+
   function toggleMenu(id) {
     setOpenMenuId((prev) => (prev === id ? null : id));
   }
@@ -56,6 +59,8 @@ export default function MySubscriptions() {
     });
   }
 
+  // fix the change plan to actually allow users to upgrade their plans, its commented out now
+
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
       {/* Header */}
@@ -97,18 +102,18 @@ export default function MySubscriptions() {
       <div className="hidden md:block px-4 max-w-6xl mx-auto">
         <div
           className={`
-    grid ${GRID_COLS}
-    items-center
-    px-4 py-3
-    text-xs font-medium
-    text-white/50
-    bg-dashboard-hover-light
-    dark:bg-dashboard-hover-dark
-    rounded-t-xl
-    border
-    border-dashboard-border-light
-    dark:border-dashboard-border-dark
-  `}
+          grid ${GRID_COLS}
+          items-center
+          px-4 py-3
+          text-xs font-medium
+          text-white/50
+          bg-dashboard-hover-light
+          dark:bg-dashboard-hover-dark
+          rounded-t-xl
+          border
+          border-dashboard-border-light
+          dark:border-dashboard-border-dark
+        `}
         >
           <div>Author</div>
           <div>Plan</div>
@@ -123,19 +128,19 @@ export default function MySubscriptions() {
               <div
                 key={s.id}
                 className={`
-    grid ${GRID_COLS}
-    items-center
-    px-4 py-3
-    rounded-xl
-    bg-dashboard-sidebar-light
-    dark:bg-dashboard-sidebar-dark
-    border
-    border-dashboard-border-light
-    dark:border-dashboard-border-dark
-    hover:bg-dashboard-hover-light
-    dark:hover:bg-dashboard-hover-dark
-    transition
-  `}
+                grid ${GRID_COLS}
+                items-center
+                px-4 py-3
+                rounded-xl
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border
+                border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                hover:bg-dashboard-hover-light
+                dark:hover:bg-dashboard-hover-dark
+                transition
+              `}
               >
                 {/* Author (avatar + name ONLY ONCE) */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -197,7 +202,7 @@ export default function MySubscriptions() {
                     ? "—"
                     : s.cancel_at_period_end
                       ? `Ends ${formatDate(s.current_period_end)}`
-                      : `Renews ${formatDate(s.current_period_end)}`}
+                      : "Renews monthly"}
                 </div>
 
                 {/* Menu */}
@@ -241,7 +246,7 @@ export default function MySubscriptions() {
                       {/* PAID ONLY */}
                       {isPaid && (
                         <>
-                          <button
+                          {/* <button
                             onClick={() => {
                               setOpenMenuId(null);
                               navigate(`/subscriptions/${s.id}/change-plan`);
@@ -249,12 +254,13 @@ export default function MySubscriptions() {
                             className="w-full px-4 py-2 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                           >
                             Change plan
-                          </button>
+                          </button> */}
 
                           <button
                             onClick={() => {
                               setOpenMenuId(null);
-                              openCancelModal(s);
+                              setCancelTarget(s);
+                              setCancelModalOpen(true);
                             }}
                             className="w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-red-500/10"
                           >
@@ -312,16 +318,10 @@ export default function MySubscriptions() {
                   <p className="text-xs opacity-60">
                     {!s.paid_subscription
                       ? "Free"
-                      : `${
-                          s.type === "monthly"
-                            ? "Monthly"
-                            : s.type === "annual"
-                              ? "Annual"
-                              : "VIP"
-                        } · ${
+                      : `${s.type === "monthly" ? "Monthly" : s.type === "annual" ? "Annual" : "VIP"} · ${
                           s.cancel_at_period_end
                             ? `Ends ${formatDate(s.current_period_end)}`
-                            : `Renews ${formatDate(s.current_period_end)}`
+                            : "Renews monthly"
                         }`}
                   </p>
                 </div>
@@ -352,7 +352,7 @@ export default function MySubscriptions() {
                     {/* PAID ONLY */}
                     {isPaid && (
                       <>
-                        <button
+                        {/* <button
                           onClick={() => {
                             setOpenMenuId(null);
                             navigate(`/subscriptions/${s.id}/change-plan`);
@@ -360,14 +360,15 @@ export default function MySubscriptions() {
                           className="w-full px-4 py-3 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                         >
                           Change plan
-                        </button>
+                        </button> */}
 
                         <button
                           onClick={() => {
                             setOpenMenuId(null);
-                            openCancelModal(s);
+                            setCancelTarget(s);
+                            setCancelModalOpen(true);
                           }}
-                          className="w-full px-4 py-3 text-sm text-left text-red-500 hover:bg-red-500/10"
+                          className="w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-red-500/10"
                         >
                           Cancel subscription
                         </button>
@@ -383,6 +384,38 @@ export default function MySubscriptions() {
 
       {loading && (
         <p className="text-sm opacity-60 px-4 py-6">Loading subscriptions…</p>
+      )}
+
+      {cancelModalOpen && cancelTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-xl bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark p-6">
+            <h2 className="text-lg font-semibold">Cancel subscription?</h2>
+
+            <p className="mt-2 text-sm opacity-70">
+              You’ll keep access until the end of the current billing period.
+            </p>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setCancelModalOpen(false)}
+                className="flex-1 py-2 rounded-lg border"
+              >
+                Keep subscription
+              </button>
+
+              <button
+                onClick={() => {
+                  openCancelModal(cancelTarget);
+                  setCancelModalOpen(false);
+                  setCancelTarget(null);
+                }}
+                className="flex-1 py-2 rounded-lg bg-red-600 text-white"
+              >
+                Cancel anyway
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

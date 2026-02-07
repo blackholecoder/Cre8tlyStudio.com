@@ -19,6 +19,7 @@ import {
   CircleQuestionMark,
   Bookmark,
   Feather,
+  Star,
 } from "lucide-react";
 
 export const SIDEBAR_SECTIONS = [
@@ -78,6 +79,14 @@ export const SIDEBAR_SECTIONS = [
         label: "Subscriptions",
         path: "/community/subscriptions",
         icon: Mail,
+        allowCommunity: true,
+        isSubItem: true,
+      },
+      {
+        key: "my subscriptions",
+        label: "My Subscriptions",
+        path: "/community/my-subscriptions",
+        icon: Star,
         allowCommunity: true,
         isSubItem: true,
       },

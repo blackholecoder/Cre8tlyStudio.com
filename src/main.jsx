@@ -82,6 +82,7 @@ import FragmentFeed from "./sections/community/fragments/FragmentFeed.jsx";
 import CreateFragment from "./sections/community/CreateFragmentPage.jsx";
 import MyFragments from "./sections/community/fragments/MyFragments.jsx";
 import SubscribeChoicePage from "./sections/community/subscriptions/SubscribeChoicePage.jsx";
+import MySubscriptions from "./sections/community/subscriptions/MySubscriptions.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -266,6 +267,24 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <Subscriptions />
+                </DashboardLayout>
+              </motion.div>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/my-subscriptions"
+          element={
+            <PrivateRoute role={["customer", "admin", "marketer"]}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-h-screen bg-[#030712]"
+              >
+                <DashboardLayout>
+                  <MySubscriptions />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>

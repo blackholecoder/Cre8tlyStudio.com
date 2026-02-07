@@ -44,9 +44,6 @@ export default function Subscriptions() {
 
       const res = await axiosInstance.get("/community/subscriptions/me");
 
-      console.log("RAW API RESPONSE:", res.data);
-      console.log("RAW SUBSCRIBERS:", res.data.subscribers);
-
       setSubscribers(res.data.subscribers || []);
       setCount(res.data.count || 0);
     } catch (err) {

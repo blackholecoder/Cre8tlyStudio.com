@@ -1,4 +1,4 @@
-export default function EmptyState({ onCheckout, type = "magnet" }) {
+export default function EmptyState({ type = "magnet" }) {
   const isBook = type === "book";
 
   return (

@@ -7,46 +7,11 @@ export default function DocsIndexPage() {
 
   const docs = [
     {
-      id: "lead-magnets",
-      title: "How to Create a Lead Magnet",
-      description:
-        "Learn how to generate, design, and publish a complete lead magnet using Cre8tly Studio Lead Magnet.",
-      path: "/docs/lead-magnets",
-    },
-    {
-      id: "pro-documents",
-      title: "How to Create Pro Documents",
-      description:
-        "Build professional ebooks, long-form guides, and publication-ready documents using Cre8tly Studio Pro Document.",
-      path: "/docs/pro-documents",
-    },
-    {
-      id: "smartprompt",
-      title: "Smart Prompt Builder",
-      description:
-        "Use the Smart Prompt Builder to instantly generate high-quality prompts by answering four simple questions.",
-      path: "/docs/smartprompt",
-    },
-    {
-      id: "canvas-editor",
-      title: "Canvas Editor",
-      description:
-        "Design pages visually: add shapes, text, images, gradients, shadows, and full layouts using the drag-and-drop editor.",
-      path: "/docs/canvas-editor",
-    },
-    {
       id: "settings-page",
       title: "Settings Page",
       description:
         "Manage your profile, avatar, Two-Factor Authentication, Passkeys, Stripe payouts, brand identity file, and your default CTA message.",
       path: "/docs/settings",
-    },
-    {
-      id: "prompt-memory",
-      title: "Prompt Memory",
-      description:
-        "Save prompts, reuse them, organize them, and accelerate your workflow.",
-      path: "",
     },
     {
       id: "landing-builder",
@@ -73,7 +38,7 @@ export default function DocsIndexPage() {
       id: "custom-domains",
       title: "Custom Domains",
       description:
-        "Connect your own domain to Cre8tly, verify ownership, and host landing pages under your brand.",
+        "Connect your own domain to The Messy Attic, verify ownership, and host landing pages under your brand.",
       path: "/docs/custom-domain",
     },
     {
@@ -88,7 +53,7 @@ export default function DocsIndexPage() {
   const filteredDocs = docs.filter(
     (d) =>
       d.title.toLowerCase().includes(query.toLowerCase()) ||
-      d.description.toLowerCase().includes(query.toLowerCase())
+      d.description.toLowerCase().includes(query.toLowerCase()),
   );
 
   return (

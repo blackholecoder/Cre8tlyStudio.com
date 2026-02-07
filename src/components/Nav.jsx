@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { navLinks } from "../constants";
 import { headerLogo } from "../assets/images";
@@ -16,9 +16,6 @@ import {
   Workflow,
   CreditCard,
   BarChart3,
-  Database,
-  Download,
-  MailCheck,
 } from "lucide-react";
 
 const Nav = () => {
@@ -243,9 +240,9 @@ const Nav = () => {
               <div
                 ref={productsMenuRef}
                 className={`fixed left-0 top-[72px] w-full pt-2
-    bg-white border border-gray-200 shadow-2xl z-50
-    transition-all duration-150 ease-out
-    ${productsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+                bg-white border border-gray-200 shadow-2xl z-50
+                transition-all duration-150 ease-out
+                ${productsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}
               >
                 <div className="max-w-7xl mx-auto grid grid-cols-4 gap-10 p-12">
                   {/* BUILD & LAUNCH */}
@@ -262,13 +259,6 @@ const Nav = () => {
                     />
 
                     <MegaItem
-                      icon={BookOpen}
-                      title="Digital Products"
-                      desc="Sell Books, audio, and downloads"
-                      onClick={() => navigateWithReferral("/smart-prompt")}
-                    />
-
-                    <MegaItem
                       icon={Users}
                       title="Communities"
                       desc="Where writers come to grow"
@@ -281,21 +271,6 @@ const Nav = () => {
                     <h4 className="text-lg font-bold uppercase tracking-wide text-gray-900 mb-6 border-b pb-3">
                       Scale
                     </h4>
-
-                    <MegaItem
-                      icon={Sparkles}
-                      title="Smart Prompts"
-                      desc="AI powered content creation"
-                      onClick={() => navigateWithReferral("/smart-prompt")}
-                    />
-
-                    {/* <MegaItem
-                      icon={Mail}
-                      title="Email Marketing"
-                      desc="Automated campaigns"
-                      disabled
-                      onClick={() => navigateWithReferral("/leads")}
-                    /> */}
 
                     <MegaItem
                       icon={Workflow}
@@ -324,33 +299,10 @@ const Nav = () => {
                       desc="Performance and insights"
                       onClick={() => navigateWithReferral("/analytics")}
                     />
-
-                    {/* <MegaItem
-                      icon={Database}
-                      title="CRM"
-                      desc="Own your audience"
-                      disabled
-                      onClick={() => navigateWithReferral("/leads")}
-                    /> */}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* OTHER NAV ITEMS */}
-            <button
-              onClick={() => navigateWithReferral("/resources")}
-              className="hover:text-black text-[16.5px] md:text-[16.5px] lg:text-[16.5px]"
-            >
-              Resources
-            </button>
-
-            {/* <button
-              onClick={() => navigateWithReferral("/plans")}
-              className="hover:text-black text-[16.5px] md:text-[16.5px] lg:text-[16.5px]"
-            >
-              Pricing
-            </button> */}
           </div>
 
           <div className="hidden md:flex items-center justify-end relative">
@@ -536,16 +488,6 @@ const Nav = () => {
                   </h3>
 
                   <MenuItem
-                    icon={Sparkles}
-                    title="Smart Prompt"
-                    desc="Turn ideas into published books"
-                    onClick={() => {
-                      navigateWithReferral("/smart-prompt");
-                      setIsOpen(false);
-                    }}
-                  />
-
-                  <MenuItem
                     icon={LayoutTemplate}
                     title="Landing Pages"
                     desc="Create landing pages that sell your books"
@@ -555,7 +497,7 @@ const Nav = () => {
                     }}
                   />
 
-                  <MenuItem
+                  {/* <MenuItem
                     icon={Download}
                     title="Digital Products"
                     desc="Sell Books, audio, and downloads"
@@ -563,7 +505,7 @@ const Nav = () => {
                       navigateWithReferral("/landing");
                       setIsOpen(false);
                     }}
-                  />
+                  /> */}
                 </div>
 
                 {/* SCALE */}

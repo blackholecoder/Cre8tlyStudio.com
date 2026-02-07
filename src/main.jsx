@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthProviderWithRouter from "./admin/AuthProviderWithRouter.jsx";
-import { MagnetProvider } from "./admin/MagnetContext.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import NotFound from "./components/NotFound.jsx";
 import ThankYou from "./sections/ThankYou.jsx";
@@ -15,10 +14,8 @@ import Terms from "./documents/Terms.jsx";
 import Privacy from "./documents/Privacy.jsx";
 import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
-import PromptPage from "./sections/PromptPage.jsx";
 import SignupPage from "./sections/SignUp.jsx";
 import { Landing, Login } from "./sections/index.js";
-import CustomerDashboard from "./sections/CustomerDashboard.jsx";
 import AdminDashboard from "./sections/AdminDashboard.jsx";
 import Contact from "./sections/Contact.jsx";
 import PlansPage from "./sections/PlansPage.jsx";
@@ -28,16 +25,13 @@ import "react-quill/dist/quill.snow.css";
 import "./index.css";
 import ForgotPassword from "./admin/ForgotPassword.jsx";
 import ResetPassword from "./admin/ResetPassword.jsx";
-import EbooksStore from "./sections/EbookStore.jsx";
 import BooksDashboard from "./sections/BooksDashboard.jsx";
 import { BookProvider } from "./admin/BookContext.jsx";
 import SettingsPage from "./sections/SettingsPage.jsx";
 import DashboardLayout from "./components/layouts/DashboardLayout.jsx";
-import PromptMemoryDashboard from "./components/prompt/PromptMemoryDashboard.jsx";
 import Inbox from "./sections/Inbox.jsx";
 import useMaintenance from "./settings/UseMaintenance.jsx";
 import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
-import CanvasEditor from "./components/canvas/CanvasEditor.jsx";
 import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
 import Leads from "./sections/Leads.jsx";
 import LandingAnalytics from "./sections/analytics/Analytics.jsx";
@@ -46,19 +40,11 @@ import CommunityPost from "./sections/community/CommunityPost.jsx";
 import CommunityTopic from "./sections/community/CommunityTopic.jsx";
 import CommunityHome from "./sections/community/CommunityHome.jsx";
 import Notifications from "./sections/community/notifications/Notifications.jsx";
-import Careers from "./documents/Careers.jsx";
 import DocsIndexPage from "./sections/docs/DocsIndexPage.jsx";
-import LeadMagnet from "./sections/docs/LeadMagnet.jsx";
-import ProDocuments from "./sections/docs/ProDocument.jsx";
-import SmartPromptDocs from "./sections/docs/SmartPrompt.jsx";
-import CanvasEditorDocs from "./sections/docs/CanvasEditorDocs.jsx";
 import SettingsDocs from "./sections/docs/SettingsPageDocs.jsx";
 import LandingBuilderDocs from "./sections/docs/LandingPageBuilderDocs.jsx";
 import SellerDashboardDocs from "./sections/docs/SellerDashboardDocs.jsx";
 import LandingAnalyticsDocs from "./sections/docs/AnalyticsDocs.jsx";
-import Resources from "./sections/landing/Resources.jsx";
-import ResourcesVideos from "./sections/landing/ResourcesVideos.jsx";
-import SmartPromptPage from "./sections/landing/SmartPromptPage.jsx";
 import SiteLayout from "./components/layouts/SiteLayout.jsx";
 import LandingInfoPage from "./sections/landing/LandingInfoPage.jsx";
 import AnalyticsFeaturePage from "./sections/AnalyticsFeaturePage.jsx";
@@ -78,7 +64,6 @@ import EmailTemplates from "./sections/community/templates/EmailTemplates.jsx";
 import CreatePostPage from "./sections/community/CreatePostPage.jsx";
 import CommunitySubscribers from "./sections/community/subscriptions/CommunitySubscribers.jsx";
 import Saved from "./sections/community/posts/Saved.jsx";
-import FragmentFeed from "./sections/community/fragments/FragmentFeed.jsx";
 import CreateFragment from "./sections/community/CreateFragmentPage.jsx";
 import MyFragments from "./sections/community/fragments/MyFragments.jsx";
 import SubscribeChoicePage from "./sections/community/subscriptions/SubscribeChoicePage.jsx";
@@ -109,22 +94,14 @@ const AnimatedRoutes = () => {
           />
 
           <Route path="contact" element={<Contact />} />
-          <Route path="shop" element={<EbooksStore />} />
-
           <Route path="terms" element={<Terms />} />
           <Route path="privacy-policy" element={<Privacy />} />
           <Route path="refund-policy" element={<Refund />} />
           <Route path="cookie-policy" element={<Cookie />} />
-          <Route path="careers" element={<Careers />} />
-
-          <Route path="smart-prompt" element={<SmartPromptPage />} />
           <Route path="landing" element={<LandingInfoPage />} />
           <Route path="plans" element={<PlansPage />} />
           <Route path="/signup-community" element={<SignupCommunity />} />
 
-          <Route path="resources" element={<Resources />}>
-            <Route path="videos" element={<ResourcesVideos />} />
-          </Route>
           <Route path="analytics" element={<AnalyticsFeaturePage />} />
           <Route path="community-feature" element={<CommunityFeaturePage />} />
           <Route path="stripe-payments" element={<StripePayments />} />
@@ -141,7 +118,6 @@ const AnimatedRoutes = () => {
 
         {/* Redirect old /home to / */}
 
-        <Route path="/canvas-editor" element={<CanvasEditor />} />
         <Route
           path="/settings"
           element={
@@ -180,7 +156,6 @@ const AnimatedRoutes = () => {
         />
         <Route path="books" element={<BooksDashboard />} />
         <Route path="thank-you" element={<ThankYou />} />
-        <Route path="prompt" element={<PromptPage />} />
         <Route
           path="/community"
           element={
@@ -530,23 +505,6 @@ const AnimatedRoutes = () => {
         />
 
         <Route
-          path="/prompts"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <DashboardLayout>
-                  <PromptMemoryDashboard />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/notifications"
           element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
@@ -622,22 +580,6 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <CustomerDashboard />
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/docs"
           element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
@@ -650,78 +592,6 @@ const AnimatedRoutes = () => {
               >
                 <DashboardLayout>
                   <DocsIndexPage />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/lead-magnets"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <LeadMagnet />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/pro-documents"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <ProDocuments />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/smartprompt"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <SmartPromptDocs />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/docs/canvas-editor"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <CanvasEditorDocs />
                 </DashboardLayout>
               </motion.div>
             </PrivateRoute>
@@ -875,19 +745,17 @@ const RootApp = () => {
     <Router>
       <AuthProviderWithRouter>
         <BookProvider>
-          <MagnetProvider>
-            <ToastContainer
-              position="bottom-right"
-              autoClose={2000}
-              hideProgressBar={false}
-              newestOnTop={true}
-              closeOnClick
-              pauseOnHover
-              draggable
-              theme="colored"
-            />
-            <AnimatedRoutes />
-          </MagnetProvider>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="colored"
+          />
+          <AnimatedRoutes />
         </BookProvider>
       </AuthProviderWithRouter>
     </Router>

@@ -1,8 +1,6 @@
 import {
   BookOpen,
   Settings,
-  SquareTerminal,
-  Package,
   Inbox,
   BarChart2,
   MessagesSquare,
@@ -125,21 +123,6 @@ export const SIDEBAR_SECTIONS = [
         path: "/books",
         icon: BookOpen,
         access: "books",
-      },
-      {
-        key: "dashboard",
-        label: "Digital Products",
-        path: "/dashboard",
-        icon: Package,
-        access: "all",
-      },
-
-      {
-        key: "prompts",
-        label: "Prompt Memory",
-        path: "/prompts",
-        icon: SquareTerminal,
-        access: "pro",
       },
     ],
   },

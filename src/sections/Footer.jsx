@@ -49,9 +49,6 @@ const Footer = () => {
               Refunds
             </Link>
             <span>|</span>
-            <Link to="/careers" className="hover:text-black transition-colors">
-              Careers
-            </Link>
           </div>
         </div>
       </div>

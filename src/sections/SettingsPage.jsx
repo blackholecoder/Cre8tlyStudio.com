@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../admin/AuthContext";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
@@ -17,7 +17,6 @@ export default function DashboardSettings() {
   const [settings, setSettings] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [ctaSaved, setCtaSaved] = useState(false);
 
   const [twofaEnabled, setTwofaEnabled] = useState(user?.twofa_enabled === 1);
   const [qr, setQr] = useState(null);
@@ -30,19 +29,6 @@ export default function DashboardSettings() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-
-  const hasBrandFile = Boolean(settings?.brand_identity_file);
-
-  const fileInputRef = useRef(null);
-
-  const isCommunityOnly =
-    user?.is_member === 1 && !user?.plan && !user?.free_trial_expires_at;
-
-  function handleLockedClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowUpgradeModal(true);
-  }
 
   function bufferToBase64URL(buffer) {
     let bytes;
@@ -250,107 +236,6 @@ export default function DashboardSettings() {
     fetchSettings();
   }, [user?.id]);
 
-  const handleUpload = async () => {
-    if (!file) {
-      toast.warning("Please select a file first.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Data = reader.result.split(",")[1];
-      setUploading(true);
-
-      try {
-        const res = await axiosInstance.post(
-          "/upload-data/user/settings/upload",
-          {
-            user_id: user.id,
-            file_name: file.name,
-            file_data: base64Data,
-          },
-        );
-
-        setSettings((prev) => ({
-          ...prev,
-          brand_identity_file: res.data.fileUrl,
-        }));
-        setUser((prev) => ({
-          ...prev,
-          brand_identity_file: res.data.fileUrl,
-        }));
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            ...user,
-            brand_identity_file: res.data.fileUrl,
-          }),
-        );
-
-        toast.success("Brand file uploaded successfully!");
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      } catch (err) {
-        console.error(err);
-        toast.error("Upload failed. Please try again.");
-      } finally {
-        setUploading(false);
-      }
-    };
-
-    reader.readAsDataURL(file);
-  };
-
-  const handleRemove = async () => {
-    try {
-      const res = await axiosInstance.delete(
-        `/upload-data/user/settings/remove/${user.id}`,
-      );
-
-      if (res.data.success) {
-        // 🔥 Clear everything in sync: state, user, localStorage, and selected file
-        setSettings((prev) => ({ ...prev, brand_identity_file: null }));
-        setUser((prev) => ({ ...prev, brand_identity_file: null }));
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...user, brand_identity_file: null }),
-        );
-
-        toast.info("Brand identity file removed. Defaults restored.");
-      } else {
-        toast.warning("Failed to remove brand file. Try again.");
-      }
-    } catch (err) {
-      console.error("Error removing brand file:", err);
-      toast.error("Error removing file.");
-    }
-  };
-
-  const handleSaveCTA = async () => {
-    try {
-      await axiosInstance.put("/upload-data/user/settings/update-cta", {
-        userId: user.id,
-        cta: settings?.cta || "",
-      });
-
-      setUser((prev) => ({ ...prev, cta: settings?.cta }));
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...user, cta: settings?.cta }),
-      );
-
-      setCtaSaved(true);
-      toast.success("CTA saved successfully!");
-      setTimeout(() => setCtaSaved(false), 3000);
-    } catch (err) {
-      console.error("Failed to update CTA:", err);
-      toast.error("Failed to update CTA. Please try again.");
-    }
-  };
-
   const handleUploadAvatar = async () => {
     if (!file) return toast.warning("Crop and select an image first");
 
@@ -466,8 +351,6 @@ export default function DashboardSettings() {
 
   const canUseCustomDomains =
     user?.pro_status === "active" && user?.plan === "business_builder_pack";
-
-  const isFreeTier = user?.has_free_magnet === 1 && !user?.plan;
 
   return (
     <div
@@ -1229,187 +1112,6 @@ export default function DashboardSettings() {
           )}
         </div>
 
-        {/* Active File */}
-        <div
-          className="bg-dashboard-sidebar-light
-        dark:bg-dashboard-sidebar-dark
-        border border-dashboard-border-light
-        dark:border-dashboard-border-dark rounded-xl p-6 space-y-3 shadow-lg mb-8 mt-8"
-        >
-          {settings?.brand_identity_file ? (
-            <>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-dashboard-text-light dark:text-dashboard-text-dark">
-                  <span className="text-green-400 font-semibold">
-                    Active Brand File
-                  </span>
-                </p>
-                <button
-                  aria-label="Remove brand identity file"
-                  onClick={handleRemove}
-                  className="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold shadow-sm transition"
-                >
-                  Remove
-                </button>
-              </div>
-              <p
-                className="text-xs text-dashboard-muted-light
-              dark:text-dashboard-muted-dark
-              italic"
-              >
-                Uploaded on: {new Date().toLocaleDateString()}
-              </p>
-            </>
-          ) : (
-            <p
-              className="text-dashboard-muted-light
-              dark:text-dashboard-muted-dark
-              text-sm text-center"
-            >
-              No brand identity uploaded yet.
-            </p>
-          )}
-        </div>
-
-        {/* Upload Section */}
-
-        <div
-          className="bg-dashboard-sidebar-light
-          dark:bg-dashboard-sidebar-dark
-          border border-dashboard-border-light
-          dark:border-dashboard-border-dark rounded-xl p-6 space-y-4 shadow-lg"
-        >
-          <h2
-            className="text-lg font-semibold text-dashboard-text-light
-            dark:text-dashboard-text-dark
-"
-          >
-            Upload New Brand File
-          </h2>
-
-          {isFreeTier ? (
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-              <p
-                className="text-dashboard-muted-light
-                dark:text-dashboard-muted-dark
-                text-sm mb-4 max-w-[400px]"
-              >
-                🧩 Uploading a custom brand identity file is a{" "}
-                <span className="text-green font-semibold">paid feature</span>.
-                Upgrade to personalize your tone, voice, and branding for all
-                generated products.
-              </p>
-              <button
-                onClick={() => (window.location.href = "/plans")}
-                className="px-6 py-3 rounded-lg bg-royalPurple text-dashboard-text-light
-                dark:text-dashboard-text-dark
-                font-semibold shadow-md hover:opacity-90 transition"
-              >
-                Upgrade Now
-              </button>
-            </div>
-          ) : (
-            <>
-              <p
-                className="text-sm text-dashboard-muted-light
-    dark:text-dashboard-muted-dark"
-              >
-                Accepted formats:{" "}
-                <span className="text-gray-700 dark:text-dashboard-text-dark">
-                  .pdf, .docx, .doc, .txt
-                </span>{" "}
-                (max 5 MB)
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
-                <div className="flex-1 w-full">
-                  {/* 🔒 Hidden native file input */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.docx,.doc,.txt"
-                    onClick={(e) => {
-                      if (isCommunityOnly) {
-                        e.preventDefault();
-                        setShowUpgradeModal(true);
-                      }
-                    }}
-                    onChange={(e) => {
-                      if (isCommunityOnly) return;
-                      setFile(e.target.files[0]);
-                    }}
-                    className="hidden"
-                  />
-
-                  {/* ✅ Custom Choose File button */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={hasBrandFile}
-                    className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition
-                    ${
-                      hasBrandFile
-                        ? `
-                          bg-gray-200 text-gray-400 cursor-not-allowed
-                          dark:bg-dashboard-hover-dark dark:text-dashboard-muted-dark
-                        `
-                        : `
-                          bg-gray-200 text-gray-900 hover:opacity-90
-                          dark:bg-dashboard-hover-dark dark:text-dashboard-text-dark
-                        `
-                    }
-                  `}
-                  >
-                    Choose File
-                  </button>
-
-                  {/* Filename display */}
-                  <p
-                    className="mt-2 text-xs italic
-                    text-dashboard-muted-light
-                    dark:text-dashboard-muted-dark"
-                  >
-                    {hasBrandFile ? (
-                      "A brand file is already uploaded. Remove it to upload a new one."
-                    ) : file ? (
-                      <>
-                        Selected:{" "}
-                        <span className="font-medium text-gray-700 dark:text-dashboard-text-dark">
-                          {file.name}
-                        </span>
-                      </>
-                    ) : (
-                      "No file selected"
-                    )}
-                  </p>
-                </div>
-
-                {/* Save button stays the same */}
-                <button
-                  onClick={handleUpload}
-                  disabled={!file || uploading || hasBrandFile}
-                  className={`relative w-full sm:w-auto px-6 py-2.5 rounded-lg font-semibold transition-all
-                  ${
-                    !file || uploading || hasBrandFile
-                      ? "opacity-60 cursor-not-allowed bg-green/60"
-                      : "bg-green hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-                  }
-                  text-black
-                `}
-                >
-                  {!file
-                    ? "Select a File"
-                    : hasBrandFile
-                      ? "Brand Already Saved"
-                      : uploading
-                        ? "Uploading..."
-                        : "Save Brand"}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-
         {/* CTA Settings */}
         <div
           className="
@@ -1420,85 +1122,6 @@ export default function DashboardSettings() {
           rounded-xl p-6 space-y-4 shadow-lg mt-8
   "
         >
-          {/* CTA Settings */}
-          <div
-            className="
-            bg-dashboard-hover-light
-            dark:bg-dashboard-hover-dark
-            border border-dashboard-border-light
-            dark:border-dashboard-border-dark
-            rounded-xl p-6 shadow-inner
-    "
-          >
-            <h2
-              className="text-lg font-semibold text-dashboard-text-light
-              dark:text-dashboard-text-dark
-"
-            >
-              Default Closing Message / CTA
-            </h2>
-            <p
-              className="text-sm text-dashboard-muted-light
-              dark:text-dashboard-muted-dark mb-4"
-            >
-              This message will appear at the end of your lead magnets or books.
-              You can change it anytime.
-            </p>
-
-            {/* Inner card for textarea + button */}
-            <div className="rounded-lg p-5 space-y-4">
-              <textarea
-                placeholder={`Example:\nJoin my free newsletter at https://yourwebsite.com.`}
-                value={settings?.cta || ""}
-                onClick={(e) => {
-                  if (isCommunityOnly) {
-                    e.preventDefault();
-                    setShowUpgradeModal(true);
-                  }
-                }}
-                onChange={(e) => {
-                  if (isCommunityOnly) return;
-                  setSettings((prev) => ({ ...prev, cta: e.target.value }));
-                }}
-                rows={6}
-                className={`w-full px-4 py-3 rounded-lg
-                bg-dashboard-bg-light
-                dark:bg-dashboard-bg-dark
-                border border-dashboard-border-light
-                dark:border-dashboard-border-dark
-                text-dashboard-text-light
-                dark:text-dashboard-text-dark
-                placeholder-dashboard-muted-light
-                dark:placeholder-dashboard-muted-dark
-                focus:ring-2 focus:ring-green focus:outline-none
-                ${isCommunityOnly ? "opacity-60 cursor-not-allowed" : ""}
-              `}
-              />
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isCommunityOnly) {
-                      setShowUpgradeModal(true);
-                      return;
-                    }
-                    handleSaveCTA();
-                  }}
-                  className={`px-6 py-2 rounded-lg font-semibold transition
-                    ${
-                      isCommunityOnly
-                        ? "opacity-60 cursor-not-allowed bg-green/60"
-                        : "bg-green hover:opacity-90"
-                    }
-                  `}
-                >
-                  {isCommunityOnly ? "Upgrade Required" : "Save CTA"}
-                </button>
-              </div>
-            </div>
-          </div>
-
           {user?.has_book ? (
             <>
               <div

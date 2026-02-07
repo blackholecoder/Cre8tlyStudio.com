@@ -10,10 +10,6 @@ export default function OutOfSlotsModal({
       title: "Book Limit Reached",
       message: `You can only have 3 active books at one time. Finish or archive an existing book\n to create a new one.`,
     },
-    leadMagnets: {
-      title: "Monthly Limit Reached",
-      message: `You’ve used all 15 lead magnet slots for this month. Your slots will automatically reset at the start of your next billing cycle.`,
-    },
   };
 
   const { title, message } = COPY[context];

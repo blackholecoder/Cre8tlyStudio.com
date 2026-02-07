@@ -18,7 +18,7 @@ export default function SingleOfferBlock({
 
   const availablePdfs = useMemo(
     () => pdfList?.filter((p) => p.status === "completed" && p.pdf_url) || [],
-    [pdfList]
+    [pdfList],
   );
 
   const updateField = (key, value) => {
@@ -41,7 +41,7 @@ export default function SingleOfferBlock({
       const res = await axiosInstance.post(
         "/landing/upload-media-block",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (res.data.url) {
@@ -276,7 +276,7 @@ export default function SingleOfferBlock({
                   <div className="w-full h-56 flex flex-col items-center justify-center rounded-lg bg-black/40 border border-gray-700">
                     <div className="w-10 h-10 border-4 border-gray-500 border-t-green rounded-full animate-spin" />
                     <p className="text-xs text-gray-400 mt-3">
-                      Loading PDF cover…
+                      Loading Book cover…
                     </p>
                   </div>
                 ) : imageToShow ? (
@@ -316,9 +316,9 @@ export default function SingleOfferBlock({
                 )}
               </div>
 
-              {/* PDF SELECT */}
+              {/* Book SELECT */}
               <label className="text-sm font-semibold text-gray-300 mt-3 block">
-                Select PDF
+                Choose Book
               </label>
               <select
                 value={block.pdf_url || ""}
@@ -339,16 +339,16 @@ export default function SingleOfferBlock({
                   }
 
                   const selectedPdf = availablePdfs.find(
-                    (p) => p.pdf_url === selectedUrl
+                    (p) => p.pdf_url === selectedUrl,
                   );
 
                   if (selectedPdf) {
-                    updateField("pdf_name", selectedPdf.title || "PDF");
+                    updateField("pdf_name", selectedPdf.title || "Book");
                   }
 
                   try {
                     const res = await axiosInstance.get(
-                      `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`
+                      `/landing/lead-magnets/cover?pdfUrl=${encodeURIComponent(selectedUrl)}`,
                     );
 
                     if (res.data?.cover_image) {
@@ -359,34 +359,34 @@ export default function SingleOfferBlock({
                       updateField("use_pdf_cover", true);
                     }
                   } catch (err) {
-                    console.error("❌ Error loading PDF cover:", err);
+                    console.error("❌ Error loading Book cover:", err);
                   } finally {
                     setCoverLoading(false);
                   }
                 }}
                 className="w-full p-2 bg-black text-white border border-gray-600 rounded mt-1"
               >
-                <option value="">-- Select PDF --</option>
+                <option value="">-- Choose Book --</option>
                 {availablePdfs.map((p) => (
                   <option key={p.id} value={p.pdf_url}>
-                    {p.title || "PDF"}
+                    {p.title || "Book"}
                   </option>
                 ))}
               </select>
 
               {block.pdf_url && (
                 <p className="text-xs text-gray-400 mt-1">
-                  Selected PDF:{" "}
+                  Selected Book:{" "}
                   <span className="text-white font-semibold">
-                    {block.pdf_name || "PDF"}
+                    {block.pdf_name || "Book"}
                   </span>
                 </p>
               )}
 
-              {/* USE PDF COVER */}
+              {/* USE Book COVER */}
               <div className="flex items-center gap-3 mt-2">
                 <label className="text-sm font-semibold text-gray-300">
-                  Use PDF Cover Image
+                  Use Book Cover Image
                 </label>
                 <input
                   type="checkbox"
@@ -406,7 +406,7 @@ export default function SingleOfferBlock({
                 />
               </div>
 
-              {/* PREVIEW PDF */}
+              {/* PREVIEW Book */}
               {block.pdf_url && (
                 <p className="text-xs text-gray-400 mt-1">
                   <a
@@ -415,7 +415,7 @@ export default function SingleOfferBlock({
                     className="text-green underline"
                     rel="noopener noreferrer"
                   >
-                    Preview PDF
+                    Preview Book
                   </a>
                 </p>
               )}

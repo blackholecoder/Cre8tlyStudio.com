@@ -13,7 +13,7 @@ export default function DownloadLockWarningModal({
         </h2>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-6">
-          Downloading this PDF will permanently lock editing for this document.
+          Downloading this book will permanently lock editing for this document.
           <br />
           <br />
           You will still be able to view and download it again, but you won’t be

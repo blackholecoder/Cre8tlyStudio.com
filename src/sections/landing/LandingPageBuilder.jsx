@@ -23,7 +23,6 @@ import LogoUploader from "../../components/landing/landingPageBuilder/LogoUpload
 import ThemeAndFontControls from "../../components/landing/landingPageBuilder/ThemeAndFontControls";
 import TextColorControls from "../../components/landing/landingPageBuilder/TextColorControls";
 import PreviewPanel from "../../components/landing/landingPageBuilder/PreviewPanel";
-import ToggleDownloadButton from "../../components/landing/landingPageBuilder/ToggleDownloadButton";
 import BottomActionsBar from "../../components/landing/landingPageBuilder/BottomActionsBar";
 import { BLOCK_LIMITS, PRO_ONLY_BLOCKS } from "./landingBlocksRules";
 import AICopyModal from "./ai/AICopyModal";
@@ -39,10 +38,7 @@ export default function LandingPageBuilder() {
   const [fontName, setFontName] = useState("");
   const [fontFile, setFontFile] = useState("");
   const [bgTheme, setBgTheme] = useState("default");
-  const [pdfList, setPdfList] = useState([]);
   const [coverPreview, setCoverPreview] = useState("");
-  const [coverLoading, setCoverLoading] = useState(false);
-  const [showPdfSection, setShowPdfSection] = useState(false);
   const [showPreviewSection, setShowPreviewSection] = useState(false);
   const [showDownloadButton, setShowDownloadButton] = useState(false);
   const [activeChild, setActiveChild] = useState(null);
@@ -195,33 +191,7 @@ export default function LandingPageBuilder() {
       };
     });
   };
-  // const moveRootIntoContainer = (rootIndex, containerIndex) => {
-  //   setLanding((prev) => {
-  //     const blocks = [...prev.content_blocks];
-  //     const block = blocks[rootIndex];
-  //     const container = blocks[containerIndex];
 
-  //     if (!block || !container || container.type !== "container") {
-  //       return prev;
-  //     }
-
-  //     // remove root block
-  //     blocks.splice(rootIndex, 1);
-
-  //     // add to container
-  //     const children = [...(container.children || []), block];
-
-  //     blocks[containerIndex] = {
-  //       ...container,
-  //       children,
-  //     };
-
-  //     return {
-  //       ...prev,
-  //       content_blocks: blocks,
-  //     };
-  //   });
-  // };
   const moveRootIntoContainer = (rootIndex, containerIndex) => {
     setLanding((prev) => {
       const blocks = [...prev.content_blocks];
@@ -498,7 +468,6 @@ export default function LandingPageBuilder() {
       newBlock.alignment = "center";
       newBlock.collapsed = false;
       newBlock.product_source = "internal";
-      newBlock.pdf_url = "";
       newBlock.external_file_url = "";
       newBlock.external_file_name = "";
     }
@@ -559,7 +528,6 @@ export default function LandingPageBuilder() {
       // ✅ COMMERCE (same as stripe_checkout)
       newBlock.price = 10;
       newBlock.product_source = "internal";
-      newBlock.pdf_url = "";
       newBlock.external_file_url = "";
       newBlock.external_file_name = "";
 
@@ -589,7 +557,6 @@ export default function LandingPageBuilder() {
       newBlock.price = 10;
       newBlock.product_source = "internal";
       newBlock.product_name;
-      newBlock.pdf_url = "";
       newBlock.page_count = null;
       newBlock.external_file_url = "";
       newBlock.external_file_name = "";
@@ -1007,14 +974,11 @@ export default function LandingPageBuilder() {
 
     const loadData = async () => {
       try {
-        const [landingRes, pdfRes] = await Promise.all([
+        const [landingRes] = await Promise.all([
           axiosInstance.get(`/landing/builder/${user.id}`),
-          axiosInstance.get("/lead-magnets"),
         ]);
 
         const lp = landingRes.data.landingPage;
-
-        const magnets = pdfRes.data.magnets || [];
 
         // parse blocks
         let blocks = [];
@@ -1049,7 +1013,6 @@ export default function LandingPageBuilder() {
           motion_settings: normalizedMotionSettings,
           content_blocks: blocks,
         });
-        setPdfList(magnets);
         setFontName(lp.font || "Montserrat");
         setFontFile(lp.font_file || "");
 
@@ -1474,7 +1437,6 @@ export default function LandingPageBuilder() {
                         activeRoot={activeRoot}
                         removeFromContainer={removeFromContainer}
                         bgTheme={bgTheme}
-                        pdfList={pdfList}
                         landing={landing}
                         openAIModal={openAIModal}
                         offerContext={landing?.offer_context}
@@ -1483,31 +1445,6 @@ export default function LandingPageBuilder() {
                   ))}
               </div>
             )}
-          </div>
-
-          {/* 🧾 PDF Attachment */}
-          <div
-            className="
-            w-full rounded-xl p-5 mb-10 pb-12 shadow-inner
-            bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-            border border-dashboard-border-light dark:border-dashboard-border-dark
-          "
-          >
-            <PdfSelector
-              pdfList={pdfList}
-              landing={landing}
-              setLanding={setLanding}
-              showPdfSection={showPdfSection}
-              setShowPdfSection={setShowPdfSection}
-              coverPreview={coverPreview}
-              setCoverPreview={setCoverPreview}
-              coverLoading={coverLoading}
-              setCoverLoading={setCoverLoading}
-            />
-            <ToggleDownloadButton
-              showDownloadButton={showDownloadButton}
-              setShowDownloadButton={setShowDownloadButton}
-            />
           </div>
 
           {isPro ? (

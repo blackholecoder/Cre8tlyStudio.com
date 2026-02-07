@@ -367,7 +367,7 @@ export default function MiniOfferBlock({
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70">
                     <div className="w-10 h-10 border-4 border-gray-500 border-t-green rounded-full animate-spin" />
                     <p className="text-xs text-gray-400 mt-3">
-                      Loading PDF cover…
+                      Loading Book cover…
                     </p>
                   </div>
                 ) : imageToShow ? (
@@ -594,7 +594,7 @@ export default function MiniOfferBlock({
                   }}
                   className="w-full p-2 bg-black border border-gray-600 rounded text-white mt-1"
                 >
-                  <option value="internal">The Messy Attic PDF</option>
+                  <option value="internal">The Messy Attic Book</option>
                   <option value="external">Upload Existing Product</option>
                 </select>
 
@@ -660,7 +660,7 @@ export default function MiniOfferBlock({
                 {productSource === "internal" && (
                   <>
                     <label className="text-sm font-semibold text-gray-300 mt-3 block">
-                      Select PDF
+                      Choose Book
                     </label>
                     <select
                       value={block.pdf_url || ""}
@@ -690,7 +690,7 @@ export default function MiniOfferBlock({
 
                         // ✅ SINGLE source of truth
                         updateField("pdf_url", selectedPdf.pdf_url);
-                        updateField("pdf_name", selectedPdf.title || "PDF");
+                        updateField("pdf_name", selectedPdf.title || "Book");
                         updateField("product_source", "internal");
                         updateField("use_pdf_cover", true);
                         updateField("image_url", "");
@@ -710,17 +710,17 @@ export default function MiniOfferBlock({
                             updateField("cover_url", res.data.cover_image);
                           }
                         } catch (err) {
-                          console.error("❌ Error loading PDF cover:", err);
+                          console.error("❌ Error loading Book cover:", err);
                         } finally {
                           setCoverLoading(false);
                         }
                       }}
                       className="w-full p-2 bg-black text-white border border-gray-600 rounded mt-1"
                     >
-                      <option value="">-- Select PDF --</option>
+                      <option value="">-- Choose Book --</option>
                       {availablePdfs.map((p) => (
                         <option key={p.id} value={p.pdf_url}>
-                          {p.title || "PDF"}
+                          {p.title || "Book"}
                         </option>
                       ))}
                     </select>
@@ -729,9 +729,9 @@ export default function MiniOfferBlock({
 
                 {block.pdf_url && (
                   <p className="text-xs text-gray-400 mt-1">
-                    Selected PDF:{" "}
+                    Selected Book:{" "}
                     <span className="text-white font-semibold">
-                      {block.pdf_name || "PDF"}
+                      {block.pdf_name || "Book"}
                     </span>
                     {block.page_count && (
                       <span className="ml-2 opacity-80">
@@ -744,7 +744,7 @@ export default function MiniOfferBlock({
                 {/* USE PDF COVER */}
                 <div className="flex items-center gap-3 mt-2">
                   <label className="text-sm font-semibold text-gray-300">
-                    Use PDF Cover Image
+                    Use Book Cover Image
                   </label>
                   <input
                     type="checkbox"
@@ -765,7 +765,7 @@ export default function MiniOfferBlock({
                       className="text-green underline"
                       rel="noopener noreferrer"
                     >
-                      Preview PDF
+                      Preview Book
                     </a>
                   </p>
                 )}

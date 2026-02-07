@@ -43,7 +43,7 @@ export default function StripeCheckoutBlock({
     ${hasProduct ? "hover:scale-105" : "opacity-50 cursor-not-allowed"}
   `}
         >
-          {block.button_text || "Buy & Download PDF"}
+          {block.button_text || "Buy & Download Book"}
         </button>
 
         <p className="text-xs text-gray-400 mt-2">
@@ -95,23 +95,23 @@ export default function StripeCheckoutBlock({
         <option value="external">Upload Existing Product</option>
       </select>
 
-      {/* PDF SELECTOR */}
+      {/* Book SELECTOR */}
       {block.product_source === "internal" && (
         <>
           <label className="text-sm font-semibold text-gray-300">
-            Select PDF to Sell
+            Select Book to Sell
           </label>
           <select
             value={block.pdf_url || ""}
             onChange={(e) => updateBlock(index, "pdf_url", e.target.value)}
             className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"
           >
-            <option value="">-- Select a Completed PDF --</option>
+            <option value="">-- Select a Completed Book --</option>
             {pdfList
               ?.filter((lm) => lm.status === "completed" && lm.pdf_url)
               .map((lm) => (
                 <option key={lm.id} value={lm.pdf_url}>
-                  {lm.title || "Untitled PDF"} — (Ready)
+                  {lm.title || "Untitled Book"} — (Ready)
                 </option>
               ))}
           </select>
@@ -138,7 +138,7 @@ export default function StripeCheckoutBlock({
                 if (
                   !["application/pdf", "application/zip"].includes(file.type)
                 ) {
-                  alert("Only PDF or ZIP files are allowed");
+                  alert("Only Book or ZIP files are allowed");
                   return;
                 }
 
@@ -207,7 +207,7 @@ export default function StripeCheckoutBlock({
             rel="noopener noreferrer"
             className="text-green underline ml-1"
           >
-            Preview PDF
+            Preview Book
           </a>
         </p>
       )}
@@ -218,7 +218,7 @@ export default function StripeCheckoutBlock({
       </label>
       <input
         type="text"
-        placeholder="Buy & Download PDF"
+        placeholder="Buy & Download Book"
         value={block.button_text || ""}
         onChange={(e) => updateBlock(index, "button_text", e.target.value)}
         className="w-full p-2 border border-gray-600 rounded bg-black text-white mt-1"

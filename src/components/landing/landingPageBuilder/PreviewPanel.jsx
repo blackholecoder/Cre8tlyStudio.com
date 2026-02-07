@@ -506,7 +506,7 @@ function renderPreviewBlock(block, index, context) {
           <button
             onClick={async () => {
               if (!block.pdf_url) {
-                toast.warn("Please select a PDF to sell first.");
+                toast.warn("Please select a Book to sell first.");
                 return;
               }
 
@@ -539,7 +539,7 @@ function renderPreviewBlock(block, index, context) {
               boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
             }}
           >
-            {block.button_text || "Buy & Download PDF"}
+            {block.button_text || "Buy & Download Book"}
           </button>
 
           <p style={{ marginTop: "8px", color: "#aaa" }}>
@@ -557,7 +557,7 @@ function renderPreviewBlock(block, index, context) {
                 rel="noopener noreferrer"
                 className="text-green font-medium ml-1 underline hover:text-green transition"
               >
-                Preview PDF
+                Preview Book
               </a>
             </p>
           )}
@@ -1952,7 +1952,7 @@ export default function PreviewPanel({
           {landing.cover_image_url && (
             <img
               src={landing.cover_image_url}
-              alt="PDF Cover"
+              alt="Book Cover"
               className="mx-auto mb-4 sm:mb-8 rounded-xl shadow-lg"
               style={{
                 width: "100%",

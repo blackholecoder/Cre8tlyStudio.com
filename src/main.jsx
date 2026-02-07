@@ -16,7 +16,6 @@ import Refund from "./documents/Refund.jsx";
 import Cookie from "./documents/Cookie.jsx";
 import SignupPage from "./sections/SignUp.jsx";
 import { Landing, Login } from "./sections/index.js";
-import AdminDashboard from "./sections/AdminDashboard.jsx";
 import Contact from "./sections/Contact.jsx";
 import PlansPage from "./sections/PlansPage.jsx";
 import { ToastContainer } from "react-toastify";
@@ -33,7 +32,7 @@ import Inbox from "./sections/Inbox.jsx";
 import useMaintenance from "./settings/UseMaintenance.jsx";
 import MaintenanceScreen from "./settings/MaintenanceScreen.jsx";
 import LandingPageBuilder from "./sections/landing/LandingPageBuilder.jsx";
-import Leads from "./sections/Leads.jsx";
+
 import LandingAnalytics from "./sections/analytics/Analytics.jsx";
 import SellerDashboard from "./sections/seller/SellerDashboard.jsx";
 import CommunityPost from "./sections/community/CommunityPost.jsx";
@@ -562,24 +561,6 @@ const AnimatedRoutes = () => {
         />
 
         <Route
-          path="/leads"
-          element={
-            <PrivateRoute role={["customer", "admin", "marketer"]}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <DashboardLayout>
-                  <Leads />
-                </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/docs"
           element={
             <PrivateRoute role={["customer", "admin", "marketer"]}>
@@ -701,23 +682,6 @@ const AnimatedRoutes = () => {
                 <DashboardLayout>
                   <AuthorsAssistantDocs />
                 </DashboardLayout>
-              </motion.div>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute role="admin">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="min-h-screen bg-[#030712]"
-              >
-                <AdminDashboard />
               </motion.div>
             </PrivateRoute>
           }

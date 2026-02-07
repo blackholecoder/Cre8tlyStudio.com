@@ -24,7 +24,7 @@ export default function FreePDFSection() {
         }, 8000);
       })
       .catch((err) => {
-        console.error("Error sending PDF:", err);
+        console.error("Error sending Book:", err);
         if (err.response && err.response.status === 409) {
           setPdfError(
             "You’ve already downloaded this guide, check your inbox 📩",

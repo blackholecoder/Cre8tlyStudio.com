@@ -139,13 +139,6 @@ export const SIDEBAR_SECTIONS = [
         access: "pro",
       },
       {
-        key: "leads",
-        label: "Leads",
-        path: "/leads",
-        icon: MailSearch,
-        access: "pro",
-      },
-      {
         key: "analytics",
         label: "Analytics",
         path: "/landing-analytics",

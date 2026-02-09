@@ -3,7 +3,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import CreateCommentBox from "./CreateCommentBox";
 import {
-  ArrowLeft,
   ShieldCheck,
   Heart,
   Eye,
@@ -13,7 +12,6 @@ import {
   Bookmark,
   MessageSquareLock,
   MessageSquare,
-  ChevronLeft,
 } from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
 import CommentThread from "./CommentThread";
@@ -476,19 +474,37 @@ export default function CommunityPost({ targetType = "post" }) {
 
   const saveEditedComment = async (commentId) => {
     try {
-      await axiosInstance.put(`/community/comments/${commentId}`, {
+      const res = await axiosInstance.put(`/community/comments/${commentId}`, {
         body: editBody,
       });
 
-      // Reload comments or patch it locally
+      const { body: updatedBody, updated_at } = res.data.comment;
+
+      // 1️⃣ Update top-level comments
       setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? { ...c, body: editBody } : c)),
+        prev.map((c) =>
+          c.id === commentId ? { ...c, body: updatedBody, updated_at } : c,
+        ),
       );
+
+      // 2️⃣ Update replies (nested comments)
+      setReplies((prev) => {
+        const next = { ...prev };
+
+        Object.keys(next).forEach((parentId) => {
+          next[parentId] = next[parentId].map((r) =>
+            r.id === commentId ? { ...r, body: updatedBody, updated_at } : r,
+          );
+        });
+
+        return next;
+      });
 
       setEditCommentId(null);
       setEditBody("");
     } catch (err) {
       console.error("Failed to update comment:", err);
+      toast.error("Failed to save edit");
     }
   };
 
@@ -570,6 +586,26 @@ export default function CommunityPost({ targetType = "post" }) {
     }, 500);
   }, [comments, replies]);
 
+  const backTo =
+    location.state?.returnTo ||
+    (isFragment
+      ? "/community"
+      : post
+        ? `/community/topic/${post.topic_id}`
+        : "/community");
+
+  useEffect(() => {
+    if (!backTo) return;
+
+    window.history.replaceState(
+      {
+        ...window.history.state,
+        backTo,
+      },
+      "",
+    );
+  }, [backTo]);
+
   if (!post) {
     return <div className="p-10 text-center opacity-60">Loading post…</div>;
   }
@@ -589,18 +625,6 @@ export default function CommunityPost({ targetType = "post" }) {
   // - explicitly locked by admin
   // - paid comments and user does not have paid subscription
   // - private comments and user is not subscribed
-
-  console.log("🧠 COMMENTS DEBUG", {
-    authLoading,
-    userId: user?.id,
-    postUserId: post?.user_id,
-    isOwner: user?.id === post?.user_id,
-    comments_visibility: post?.comments_visibility,
-    comments_locked: post?.comments_locked,
-    isSubscribed,
-    hasPaidSubscription,
-  });
-
   const commentsLocked = (() => {
     // 1️⃣ Owner always allowed
     if (user?.id === post.user_id) return false;
@@ -616,21 +640,6 @@ export default function CommunityPost({ targetType = "post" }) {
 
     return false;
   })();
-
-  console.log("🔒 COMMENTS LOCK RESULT", {
-    commentsLocked,
-    reason: {
-      adminLock: post.comments_locked === 1,
-      paidBlocked: isCommentsPaid && !hasPaidSubscription,
-      privateBlocked: isCommentsPrivate && !isSubscribed,
-      ownerBypass: user?.id === post.user_id,
-      authLoading,
-    },
-  });
-
-  const backTo =
-    location.state?.from ||
-    (isFragment ? "/community" : `/community/topic/${post.topic_id}`);
 
   const avatarInitial = post.author?.charAt(0)?.toUpperCase() ?? "U";
   const isStudioPost = post.is_admin_post === 1;
@@ -682,6 +691,7 @@ export default function CommunityPost({ targetType = "post" }) {
     rounded-none
     shadow-none
     p-0
+    pt-14
 
     /* desktop */
     sm:bg-dashboard-sidebar-light
@@ -695,29 +705,6 @@ export default function CommunityPost({ targetType = "post" }) {
     space-y-6 sm:space-y-8 lg:space-y-10
   "
       >
-        {/* Breadcrumb */}
-        <div
-          className="
-  w-full mb-6 text-sm flex items-center gap-2
-  text-dashboard-muted-light dark:text-dashboard-muted-dark
-"
-        >
-          <button
-            onClick={() => navigate(backTo)}
-            className="
-            w-10 h-10
-            flex items-center justify-center
-            rounded-xl
-            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-            hover:opacity-90
-            transition
-          "
-            aria-label="Back"
-          >
-            <ChevronLeft size={21} />
-          </button>
-        </div>
-
         {/* Main content */}
         <div className="w-full space-y-6 sm:space-y-8 lg:space-y-100">
           {/* Post Card */}
@@ -885,7 +872,7 @@ export default function CommunityPost({ targetType = "post" }) {
 
                   {/* Actions */}
                   <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-sm sm:text-xs">
                       <Eye size={18} className="opacity-70" />
                       <span>{post.views ?? 0}</span>
                     </div>
@@ -1281,36 +1268,35 @@ export default function CommunityPost({ targetType = "post" }) {
                         </button>
 
                         <div className="flex-1">
-                          <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-4">
+                          <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-[4px]">
                             <div className="flex items-center gap-0">
-                              <span
-                                className="
-                              font-medium
-                              text-dashboard-muted-light
-                              dark:text-dashboard-muted-dark
-                            "
-                              >
+                              <span className="font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
                                 {c.author}
                               </span>
 
                               {commentAdmin && (
-                                <span
-                                  className="
-                                flex items-center gap-1
-                                text-dashboard-muted-light dark:text-dashboard-muted-dark
-                                text-xs
-                                px-1
-                                rounded-full
-                              "
-                                >
+                                <span className="px-1">
                                   <ShieldCheck
-                                    className="text-dashboard-muted-light dark:text-green"
                                     size={12}
+                                    className="text-dashboard-muted-light dark:text-green"
                                   />
                                 </span>
                               )}
                             </div>
+
+                            <span>·</span>
                             <span>{timeAgo(c.created_at)}</span>
+
+                            {c.updated_at &&
+                              new Date(c.updated_at).getTime() >
+                                new Date(c.created_at).getTime() && (
+                                <>
+                                  <span>·</span>
+                                  <span className="text-[10px] opacity-60">
+                                    edited
+                                  </span>
+                                </>
+                              )}
                           </div>
                           {editCommentId !== c.id && (
                             <>

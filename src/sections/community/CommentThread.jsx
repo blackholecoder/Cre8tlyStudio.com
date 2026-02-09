@@ -179,36 +179,30 @@ export default function CommentThread({
                 </button>
 
                 {/* Author + Meta */}
-                <div className="flex items-center gap-[2px] text-xs text-gray-500">
+                <div className="flex items-center gap-[4px] text-xs text-gray-500">
                   <div className="flex items-center gap-0">
-                    <span
-                      className="
-                      font-medium
-                      text-dashboard-muted-light
-                      dark:text-dashboard-muted-dark
-                    "
-                    >
+                    <span className="font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
                       {comment.author}
                     </span>
 
                     {comment.author_role === "admin" && (
-                      <span
-                        className="
-                      flex items-center 
-                      text-dashboard-muted-light dark:text-dashboard-muted-dark
-                      text-[10px]
-                      p-1
-                      rounded-full
-                    "
-                      >
-                        <ShieldCheck
-                          size={11}
-                          className="text-dashboard-muted-light dark:text-green"
-                        />
+                      <span className="p-1">
+                        <ShieldCheck size={11} className="text-green" />
                       </span>
                     )}
                   </div>
-                  • {timeAgo(comment.created_at)}
+
+                  <span>•</span>
+                  <span>{timeAgo(comment.created_at)}</span>
+
+                  {comment.updated_at &&
+                    new Date(comment.updated_at) >
+                      new Date(comment.created_at) && (
+                      <>
+                        <span>·</span>
+                        <span className="text-[10px] opacity-60">edited</span>
+                      </>
+                    )}
                 </div>
               </div>
               {/* Replying to indicator */}

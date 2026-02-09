@@ -68,22 +68,24 @@ export default function CommunityFeaturePage() {
               variants={reveal}
               className="text-sm font-medium tracking-wide text-white/70 uppercase"
             >
-              SUBSCRIPTION-FIRST · WRITING-LED · INVITE-ONLY
+              WRITING-FIRST · SUBSCRIPTION-POWERED · NO ALGORITHMS
             </motion.div>
 
             <motion.h1
               variants={reveal}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white"
             >
-              A subscription-first community built for writers.
+              A focused writing community built on real support.
             </motion.h1>
 
             <motion.p
               variants={reveal}
               className="max-w-2xl mx-auto lg:mx-0 text-lg text-white/90"
             >
-              Publish posts, invite your audience, and build a focused community
-              without follows, feeds, or algorithms.
+              Write posts, fragments, and thoughts in a single shared feed.
+              Invite readers who actually care, and build a paid community
+              without followers, engagement tricks, or algorithms deciding who
+              gets seen.
             </motion.p>
           </div>
 
@@ -123,18 +125,18 @@ export default function CommunityFeaturePage() {
             {[
               {
                 icon: Users,
-                title: "Subscribe only, no follows",
-                desc: "Members subscribe intentionally. No followers, no feeds, no algorithmic noise.",
+                title: "Subscribe don't chase",
+                desc: "People join because they want your writing, not because an algorithm pushed it in front of them.",
               },
               {
                 icon: FileText,
-                title: "Professional posts",
-                desc: "Publish long form posts with a clean editor built for serious writing.",
+                title: "Posts and fragments in one feed",
+                desc: "Long posts, short fragments, and real conversations all live together, exactly where your readers are.",
               },
               {
                 icon: Upload,
-                title: "Invite by CSV",
-                desc: "Upload your email list and invite your existing audience directly.",
+                title: "Bring your readers with you",
+                desc: "Upload your list, send direct invites, and move your audience somewhere you actually own.",
               },
             ].map(({ icon: Icon, title, desc, color }) => (
               <motion.div
@@ -167,12 +169,13 @@ export default function CommunityFeaturePage() {
           className="mb-12 max-w-2xl"
         >
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-800 leading-tight">
-            Everything a modern
-            <span className="block">community needs</span>
+            Built for writers
+            <span className="block">who care about the work</span>
           </h2>
           <p className="mt-4 text-gray-600">
-            The Messy Attic communities are designed for focus, ownership, and
-            meaningful discussion without algorithms or social feeds.
+            The Messy Attic is designed for writers who want fewer distractions,
+            deeper conversations, and a community that values the work, not the
+            numbers.
           </p>
         </motion.div>
 
@@ -187,31 +190,31 @@ export default function CommunityFeaturePage() {
           {[
             {
               icon: Users,
-              title: "Creator profiles",
+              title: "A home for your writing",
               color: "text-blue-600",
-              desc: "Each creator has a dedicated profile with bio, links, and a clear identity.",
+              desc: "Your profile becomes a central place for your work, your voice, and your community.",
             },
             {
               icon: MessageSquare,
-              title: "Comments and discussion",
+              title: "Real conversation",
               color: "text-purple-600",
-              desc: "Readers can comment, reply, and take part in thoughtful discussion together.",
+              desc: "Readers respond, discuss, and engage thoughtfully, not just tap a like and scroll past.",
             },
             {
               icon: Share2,
-              title: "Shareable posts",
+              title: "Share on your terms",
               color: "text-emerald-600",
-              desc: "Every post includes a shareable link you can use anywhere online.",
+              desc: "Every post has a clean link you can share anywhere without fighting platforms for visibility.",
             },
             {
               icon: Lock,
-              title: "Intentional access",
+              title: "Paid access",
               color: "text-pink-600",
-              desc: "Subscription based access keeps communities focused, respectful, and intentional.",
+              desc: "Attract people who are invested, supportive, and serious about being there.",
             },
           ].map(({ icon: Icon, title, desc, color }) => (
             <motion.div key={title} variants={reveal}>
-              <Card className="p-6 hover:-translate-y-1 transition">
+              <Card className="p-6 w-full max-w-none hover:-translate-y-1 transition">
                 <Icon className={`h-5 w-5 ${color}`} />
                 <div className="mt-3 font-bold">{title}</div>
                 <p className="mt-2 text-sm text-gray-600">{desc}</p>
@@ -237,12 +240,12 @@ export default function CommunityFeaturePage() {
               </div>
 
               <div className="mt-2 text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-                Build a community around your writing.
+                Build a community that values your writing.
               </div>
 
               <p className="mt-3 text-white/90 max-w-xl">
-                Publish posts, invite your audience, and host thoughtful
-                discussion without followers or algorithms.
+                Write freely, publish consistently, and grow a paid community
+                without algorithms, follower counts, or pressure to perform.
               </p>
             </div>
 

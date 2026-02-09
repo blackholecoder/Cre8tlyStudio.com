@@ -21,23 +21,27 @@ export default function PlanDetailsModal({ plan, onClose }) {
     basic: {
       title: "Basic Creator",
       content: `
-The Basic Creator Plan gives you 5 Lead Magnet Slots to design professional, conversion-ready lead magnets using Cre8tly’s AI tools. Access standard templates, custom branding, and editable layouts so you can attract new subscribers and showcase your expertise with ease.`,
+The Basic Creator plan gives you free access to The Messy Attic community.
+
+Publish posts and short fragments, join discussions, and connect with other writers in a focused, algorithm-free environment. This plan is ideal for writers who want to share their work, build visibility, and participate in the community without any pressure to monetize.
+
+Upgrade anytime when you’re ready to enable paid subscriptions or sell your work professionally.`,
     },
     business_basic_builder: {
       title: "Business Basic Builder",
       content: `
-The Business Basic Builder plan is designed for creators and entrepreneurs who want to start selling without the full Pro commitment.
+The Business Basic Builder plan is designed for writers who are ready to monetize their work and establish a professional presence.
 
 This plan includes:
-• 7 Lead Magnet Slots  
-• Sell directly on your landing pages  
-• No platform fees: keep what you make  
-• Pro Covers for books and lead magnets  
-• Prompt Memory for consistent AI writing  
-• Access to millions of royalty-free Unsplash images  
-• Built-in email capture for lead generation  
+• Free access to the community  
+• Set your own subscription prices  
+• Monthly, annual, and VIP Founder tiers  
+• Subscriber-only posts and fragments  
+• Direct relationship with your readers  
+• Landing page builder to sell books and writing  
+• Custom domain support  
 
-Business Basic gives you everything you need to launch, validate, and grow without advanced analytics or custom landing page features. Upgrade anytime when you're ready to scale.`,
+Business Basic gives you the tools to sell your work, grow a paid audience, and own your platform without unnecessary complexity. Upgrade anytime when you’re ready to scale further.`,
     },
     author: {
       title: "Author’s Assistant",
@@ -50,22 +54,17 @@ Author’s Assistant is a complete book creation and publishing system designed 
     business_builder_pack: {
       title: "Pro Business Builder Pack",
       content: `
-The Pro Business Builder Pack is the ultimate growth suite for creators, entrepreneurs, and marketers who want to look professional, build trust, and scale with confidence.
+The Pro Business Builder Pack is built for writers and creators who want full control over how their work is presented, sold, and scaled.
 
-It gives you everything you need to build high-converting landing pages, capture leads automatically, and sell digital products under your own brand using The Messy Attic’s advanced tools.
+This plan includes:
+• Everything in Business Basic Builder  
+• Unlimited paid subscribers  
+• Advanced landing page layouts and themes  
+• Custom domains and professional branding  
+• Deeper analytics and engagement insights  
+• Priority support  
 
-Features include:
-• High-converting landing pages and lead forms  
-• Mini Offers for quick digital sales and upsells  
-• Animated sections and scroll effects for premium page engagement  
-• Custom domain support (use your own branded domain)  
-• Built-in analytics to track performance and conversions  
-• No platform fees, keep what you make  
-• AI-powered email content generator  
-• Premium conversion-optimized templates  
-• Priority support and one-year updates  
-
-This plan is designed for creators who want full brand control, higher trust, and the ability to scale their digital business without limitations.`,
+The Business Builder Pack is designed for creators running their writing as a serious business, offering maximum flexibility, ownership, and room to grow without platform limitations.`,
     },
   };
 

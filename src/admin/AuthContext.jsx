@@ -1,6 +1,7 @@
 // AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from "react";
 import axiosInstance from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -12,6 +13,7 @@ function applyTheme(theme) {
 }
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -94,6 +96,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+
+    navigate("/login", { replace: true });
   }
 
   async function updateTheme(theme) {

@@ -37,6 +37,7 @@ import freeSubDomain from "./subdomain.webp";
 import tools from "./tools.webp";
 import comingSoon from "./coming-soon.webp";
 import defaultImage from "./userImage.png";
+import defaultBrandLogo from "./defaultBrandLogo.webp";
 
 // Authors Assistant
 import bookFeature from "./white-author.webp";
@@ -82,4 +83,5 @@ export {
   bookFeature,
   aiCopy,
   defaultImage,
+  defaultBrandLogo,
 };

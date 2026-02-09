@@ -151,14 +151,14 @@ export function MobilePostCard({
         px-6 sm:px-0
         flex items-center gap-6
         py-3
-        text-xs
+        text-sm sm:text-xs
         text-dashboard-muted-light
         dark:text-dashboard-muted-dark
       "
       >
         {/* Views */}
-        <div className="flex items-center gap-1">
-          <Eye size={14} className="opacity-70" />
+        <div className="flex items-center gap-[2px]">
+          <Eye size={16} className="opacity-70" />
           <span>{post.views ?? 0}</span>
         </div>
 
@@ -166,10 +166,10 @@ export function MobilePostCard({
         <button
           onClick={onLike}
           disabled={!onLike}
-          className="flex items-center gap-1 hover:opacity-80 transition disabled:opacity-60 disabled:cursor-default"
+          className="flex items-center  gap-[2px] hover:opacity-80 transition disabled:opacity-60 disabled:cursor-default"
         >
           <Heart
-            size={14}
+            size={16}
             className={
               post.has_liked ? "text-red-500 fill-red-500" : "opacity-70"
             }
@@ -178,11 +178,11 @@ export function MobilePostCard({
         </button>
 
         {/* Comments */}
-        <div className="flex items-center gap-1 opacity-70">
+        <div className="flex items-center  gap-[2px] opacity-70">
           {isCommentsLocked ? (
-            <MessageSquareLock size={14} />
+            <MessageSquareLock size={16} />
           ) : (
-            <MessageSquare size={14} />
+            <MessageSquare size={16} />
           )}
           <span>{post.comment_count ?? 0}</span>
         </div>
@@ -191,12 +191,12 @@ export function MobilePostCard({
         <button
           onClick={onShare}
           disabled={!onShare}
-          className="flex items-center gap-1 hover:opacity-80 transition disabled:opacity-60 disabled:cursor-default"
+          className="flex items-center  gap-[2px] hover:opacity-80 transition disabled:opacity-60 disabled:cursor-default"
         >
           {copiedPostId === post.id ? (
-            <Check size={14} className="text-green-500" />
+            <Check size={16} className="text-green-500" />
           ) : (
-            <Share2 size={14} className="opacity-70" />
+            <Share2 size={16} className="opacity-70" />
           )}
         </button>
       </div>

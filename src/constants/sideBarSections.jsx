@@ -88,6 +88,7 @@ export const SIDEBAR_SECTIONS = [
         allowCommunity: true,
         isSubItem: true,
       },
+
       {
         key: "profile",
         label: "Profile",

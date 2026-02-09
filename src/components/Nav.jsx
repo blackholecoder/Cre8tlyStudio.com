@@ -134,20 +134,12 @@ const Nav = () => {
   }, [isOpen]);
 
   const noNavRoutes = [
-    "/dashboard",
     "/books",
     "/settings",
-    "/prompts",
     "/notifications",
-    "/canvas-editor",
     "/landing-page-builder",
-    "/leads",
     "/landing-analytics",
     "/seller-dashboard",
-    "/docs/pro-document",
-    "/docs/lead-magnets",
-    "/docs/smartprompt",
-    "/docs/canvas-editor",
     "/docs/landing-page-builder",
     "/docs/analytics-docs",
     "/docs/analytics",
@@ -369,7 +361,7 @@ const Nav = () => {
                   >
                     <button
                       onClick={() => {
-                        navigate("/dashboard");
+                        navigate("/community");
                         setAccountOpen(false);
                       }}
                       className="w-full px-4 py-2 text-left text-sm text-black hover:bg-gray-50"
@@ -580,7 +572,7 @@ const Nav = () => {
                     <>
                       <button
                         onClick={() => {
-                          navigate("/dashboard");
+                          navigate("/community");
                           setIsOpen(false);
                         }}
                         className="w-full text-left font-semibold text-gray-700"

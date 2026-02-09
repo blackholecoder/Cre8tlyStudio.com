@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
-  ChevronLeft,
   Eye,
   Heart,
   MessageSquare,
@@ -111,26 +110,8 @@ export default function CommunityTopic() {
   if (!topic) return null;
 
   return (
-    <div className="sm:pt-16 px-0 sm:px-6 lg:px-6 max-w-4xl mx-auto">
+    <div className="sm:pt-16 px-0 sm:px-6 lg:px-6 max-w-4xl mx-auto pt-14">
       {/* 🔙 Back + Breadcrumbs */}
-      <div
-        className="flex items-center gap-2 text-sm
-      text-dashboard-muted-light dark:text-dashboard-muted-dark mb-4"
-      >
-        <button
-          onClick={() => navigate("/community")}
-          className="
-            w-10 h-10
-            flex items-center justify-center
-            rounded-xl
-            bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-            hover:opacity-90
-            transition
-          "
-        >
-          <ChevronLeft size={21} />
-        </button>
-      </div>
 
       {/* Header + Create Button */}
       <div
@@ -364,25 +345,25 @@ export default function CommunityTopic() {
                         )}
 
                         {/* ACTIONS */}
-                        <div className="flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                        <div className="flex items-center gap-6 text-sm sm:text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                           <div className="flex items-center gap-[3px]">
-                            <Eye size={14} className="opacity-70" />
+                            <Eye size={16} className="opacity-70" />
                             <span>{post.views ?? 0}</span>
                           </div>
 
                           <div className="flex items-center gap-[3px]">
-                            <Heart size={14} className="opacity-70" />
+                            <Heart size={16} className="opacity-70" />
                             <span>{post.like_count ?? 0}</span>
                           </div>
 
                           <div className="flex items-center gap-[3px]">
                             {isTopicCommentsLocked(post) ? (
                               <MessageSquareLock
-                                size={14}
+                                size={16}
                                 className="opacity-70"
                               />
                             ) : (
-                              <MessageSquare size={14} className="opacity-70" />
+                              <MessageSquare size={16} className="opacity-70" />
                             )}
                             <span>{post.comment_count ?? 0}</span>
                           </div>

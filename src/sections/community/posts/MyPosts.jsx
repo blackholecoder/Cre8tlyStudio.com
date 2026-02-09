@@ -276,14 +276,21 @@ export default function MyPosts() {
                 </p>
 
                 {/* Left stats */}
-                <div className="mt-2 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                <div className="mt-2 flex items-center gap-6 text-sm sm:text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
                   <div className="flex items-center gap-1.5">
-                    <Heart size={14} className="opacity-70" />
+                    <Heart
+                      size={16}
+                      className={
+                        post.has_liked
+                          ? "text-red-500 fill-red-500"
+                          : "opacity-70"
+                      }
+                    />
                     <span>{post.like_count ?? 0}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <MessageCircle size={14} className="opacity-70" />
+                    <MessageCircle size={16} className="opacity-70" />
                     <span>{post.comment_count ?? 0}</span>
                   </div>
 

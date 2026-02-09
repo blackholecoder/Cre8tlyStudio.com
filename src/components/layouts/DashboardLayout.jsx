@@ -2,7 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/AuthContext";
 import axiosInstance from "../../api/axios";
-import { Menu, LogOut, Sun, Moon, ChevronDown, X } from "lucide-react";
+import {
+  Menu,
+  LogOut,
+  Sun,
+  Moon,
+  ChevronDown,
+  X,
+  ChevronLeft,
+} from "lucide-react";
 
 import {
   SIDEBAR_SECTIONS,
@@ -33,6 +41,12 @@ export default function DashboardLayout({ children }) {
   const mainRef = useRef(null);
 
   const location = useLocation();
+
+  const ROOT_ROUTES = ["/", "/community"];
+
+  const canGoBack =
+    window.history.length > 1 && !ROOT_ROUTES.includes(location.pathname);
+
   const { user, logout, updateTheme } = useAuth();
 
   const SIDEBAR_EXPANDED_WIDTH = 260;
@@ -376,17 +390,48 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
       )}
 
       {!isDesktop && (
-        <div className="sticky top-0 z-30 bg-dashboard-bg-light dark:bg-dashboard-bg-dark ">
-          <div className="flex justify-end p-3">
+        <div className="sticky top-0 z-40 bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+          <div className="h-14 px-3 flex items-center justify-between">
+            {/* BACK */}
+            {canGoBack ? (
+              <button
+                onClick={() => navigate(-1)}
+                className="
+            w-10 h-10
+            flex items-center justify-center
+            rounded-lg
+             bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+            hover:bg-dashboard-hover-light
+            dark:hover:bg-dashboard-hover-dark
+            transition
+          "
+                aria-label="Back"
+              >
+                <ChevronLeft size={22} />
+              </button>
+            ) : (
+              <div className="w-10 h-10" />
+            )}
+
+            {/* MENU */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-lg"
+              className="
+          w-10 h-10
+          flex items-center justify-center
+          rounded-lg
+          hover:bg-dashboard-hover-light
+          dark:hover:bg-dashboard-hover-dark
+          transition
+        "
+              aria-label="Menu"
             >
               <Menu size={22} />
             </button>
           </div>
         </div>
       )}
+
       {!isDesktop && mobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-dashboard-bg-light dark:bg-dashboard-bg-dark overflow-y-auto">
           <div className="p-4 space-y-4">

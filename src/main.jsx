@@ -67,6 +67,7 @@ import CreateFragment from "./sections/community/CreateFragmentPage.jsx";
 import MyFragments from "./sections/community/fragments/MyFragments.jsx";
 import SubscribeChoicePage from "./sections/community/subscriptions/SubscribeChoicePage.jsx";
 import MySubscriptions from "./sections/community/subscriptions/MySubscriptions.jsx";
+import MyPublication from "./sections/community/publication/MyPublication.jsx";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -346,6 +347,22 @@ const AnimatedRoutes = () => {
                 <Profile />
               </DashboardLayout>
             </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/authors/:userId/publication"
+          element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="min-h-screen bg-[#030712]"
+            >
+              <DashboardLayout>
+                <MyPublication />
+              </DashboardLayout>
+            </motion.div>
           }
         />
 

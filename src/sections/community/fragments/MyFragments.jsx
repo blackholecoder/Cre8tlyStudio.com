@@ -257,24 +257,31 @@ export default function MyFragments() {
                 </p>
 
                 {/* ICONS — NOW PERFECTLY ALIGNED */}
-                <div className="mt-3 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  <div className="flex items-center gap-[3px]">
-                    <Eye size={14} className="opacity-70" />
+                <div className="mt-3 flex items-center gap-6 text-sm sm:text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  <div className="flex items-center gap-[4px]">
+                    <Eye size={16} className="opacity-70" />
                     <span>{fragment.views ?? 0}</span>
                   </div>
 
-                  <div className="flex items-center gap-[3px]">
-                    <Heart size={14} className="opacity-70" />
+                  <div className="flex items-center gap-[4px]">
+                    <Heart
+                      size={16}
+                      className={
+                        fragment.has_liked
+                          ? "text-red-500 fill-red-500"
+                          : "opacity-70"
+                      }
+                    />
                     <span>{fragment.like_count ?? 0}</span>
                   </div>
 
-                  <div className="flex items-center gap-[3px]">
-                    <MessageCircle size={14} className="opacity-70" />
+                  <div className="flex items-center gap-[4px]">
+                    <MessageCircle size={16} className="opacity-70" />
                     <span>{fragment.comment_count ?? 0}</span>
                   </div>
 
-                  <div className="flex items-center gap-[3px]">
-                    <Repeat size={14} className="opacity-70" />
+                  <div className="flex items-center gap-[4px]">
+                    <Repeat size={16} className="opacity-70" />
                     <span>{fragment.reshare_count ?? 0}</span>
                   </div>
                 </div>

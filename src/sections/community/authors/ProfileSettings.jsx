@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../api/axios";
 import { Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import PreviewSubscribeModal from "./modals/PreviewSubscribeModal";
+import { defaultBrandLogo } from "../../../assets/images";
 
 const inputClass = `
   w-full rounded-xl px-4 py-3 text-sm
@@ -15,6 +16,7 @@ const inputClass = `
 `;
 
 export default function ProfileSettings() {
+  const originalPublicationNameRef = useRef("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [username, setUsername] = useState("");
@@ -40,6 +42,10 @@ export default function ProfileSettings() {
 
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [hasUsername, setHasUsername] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [publicationLogoUrl, setPublicationLogoUrl] = useState(null);
+  const [publicationName, setPublicationName] = useState("");
+  const [publicationNameWarning, setPublicationNameWarning] = useState("");
 
   const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
 
@@ -77,6 +83,7 @@ export default function ProfileSettings() {
       const res = await axiosInstance.get("/community/authors/me");
 
       const p = res.data.profile || {};
+
       setSubscriptionsEnabled(!!p.subscriptions_enabled);
       setUsername(p.username || "");
       setBio(p.bio || "");
@@ -85,8 +92,15 @@ export default function ProfileSettings() {
       setInterests(p.interests || []);
       setServices(p.services || []);
       setMediaLinks(p.media_links || []);
+      setProfile(p);
+      setPublicationLogoUrl(p.publication_logo_url || null);
+      setPublicationName(p.publication_name || "");
+
+      originalPublicationNameRef.current = p.publication_name || "";
+
       setAuthorId(p.id);
       setHasStripeCustomer(!!p.stripe_connect_account_id);
+
       setSubscriptionsEnabled(!!p.subscriptions_enabled);
       setMonthlyPrice(
         typeof p.monthly_price === "number" ? p.monthly_price.toFixed(2) : "",
@@ -108,6 +122,30 @@ export default function ProfileSettings() {
   }
 
   const canToggleSubscriptions = hasStripeCustomer || subscriptionsEnabled;
+
+  async function uploadPublicationLogo(file) {
+    if (!file || !authorId) return;
+
+    try {
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const res = await axiosInstance.post("/upload-data/upload-avatar", {
+          userId: authorId,
+          profileImage: reader.result,
+          target: "publication",
+        });
+
+        setPublicationLogoUrl(res.data.profileImage); // ✅ now defined
+        toast.success("Publication logo updated");
+      };
+
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Publication logo upload failed", err);
+      toast.error("Failed to upload logo");
+    }
+  }
 
   async function fetchNotificationPrefs() {
     try {
@@ -147,6 +185,8 @@ export default function ProfileSettings() {
         interests,
         services,
         media_links: mediaLinks,
+        publication_logo_url: publicationLogoUrl,
+        publication_name: publicationName,
         monthly_benefits: monthlyBenefits,
         annual_benefits: annualBenefits,
         vip_benefits: vipBenefits,
@@ -173,8 +213,14 @@ export default function ProfileSettings() {
       );
 
       toast.success("Profile updated");
-    } catch {
-      toast.error("Failed to save profile");
+      setPublicationNameWarning("");
+    } catch (err) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to save profile";
+
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -267,6 +313,101 @@ export default function ProfileSettings() {
               Letters, numbers, and underscores only
             </p>
           </Section>
+          <Section
+            title="Publication name"
+            description="This is the public name of your writing publication."
+          >
+            <input
+              value={publicationName}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPublicationName(value);
+
+                const trimmed = value.trim();
+
+                if (!trimmed) {
+                  setPublicationNameWarning("");
+                  return;
+                }
+
+                if (trimmed === originalPublicationNameRef.current.trim()) {
+                  setPublicationNameWarning("");
+                  return;
+                }
+
+                if (trimmed.length < 3) {
+                  setPublicationNameWarning(
+                    "Publication name must be at least 3 characters",
+                  );
+                } else if (trimmed.length > 120) {
+                  setPublicationNameWarning(
+                    "Publication name can’t exceed 120 characters",
+                  );
+                } else {
+                  setPublicationNameWarning(
+                    "Publication names must be unique and can’t be shared with other writers",
+                  );
+                }
+              }}
+              placeholder="The Messy Attic"
+              maxLength={120}
+              className={inputClass}
+            />
+
+            {publicationNameWarning ? (
+              <p className="text-xs mt-1 text-yellow-600">
+                {publicationNameWarning}
+              </p>
+            ) : (
+              <p className="text-xs mt-1 opacity-60">
+                If left blank, your name will be used.
+              </p>
+            )}
+          </Section>
+
+          <Section
+            title="Publication logo"
+            description="This image appears on your author page and publication header."
+          >
+            <div className="flex items-center gap-4">
+              <img
+                src={publicationLogoUrl || defaultBrandLogo}
+                alt="Publication logo"
+                className="w-20 h-20 rounded-xl object-cover border border-dashboard-border-light dark:border-dashboard-border-dark"
+              />
+
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadPublicationLogo(file);
+                  }}
+                />
+
+                <span
+                  className="
+                  inline-flex items-center
+                  px-4 py-2
+                  rounded-lg
+                  text-sm font-medium
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  border
+                  border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  hover:opacity-90
+                  transition
+                "
+                >
+                  Upload logo
+                </span>
+              </label>
+            </div>
+          </Section>
+
           <Section title="Bio" description="Short one-line summary">
             <textarea
               value={bio}

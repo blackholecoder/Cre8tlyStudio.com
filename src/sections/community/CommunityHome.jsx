@@ -783,15 +783,15 @@ export default function CommunityHome() {
                                 )}
 
                                 {/* ACTIONS */}
-                                <div className="flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                                  <div className="flex items-center gap-[3px]">
+                                <div className="flex items-center gap-6 text-sm  text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                                  <div className="flex items-center gap-[4px]">
                                     <Eye size={14} className="opacity-70" />
                                     <span>{post.views ?? 0}</span>
                                   </div>
 
                                   <button
                                     onClick={(e) => togglePostLike(e, post)}
-                                    className="flex items-center gap-[3px] hover:opacity-80 transition"
+                                    className="flex items-center gap-[4px] hover:opacity-80 transition"
                                   >
                                     <Heart
                                       size={14}
@@ -809,7 +809,7 @@ export default function CommunityHome() {
                                       e.stopPropagation();
                                       handlePostClick(post.id);
                                     }}
-                                    className="flex items-center gap-[3px] hover:opacity-80 transition"
+                                    className="flex items-center gap-[4px] hover:opacity-80 transition"
                                   >
                                     {isFeedCommentsLocked(post) ? (
                                       <MessageSquareLock
@@ -827,7 +827,7 @@ export default function CommunityHome() {
 
                                   <button
                                     onClick={(e) => handleShare(e, post)}
-                                    className="flex items-center gap-[3px] hover:opacity-80 transition"
+                                    className="flex items-center gap-[4px] hover:opacity-80 transition"
                                   >
                                     {copiedPostId === post.id ? (
                                       <Check

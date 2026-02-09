@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../api/axios";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronRight } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../admin/AuthContext";
@@ -262,6 +262,63 @@ export default function Profile() {
                 </div>
               </div>
             )}
+            {/* Publication */}
+            {profile.posts?.length > 0 && (
+              <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
+                <div className="flex flex-col gap-4">
+                  {/* Publication header */}
+                  <div className="flex items-center gap-3">
+                    {profile.publication_logo_url && (
+                      <img
+                        src={profile.publication_logo_url}
+                        alt={profile.publication_name}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                    )}
+
+                    <div className="leading-tight">
+                      <h3 className="text-sm font-semibold">
+                        {profile.publication_name || "Publication"}
+                      </h3>
+                      <p className="text-xs opacity-60">
+                        Writing by {profile.name}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {profile.publication_description && (
+                    <p className="text-sm opacity-70 leading-relaxed">
+                      {profile.publication_description}
+                    </p>
+                  )}
+
+                  {/* Action */}
+                  <button
+                    onClick={() =>
+                      navigate(`/community/authors/${profile.id}/publication`)
+                    }
+                    className="
+          mt-1
+          w-full
+          flex items-center justify-between
+          px-4 py-2
+          rounded-lg
+          bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+          text-sm
+          text-dashboard-text-light dark:text-dashboard-text-dark
+          hover:opacity-80
+          transition
+        "
+                  >
+                    <span>
+                      Read {profile.publication_name || "publication"}
+                    </span>
+                    <ChevronRight size={16} className="mt-[1px]" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT COLUMN */}
@@ -298,12 +355,6 @@ export default function Profile() {
               </Section>
             )}
 
-            {/* Activity */}
-            <Section title="Recent Activity">
-              <p className="text-sm opacity-60">
-                More posts and recommendations coming next.
-              </p>
-            </Section>
             {/* Recent Posts */}
             {profile.posts?.length > 0 && (
               <Section title="Posts">
@@ -372,9 +423,14 @@ function TagGrid({ tags }) {
         <span
           key={tag}
           className="
-            px-3 py-1 rounded-full text-xs font-medium
-            bg-dashboard-hover-light dark:bg-[#1b1f27]
-            border border-dashboard-border-light dark:border-[#2a2f38]
+            px-2.5 py-0.5
+            rounded-full
+            text-[11px] font-medium tracking-wide
+            bg-dashboard-hover-light/70
+            dark:bg-[#1b1f27]/70
+            border border-dashboard-border-light/60
+            dark:border-[#2a2f38]/60
+            opacity-80
           "
         >
           {tag}

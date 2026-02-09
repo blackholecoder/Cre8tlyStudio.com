@@ -98,8 +98,8 @@ export default function PlansPage() {
           Pricing
         </h1>
         <p className="text-black mt-4 text-center max-w-xl">
-          Start free. Upgrade anytime for professional tools, branding,
-          <br /> and automation built for authors.
+          The community is always free.
+          <br /> Upgrade when you’re ready to monetize your work.
         </p>
       </div>
 
@@ -109,32 +109,25 @@ export default function PlansPage() {
         <div className="flex flex-col rounded-2xl border border-gray-800 bg-[#111]/80 p-10 text-left hover:border-green/50 transition">
           {/* PLAN NAME */}
           <h2 className="text-2xl font-bold mb-1 text-white design-text">
-            Free Builder Trial
+            Community (free)
           </h2>
 
           {/* PRICE */}
-          <p className="text-4xl font-extrabold text-white">$0</p>
-          <p className="text-gray-400 mb-3 text-sm">
-            No credit card required · 7 days
-          </p>
-
-          {/* OUTCOME ANCHOR */}
-          <p className="text-sm text-gray-300 mb-6">
-            Best for testing an idea and building your first lead magnet.
-          </p>
+          <p className="text-4xl font-extrabold text-white mb-6">$0</p>
 
           {/* INCLUDED */}
           <ul className="text-sm text-gray-300 space-y-2 mb-6">
-            <li>✅ 1 lead magnet (up to 5 pages)</li>
-            <li>✅ Basic templates</li>
-            <li>✅ AI-assisted writing tools</li>
-            <li>⚡ Full access for 7 days</li>
+            <li>✅ Publish posts and short fragments</li>
+            <li>✅ Participate in the community feed</li>
+            <li>✅ Comment and engage in discussion</li>
+            <li>✅ Create a public writing profile</li>
+            <li>✅ Join for free, no credit card</li>
           </ul>
 
           {/* UPGRADE SEED */}
           <p className="text-xs text-gray-500 mb-8">
-            Upgrade anytime to unlock selling, custom domains, analytics, and
-            branding.
+            Set your own subscription prices anytime. We don’t control your
+            rates.
           </p>
 
           {/* CTA LOGIC */}
@@ -148,7 +141,7 @@ export default function PlansPage() {
               }}
               className="mt-auto w-full py-3 text-lg font-semibold rounded-lg bg-green text-black hover:opacity-90 transition"
             >
-              Start Building for Free
+              Join the Community
             </button>
           ) : user?.has_free_magnet === 1 ? (
             <button
@@ -271,7 +264,8 @@ export default function PlansPage() {
 
           {/* OUTCOME ANCHOR */}
           <p className="text-sm text-gray-300 mb-6">
-            Best for launching a professional landing page and capturing leads.
+            Best for writers who want a professional home to sell books, set
+            their own subscription tiers, and own their audience.
           </p>
 
           {/* INCLUDED */}
@@ -280,31 +274,26 @@ export default function PlansPage() {
               What’s included
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ 7 Lead Magnet Slots per month</li>
-              <li>✅ Sell directly on your landing page</li>
-              <li>✅ No platform fees, keep what you make</li>
-              <li>✅ Pro covers and prompt memory</li>
-              <li>✅ 5M Unsplash image library</li>
-              <li>✅ Custom subdomain and email capture</li>
+              <li>✅ Free access to the community</li>
+              <li>✅ Set your own subscription prices</li>
+              <li>✅ Monthly, annual, and VIP Founder tiers</li>
+              <li>✅ Subscriber-only posts and fragments</li>
+              <li>✅ Direct relationship with your readers</li>
             </ul>
           </div>
 
-          {/* UPGRADE SECTION */}
+          {/* BUILDER / SELLING TOOLS */}
           <div className="mb-8">
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-              Advanced tools for scaling revenue
+              Professional tools
             </p>
 
             <ul className="text-[13px] text-gray-500 space-y-1 opacity-70">
-              <li>• Custom domain</li>
-              <li>• Animations and scroll effects</li>
-              <li>• Gradient themes</li>
-              <li>• Custom branding</li>
-              <li>• Audio player</li>
-              <li>• Calendly integration</li>
-              <li>• Verified reviews</li>
-              <li>• Advanced analytics</li>
-              <li>• Mini offers</li>
+              <li>• Landing page builder to sell books</li>
+              <li>• Custom domain support</li>
+              <li>• Clean, professional layouts</li>
+              <li>• Shareable links for posts and pages</li>
+              <li>• Simple analytics for growth</li>
             </ul>
           </div>
 
@@ -351,37 +340,36 @@ export default function PlansPage() {
 
           {/* OUTCOME ANCHOR */}
           <p className="text-sm text-gray-300 mb-6">
-            Built for creators and entrepreneurs who want to launch, sell, and
-            scale digital products from one platform.
+            Built for writers and creators who want to scale paid communities,
+            sell books professionally, and fully own their platform.
           </p>
 
           {/* CORE CAPABILITIES */}
           <div className="mb-6">
             <p className="text-xs uppercase tracking-wide text-blue-400 mb-2">
-              Everything you need to sell
+              Everything you need to scale
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ 15 lead magnet slots per month</li>
-              <li>✅ Sell directly on high-converting landing pages</li>
-              <li>✅ No platform fees, keep 100% of your sales</li>
-              <li>✅ Mini offers, verified reviews, and audio products</li>
-              <li>✅ Custom domain, branding, and advanced themes</li>
-              <li>✅ Advanced analytics and priority support</li>
+              <li>✅ Free access to the community</li>
+              <li>✅ Set your own subscription prices</li>
+              <li>✅ Monthly, annual, and VIP Founder tiers</li>
+              <li>✅ Subscriber-only posts and fragments</li>
+              <li>✅ Unlimited paid subscribers</li>
+              <li>✅ Priority support</li>
             </ul>
           </div>
 
-          {/* FULL ACCESS (DE-EMPHASIZED BUT COMPLETE) */}
+          {/* FULL ACCESS */}
           <div className="mb-8">
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-              Full feature access
+              Professional tools
             </p>
             <ul className="text-[13px] text-gray-500 space-y-1 opacity-75">
-              <li>• Animated sections and scroll effects</li>
-              <li>• Pro covers and prompt memory</li>
-              <li>• 5M Unsplash image library</li>
-              <li>• Audio player and Calendly integration</li>
-              <li>• Custom branding and gradient themes</li>
-              <li>• Advanced analytics and verified reviews</li>
+              <li>• Landing page builder to sell books</li>
+              <li>• Custom domain and branding</li>
+              <li>• Advanced layouts and themes</li>
+              <li>• Shareable links and pages</li>
+              <li>• Deeper analytics and insights</li>
             </ul>
           </div>
 
@@ -427,25 +415,26 @@ export default function PlansPage() {
 
           {/* VALUE FRAMING */}
           <p className="text-sm text-gray-300 mb-6">
-            For builders who want maximum flexibility while running their
-            business month-to-month.
+            For writers and creators who want full access to the platform with
+            the flexibility of monthly billing.
           </p>
 
-          {/* FEATURE SUMMARY (NOT FULL LIST) */}
+          {/* FEATURE SUMMARY */}
           <div className="mb-6">
             <p className="text-xs uppercase tracking-wide text-sky-400 mb-2">
               Full Business Builder access
             </p>
             <ul className="text-sm text-gray-300 space-y-2">
-              <li>✅ Everything included in Business Builder</li>
-              <li>✅ 15 lead magnets per month</li>
-              <li>✅ Selling, branding, analytics, and automation</li>
-              <li>✅ Custom domains, advanced themes, and integrations</li>
+              <li>✅ Free access to the community</li>
+              <li>✅ Set your own subscription prices</li>
+              <li>✅ Monthly, annual, and VIP Founder tiers</li>
+              <li>✅ Subscriber-only posts and fragments</li>
+              <li>✅ Landing page builder and custom domains</li>
               <li>✅ Priority support</li>
             </ul>
           </div>
 
-          {/* OPTIONAL REFERENCE (LIGHT) */}
+          {/* OPTIONAL REFERENCE */}
           <p className="text-xs text-gray-300 mb-8">
             Prefer the best value? Save significantly with annual billing.
           </p>

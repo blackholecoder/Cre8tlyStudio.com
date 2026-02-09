@@ -105,9 +105,9 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
           )}
 
           {/* ACTIONS */}
-          <div className="mt-3 flex items-center gap-6 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-            <div className="flex items-center gap-[3px]">
-              <Eye size={14} className="opacity-70" />
+          <div className="mt-3 flex items-center gap-6 text-sm sm:text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+            <div className="flex items-center gap-[4px]">
+              <Eye size={16} className="opacity-70" />
               <span>{views ?? 0}</span>
             </div>
 
@@ -117,10 +117,10 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
                 e.stopPropagation();
                 onToggleLike(fragment.id, has_liked);
               }}
-              className="flex items-center gap-[3px] hover:opacity-80 transition"
+              className="flex items-center gap-[4px] hover:opacity-80 transition"
             >
               <Heart
-                size={14}
+                size={16}
                 className={
                   has_liked ? "text-red-500 fill-red-500" : "opacity-70"
                 }
@@ -128,13 +128,13 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
               <span>{like_count}</span>
             </button>
 
-            <div className="flex items-center gap-[3px]">
-              <MessageSquare size={14} className="opacity-70" />
+            <div className="flex items-center gap-[4px]">
+              <MessageSquare size={16} className="opacity-70" />
               <span>{comment_count}</span>
             </div>
 
-            <div className="flex items-center gap-[3px]">
-              <Repeat size={14} className="opacity-70" />
+            <div className="flex items-center gap-[4px]">
+              <Repeat size={16} className="opacity-70" />
               <span>{reshare_count}</span>
             </div>
           </div>

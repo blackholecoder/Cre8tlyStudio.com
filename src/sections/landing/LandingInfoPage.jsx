@@ -76,9 +76,9 @@ export default function LandingInfoPage() {
       image: blocks,
     },
     {
-      title: "Sell Digital Products Instantly",
+      title: "Sell Your Book Instantly",
       description:
-        "Turn landing pages into revenue generators by selling PDFs, guides, audio, and digital downloads directly from your page.",
+        "Turn landing pages into revenue generators by selling your published books directly from your custom  landing pagepage.",
       image: downLoadFeature,
     },
     {
@@ -87,12 +87,7 @@ export default function LandingInfoPage() {
         "Accept payments through secure Stripe Express checkout and receive weekly payouts with no extra setup.",
       image: stripeCheckout,
     },
-    {
-      title: "Capture Leads Automatically",
-      description:
-        "Collect emails and leads directly from your landing pages and build your audience with every visit.",
-      image: leadCapture,
-    },
+
     {
       title: "AI Powered Content Creation",
       description:
@@ -112,16 +107,10 @@ export default function LandingInfoPage() {
       image: containers,
     },
     {
-      title: "Offer PDFs You’ve Already Created",
+      title: "Offer Books You’ve Already Created",
       description:
-        "Attach any PDF created inside The Messy Attic directly to your landing page and turn it into a downloadable or sellable offer.",
+        "Attach any Book inside The Messy Attic directly to your landing page and turn it into a downloadable or sellable offer.",
       image: offer,
-    },
-    {
-      title: "Built-In Free Download Offers",
-      description:
-        "Create free download offers to capture emails and deliver PDFs instantly without extra tools or integrations.",
-      image: freeOffer,
     },
     {
       title: "Fully Custom Brand Control",

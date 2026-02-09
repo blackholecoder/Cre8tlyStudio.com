@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   MessageCircle,
   Ellipsis,
@@ -11,6 +11,7 @@ import axiosInstance from "../../../api/axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { toast } from "react-toastify";
+import MobileCreateFAB from "./MobileCreateFAB";
 
 export default function MyPosts() {
   const navigate = useNavigate();
@@ -20,6 +21,13 @@ export default function MyPosts() {
   const { postId } = useParams();
   const isEdit = Boolean(postId);
   const [loadingPost, setLoadingPost] = useState(isEdit);
+  const [search, setSearch] = useState("");
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const createMenuRef = useRef(null);
+
+  const [showFab, setShowFab] = useState(true);
+  const lastScrollY = useRef(0);
 
   const [loading, setLoading] = useState(true);
 
@@ -84,6 +92,46 @@ export default function MyPosts() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (createMenuRef.current && !createMenuRef.current.contains(e.target)) {
+        setCreateOpen(false);
+      }
+    }
+
+    if (createOpen) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [createOpen]);
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentY = window.scrollY;
+
+      // scrolling down → hide
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setShowFab(false);
+      }
+
+      // scrolling up → show
+      if (currentY < lastScrollY.current) {
+        setShowFab(true);
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   function confirmDeletePost(postId) {
     const toastId = toast(
@@ -150,6 +198,19 @@ export default function MyPosts() {
     setOpenMenuId(null);
   }
 
+  const filteredPosts = useMemo(() => {
+    if (!search.trim()) return posts;
+
+    const q = search.toLowerCase();
+
+    return posts.filter((post) => {
+      return (
+        post.title?.toLowerCase().includes(q) ||
+        post.subtitle?.toLowerCase().includes(q)
+      );
+    });
+  }, [posts, search]);
+
   if (loadingPost) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -182,38 +243,44 @@ export default function MyPosts() {
         </div>
       </div>
 
-      {/* Mobile action bar */}
-
-      <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-        <button
-          onClick={() => navigate("/community/create-post")}
-          className="
-      w-full
-      py-2.5
-      rounded-lg
-      text-sm
-      font-medium
-      bg-dashboard-text-light
-      dark:bg-dashboard-text-dark
-      text-dashboard-bg-light
-      dark:text-dashboard-bg-dark
-      hover:opacity-90
-      transition
-    "
-        >
-          Create new post
-        </button>
-      </div>
-
       {/* List */}
       <div className="px-4 py-4 pb-24 max-w-3xl mx-auto space-y-2">
         {loading && <p className="text-sm opacity-60">Loading posts…</p>}
 
-        {!loading && posts.length === 0 && (
-          <p className="text-sm opacity-60">You haven’t posted anything yet.</p>
+        {!loading && filteredPosts.length === 0 && (
+          <p className="text-sm opacity-60">
+            {search
+              ? "No posts match your search."
+              : "You haven’t posted anything yet."}
+          </p>
         )}
 
-        {posts.map((post) => (
+        <div className="max-w-3xl mx-auto">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search your posts by title or subtitle…"
+            className="
+        w-full
+        px-4 py-2.5
+        rounded-lg
+        text-sm
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        placeholder:text-dashboard-muted-light
+        dark:placeholder:text-dashboard-muted-dark
+        focus:outline-none
+        focus:ring-2
+        focus:ring-green
+      "
+          />
+        </div>
+
+        {filteredPosts.map((post) => (
           <div
             key={post.id}
             className="
@@ -372,6 +439,24 @@ export default function MyPosts() {
           </div>
         ))}
       </div>
+      <MobileCreateFAB
+        className={`
+          md:hidden
+          transition-all duration-200 ease-out
+          ${showFab ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}
+        `}
+        open={createOpen}
+        setOpen={setCreateOpen}
+        containerRef={createMenuRef}
+        onCreatePost={() => {
+          setCreateOpen(false);
+          navigate("/community/create-post");
+        }}
+        onCreateFragment={() => {
+          setCreateOpen(false);
+          navigate("/community/fragments/create");
+        }}
+      />
     </div>
   );
 }

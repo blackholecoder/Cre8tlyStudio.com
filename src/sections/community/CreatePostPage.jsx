@@ -42,6 +42,8 @@ export default function CreatePostPage({ post = null, topicId }) {
     return null;
   }, [topicId, selectedTopicId, topics]);
 
+  const activeTopicId = lockedTopicId || topicId || selectedTopicId || null;
+
   const wordCount = useMemo(() => {
     const text = body
       ?.replace(/<[^>]*>/g, " ")
@@ -166,6 +168,10 @@ export default function CreatePostPage({ post = null, topicId }) {
         setSubtitle(post.subtitle || "");
         setBody(post.body);
         setSelectedTopicId(post.topic_id);
+        setCommentsVisibility(post.comments_visibility || "public");
+        setRelatedTopicIds(
+          (post.related_topic_ids || []).filter((id) => id !== post.topic_id),
+        );
 
         if (post.image_url) {
           setImagePreview(post.image_url);
@@ -494,7 +500,7 @@ export default function CreatePostPage({ post = null, topicId }) {
           )}
 
           {/* Related Topics */}
-          {topics.length > 0 && (
+          {!isEdit && topics.length > 0 && (
             <div className="mt-6 space-y-2">
               <label
                 className="
@@ -517,7 +523,7 @@ export default function CreatePostPage({ post = null, topicId }) {
 
               <div className="flex flex-wrap gap-2 mt-2">
                 {topics
-                  .filter((t) => !t.is_locked && t.id !== topicId)
+                  .filter((t) => !t.is_locked && t.id !== activeTopicId)
                   .map((t) => {
                     const active = relatedTopicIds.includes(t.id);
 

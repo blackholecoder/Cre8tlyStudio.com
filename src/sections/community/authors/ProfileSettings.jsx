@@ -706,8 +706,7 @@ export default function ProfileSettings() {
             "
             >
               <p className="text-sm opacity-80 max-w-xl">
-                Author’s Assistant and the Pro Document Generator are available
-                on paid plans with expanded limits and advanced tools.
+                Author’s Assistant is available on paid plan.
               </p>
 
               <Link to="/plans">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   MessageCircle,
   Ellipsis,
@@ -13,12 +13,20 @@ import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import { formatDate, timeAgo } from "../../../helpers/date";
+import MobileCreateFAB from "../posts/MobileCreateFAB";
 
 export default function MyFragments() {
   const navigate = useNavigate();
   const [fragments, setFragments] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const createMenuRef = useRef(null);
+
+  const [showFab, setShowFab] = useState(true);
+  const lastScrollY = useRef(0);
 
   const menuItem =
     "w-full px-4 py-3 text-sm text-left flex items-center gap-3 transition-colors";
@@ -86,6 +94,59 @@ export default function MyFragments() {
     );
   }
 
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (createMenuRef.current && !createMenuRef.current.contains(e.target)) {
+        setCreateOpen(false);
+      }
+    }
+
+    if (createOpen) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [createOpen]);
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentY = window.scrollY;
+
+      // scrolling down → hide
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setShowFab(false);
+      }
+
+      // scrolling up → show
+      if (currentY < lastScrollY.current) {
+        setShowFab(true);
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const filteredFragments = useMemo(() => {
+    if (!search.trim()) return fragments;
+
+    const q = search.toLowerCase();
+
+    return fragments.filter((fragment) => {
+      return (
+        fragment.body?.toLowerCase().includes(q) ||
+        fragment.author?.toLowerCase().includes(q)
+      );
+    });
+  }, [fragments, search]);
+
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
       <div className="sticky top-0 z-20 px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark">
@@ -106,29 +167,45 @@ export default function MyFragments() {
         </div>
       </div>
 
-      <div className="md:hidden px-4 py-3">
-        <button
-          onClick={() => navigate("/community/fragments/create")}
-          className="
-            w-full py-2.5 rounded-lg text-sm font-medium
-            bg-dashboard-text-light dark:bg-dashboard-text-dark
-            text-dashboard-bg-light dark:text-dashboard-bg-dark
-          "
-        >
-          Write Fragment
-        </button>
-      </div>
-
       <div className="px-0 py-4 pb-24 max-w-3xl mx-auto space-y-2">
         {loading && <p className="text-sm opacity-60">Loading fragments…</p>}
 
-        {!loading && fragments.length === 0 && (
+        <div className="max-w-3xl mx-auto">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search your posts by title or subtitle…"
+            className="
+        w-full
+        px-4 py-2.5
+        rounded-lg
+        text-sm
+        bg-dashboard-bg-light
+        dark:bg-dashboard-bg-dark
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        text-dashboard-text-light
+        dark:text-dashboard-text-dark
+        placeholder:text-dashboard-muted-light
+        dark:placeholder:text-dashboard-muted-dark
+        focus:outline-none
+        focus:ring-2
+        focus:ring-green
+      "
+          />
+        </div>
+
+        {!loading && filteredFragments.length === 0 && (
           <p className="text-sm opacity-60">
-            You haven’t written any fragments yet.
+            {search
+              ? "No fragments match your search."
+              : "You haven’t posted anything yet."}
           </p>
         )}
 
-        {fragments.map((fragment) => (
+        <div className="px-4 py-3"></div>
+
+        {filteredFragments.map((fragment) => (
           <div
             key={fragment.id}
             onClick={() => navigate(`/community/fragments/${fragment.id}`)}
@@ -290,6 +367,24 @@ export default function MyFragments() {
           </div>
         ))}
       </div>
+      <MobileCreateFAB
+        className={`
+    md:hidden
+    transition-all duration-200 ease-out
+    ${showFab ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}
+  `}
+        open={createOpen}
+        setOpen={setCreateOpen}
+        containerRef={createMenuRef}
+        onCreatePost={() => {
+          setCreateOpen(false);
+          navigate("/community/create-post");
+        }}
+        onCreateFragment={() => {
+          setCreateOpen(false);
+          navigate("/community/fragments/create");
+        }}
+      />
     </div>
   );
 }

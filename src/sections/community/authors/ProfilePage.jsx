@@ -326,7 +326,7 @@ export default function Profile() {
             {/* About */}
             {profile.about && (
               <Section title="About">
-                <p className="text-sm leading-relaxed opacity-80">
+                <p className="text-sm leading-relaxed opacity-80 whitespace-pre-wrap">
                   {profile.about}
                 </p>
               </Section>

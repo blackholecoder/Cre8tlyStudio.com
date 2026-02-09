@@ -1120,11 +1120,62 @@ export default function CommunityPost({ targetType = "post" }) {
                 />
               </div>
             )}
+
             <div className={isFragment ? fragmentClasses : htmlClasses}>
+              {/* Reshared fragment card */}
+
+              {/* Your fragment text */}
               {isFragment ? (
                 <p>{post.body}</p>
               ) : (
                 <div dangerouslySetInnerHTML={{ __html: post.body }} />
+              )}
+              {isFragment && post.reshared_id && (
+                <div
+                  className="
+        mb-4
+        rounded-lg
+       border border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+        p-4
+      "
+                >
+                  <div className="grid grid-cols-[40px_1fr] gap-3">
+                    {/* Avatar */}
+                    {post.reshared_author_image ? (
+                      <img
+                        src={post.reshared_author_image}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-dashboard-border-light dark:bg-dashboard-border-dark" />
+                    )}
+
+                    {/* Name + time */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
+                          {post.reshared_author}
+                        </span>
+
+                        {post.reshared_author_is_verified === 1 && (
+                          <ShieldCheck size={14} className="text-green" />
+                        )}
+                      </div>
+
+                      <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                        {timeAgo(post.reshared_created_at)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
+                    {post.reshared_body}
+                  </p>
+                </div>
               )}
             </div>
           </div>

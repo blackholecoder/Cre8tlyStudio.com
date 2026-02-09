@@ -1,5 +1,6 @@
 import { Eye, Heart, MessageSquare, Repeat, ShieldCheck } from "lucide-react";
 import { timeAgo } from "../../../helpers/date";
+import { useNavigate } from "react-router-dom";
 
 export function FragmentItem({ fragment, onOpen, onToggleLike }) {
   const {
@@ -15,10 +16,8 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
     author_image,
     author_is_verified,
     reshared_id,
-    reshared_body,
-    reshared_author,
   } = fragment;
-
+  const navigate = useNavigate();
   const isVerified = author_is_verified === 1;
 
   return (
@@ -86,21 +85,53 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             {body}
           </p>
 
-          {/* RESHARE */}
+          {/* RESHARED FRAGMENT */}
           {reshared_id && (
             <div
               className="
-            mt-3 p-3
-            rounded-lg
+              mt-3
+              rounded-lg
             border border-dashboard-border-light
-            dark:border-dashboard-border-dark
-            text-xs
-            text-dashboard-muted-light
-            dark:text-dashboard-muted-dark
-          "
+              dark:border-dashboard-border-dark
+              bg-dashboard-sidebar-light
+              dark:bg-dashboard-sidebar-dark
+              p-3
+            "
             >
-              <span className="font-medium">{reshared_author}</span>
-              <p className="mt-1 whitespace-pre-wrap">{reshared_body}</p>
+              <div className="grid grid-cols-[32px_1fr] gap-3">
+                {/* Avatar */}
+                {fragment.reshared_author_image ? (
+                  <img
+                    src={fragment.reshared_author_image}
+                    alt=""
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-dashboard-border-light dark:bg-dashboard-border-dark" />
+                )}
+
+                {/* Name + time */}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-[4px]">
+                    <span className="text-xs font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
+                      {fragment.reshared_author}
+                    </span>
+
+                    {fragment.reshared_author_is_verified === 1 && (
+                      <ShieldCheck size={12} className="text-green" />
+                    )}
+                  </div>
+
+                  <div className="text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                    {timeAgo(fragment.reshared_created_at)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Body */}
+              <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
+                {fragment.reshared_body}
+              </p>
             </div>
           )}
 
@@ -133,9 +164,15 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
               <span>{comment_count}</span>
             </div>
 
-            <div className="flex items-center gap-[4px]">
+            <div
+              className="flex items-center gap-[4px] cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/community/fragments/create?reshare=${fragment.id}`);
+              }}
+            >
               <Repeat size={16} className="opacity-70" />
-              <span>{reshare_count}</span>
+              <span>{fragment.reshare_count}</span>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   Pencil,
   Eye,
   Repeat,
+  ShieldCheck,
 } from "lucide-react";
 import axiosInstance from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -332,6 +333,55 @@ export default function MyFragments() {
                 <p className="mt-2 text-sm leading-relaxed line-clamp-3 text-dashboard-text-light dark:text-dashboard-text-dark">
                   {fragment.body}
                 </p>
+                {/* RESHARED FRAGMENT — FULL STYLE */}
+                {fragment.reshared_id && (
+                  <div
+                    className="
+                    mt-4
+                    rounded-lg
+                    border border-dashboard-border-light
+                    dark:border-dashboard-border-dark
+                    bg-dashboard-sidebar-light
+                    dark:bg-dashboard-sidebar-dark
+                    p-4
+                  "
+                  >
+                    <div className="grid grid-cols-[32px_1fr] gap-3">
+                      {/* Avatar */}
+                      {fragment.reshared_author_image ? (
+                        <img
+                          src={fragment.reshared_author_image}
+                          alt=""
+                          className="w-7 h-7 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-dashboard-hover-light dark:bg-dashboard-hover-dark" />
+                      )}
+
+                      {/* Name + date */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-[3px]">
+                          <span className="text-xs font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
+                            {fragment.reshared_author}
+                          </span>
+
+                          {fragment.reshared_author_is_verified === 1 && (
+                            <ShieldCheck size={12} className="text-green" />
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                          <span>{timeAgo(fragment.reshared_created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reshared body */}
+                    <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
+                      {fragment.reshared_body}
+                    </p>
+                  </div>
+                )}
 
                 {/* ICONS — NOW PERFECTLY ALIGNED */}
                 <div className="mt-3 flex items-center gap-6 text-sm sm:text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">

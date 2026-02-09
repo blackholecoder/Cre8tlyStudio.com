@@ -830,10 +830,7 @@ export default function CommunityHome() {
                                     className="flex items-center gap-[4px] hover:opacity-80 transition"
                                   >
                                     {copiedPostId === post.id ? (
-                                      <Check
-                                        size={14}
-                                        className="text-green-500"
-                                      />
+                                      <Check size={14} className="text-green" />
                                     ) : (
                                       <Share2
                                         size={14}

@@ -448,7 +448,23 @@ export default function CreatePostPage({ post = null, topicId }) {
               </p>
             </div>
           )}
-
+          <div
+            className="
+    -mt-2
+    mb-2
+    text-xs
+    text-dashboard-muted-light
+    dark:text-dashboard-muted-dark
+    flex items-center gap-1
+  "
+          >
+            <span className="opacity-80">
+              Tip, you can mention other writers by typing
+            </span>
+            <span className="font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
+              @username
+            </span>
+          </div>
           {/* Body */}
           <CommunityPostEditor
             ref={editorRef}
@@ -456,6 +472,7 @@ export default function CreatePostPage({ post = null, topicId }) {
             onChange={setBody}
             onMention={handleMention}
           />
+
           {showMentions && mentionResults.length > 0 && (
             <div
               className="

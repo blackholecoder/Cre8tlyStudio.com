@@ -29,6 +29,7 @@ import {
 import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
 import axiosInstance from "../../../api/axios";
+import { MentionMark } from "./MentionMark";
 
 const CommunityPostEditor = forwardRef(
   ({ value, onChange, onMention }, ref) => {
@@ -76,6 +77,7 @@ const CommunityPostEditor = forwardRef(
         Placeholder.configure({
           placeholder: "Write your post...",
         }),
+        MentionMark,
       ],
       editorProps: {
         attributes: {
@@ -180,7 +182,17 @@ const CommunityPostEditor = forwardRef(
             from: mentionStart,
             to: from,
           })
-          .insertContent(`@${username} `)
+          .insertContent({
+            type: "text",
+            text: `@${username}`,
+            marks: [
+              {
+                type: "mention",
+                attrs: { username },
+              },
+            ],
+          })
+          .insertContent(" ")
           .run();
       },
     }));

@@ -111,7 +111,29 @@
 .post-body a.mention:hover {
   text-decoration: underline;
 }
+.dark .post-body a.mention {
+  color: #38bdf8;
+  font-weight: 500;
+  text-decoration: none;
+}
 
+.dark .post-body a.mention:hover {
+  text-decoration: underline;
+}
+
+.mention-inline {
+  color: #2563eb; /* blue */
+  background: rgba(37, 99, 235, 0.08);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dark .mention-inline {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
 /* =============================== */
 /* Post Content Headings (FINAL)   */
 /* =============================== */

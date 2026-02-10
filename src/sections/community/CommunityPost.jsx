@@ -1124,12 +1124,12 @@ export default function CommunityPost({ targetType = "post" }) {
             <div className={isFragment ? fragmentClasses : htmlClasses}>
               {/* Reshared fragment card */}
 
-              {/* Your fragment text */}
-              {isFragment ? (
-                <p>{post.body}</p>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: post.body }} />
-              )}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: typeof post?.body === "string" ? post.body : "",
+                }}
+              />
+
               {isFragment && post.reshared_id && (
                 <div
                   className="

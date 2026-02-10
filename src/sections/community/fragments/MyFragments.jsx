@@ -330,9 +330,13 @@ export default function MyFragments() {
                 </div>
 
                 {/* BODY */}
-                <p className="mt-2 text-sm leading-relaxed line-clamp-3 text-dashboard-text-light dark:text-dashboard-text-dark">
-                  {fragment.body}
-                </p>
+                <div
+                  className="mt-2 text-sm leading-relaxed line-clamp-3 text-dashboard-text-light dark:text-dashboard-text-dark"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      typeof fragment?.body === "string" ? fragment.body : "",
+                  }}
+                />
                 {/* RESHARED FRAGMENT — FULL STYLE */}
                 {fragment.reshared_id && (
                   <div
@@ -377,9 +381,15 @@ export default function MyFragments() {
                     </div>
 
                     {/* Reshared body */}
-                    <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
-                      {fragment.reshared_body}
-                    </p>
+                    <div
+                      className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          typeof fragment?.reshared_body === "string"
+                            ? fragment.reshared_body
+                            : "",
+                      }}
+                    />
                   </div>
                 )}
 

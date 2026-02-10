@@ -81,9 +81,12 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
           </div>
 
           {/* BODY */}
-          <p className="text-sm leading-relaxed text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap">
-            {body}
-          </p>
+          <div
+            className="text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark"
+            dangerouslySetInnerHTML={{
+              __html: typeof body === "string" ? body : "",
+            }}
+          />
 
           {/* RESHARED FRAGMENT */}
           {reshared_id && (
@@ -129,9 +132,15 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
               </div>
 
               {/* Body */}
-              <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
-                {fragment.reshared_body}
-              </p>
+              <div
+                className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    typeof fragment.reshared_body === "string"
+                      ? fragment.reshared_body
+                      : "",
+                }}
+              />
             </div>
           )}
 

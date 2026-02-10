@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../api/axios";
@@ -7,6 +7,7 @@ import { ShieldCheck } from "lucide-react";
 
 export default function CreateFragment() {
   const MAX_CHARS = 500;
+  const textareaRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const reshareId = searchParams.get("reshare");
@@ -142,25 +143,38 @@ export default function CreateFragment() {
 
   const handleBodyChange = async (e) => {
     const value = e.target.value;
+    const cursorPos = e.target.selectionStart;
 
     if (value.length <= MAX_CHARS) {
       setBody(value);
     }
 
+    // Look back up to 50 chars from cursor
+    const textBeforeCursor = value.slice(
+      Math.max(0, cursorPos - 50),
+      cursorPos,
+    );
+
+    const match = textBeforeCursor.match(/@([a-zA-Z0-9_]*)$/);
+
+    if (!match) {
+      setShowMentions(false);
+      setMentionResults([]);
+      return;
+    }
+
+    const query = match[1];
+
+    if (/\s/.test(query)) {
+      setShowMentions(false);
+      return;
+    }
+
+    setMentionQuery(query);
+
+    if (query.length < 1) return;
+
     try {
-      const match = value.match(/@([a-zA-Z0-9_]*)$/);
-
-      if (!match) {
-        setShowMentions(false);
-        setMentionResults([]);
-        return;
-      }
-
-      const query = match[1];
-      setMentionQuery(query);
-
-      if (query.length < 1) return;
-
       const res = await axiosInstance.get(
         `/community/users/search?query=${query}`,
       );
@@ -173,12 +187,64 @@ export default function CreateFragment() {
     }
   };
 
+  // const insertMention = (username) => {
+  //   const textarea = document.activeElement;
+  //   if (!textarea) return;
+
+  //   const cursorPos = textarea.selectionStart;
+
+  //   // Look backwards for the @mention start
+  //   const textUpToCursor = body.slice(0, cursorPos);
+  //   const match = textUpToCursor.match(/@([a-zA-Z0-9_]*)$/);
+
+  //   if (!match) return;
+
+  //   const mentionStart = cursorPos - match[0].length;
+  //   const before = body.slice(0, mentionStart);
+  //   const after = body.slice(cursorPos);
+
+  //   const newText = `${before}@${username} ${after}`;
+  //   setBody(newText);
+
+  //   setShowMentions(false);
+  //   setMentionResults([]);
+  //   setMentionQuery("");
+
+  //   // Restore caret right after inserted mention
+  //   requestAnimationFrame(() => {
+  //     const newPos = mentionStart + username.length + 2;
+  //     textarea.setSelectionRange(newPos, newPos);
+  //     textarea.focus();
+  //   });
+  // };
   const insertMention = (username) => {
-    setBody((prev) => prev.replace(/@([a-zA-Z0-9_]*)$/, `@${username} `));
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart;
+    const textUpToCursor = body.slice(0, cursorPos);
+
+    const match = textUpToCursor.match(/@([a-zA-Z0-9_]*)$/);
+    if (!match) return;
+
+    const mentionStart = cursorPos - match[0].length;
+
+    const before = body.slice(0, mentionStart);
+    const after = body.slice(cursorPos);
+
+    const newText = `${before}@${username} ${after}`;
+    setBody(newText);
 
     setShowMentions(false);
     setMentionResults([]);
     setMentionQuery("");
+
+    // restore cursor
+    requestAnimationFrame(() => {
+      const pos = mentionStart + username.length + 2;
+      textarea.setSelectionRange(pos, pos);
+      textarea.focus();
+    });
   };
 
   return (
@@ -242,6 +308,7 @@ export default function CreateFragment() {
             </label>
 
             <textarea
+              ref={textareaRef}
               value={body}
               onChange={handleBodyChange}
               placeholder="Write a thought, a line, or something unfinished… use @ to mention other users in your fragment"
@@ -279,7 +346,14 @@ export default function CreateFragment() {
                   <button
                     key={user.id}
                     type="button"
-                    onClick={() => insertMention(user.username)}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // desktop
+                      insertMention(user.username);
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault(); // mobile
+                      insertMention(user.username);
+                    }}
                     className="
                     w-full
                     flex

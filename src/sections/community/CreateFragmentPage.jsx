@@ -16,6 +16,10 @@ export default function CreateFragment() {
   const [uploading, setUploading] = useState(false);
   const [reshareFragment, setReshareFragment] = useState(null);
 
+  const [mentionResults, setMentionResults] = useState([]);
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+
   const { fragmentId } = useParams();
   const isEdit = Boolean(fragmentId);
   const isReshare = Boolean(reshareId) && !isEdit;
@@ -136,6 +140,47 @@ export default function CreateFragment() {
     fetchFragment();
   }, [fragmentId, isEdit]);
 
+  const handleBodyChange = async (e) => {
+    const value = e.target.value;
+
+    if (value.length <= MAX_CHARS) {
+      setBody(value);
+    }
+
+    try {
+      const match = value.match(/@([a-zA-Z0-9_]*)$/);
+
+      if (!match) {
+        setShowMentions(false);
+        setMentionResults([]);
+        return;
+      }
+
+      const query = match[1];
+      setMentionQuery(query);
+
+      if (query.length < 1) return;
+
+      const res = await axiosInstance.get(
+        `/community/users/search?query=${query}`,
+      );
+
+      setMentionResults(res.data.users || []);
+      setShowMentions(true);
+    } catch (err) {
+      console.error("❌ fragment mention search failed:", err);
+      setShowMentions(false);
+    }
+  };
+
+  const insertMention = (username) => {
+    setBody((prev) => prev.replace(/@([a-zA-Z0-9_]*)$/, `@${username} `));
+
+    setShowMentions(false);
+    setMentionResults([]);
+    setMentionQuery("");
+  };
+
   return (
     <div className="min-h-screen w-full bg-dashboard-bg-light dark:bg-dashboard-bg-dark flex flex-col">
       {/* Header */}
@@ -198,13 +243,8 @@ export default function CreateFragment() {
 
             <textarea
               value={body}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value.length <= MAX_CHARS) {
-                  setBody(value);
-                }
-              }}
-              placeholder="Write a thought, a line, or something unfinished…"
+              onChange={handleBodyChange}
+              placeholder="Write a thought, a line, or something unfinished… use @ to mention other users in your fragment"
               rows={6}
               className="
               w-full p-4 rounded-lg
@@ -217,6 +257,62 @@ export default function CreateFragment() {
               resize-y
             "
             />
+            {showMentions && mentionResults.length > 0 && (
+              <div
+                className="
+      relative
+      z-50
+      mt-2
+      w-full
+      max-h-56
+      overflow-y-auto
+      rounded-xl
+      border
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      shadow-2xl
+    "
+              >
+                {mentionResults.map((user) => (
+                  <button
+                    key={user.id}
+                    type="button"
+                    onClick={() => insertMention(user.username)}
+                    className="
+                    w-full
+                    flex
+                    items-center
+                    gap-3
+                    px-3
+                    py-2
+                    text-left
+                    hover:bg-dashboard-hover-light
+                    dark:hover:bg-dashboard-hover-dark
+                    transition
+                  "
+                  >
+                    {user.profile_image_url ? (
+                      <img
+                        src={user.profile_image_url}
+                        alt={user.username}
+                        className="w-7 h-7 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+                        {user.username?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
+
+                    <span className="text-sm font-medium">
+                      @{user.username}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div
               className={`flex justify-end text-xs ${
                 body.length >= MAX_CHARS

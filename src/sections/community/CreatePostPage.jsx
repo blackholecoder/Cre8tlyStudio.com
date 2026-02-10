@@ -21,6 +21,10 @@ export default function CreatePostPage({ post = null, topicId }) {
   const lockedTopicName = location.state?.topicName || null;
   const [selectedTopicId, setSelectedTopicId] = useState(lockedTopicId || "");
 
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionResults, setMentionResults] = useState([]);
+  const [showMentions, setShowMentions] = useState(false);
+
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(post?.image_url || null);
   const [uploading, setUploading] = useState(false);
@@ -141,6 +145,33 @@ export default function CreatePostPage({ post = null, topicId }) {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleMention = async (query) => {
+    if (!query) {
+      setShowMentions(false);
+      setMentionResults([]);
+      return;
+    }
+
+    try {
+      const res = await axiosInstance.get(
+        `/community/users/search?query=${query}`,
+      );
+
+      setMentionResults(res.data.users || []);
+      setShowMentions(true);
+    } catch (err) {
+      console.error("mention search failed", err);
+    }
+  };
+
+  const insertMention = (username) => {
+    editorRef.current?.insertMention(username);
+
+    setShowMentions(false);
+    setMentionResults([]);
+    setMentionQuery("");
   };
 
   useEffect(() => {
@@ -423,7 +454,62 @@ export default function CreatePostPage({ post = null, topicId }) {
             ref={editorRef}
             value={body}
             onChange={setBody}
+            onMention={handleMention}
           />
+          {showMentions && mentionResults.length > 0 && (
+            <div
+              className="
+      relative
+      z-50
+      mt-2
+      w-full
+      max-h-56
+      overflow-y-auto
+      rounded-xl
+      border
+      bg-dashboard-sidebar-light
+      dark:bg-dashboard-sidebar-dark
+      border-dashboard-border-light
+      dark:border-dashboard-border-dark
+      shadow-2xl
+    "
+            >
+              {mentionResults.map((user) => (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => insertMention(user.username)}
+                  className="
+                  w-full
+                  flex
+                  items-center
+                  gap-3
+                  px-3
+                  py-2
+                  text-left
+                  hover:bg-dashboard-hover-light
+                  dark:hover:bg-dashboard-hover-dark
+                  transition
+                "
+                >
+                  {user.profile_image_url ? (
+                    <img
+                      src={user.profile_image_url}
+                      alt={user.username}
+                      className="w-7 h-7 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold">
+                      {user.username?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
+
+                  <span className="text-sm font-medium">@{user.username}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {!isEdit && hasStartedWriting && isBelowPostThreshold && (
             <div
               className="

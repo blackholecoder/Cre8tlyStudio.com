@@ -24,6 +24,7 @@ import { confirmDelete } from "../../helpers/confirmToast";
 import { ButtonSpinner } from "../../helpers/buttonSpinner";
 import { toast } from "react-toastify";
 import TipModal from "./modals/TipModal";
+import FragmentAudioPlayer from "./fragments/FragmentAudioPlayer";
 
 export default function CommunityPost({ targetType = "post" }) {
   const isFragment = targetType === "fragment";
@@ -683,27 +684,27 @@ export default function CommunityPost({ targetType = "post" }) {
     >
       <div
         className="
-    w-full max-w-4xl
+        w-full max-w-4xl
 
-    /* mobile */
-    bg-transparent
-    border-none
-    rounded-none
-    shadow-none
-    p-0
-    pt-14
+        /* mobile */
+        bg-transparent
+        border-none
+        rounded-none
+        shadow-none
+        p-0
+        pt-14
 
-    /* desktop */
-    sm:bg-dashboard-sidebar-light
-    sm:dark:bg-dashboard-sidebar-dark
-    sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
-    sm:rounded-xl
-    sm:p-8
-    lg:p-10
-    sm:shadow-xl
+        /* desktop */
+        sm:bg-dashboard-sidebar-light
+        sm:dark:bg-dashboard-sidebar-dark
+        sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
+        sm:rounded-xl
+        sm:p-8
+        lg:p-10
+        sm:shadow-xl
 
-    space-y-6 sm:space-y-8 lg:space-y-10
-  "
+        space-y-6 sm:space-y-8 lg:space-y-10
+      "
       >
         {/* Main content */}
         <div className="w-full space-y-6 sm:space-y-8 lg:space-y-100">
@@ -1043,14 +1044,14 @@ export default function CommunityPost({ targetType = "post" }) {
               {!isFragment && (
                 <h2
                   className="
-                not-prose
-                text-3xl sm:text-3xl
-                font-bold
-                tracking-tight
-                leading-tight
-                text-dashboard-text-light
-                dark:text-dashboard-text-dark
-              "
+                  not-prose
+                  text-3xl sm:text-3xl
+                  font-bold
+                  tracking-tight
+                  leading-tight
+                  text-dashboard-text-light
+                  dark:text-dashboard-text-dark
+                "
                 >
                   {post.title}
                 </h2>
@@ -1130,17 +1131,26 @@ export default function CommunityPost({ targetType = "post" }) {
                 }}
               />
 
+              {isFragment && post.audio_url && (
+                <FragmentAudioPlayer
+                  audioUrl={post.audio_url}
+                  audioTitle={post.audio_title}
+                  durationSeconds={post.audio_duration_seconds}
+                />
+              )}
+
               {isFragment && post.reshared_id && (
                 <div
                   className="
-        mb-4
-        rounded-lg
-       border border-dashboard-border-light
-      dark:border-dashboard-border-dark
-      bg-dashboard-sidebar-light
-      dark:bg-dashboard-sidebar-dark
-        p-4
-      "
+                  mt-6
+                  mb-4
+                  rounded-lg
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  bg-dashboard-sidebar-light
+                  dark:bg-dashboard-sidebar-dark
+                  p-4
+                "
                 >
                   <div className="grid grid-cols-[40px_1fr] gap-3">
                     {/* Avatar */}

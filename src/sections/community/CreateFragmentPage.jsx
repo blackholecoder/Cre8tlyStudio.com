@@ -4,31 +4,104 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../api/axios";
 import { timeAgo } from "../../helpers/date";
 import { ShieldCheck } from "lucide-react";
+import FragmentAudioPlayer from "./fragments/FragmentAudioPlayer";
 
 export default function CreateFragment() {
   const MAX_CHARS = 500;
+  const MAX_AUDIO_SECONDS = 10800;
   const textareaRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const reshareId = searchParams.get("reshare");
   const [body, setBody] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [audioUploading, setAudioUploading] = useState(false);
   const [reshareFragment, setReshareFragment] = useState(null);
 
   const [mentionResults, setMentionResults] = useState([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
 
+  // Audio State
+
+  const [audioFile, setAudioFile] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [audioTitle, setAudioTitle] = useState("");
+  const [audioDuration, setAudioDuration] = useState(null);
+  const [audioFileSize, setAudioFileSize] = useState(null);
+  const [audioMimeType, setAudioMimeType] = useState(null);
+
   const { fragmentId } = useParams();
   const isEdit = Boolean(fragmentId);
   const isReshare = Boolean(reshareId) && !isEdit;
 
+  function validateAudioDuration(file) {
+    return new Promise((resolve, reject) => {
+      const audio = document.createElement("audio");
+      audio.preload = "metadata";
+
+      audio.onloadedmetadata = () => {
+        URL.revokeObjectURL(audio.src);
+
+        if (audio.duration > MAX_AUDIO_SECONDS) {
+          reject(new Error("Audio exceeds the 3 hour maximum"));
+        } else {
+          resolve(audio.duration);
+        }
+      };
+
+      audio.onerror = () => {
+        reject(new Error("Unable to read audio metadata"));
+      };
+
+      audio.src = URL.createObjectURL(file);
+    });
+  }
+
+  const handleAudioUpload = async (file) => {
+    try {
+      setAudioUploading(true);
+
+      // 1️⃣ Validate duration locally
+      const duration = await validateAudioDuration(file);
+
+      // 2️⃣ Prepare multipart form data
+      const formData = new FormData();
+      formData.append("audio", file);
+
+      // 3️⃣ Upload to backend (express-fileupload route)
+      const uploadRes = await axiosInstance.post(
+        "/fragments/upload-audio",
+        formData,
+      );
+
+      if (!uploadRes.data?.success) {
+        throw new Error("Audio upload failed");
+      }
+
+      const { publicUrl, fileSize, mimeType } = uploadRes.data;
+
+      // 4️⃣ Set state from backend response
+      setAudioFile(file);
+      setAudioUrl(publicUrl);
+      setAudioTitle(file.name.replace(/\.[^/.]+$/, ""));
+      setAudioDuration(Math.floor(duration));
+      setAudioFileSize(fileSize);
+      setAudioMimeType(mimeType);
+
+      toast.success("Audio uploaded");
+    } catch (err) {
+      console.error("❌ handleAudioUpload failed:", err);
+      toast.error(err.message || "Audio upload failed");
+    } finally {
+      setAudioUploading(false);
+    }
+  };
+
   const submit = async () => {
     const strippedBody = body.trim();
 
-    if (!strippedBody && !isReshare) {
+    if (!strippedBody && !isReshare && !audioUrl) {
       toast.error("Fragment cannot be empty");
       return;
     }
@@ -38,34 +111,32 @@ export default function CreateFragment() {
       return;
     }
 
+    if (audioUrl && !audioTitle.trim()) {
+      toast.error("Audio title is required");
+      return;
+    }
+
     try {
-      setUploading(true);
-
-      let imageUrl = null;
-
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("image", imageFile);
-
-        const uploadRes = await axiosInstance.post(
-          "/community/upload-image",
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } },
-        );
-
-        imageUrl = uploadRes.data.image_url;
-      }
+      setSubmitting(true);
 
       if (isEdit) {
         await axiosInstance.put(`/fragments/${fragmentId}`, {
           body,
-          image_url: imageUrl,
+          audio_url: audioUrl,
+          audio_title: audioTitle,
+          audio_duration_seconds: audioDuration,
+          audio_file_size: audioFileSize,
+          audio_mime_type: audioMimeType,
         });
       } else {
         await axiosInstance.post("/fragments", {
           body,
-          image_url: imageUrl,
           reshareFragmentId: isReshare ? reshareId : null,
+          audio_url: audioUrl,
+          audio_title: audioTitle,
+          audio_duration_seconds: audioDuration,
+          audio_file_size: audioFileSize,
+          audio_mime_type: audioMimeType,
         });
       }
 
@@ -75,7 +146,7 @@ export default function CreateFragment() {
       console.error("Failed to create fragment:", err);
       toast.error("Failed to publish fragment");
     } finally {
-      setUploading(false);
+      setSubmitting(false);
     }
   };
 
@@ -123,7 +194,13 @@ export default function CreateFragment() {
         }
 
         setBody(f.body || "");
-        setImagePreview(f.image_url || null);
+        if (f.audio_url) {
+          setAudioUrl(f.audio_url);
+          setAudioTitle(f.audio_title || "");
+          setAudioDuration(f.audio_duration_seconds || null);
+          setAudioFileSize(f.audio_file_size || null);
+          setAudioMimeType(f.audio_mime_type || null);
+        }
 
         // 🔥 THIS IS THE MISSING PART
         if (f.reshare_fragment_id) {
@@ -142,14 +219,12 @@ export default function CreateFragment() {
   }, [fragmentId, isEdit]);
 
   const handleBodyChange = async (e) => {
-    const value = e.target.value;
+    const rawValue = e.target.value;
     const cursorPos = e.target.selectionStart;
 
-    if (value.length <= MAX_CHARS) {
-      setBody(value);
-    }
+    const value = rawValue.slice(0, MAX_CHARS);
+    setBody(value);
 
-    // Look back up to 50 chars from cursor
     const textBeforeCursor = value.slice(
       Math.max(0, cursorPos - 50),
       cursorPos,
@@ -187,36 +262,6 @@ export default function CreateFragment() {
     }
   };
 
-  // const insertMention = (username) => {
-  //   const textarea = document.activeElement;
-  //   if (!textarea) return;
-
-  //   const cursorPos = textarea.selectionStart;
-
-  //   // Look backwards for the @mention start
-  //   const textUpToCursor = body.slice(0, cursorPos);
-  //   const match = textUpToCursor.match(/@([a-zA-Z0-9_]*)$/);
-
-  //   if (!match) return;
-
-  //   const mentionStart = cursorPos - match[0].length;
-  //   const before = body.slice(0, mentionStart);
-  //   const after = body.slice(cursorPos);
-
-  //   const newText = `${before}@${username} ${after}`;
-  //   setBody(newText);
-
-  //   setShowMentions(false);
-  //   setMentionResults([]);
-  //   setMentionQuery("");
-
-  //   // Restore caret right after inserted mention
-  //   requestAnimationFrame(() => {
-  //     const newPos = mentionStart + username.length + 2;
-  //     textarea.setSelectionRange(newPos, newPos);
-  //     textarea.focus();
-  //   });
-  // };
   const insertMention = (username) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -278,17 +323,17 @@ export default function CreateFragment() {
 
         <button
           onClick={submit}
-          disabled={uploading}
+          disabled={submitting || audioUploading}
           className="
-    hidden sm:inline-flex
-    px-3 py-1.5
-    rounded-md
-    text-sm font-medium
-    bg-green text-black
-    disabled:opacity-50
-  "
+          hidden sm:inline-flex
+          px-3 py-1.5
+          rounded-md
+          text-sm font-medium
+          bg-green text-black
+          disabled:opacity-50
+        "
         >
-          {uploading ? "Saving…" : isEdit ? "Save Changes" : "Post Fragment"}
+          {submitting ? "Saving…" : isEdit ? "Save Changes" : "Post Fragment"}
         </button>
       </header>
 
@@ -306,14 +351,14 @@ export default function CreateFragment() {
             >
               {isReshare ? "Add a thought (optional)" : "Fragment"}
             </label>
-
-            <textarea
-              ref={textareaRef}
-              value={body}
-              onChange={handleBodyChange}
-              placeholder="Write a thought, a line, or something unfinished… use @ to mention other users in your fragment"
-              rows={6}
-              className="
+            <div className="relative">
+              <textarea
+                ref={textareaRef}
+                value={body}
+                onChange={handleBodyChange}
+                placeholder="Write a thought, a line, or something unfinished… use @ to mention other users in your fragment"
+                rows={6}
+                className="
               w-full p-4 rounded-lg
               bg-dashboard-bg-light dark:bg-dashboard-bg-dark
               border border-dashboard-border-light dark:border-dashboard-border-dark
@@ -323,38 +368,47 @@ export default function CreateFragment() {
               focus:outline-none focus:ring-2 focus:ring-green
               resize-y
             "
-            />
-            {showMentions && mentionResults.length > 0 && (
+              />
               <div
-                className="
-      relative
-      z-50
-      mt-2
-      w-full
-      max-h-56
-      overflow-y-auto
-      rounded-xl
-      border
-      bg-dashboard-sidebar-light
-      dark:bg-dashboard-sidebar-dark
-      border-dashboard-border-light
-      dark:border-dashboard-border-dark
-      shadow-2xl
-    "
+                className={`flex justify-end text-xs ${
+                  body.length >= MAX_CHARS
+                    ? "text-red-500"
+                    : "text-dashboard-muted-light dark:text-dashboard-muted-dark pb-4"
+                }`}
               >
-                {mentionResults.map((user) => (
-                  <button
-                    key={user.id}
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault(); // desktop
-                      insertMention(user.username);
-                    }}
-                    onTouchStart={(e) => {
-                      e.preventDefault(); // mobile
-                      insertMention(user.username);
-                    }}
-                    className="
+                {body.length}/{MAX_CHARS} characters max
+              </div>
+              {showMentions && mentionResults.length > 0 && (
+                <div
+                  className="
+                relative
+                z-50
+                mt-2
+                w-full
+                max-h-56
+                overflow-y-auto
+                rounded-xl
+                border
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                shadow-2xl
+              "
+                >
+                  {mentionResults.map((user) => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // desktop
+                        insertMention(user.username);
+                      }}
+                      onTouchStart={(e) => {
+                        e.preventDefault(); // mobile
+                        insertMention(user.username);
+                      }}
+                      className="
                     w-full
                     flex
                     items-center
@@ -366,47 +420,167 @@ export default function CreateFragment() {
                     dark:hover:bg-dashboard-hover-dark
                     transition
                   "
-                  >
-                    {user.profile_image_url ? (
-                      <img
-                        src={user.profile_image_url}
-                        alt={user.username}
-                        className="w-7 h-7 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-                        {user.username?.charAt(0)?.toUpperCase()}
-                      </div>
-                    )}
+                    >
+                      {user.profile_image_url ? (
+                        <img
+                          src={user.profile_image_url}
+                          alt={user.username}
+                          className="w-7 h-7 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+                          {user.username?.charAt(0)?.toUpperCase()}
+                        </div>
+                      )}
 
-                    <span className="text-sm font-medium">
-                      @{user.username}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div
-              className={`flex justify-end text-xs ${
-                body.length >= MAX_CHARS
-                  ? "text-red-500"
-                  : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
-              }`}
-            >
-              {body.length}/{MAX_CHARS}
+                      <span className="text-sm font-medium">
+                        @{user.username}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            <div
+              className="
+              mt-6
+              rounded-2xl
+              border border-dashboard-border-light dark:border-dashboard-border-dark
+              bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+              p-6
+              space-y-5
+            "
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-semibold text-dashboard-text-light dark:text-dashboard-text-dark">
+                  Add Audio{" "}
+                  <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark font-normal">
+                    (optional · max 3 hours)
+                  </span>
+                </h3>
+
+                {audioUrl && (
+                  <button
+                    type="button"
+                    className="
+                    text-xs
+                    text-dashboard-muted-light
+                    dark:text-dashboard-muted-dark
+                    hover:text-red-500
+                    transition
+                  "
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              {/* Upload Button Styled */}
+              {!audioUrl && !audioUploading && (
+                <label
+                  className="
+                  flex items-center justify-center
+                  h-24
+                  rounded-lg
+                  border-2 border-dashed
+                  border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  text-sm
+                  cursor-pointer
+                  hover:bg-dashboard-hover-light
+                  dark:hover:bg-dashboard-hover-dark
+                  transition
+                "
+                >
+                  <span className="opacity-70">Click to upload audio</span>
+
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    disabled={submitting || audioUploading}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      handleAudioUpload(file);
+                      e.target.value = "";
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+
+              {/* Uploading State */}
+              {audioUploading && (
+                <div
+                  className="
+                  rounded-lg
+                  border border-dashboard-border-light
+                  dark:border-dashboard-border-dark
+                  bg-dashboard-bg-light
+                  dark:bg-dashboard-bg-dark
+                  p-4
+                  flex items-center gap-3
+                "
+                >
+                  <div className="w-5 h-5 border-2 border-green border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm font-medium">Uploading audio…</span>
+                </div>
+              )}
+
+              {/* After Upload */}
+              {!audioUploading && audioUrl && (
+                <div className="space-y-4">
+                  {/* Title */}
+                  <div>
+                    <label className="block text-xs font-medium mb-1 text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                      Audio Title
+                    </label>
+
+                    <input
+                      className="
+                      w-full
+                      px-3 py-2.5
+                      rounded-lg
+                      bg-dashboard-bg-light
+                      dark:bg-dashboard-bg-dark
+                      border border-dashboard-border-light
+                      dark:border-dashboard-border-dark
+                      text-sm
+                      text-dashboard-text-light
+                      dark:text-dashboard-text-dark
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-green
+                      transition
+                    "
+                    />
+
+                    <div className="text-[11px] text-right opacity-60 mt-1">
+                      {audioTitle.length}/255
+                    </div>
+                  </div>
+
+                  {/* Player */}
+                  <FragmentAudioPlayer
+                    audioUrl={audioUrl}
+                    audioTitle={audioTitle}
+                    durationSeconds={audioDuration}
+                  />
+                </div>
+              )}
+            </div>
+
             {reshareFragment && (
               <div
                 className="
-      mt-4
-      rounded-lg
-      border border-dashboard-border-light
-      dark:border-dashboard-border-dark
-      bg-dashboard-sidebar-light
-      dark:bg-dashboard-sidebar-dark
-      p-4
-    "
+                mt-4
+                rounded-lg
+                border border-dashboard-border-light
+                dark:border-dashboard-border-dark
+                bg-dashboard-sidebar-light
+                dark:bg-dashboard-sidebar-dark
+                p-4
+              "
               >
                 <div className="grid grid-cols-[40px_1fr] gap-3">
                   {/* Avatar */}
@@ -459,7 +633,7 @@ export default function CreateFragment() {
         >
           <button
             onClick={submit}
-            disabled={uploading}
+            disabled={submitting || audioUploading}
             className="
             w-full
             py-3
@@ -469,7 +643,7 @@ export default function CreateFragment() {
             disabled:opacity-50
           "
           >
-            {uploading ? "Saving…" : isEdit ? "Save Changes" : "Post Fragment"}
+            {submitting ? "Saving…" : isEdit ? "Save Changes" : "Post Fragment"}
           </button>
         </div>
       </main>

@@ -48,20 +48,20 @@ export default function CreatePostPage({ post = null, topicId }) {
 
   const activeTopicId = lockedTopicId || topicId || selectedTopicId || null;
 
-  const wordCount = useMemo(() => {
-    const text = body
-      ?.replace(/<[^>]*>/g, " ")
-      ?.replace(/\s+/g, " ")
-      ?.trim();
-
-    if (!text) return 0;
-    return text.split(" ").length;
+  const plainText = useMemo(() => {
+    return (
+      body
+        ?.replace(/<[^>]*>/g, " ")
+        ?.replace(/\s+/g, " ")
+        ?.trim() || ""
+    );
   }, [body]);
 
-  const MIN_POST_WORDS = 501;
-  const isBelowPostThreshold = wordCount < MIN_POST_WORDS;
+  const charCount = plainText.length;
 
-  const hasStartedWriting = wordCount > 0;
+  const MIN_POST_CHARS = 501; // choose your threshold
+  const isBelowPostThreshold = charCount < MIN_POST_CHARS;
+  const hasStartedWriting = charCount > 0;
 
   const submit = async () => {
     if (!title.trim()) {
@@ -81,9 +81,9 @@ export default function CreatePostPage({ post = null, topicId }) {
       return;
     }
 
-    if (!isEdit && wordCount < MIN_POST_WORDS) {
+    if (!isEdit && charCount < MIN_POST_CHARS) {
       toast.error(
-        `Posts require at least ${MIN_POST_WORDS} words. This looks like a fragment.`,
+        `Posts require at least ${MIN_POST_CHARS} characters. This looks like a fragment.`,
       );
       return;
     }
@@ -472,6 +472,22 @@ export default function CreatePostPage({ post = null, topicId }) {
             onChange={setBody}
             onMention={handleMention}
           />
+          <div className="text-xs text-right transition-colors">
+            <span
+              className={
+                charCount >= MIN_POST_CHARS
+                  ? "text-green font-medium"
+                  : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
+              }
+            >
+              {charCount}
+            </span>
+
+            <span className="text-dashboard-muted-light dark:text-dashboard-muted-dark">
+              {" "}
+              / {MIN_POST_CHARS} characters minimum
+            </span>
+          </div>
 
           {showMentions && mentionResults.length > 0 && (
             <div
@@ -546,8 +562,8 @@ export default function CreatePostPage({ post = null, topicId }) {
                 Keep going — longer posts work best here.
               </p>
               <p className="mt-1 opacity-80">
-                Posts need at least {MIN_POST_WORDS} words. Short pieces belong
-                as fragments.
+                Posts need at least {MIN_POST_CHARS} characters. Short pieces
+                belong as fragments.
               </p>
 
               <button

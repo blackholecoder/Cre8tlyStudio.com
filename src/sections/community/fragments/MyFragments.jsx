@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { formatDate, timeAgo } from "../../../helpers/date";
 import MobileCreateFAB from "../posts/MobileCreateFAB";
+import FragmentAudioPlayer from "./FragmentAudioPlayer";
 
 export default function MyFragments() {
   const navigate = useNavigate();
@@ -337,6 +338,16 @@ export default function MyFragments() {
                       typeof fragment?.body === "string" ? fragment.body : "",
                   }}
                 />
+
+                {fragment.audio_url && (
+                  <div className="mt-3">
+                    <FragmentAudioPlayer
+                      audioUrl={fragment.audio_url}
+                      audioTitle={fragment.audio_title}
+                      durationSeconds={fragment.audio_duration_seconds}
+                    />
+                  </div>
+                )}
                 {/* RESHARED FRAGMENT — FULL STYLE */}
                 {fragment.reshared_id && (
                   <div

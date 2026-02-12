@@ -117,8 +117,18 @@ export function MobilePostCard({
               </p>
             )}
 
-            <p className="mt-2 text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark line-clamp-2">
-              {post.excerpt || post.body_preview || ""}
+            <p
+              className="
+              mt-2
+              text-sm
+              leading-relaxed
+              text-dashboard-muted-light
+              dark:text-dashboard-muted-dark
+              opacity-60
+              line-clamp-3
+            "
+            >
+              {post.body_preview}
             </p>
 
             <button
@@ -148,7 +158,7 @@ export function MobilePostCard({
       <div
         className="
         mt-2
-        px-6 sm:px-0
+        px-6
         flex items-center gap-6
         py-3
         text-sm sm:text-xs

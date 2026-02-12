@@ -1,6 +1,7 @@
 import { Eye, Heart, MessageSquare, Repeat, ShieldCheck } from "lucide-react";
 import { timeAgo } from "../../../helpers/date";
 import { useNavigate } from "react-router-dom";
+import FragmentAudioPlayer from "./FragmentAudioPlayer";
 
 export function FragmentItem({ fragment, onOpen, onToggleLike }) {
   const {
@@ -16,9 +17,28 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
     author_image,
     author_is_verified,
     reshared_id,
+    audio_url,
+    audio_title,
+    audio_duration_seconds,
   } = fragment;
   const navigate = useNavigate();
   const isVerified = author_is_verified === 1;
+
+  function formatDuration(seconds) {
+    if (!seconds) return null;
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
+    }
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
 
   return (
     <div
@@ -86,6 +106,12 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             dangerouslySetInnerHTML={{
               __html: typeof body === "string" ? body : "",
             }}
+          />
+
+          <FragmentAudioPlayer
+            audioUrl={audio_url}
+            audioTitle={audio_title}
+            durationSeconds={audio_duration_seconds}
           />
 
           {/* RESHARED FRAGMENT */}

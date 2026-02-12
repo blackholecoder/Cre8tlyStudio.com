@@ -419,9 +419,7 @@ export default function CommunityHome() {
             mb-8
           "
           >
-            where writers come together to share work, encourage one another,
-            <br />
-            and grow through honest feedback and connection.
+            where writers come together
           </p>
 
           <div
@@ -706,18 +704,18 @@ export default function CommunityHome() {
                       {/* DESKTOP ONLY */}
                       <div
                         className="
-    hidden md:block
-    px-4 py-4 sm:px-6
-    rounded-lg
-    border border-dashboard-border-light
-    dark:border-dashboard-border-dark
-    bg-dashboard-sidebar-light
-    dark:bg-dashboard-sidebar-dark
-    hover:bg-dashboard-hover-light
-    dark:hover:bg-dashboard-hover-dark
-    transition
-    cursor-pointer
-  "
+                        hidden md:block
+                        px-4 py-4 sm:px-6
+                        rounded-lg
+                        border border-dashboard-border-light
+                        dark:border-dashboard-border-dark
+                        bg-dashboard-sidebar-light
+                        dark:bg-dashboard-sidebar-dark
+                        hover:bg-dashboard-hover-light
+                        dark:hover:bg-dashboard-hover-dark
+                        transition
+                        cursor-pointer
+                      "
                       >
                         <div className="grid grid-cols-[1fr_auto] gap-6 items-start">
                           {/* LEFT COLUMN */}
@@ -781,6 +779,20 @@ export default function CommunityHome() {
                                     {post.subtitle}
                                   </p>
                                 )}
+                                <p
+                                  className="
+                                  mb-4
+                                  mt-2
+                                  text-sm
+                                  leading-relaxed
+                                  text-dashboard-muted-light
+                                  dark:text-dashboard-muted-dark
+                                  opacity-60
+                                  line-clamp-3
+                                "
+                                >
+                                  {post.body_preview}
+                                </p>
 
                                 {/* ACTIONS */}
                                 <div className="flex items-center gap-6 text-sm  text-dashboard-muted-light dark:text-dashboard-muted-dark">

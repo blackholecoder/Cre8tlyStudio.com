@@ -215,7 +215,7 @@ export default function CommentThread({
                 </div>
               )}
               {/* Comment Body */}
-              <p
+              <div
                 className="
             prose prose-sm max-w-none
              dark:prose-invert
@@ -226,7 +226,7 @@ export default function CommentThread({
           "
               >
                 {renderTextWithLinks(displayText)}
-              </p>
+              </div>
               {/* SEE MORE */}
               {!isExpanded && isLong && (
                 <button
@@ -376,6 +376,8 @@ export default function CommentThread({
                 onReplySubmit={onReplySubmit}
                 openReplies={openReplies}
                 toggleReplyVisibility={toggleReplyVisibility}
+                expandedComments={expandedComments}
+                setExpandedComments={setExpandedComments}
               />
             </div>
           ))}

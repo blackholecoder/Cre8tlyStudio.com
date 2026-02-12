@@ -96,8 +96,8 @@ const CommunityPostEditor = forwardRef(
           " ",
         );
 
-        const words = text.trim().split(/\s+/).filter(Boolean).length;
-        setWordCount(words);
+        const charCount = text.length;
+        setWordCount(charCount);
 
         // 🚫 ignore empty editor emissions
         if (!html || html.trim() === "<p></p>") return;

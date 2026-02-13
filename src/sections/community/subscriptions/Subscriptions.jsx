@@ -128,7 +128,7 @@ export default function Subscriptions() {
       </div>
 
       {/* Revenue summary */}
-      <div className="px-4 pt-4 max-w-6xl mx-auto">
+      <div className="px-0 pt-4 max-w-6xl mx-auto">
         <div
           className="
           grid grid-cols-1 sm:grid-cols-2 gap-3
@@ -168,7 +168,7 @@ export default function Subscriptions() {
       </div>
 
       {/* Mobile action bar */}
-      <div className="md:hidden px-4 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+      <div className="md:hidden px-0 py-3 border-b border-dashboard-border-light dark:border-dashboard-border-dark bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
         <button
           onClick={() => setInviteOpen(true)}
           className="
@@ -187,7 +187,7 @@ export default function Subscriptions() {
       </div>
 
       {/* Search */}
-      <div className="px-4 py-4 max-w-6xl mx-auto">
+      <div className="px-0 py-4 max-w-6xl mx-auto">
         <div className="relative">
           <Search
             size={16}
@@ -440,7 +440,7 @@ export default function Subscriptions() {
       </div>
 
       {/* Mobile cards */}
-      <div className="md:hidden px-4 space-y-3">
+      <div className="md:hidden px-0 space-y-3">
         {filtered.map((s) => (
           <div
             key={s.id}

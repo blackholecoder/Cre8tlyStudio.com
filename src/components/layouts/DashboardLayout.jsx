@@ -222,13 +222,13 @@ ${locked ? "opacity-50 cursor-pointer" : ""}
 
         {item.badge === "unreadCount" && unreadCount > 0 && (
           <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-            {unreadCount > 9 ? "9+" : unreadCount}
+            {unreadCount > 98 ? "99+" : unreadCount}
           </span>
         )}
 
         {item.badge === "communityCount" && communityCount > 0 && (
           <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-            {communityCount > 9 ? "9+" : communityCount}
+            {communityCount > 98 ? "99+" : communityCount}
           </span>
         )}
 
@@ -511,14 +511,14 @@ text-dashboard-muted-light dark:text-dashboard-muted-dark"
                         {/* BADGES */}
                         {item.badge === "unreadCount" && unreadCount > 0 && (
                           <span className="ml-auto mr-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            {unreadCount > 9 ? "9+" : unreadCount}
+                            {unreadCount > 98 ? "99+" : unreadCount}
                           </span>
                         )}
 
                         {item.badge === "communityCount" &&
                           communityCount > 0 && (
                             <span className="ml-auto mr-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                              {communityCount > 9 ? "9+" : communityCount}
+                              {communityCount > 98 ? "99+" : communityCount}
                             </span>
                           )}
 

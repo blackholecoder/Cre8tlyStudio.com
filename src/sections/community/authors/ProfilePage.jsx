@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../api/axios";
 import { ExternalLink, ChevronRight } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { useAuth } from "../../../admin/AuthContext";
 import { ProfilePostCarousel } from "../posts/ProfilePostCarousel";
 import { ButtonSpinner } from "../../../helpers/buttonSpinner";
@@ -77,49 +76,16 @@ export default function Profile() {
     }
   }
 
-  async function toggleSubscribe() {
+  function handleSubscribeClick() {
     if (!profile?.id) return;
 
-    // not logged in → signup
     if (!user) {
-      navigate(`/signup-community?redirect=/community/authors/${profile.id}`);
+      navigate(
+        `/signup-community?redirect=/community/subscribe/${profile.id}/choose`,
+      );
       return;
     }
 
-    // already subscribed → unsubscribe
-    if (isSubscribed) {
-      setSubLoading(true);
-      try {
-        await axiosInstance.delete(
-          `/community/subscriptions/${profile.id}/subscribe`,
-        );
-        setIsSubscribed(false);
-      } catch (err) {
-        toast.error("Failed to unsubscribe");
-      } finally {
-        setSubLoading(false);
-      }
-      return;
-    }
-
-    // NOT subscribed yet
-    if (!hasPaidSubscription) {
-      // free subscribe
-      setSubLoading(true);
-      try {
-        await axiosInstance.post(
-          `/community/subscriptions/${profile.id}/subscribe`,
-        );
-        setIsSubscribed(true);
-      } catch (err) {
-        toast.error("Subscription failed");
-      } finally {
-        setSubLoading(false);
-      }
-      return;
-    }
-
-    // paid subscription exists → choose page
     navigate(`/community/subscribe/${profile.id}/choose`, {
       state: {
         from: `/community/authors/${profile.id}`,
@@ -162,7 +128,7 @@ export default function Profile() {
                 <p>@{profile.username}</p>
                 {!isOwnProfile && (
                   <button
-                    onClick={toggleSubscribe}
+                    onClick={handleSubscribeClick}
                     disabled={subLoading}
                     className={`
     mt-4
@@ -182,7 +148,7 @@ export default function Profile() {
                         <span className="text-xs">Please wait</span>
                       </>
                     ) : isSubscribed ? (
-                      "Subscribed"
+                      "Manage Subscription"
                     ) : (
                       "Subscribe"
                     )}

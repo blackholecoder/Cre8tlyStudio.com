@@ -25,11 +25,13 @@ import {
   Bold,
   Minus,
   Italic,
+  Lock,
 } from "lucide-react";
 import { LinkModal } from "./LinkModal";
 import { VideoModal } from "./VideoModal";
 import axiosInstance from "../../../api/axios";
 import { MentionMark } from "./MentionMark";
+import { SubscriberDivider } from "./SubscriberDivider";
 
 const CommunityPostEditor = forwardRef(
   ({ value, onChange, onMention }, ref) => {
@@ -54,6 +56,7 @@ const CommunityPostEditor = forwardRef(
         Blockquote,
         Underline,
         HorizontalRule,
+        SubscriberDivider,
         Link.configure({
           openOnClick: false,
           autolink: true,
@@ -335,6 +338,21 @@ const CommunityPostEditor = forwardRef(
             </div>
 
             {/* existing buttons */}
+            <button
+              onClick={() => {
+                editor
+                  .chain()
+                  .focus()
+                  .insertContent({
+                    type: "subscriberDivider",
+                  })
+                  .run();
+              }}
+              className="shrink-0 p-2 rounded hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+              title="Subscriber Only Divider"
+            >
+              <Lock size={16} />
+            </button>
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
               className={`

@@ -154,7 +154,7 @@ export default function MyPublication() {
 
   return (
     <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-0 py-8">
         <PublicationHeader profile={profile} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-10 sm:gap-12">

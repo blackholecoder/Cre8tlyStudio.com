@@ -25,6 +25,7 @@ export default function SubscribeChoicePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [hasPaidSubscription, setHasPaidSubscription] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     loadAuthor();
@@ -39,6 +40,7 @@ export default function SubscribeChoicePage() {
 
       setAuthor(authorRes.data.profile);
       setHasPaidSubscription(statusRes.data.has_paid_subscription);
+      setIsSubscribed(statusRes.data.subscribed);
     } catch (err) {
       toast.error("Failed to load author");
       navigate(redirectBack);
@@ -81,6 +83,24 @@ export default function SubscribeChoicePage() {
       navigate(redirectBack);
     } catch (err) {
       toast.error("Failed to subscribe");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleUnsubscribe() {
+    if (submitting) return;
+    setSubmitting(true);
+
+    try {
+      await axiosInstance.delete(
+        `/community/subscriptions/${authorId}/subscribe`,
+      );
+
+      toast.success("Unsubscribed");
+      navigate(redirectBack);
+    } catch (err) {
+      toast.error("Failed to unsubscribe");
     } finally {
       setSubmitting(false);
     }
@@ -178,20 +198,22 @@ export default function SubscribeChoicePage() {
           <button
             type="button"
             disabled={submitting}
-            onClick={handleFreeSubscribe}
+            onClick={isSubscribed ? handleUnsubscribe : handleFreeSubscribe}
             className={`
-            w-full mt-4 py-3 rounded-lg
-            border
-            transition
-            flex items-center justify-center gap-2
-            ${submitting ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
-          `}
+    w-full mt-4 py-3 rounded-lg
+    border
+    transition
+    flex items-center justify-center gap-2
+    ${submitting ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
+  `}
           >
             {submitting ? (
               <>
                 <ButtonSpinner size={16} />
-                Subscribing…
+                Updating…
               </>
+            ) : isSubscribed ? (
+              "Unsubscribe"
             ) : (
               "Subscribe for free"
             )}

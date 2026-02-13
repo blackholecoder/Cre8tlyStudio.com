@@ -1,30 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import CreateCommentBox from "./CreateCommentBox";
-import {
-  ShieldCheck,
-  Heart,
-  Eye,
-  Share2,
-  Check,
-  DollarSign,
-  Bookmark,
-  MessageSquareLock,
-  MessageSquare,
-} from "lucide-react";
 import { useAuth } from "../../admin/AuthContext";
-import CommentThread from "./CommentThread";
-import ReplyBox from "../../components/community/ReplyBox";
-import { Img } from "react-image";
-import { headerLogo } from "../../assets/images";
-import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
 import { formatPostDate } from "../../helpers/formatPostDate";
 import { confirmDelete } from "../../helpers/confirmToast";
-import { ButtonSpinner } from "../../helpers/buttonSpinner";
 import { toast } from "react-toastify";
 import TipModal from "./modals/TipModal";
-import FragmentAudioPlayer from "./fragments/FragmentAudioPlayer";
+import PostHeader from "./posts/PostHeader";
+import PostBody from "./posts/PostBody";
+import CommentsSection from "./posts/CommentsSection";
 
 export default function CommunityPost({ targetType = "post" }) {
   const isFragment = targetType === "fragment";
@@ -59,6 +43,7 @@ export default function CommunityPost({ targetType = "post" }) {
   const [tipLoading, setTipLoading] = useState(false);
   const [expandedComments, setExpandedComments] = useState({});
   const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
+  const [subscriberHasPaid, setSubscriberHasPaid] = useState(false);
 
   // paid subs state
   const [hasPaidSubscription, setHasPaidSubscription] = useState(false);
@@ -74,12 +59,14 @@ export default function CommunityPost({ targetType = "post" }) {
   const htmlClasses = `
   post-body
   prose prose-md max-w-none
-  prose-pre:bg-zinc-900 dark:prose-pre:bg-zinc-800
-  prose-pre:text-gray-100
-  prose-pre:overflow-x-auto
-  prose-code:text-[#e5e7eb]
-  dark:prose-invert
-  text-dashboard-text-light dark:text-dashboard-text-dark
+  prose-p:text-dashboard-text-light
+  prose-headings:text-dashboard-text-light
+  prose-strong:text-dashboard-text-light
+  prose-li:text-dashboard-text-light
+  dark:prose-p:text-dashboard-text-dark
+  dark:prose-headings:text-dashboard-text-dark
+  dark:prose-strong:text-dashboard-text-dark
+  dark:prose-li:text-dashboard-text-dark
 `;
 
   const targetConfig = {
@@ -211,6 +198,7 @@ export default function CommunityPost({ targetType = "post" }) {
 
           setIsSubscribed(subRes.data.subscribed);
           setHasPaidSubscription(subRes.data.has_paid_subscription);
+          setSubscriberHasPaid(subRes.data.subscriber_has_paid);
         } catch (err) {
           console.error("Failed to load subscription status", err);
         }
@@ -622,10 +610,6 @@ export default function CommunityPost({ targetType = "post" }) {
   const isCommentsPrivate =
     post.comments_visibility === COMMENTS_VISIBILITY.PRIVATE;
 
-  // locked if:
-  // - explicitly locked by admin
-  // - paid comments and user does not have paid subscription
-  // - private comments and user is not subscribed
   const commentsLocked = (() => {
     // 1️⃣ Owner always allowed
     if (user?.id === post.user_id) return false;
@@ -634,7 +618,7 @@ export default function CommunityPost({ targetType = "post" }) {
     if (post.comments_locked === 1) return true;
 
     // 3️⃣ Paid comments require paid subscription
-    if (isCommentsPaid && !hasPaidSubscription) return true;
+    if (isCommentsPaid && !subscriberHasPaid) return true;
 
     // 4️⃣ Private comments require ANY subscription
     if (isCommentsPrivate && !isSubscribed) return true;
@@ -725,897 +709,78 @@ export default function CommunityPost({ targetType = "post" }) {
             sm:shadow-lg
           "
           >
-            <div className="flex items-start gap-4 mb-4 sm:mb-6">
-              <button
-                title={
-                  !post.author_has_profile ? "Profile coming soon" : undefined
-                }
-                onClick={() => {
-                  // Own post → no navigation
-                  if (user?.id === post.user_id) return;
-
-                  // Author has no profile → block + inform
-                  if (!post.author_has_profile) {
-                    toast.info("This! author hasn’t set up their profile yet");
-                    return;
-                  }
-
-                  // Safe navigation
-                  navigate(`/community/authors/${post.user_id}`);
-                }}
-                className={`group -mt-2.5 ${!post.author_has_profile ? "cursor-default" : "cursor-pointer"}`}
-              >
-                {isStudioPost ? (
-                  <img
-                    src={headerLogo}
-                    className="w-12 h-12 rounded-full object-cover"
-                    alt="The Messy Attic"
-                  />
-                ) : post.author_image ? (
-                  <Img
-                    src={post.author_image}
-                    loader={
-                      <div className="w-12 h-12 rounded-full bg-gray-700/40 animate-pulse" />
-                    }
-                    unloader={
-                      <div
-                        className="w-12 h-12 rounded-full border flex items-center justify-center text-xl font-bold bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-                      border-dashboard-border-light dark:border-dashboard-border-dark
-                      text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                      >
-                        {avatarInitial}
-                      </div>
-                    }
-                    decode={true}
-                    alt="User avatar"
-                    className="w-12 h-12 rounded-full object-cover  shadow-xl transition-opacity duration-300"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-green/90 border border-green flex items-center justify-center text-xl font-bold text-green">
-                    {avatarInitial}
-                  </div>
-                )}
-              </button>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-[1px]">
-                    <p className="text-dashboard-text-light dark:text-dashboard-text-dark text-lg font-semibold">
-                      {post.author}
-                    </p>
-
-                    {(isStudioPost || isAdmin) && (
-                      <span
-                        className="
-                        flex items-center
-                        text-dashboard-muted-light dark:text-dashboard-muted-dark
-                        text-[10px]
-                        px-0.5 py-0.5
-                        rounded-full
-                      "
-                      >
-                        <ShieldCheck
-                          size={15}
-                          className="text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                        />
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Subscribe button */}
-                  {!isStudioPost && user?.id !== post.user_id && (
-                    <button
-                      onClick={toggleSubscribe}
-                      disabled={subLoading}
-                      className={`
-                      text-xs
-                      px-2
-                      py-1
-                      min-w-[88px]
-                      rounded-md
-                      border
-                      transition
-                      flex
-                      items-center
-                      justify-center
-                      gap-1
-
-                      ${
-                        isSubscribed
-                          ? "bg-green/10 text-green border-green/30"
-                          : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark"
-                      }
-
-                      ${subLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
-                    `}
-                    >
-                      {subLoading ? (
-                        <>
-                          <ButtonSpinner />
-                          <span>
-                            {isSubscribed ? "Updating" : "Subscribing"}
-                          </span>
-                        </>
-                      ) : (
-                        <span>{isSubscribed ? "Subscribed" : "Subscribe"}</span>
-                      )}
-                    </button>
-                  )}
-                </div>
-
-                <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark text-sm mt-1 flex items-center flex-wrap gap-1">
-                  <span>{formatPostDate(post.created_at)}</span>
-                  <span className="mx-1">·</span>
-                  <span className="opacity-80">{timeAgo(post.created_at)}</span>
-                  <span className="mx-1">·</span>
-                  <span className="flex items-center gap-1 opacity-80">
-                    <Bookmark
-                      size={12}
-                      className="text-dashboard-muted-light dark:text-dashboard-muted-dark stroke-[2]"
-                    />
-                    {post.save_count}
-                  </span>
-                </p>
-
-                {/* Mobile meta + actions */}
-                <div
-                  className="
-                  sm:hidden
-                  mt-2
-                  w-full
-                  flex items-center
-                  justify-between
-                  text-dashboard-muted-light
-                  dark:text-dashboard-muted-dark
-                "
-                >
-                  {/* Views (meta, not clickable) */}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 text-sm sm:text-xs">
-                      <Eye size={18} className="opacity-70" />
-                      <span>{post.views ?? 0}</span>
-                    </div>
-
-                    {/* Like */}
-                    <button
-                      onClick={togglePostLike}
-                      className="
-                      flex items-center gap-2
-                      text-sm
-                      active:scale-95
-                      transition
-                    "
-                    >
-                      <Heart
-                        size={18}
-                        className={
-                          post.has_liked
-                            ? "text-red-500 fill-red-500"
-                            : "opacity-80"
-                        }
-                      />
-                      <span>{post.like_count ?? 0}</span>
-                    </button>
-
-                    {/* Comments */}
-                    <button
-                      onClick={() =>
-                        document
-                          .getElementById("comments")
-                          ?.scrollIntoView({ behavior: "smooth" })
-                      }
-                      className="
-                      flex items-center gap-2
-                      text-sm
-                      active:scale-95
-                      transition
-                    "
-                    >
-                      {commentsLocked ? (
-                        <MessageSquareLock size={15} className="opacity-80" />
-                      ) : (
-                        <MessageSquare size={15} className="opacity-80" />
-                      )}
-                      <span>{post.comment_count ?? 0}</span>
-                    </button>
-
-                    {/* Share */}
-                    <button
-                      onClick={handleShare}
-                      className="
-                      flex items-center gap-2
-                      text-sm
-                      active:scale-95
-                      transition
-                    "
-                    >
-                      {copied ? (
-                        <>
-                          <Check size={18} className="text-green" />
-                        </>
-                      ) : (
-                        <>
-                          <Share2 size={18} className="opacity-80" />
-                        </>
-                      )}
-                    </button>
-                    {user &&
-                      user.id !== post.user_id &&
-                      (tipSuccess ? (
-                        <div className="flex items-center gap-2 text-sm text-green">
-                          <Check size={18} />
-                          <span>Sent</span>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={openTipModal}
-                          className="
-                          flex items-center gap-2
-                          text-sm
-                          active:scale-95
-                          transition
-                        "
-                        >
-                          <DollarSign size={18} className="opacity-80" />
-                          <span>Tip</span>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Desktop Menu */}
-                <div className="hidden sm:flex items-center gap-6 mt-2 text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                  <div className="flex items-center gap-[3px]">
-                    <Eye size={16} />
-                    <span>{post.views ?? 0}</span>
-                  </div>
-
-                  <button
-                    onClick={togglePostLike}
-                    className={`
-                    flex items-center gap-[3px]
-                    transition
-                    ${post.has_liked ? "text-red-500" : "opacity-70 hover:opacity-100"}
-                  `}
-                  >
-                    <Heart
-                      size={16}
-                      fill={post.has_liked ? "currentColor" : "transparent"}
-                    />
-                    <span>{post.like_count ?? 0}</span>
-                  </button>
-
-                  <div className="flex items-center gap-[3px]">
-                    {commentsLocked ? (
-                      <MessageSquareLock size={15} className="opacity-80" />
-                    ) : (
-                      <MessageSquare size={15} className="opacity-80" />
-                    )}
-                    <span>{post.comment_count ?? 0}</span>
-                  </div>
-                  <button
-                    onClick={handleShare}
-                    className="
-                    relative
-                    flex items-center gap-1
-                     hover:text-sky-400/80
-                    transition
-                  "
-                  >
-                    {copied ? (
-                      <>
-                        <Check size={16} className="text-green" />
-                      </>
-                    ) : (
-                      <>
-                        <Share2 size={16} />
-                      </>
-                    )}
-                  </button>
-                  {user &&
-                    user.id !== post.user_id &&
-                    (tipSuccess ? (
-                      <div className="flex items-center gap-1 text-green text-xs">
-                        <Check size={14} />
-                        <span>Tip sent!</span>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={openTipModal}
-                        className="
-                        flex items-center gap-1
-                        text-dashboard-muted-light
-                        dark:text-dashboard-muted-dark
-                        hover:text-green
-                        transition
-                      "
-                      >
-                        <DollarSign size={16} />
-                        <span>Tip</span>
-                      </button>
-                    ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start justify-between gap-4">
-              {!isFragment && (
-                <h2
-                  className="
-                  not-prose
-                  text-3xl sm:text-3xl
-                  font-bold
-                  tracking-tight
-                  leading-tight
-                  text-dashboard-text-light
-                  dark:text-dashboard-text-dark
-                "
-                >
-                  {post.title}
-                </h2>
-              )}
-
-              {!isFragment && user && (
-                <button
-                  onClick={toggleBookmark}
-                  className="
-                  mt-1
-                  p-2
-                  rounded-lg
-                  text-dashboard-muted-light
-                  dark:text-dashboard-muted-dark
-                  hover:bg-dashboard-hover-light
-                  dark:hover:bg-dashboard-hover-dark
-                  active:scale-95
-                  transition
-                "
-                  title={post.is_bookmarked ? "Saved" : "Save for later"}
-                >
-                  {bookmarkSuccess ? (
-                    <Check size={18} className="text-green" />
-                  ) : (
-                    <Bookmark
-                      size={18}
-                      className={
-                        post.is_bookmarked
-                          ? "text-green stroke-[2.2]"
-                          : "opacity-80"
-                      }
-                    />
-                  )}
-                </button>
-              )}
-            </div>
-
-            {!isFragment && post.subtitle && (
-              <p
-                className="
-                text-base sm:text-lg
-                font-normal
-                leading-relaxed
-                max-w-2xl
-                text-dashboard-muted-light
-                dark:text-dashboard-muted-dark
-              "
-              >
-                {post.subtitle}
-              </p>
-            )}
-
-            {post.image_url && (
-              <div className="mb-6">
-                <img
-                  src={post.image_url}
-                  alt="Post"
-                  className="
-                w-full
-                max-h-[420px]
-                object-cover
-                rounded-xl
-                mt-12
-                border border-dashboard-border-light
-                dark:border-dashboard-border-dark
-              "
-                />
-              </div>
-            )}
-
-            <div className={isFragment ? fragmentClasses : htmlClasses}>
-              {/* Reshared fragment card */}
-
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: typeof post?.body === "string" ? post.body : "",
-                }}
-              />
-
-              {isFragment && post.audio_url && (
-                <FragmentAudioPlayer
-                  audioUrl={post.audio_url}
-                  audioTitle={post.audio_title}
-                  durationSeconds={post.audio_duration_seconds}
-                />
-              )}
-
-              {isFragment && post.reshared_id && (
-                <div
-                  className="
-                  mt-6
-                  mb-4
-                  rounded-lg
-                  border border-dashboard-border-light
-                  dark:border-dashboard-border-dark
-                  bg-dashboard-sidebar-light
-                  dark:bg-dashboard-sidebar-dark
-                  p-4
-                "
-                >
-                  <div className="grid grid-cols-[40px_1fr] gap-3">
-                    {/* Avatar */}
-                    {post.reshared_author_image ? (
-                      <img
-                        src={post.reshared_author_image}
-                        alt=""
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-dashboard-border-light dark:bg-dashboard-border-dark" />
-                    )}
-
-                    {/* Name + time */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm font-medium text-dashboard-text-light dark:text-dashboard-text-dark">
-                          {post.reshared_author}
-                        </span>
-
-                        {post.reshared_author_is_verified === 1 && (
-                          <ShieldCheck size={14} className="text-green" />
-                        )}
-                      </div>
-
-                      <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                        {timeAgo(post.reshared_created_at)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="mt-3 text-sm leading-relaxed whitespace-pre-wrap text-dashboard-text-light dark:text-dashboard-text-dark">
-                    {post.reshared_body}
-                  </p>
-                </div>
-              )}
-            </div>
+            <PostHeader
+              post={post}
+              user={user}
+              navigate={navigate}
+              isStudioPost={isStudioPost}
+              isAdmin={isAdmin}
+              avatarInitial={avatarInitial}
+              toggleSubscribe={toggleSubscribe}
+              subLoading={subLoading}
+              isSubscribed={isSubscribed}
+              formatPostDate={formatPostDate}
+              timeAgo={timeAgo}
+              togglePostLike={togglePostLike}
+              commentsLocked={commentsLocked}
+              handleShare={handleShare}
+              copied={copied}
+              tipSuccess={tipSuccess}
+              openTipModal={openTipModal}
+            />
+            <PostBody
+              post={post}
+              isFragment={isFragment}
+              user={user}
+              navigate={navigate}
+              toggleBookmark={toggleBookmark}
+              bookmarkSuccess={bookmarkSuccess}
+              fragmentClasses={fragmentClasses}
+              htmlClasses={htmlClasses}
+              timeAgo={timeAgo}
+            />
           </div>
 
-          {/* Comments */}
-          <div>
-            <h2
-              className="text-xl font-semibold mb-5
-            text-dashboard-text-light dark:text-dashboard-text-dark"
-            >
-              Comments
-            </h2>
-
-            {commentsLocked ? (
-              <div className="mb-10 p-4 rounded-lg border border-dashboard-border-light dark:border-dashboard-border-dark text-sm text-dashboard-muted-light dark:text-dashboard-muted-dark flex items-center gap-2">
-                <MessageSquareLock size={16} />
-                <span>
-                  {isCommentsPaid
-                    ? "Comments are for paid subscribers only."
-                    : "Comments are private."}
-                </span>
-                {isCommentsPaid && user?.id !== post.user_id && (
-                  <button
-                    onClick={() =>
-                      navigate(`/community/subscribe/${post.user_id}/choose`, {
-                        state: { from: redirectPath },
-                      })
-                    }
-                    className="
-                    text-green
-                    text-sm
-                    font-medium
-                    w-fit
-                    hover:underline
-                  "
-                  >
-                    Become a paid subscriber →
-                  </button>
-                )}
-              </div>
-            ) : comments.length === 0 ? (
-              <p className="text-dashboard-muted-light dark:text-dashboard-muted-dark mb-6">
-                No comments yet.
-              </p>
-            ) : null}
-            {!commentsLocked && (
-              <div className="space-y-4 mb-10">
-                {comments.map((c) => {
-                  const commentAvatar =
-                    c.author?.charAt(0).toUpperCase() ?? "U";
-                  const commentAdmin = c.author_role === "admin";
-
-                  const MAX_LENGTH = 420;
-
-                  const isExpanded = expandedComments[c.id] !== false;
-                  const isLong = c.body.length > MAX_LENGTH;
-
-                  const displayText =
-                    !isExpanded && isLong
-                      ? c.body.slice(0, MAX_LENGTH).trim() + "…"
-                      : c.body;
-
-                  return (
-                    <div
-                      key={c.id}
-                      className="
-                    /* mobile */
-                    bg-transparent
-                    border-b border-dashboard-border-light/50 dark:border-dashboard-border-dark/50
-                    rounded-none
-                    shadow-none
-                    p-3
-
-                    /* desktop */
-                    sm:bg-dashboard-sidebar-light
-                    sm:dark:bg-dashboard-sidebar-dark
-                    sm:border sm:border-dashboard-border-light sm:dark:border-dashboard-border-dark
-                    sm:rounded-lg
-                    sm:p-5
-                    lg:p-6
-                    sm:shadow-inner
-                  "
-                    >
-                      <div className="flex items-start gap-4">
-                        <button
-                          title={
-                            !c.author_has_profile
-                              ? "Profile coming soon"
-                              : undefined
-                          }
-                          onClick={() => {
-                            // own comment → no navigation
-                            if (user?.id === c.user_id) return;
-
-                            // no profile → block
-                            if (!c.author_has_profile) {
-                              toast.info(
-                                "This author hasn’t set up their profile yet",
-                              );
-                              return;
-                            }
-
-                            // navigate
-                            navigate(`/community/authors/${c.user_id}`);
-                          }}
-                          className={`flex-shrink-0 ${
-                            !c.author_has_profile
-                              ? "cursor-default"
-                              : "cursor-pointer"
-                          }`}
-                        >
-                          {c.author_image ? (
-                            <Img
-                              src={c.author_image}
-                              loader={
-                                <div className="w-8 h-8 rounded-full bg-gray-700/40 animate-pulse" />
-                              }
-                              unloader={
-                                <div
-                                  className="
-                                w-10 h-10 rounded-full
-                                flex items-center justify-center
-                                text-sm font-semibold
-                                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-                                border border-dashboard-border-light dark:border-dashboard-border-dark
-                                text-dashboard-muted-light dark:text-dashboard-muted-dark
-                              "
-                                >
-                                  {commentAvatar}
-                                </div>
-                              }
-                              decode
-                              alt="Comment avatar"
-                              className="w-10 h-10 rounded-full object-cover border border-gray-700 transition-opacity duration-300"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
-                              {commentAvatar}
-                            </div>
-                          )}
-                        </button>
-
-                        <div className="flex-1">
-                          <div className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-2 flex items-center gap-[4px]">
-                            <div className="flex items-center gap-0">
-                              <span className="font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                                {c.author}
-                              </span>
-
-                              {commentAdmin && (
-                                <span className="px-1">
-                                  <ShieldCheck
-                                    size={12}
-                                    className="text-dashboard-muted-light dark:text-green"
-                                  />
-                                </span>
-                              )}
-                            </div>
-
-                            <span>·</span>
-                            <span>{timeAgo(c.created_at)}</span>
-
-                            {c.updated_at &&
-                              new Date(c.updated_at).getTime() >
-                                new Date(c.created_at).getTime() && (
-                                <>
-                                  <span>·</span>
-                                  <span className="text-[10px] opacity-60">
-                                    edited
-                                  </span>
-                                </>
-                              )}
-                          </div>
-                          {editCommentId !== c.id && (
-                            <>
-                              <div
-                                className="
-                              prose prose-sm max-w-none
-                              my-1
-                              text-dashboard-text-light dark:text-dashboard-text-dark
-                              whitespace-pre-wrap
-                              dark:prose-invert
-                              dark:prose-a:text-sky-400
-                              dark:prose-a:decoration-sky-400
-                            "
-                              >
-                                {renderTextWithLinks(displayText)}
-                              </div>
-
-                              {!isExpanded && isLong && (
-                                <button
-                                  onClick={() =>
-                                    setExpandedComments((prev) => ({
-                                      ...prev,
-                                      [c.id]: true,
-                                    }))
-                                  }
-                                  className="text-xs text-sky-400 mt-1 hover:underline"
-                                >
-                                  See more
-                                </button>
-                              )}
-
-                              {isExpanded && isLong && (
-                                <button
-                                  onClick={() =>
-                                    setExpandedComments((prev) => ({
-                                      ...prev,
-                                      [c.id]: false,
-                                    }))
-                                  }
-                                  className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark mt-1 hover:underline"
-                                >
-                                  See less
-                                </button>
-                              )}
-                            </>
-                          )}
-
-                          {editCommentId === c.id && (
-                            <div className="mt-3">
-                              <textarea
-                                value={editBody}
-                                onChange={(e) => setEditBody(e.target.value)}
-                                className="
-                              w-full
-                              bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-                              border border-dashboard-border-light dark:border-dashboard-border-dark
-                              p-2 rounded
-                              text-dashboard-text-light dark:text-dashboard-text-dark
-                              text-sm
-                            "
-                                rows={3}
-                              />
-
-                              <div className="flex gap-3 mt-2">
-                                <button
-                                  onClick={() => saveEditedComment(c.id)}
-                                  className="px-3 py-1 bg-blue text-white text-xs rounded hover:bg-blue/90"
-                                >
-                                  Save
-                                </button>
-
-                                <button
-                                  onClick={() => {
-                                    setEditCommentId(null);
-                                    setEditBody("");
-                                  }}
-                                  className="
-                                px-3 py-1
-                                bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-                                text-dashboard-muted-light dark:text-dashboard-muted-dark
-                                border border-dashboard-border-light dark:border-dashboard-border-dark
-                                text-xs rounded
-                                hover:opacity-80
-"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Action Row */}
-                          {editCommentId !== c.id && (
-                            <div className="flex items-center gap-3 mt-1.5">
-                              <button
-                                onClick={() => toggleLike(c)}
-                                className={`text-xs ${
-                                  c.user_liked
-                                    ? "text-red-600"
-                                    : "text-dashboard-muted-light dark:text-dashboard-muted-dark"
-                                } hover:opacity-80`}
-                              >
-                                <Heart
-                                  size={12}
-                                  fill={
-                                    c.user_liked
-                                      ? "currentColor"
-                                      : "transparent"
-                                  }
-                                  className="inline-block mr-1"
-                                />
-                                {c.like_count}
-                              </button>
-                              {/* Reply is ALWAYS available */}
-                              {!commentsLocked && (
-                                <button
-                                  onClick={() => setActiveReplyBox(c.id)}
-                                  className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
-                                >
-                                  Reply
-                                </button>
-                              )}
-
-                              {/* View / Hide replies only if replies exist */}
-                              {c.reply_count > 0 && (
-                                <button
-                                  onClick={() => toggleReplies(c.id)}
-                                  className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
-                                >
-                                  {openReplies[c.id]
-                                    ? "Hide replies"
-                                    : `View replies (${c.reply_count})`}
-                                </button>
-                              )}
-
-                              {/* Edit */}
-                              {!openReplies[c.id] &&
-                                user &&
-                                c.user_id === user.id && (
-                                  <button
-                                    onClick={() => {
-                                      setEditCommentId(c.id);
-                                      setEditBody(c.body);
-                                    }}
-                                    className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
-                                  >
-                                    Edit
-                                  </button>
-                                )}
-
-                              {/* Delete */}
-                              {!openReplies[c.id] &&
-                                user &&
-                                (c.user_id === user.id ||
-                                  post.user_id === user.id) && (
-                                  <button
-                                    onClick={() => handleDelete(c.id)}
-                                    className="text-xs text-dashboard-text-light dark:text-dashboard-text-dark hover:opacity-80"
-                                  >
-                                    Delete
-                                  </button>
-                                )}
-                            </div>
-                          )}
-
-                          {activeReplyBox === c.id && (
-                            <div className="mt-3 ml-6">
-                              <ReplyBox
-                                parentComment={c}
-                                onReply={async (newReply) => {
-                                  // 1️⃣ add reply locally
-                                  setReplies((prev) => ({
-                                    ...prev,
-                                    [c.id]: [...(prev[c.id] || []), newReply],
-                                  }));
-
-                                  // 2️⃣ increment reply_count on the parent comment
-                                  setComments((prev) =>
-                                    prev.map((comment) =>
-                                      comment.id === c.id
-                                        ? {
-                                            ...comment,
-                                            reply_count:
-                                              (comment.reply_count || 0) + 1,
-                                          }
-                                        : comment,
-                                    ),
-                                  );
-
-                                  // 3️⃣ open replies immediately
-                                  setOpenReplies((prev) => ({
-                                    ...prev,
-                                    [c.id]: true,
-                                  }));
-
-                                  // 4️⃣ close reply box
-                                  setTimeout(
-                                    () => setActiveReplyBox(null),
-                                    100,
-                                  );
-                                }}
-                                onCancel={() => setActiveReplyBox(null)}
-                              />
-                            </div>
-                          )}
-
-                          {/* Replies */}
-                          {openReplies[c.id] &&
-                            (replies[c.id] || []).map((reply) => (
-                              <CommentThread
-                                key={reply.id}
-                                postOwnerId={post.user_id}
-                                comment={reply}
-                                depth={1}
-                                loadReplies={loadReplies}
-                                replies={replies}
-                                setReplies={setReplies}
-                                replyPages={replyPages}
-                                timeAgo={timeAgo}
-                                toggleLike={toggleLike}
-                                activeReplyBox={activeReplyBox}
-                                setActiveReplyBox={setActiveReplyBox}
-                                editCommentId={editCommentId}
-                                editBody={editBody}
-                                setEditBody={setEditBody}
-                                setEditCommentId={setEditCommentId}
-                                handleDelete={handleDelete}
-                                onReplySubmit={saveEditedComment}
-                                openReplies={openReplies}
-                                toggleReplyVisibility={toggleReplies}
-                                expandedComments={expandedComments}
-                                setExpandedComments={setExpandedComments}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div ref={observerRef} className="h-10"></div>
-              </div>
-            )}
-            {!commentsLocked && (
-              <CreateCommentBox
-                targetType={targetType}
-                targetId={post.id}
-                onComment={(newComment) => {
-                  setComments((prev) => [newComment, ...prev]);
-
-                  setPost((prev) => ({
-                    ...prev,
-                    comment_count: (prev.comment_count || 0) + 1,
-                  }));
-                }}
-              />
-            )}
-          </div>
+          <CommentsSection
+            commentsState={{
+              comments,
+              setComments,
+              replies,
+              setReplies,
+              setOpenReplies,
+              replyPages,
+              expandedComments,
+              setExpandedComments,
+              openReplies,
+              activeReplyBox,
+              editCommentId,
+              editBody,
+            }}
+            postState={{
+              post,
+              setPost,
+              commentsLocked,
+              isCommentsPaid,
+              targetType,
+            }}
+            handlers={{
+              toggleLike,
+              toggleReplies,
+              loadReplies,
+              setActiveReplyBox,
+              setEditCommentId,
+              setEditBody,
+              saveEditedComment,
+              handleDelete,
+            }}
+            uiHelpers={{
+              user,
+              navigate,
+              redirectPath,
+              timeAgo,
+              observerRef,
+            }}
+          />
         </div>
       </div>
       <TipModal

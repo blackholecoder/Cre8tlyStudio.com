@@ -325,6 +325,20 @@ export default function CommunityHome() {
     }
   };
 
+  function getSafePreview(post) {
+    if (!post?.body_preview) return "";
+
+    const body = post.body_preview;
+
+    const dividerIndex = body.indexOf("data-subscriber-divider");
+
+    if (dividerIndex !== -1) {
+      return body.substring(0, dividerIndex);
+    }
+
+    return body;
+  }
+
   useEffect(() => {
     const fetchViews = async () => {
       try {
@@ -791,7 +805,7 @@ export default function CommunityHome() {
                                   line-clamp-3
                                 "
                                 >
-                                  {post.body_preview}
+                                  {getSafePreview(post)}
                                 </p>
 
                                 {/* ACTIONS */}

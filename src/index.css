@@ -133,6 +133,45 @@ a.mention:hover {
 /* Post Content Headings (FINAL)   */
 /* =============================== */
 
+.subscriber-divider-wrapper {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  text-align: center;
+  user-select: none;
+}
+
+.dark .subscriber-divider-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.subscriber-divider-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.subscriber-divider-top {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.subscriber-divider-bottom {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7bed9f;
+}
+
+.subscriber-divider-line {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, currentColor, transparent);
+  opacity: 0.3;
+}
+
 /* Base heading reset inside post body */
 .post-body.prose h1,
 .post-body.prose h2,
@@ -847,19 +886,12 @@ input[type="color"]:focus {
     outline: none !important;
     font-size: 1.05rem;
     line-height: 1.75;
-    min-height: 70vh;
+    min-height: 200px;
     padding: 1.5rem;
     border-radius: 0.75rem;
     box-shadow: none !important;
   }
 
-  .ProseMirror {
-    outline: none;
-    min-height: 75vh;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    padding: 1rem;
-  }
   .ProseMirror-focused {
     outline: none;
   }

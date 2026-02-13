@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MoreHorizontal, Star } from "lucide-react";
+import { Search, MoreHorizontal } from "lucide-react";
 import axiosInstance from "../../../api/axios";
 import { toast } from "react-toastify";
 
@@ -75,7 +75,7 @@ export default function MySubscriptions() {
       </div>
 
       {/* Search */}
-      <div className="px-4 py-4 max-w-6xl mx-auto">
+      <div className="px-0 py-4 max-w-6xl mx-auto">
         <div className="relative">
           <Search
             size={16}
@@ -246,16 +246,6 @@ export default function MySubscriptions() {
                       {/* PAID ONLY */}
                       {isPaid && (
                         <>
-                          {/* <button
-                            onClick={() => {
-                              setOpenMenuId(null);
-                              navigate(`/subscriptions/${s.id}/change-plan`);
-                            }}
-                            className="w-full px-4 py-2 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
-                          >
-                            Change plan
-                          </button> */}
-
                           <button
                             onClick={() => {
                               setOpenMenuId(null);
@@ -285,7 +275,7 @@ export default function MySubscriptions() {
       </div>
 
       {/* Mobile cards */}
-      <div className="md:hidden px-4 space-y-3">
+      <div className="md:hidden px-0 space-y-3">
         {filtered.map((s) => {
           const isPaid = s.paid_subscription === 1;
           return (

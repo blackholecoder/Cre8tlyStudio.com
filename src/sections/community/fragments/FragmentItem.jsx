@@ -2,12 +2,14 @@ import { Eye, Heart, MessageSquare, Repeat, ShieldCheck } from "lucide-react";
 import { timeAgo } from "../../../helpers/date";
 import { useNavigate } from "react-router-dom";
 import FragmentAudioPlayer from "./FragmentAudioPlayer";
+import FragmentOwnerMenu from "./FragmentOwnerMenu";
 
 export function FragmentItem({ fragment, onOpen, onToggleLike }) {
   const {
     body,
     created_at,
     updated_at,
+    is_owner,
     views,
     like_count,
     has_liked,
@@ -23,22 +25,6 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
   } = fragment;
   const navigate = useNavigate();
   const isVerified = author_is_verified === 1;
-
-  function formatDuration(seconds) {
-    if (!seconds) return null;
-
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-
-    if (h > 0) {
-      return `${h}:${m.toString().padStart(2, "0")}:${s
-        .toString()
-        .padStart(2, "0")}`;
-    }
-
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  }
 
   return (
     <div
@@ -73,31 +59,36 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
 
         {/* CONTENT COLUMN */}
         <div className="min-w-0">
-          {/* NAME + DATE */}
-          <div className="mb-2">
-            <div className="flex items-center gap-[2px]">
-              <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
-                {author}
-              </span>
+          <div className="flex items-start justify-between gap-4">
+            {/* LEFT SIDE */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-[2px]">
+                <span className="text-xs font-medium text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  {author}
+                </span>
 
-              {isVerified && (
-                <ShieldCheck
-                  size={12}
-                  className="text-dashboard-muted-light dark:text-green"
-                />
-              )}
+                {isVerified && (
+                  <ShieldCheck
+                    size={12}
+                    className="text-dashboard-muted-light dark:text-green"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                <span>{timeAgo(created_at)}</span>
+
+                {updated_at && new Date(updated_at) > new Date(created_at) && (
+                  <>
+                    <span>·</span>
+                    <span className="italic opacity-70">edited</span>
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-1 text-[11px] text-dashboard-muted-light dark:text-dashboard-muted-dark">
-              <span>{timeAgo(created_at)}</span>
-
-              {updated_at && new Date(updated_at) > new Date(created_at) && (
-                <>
-                  <span>·</span>
-                  <span className="italic opacity-70">edited</span>
-                </>
-              )}
-            </div>
+            {/* RIGHT SIDE */}
+            <FragmentOwnerMenu fragmentId={fragment.id} isOwner={is_owner} />
           </div>
 
           {/* BODY */}

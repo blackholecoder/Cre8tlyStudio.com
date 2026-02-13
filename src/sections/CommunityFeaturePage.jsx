@@ -1,12 +1,13 @@
 // src/pages/CommunityFeaturePage.jsx
 import {
-  Users,
   MessageSquare,
-  FileText,
   Upload,
-  Share2,
   Lock,
   PenTool,
+  DollarSign,
+  TrendingUp,
+  Check,
+  AudioWaveform,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -68,7 +69,7 @@ export default function CommunityFeaturePage() {
               variants={reveal}
               className="text-sm font-medium tracking-wide text-white/70 uppercase"
             >
-              WRITING-FIRST · SUBSCRIPTION-POWERED · NO ALGORITHMS
+              WRITING-FIRST · SUBSCRIPTION-POWERED
             </motion.div>
 
             <motion.h1
@@ -82,10 +83,9 @@ export default function CommunityFeaturePage() {
               variants={reveal}
               className="max-w-2xl mx-auto lg:mx-0 text-lg text-white/90"
             >
-              Write posts, fragments, and thoughts in a single shared feed.
-              Invite readers who actually care, and build a paid community
-              without followers, engagement tricks, or algorithms deciding who
-              gets seen.
+              Publish free previews. Lock full essays behind a subscriber
+              paywall. Turn readers into paying supporters without algorithms,
+              follower counts, or platforms deciding who gets seen.
             </motion.p>
           </div>
 
@@ -113,49 +113,58 @@ export default function CommunityFeaturePage() {
       </section>
 
       {/* FEATURE PREVIEW */}
-      <section className="mx-auto max-w-6xl px-6 pb-20 pt-20">
-        <Card className="p-6 sm:p-8">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid gap-6 md:grid-cols-3"
-          >
-            {[
-              {
-                icon: Users,
-                title: "Subscribe don't chase",
-                desc: "People join because they want your writing, not because an algorithm pushed it in front of them.",
-              },
-              {
-                icon: FileText,
-                title: "Posts and fragments in one feed",
-                desc: "Long posts, short fragments, and real conversations all live together, exactly where your readers are.",
-              },
-              {
-                icon: Upload,
-                title: "Bring your readers with you",
-                desc: "Upload your list, send direct invites, and move your audience somewhere you actually own.",
-              },
-            ].map(({ icon: Icon, title, desc, color }) => (
-              <motion.div
-                key={title}
-                variants={reveal}
-                whileHover={{ y: -6 }}
-                className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700">
-                    <Icon className="h-5 w-5 text-black" />
-                  </div>
-                  <div className="font-bold">{title}</div>
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid gap-6 md:grid-cols-3"
+        >
+          {[
+            {
+              icon: Lock,
+              title: "Free + Paid in one post",
+              desc: "Write a free preview, then lock the rest behind your paywall.",
+            },
+            {
+              icon: DollarSign,
+              title: "Subscriber-based access",
+              desc: "Offer paid subscriptions and unlock exclusive posts and discussions.",
+            },
+            {
+              icon: Upload,
+              title: "Bring your audience",
+              desc: "Invite readers directly and build a community you actually own.",
+            },
+          ].map(({ icon: Icon, title, desc }) => (
+            <motion.div
+              key={title}
+              variants={reveal}
+              whileHover={{ y: -6 }}
+              className="
+          rounded-2xl
+          border border-gray-200
+          bg-white
+          p-6
+          shadow-sm
+          transition
+        "
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200">
+                  <Icon className="h-5 w-5 text-gray-800" />
                 </div>
-                <p className="mt-2 text-sm text-gray-600">{desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </Card>
+
+                <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              </div>
+
+              <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                {desc}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
       {/* VALUE GRID */}
@@ -168,9 +177,8 @@ export default function CommunityFeaturePage() {
           viewport={{ once: true }}
           className="mb-12 max-w-2xl"
         >
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-800 leading-tight">
-            Built for writers
-            <span className="block">who care about the work</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+            Built for writers who care about the work
           </h2>
           <p className="mt-4 text-gray-600">
             The Messy Attic is designed for writers who want fewer distractions,
@@ -185,47 +193,289 @@ export default function CommunityFeaturePage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-8 md:grid-cols-3 items-stretch"
         >
           {[
             {
-              icon: Users,
-              title: "A home for your writing",
-              color: "text-blue-600",
-              desc: "Your profile becomes a central place for your work, your voice, and your community.",
-            },
-            {
               icon: MessageSquare,
               title: "Real conversation",
-              color: "text-purple-600",
-              desc: "Readers respond, discuss, and engage thoughtfully, not just tap a like and scroll past.",
-            },
-            {
-              icon: Share2,
-              title: "Share on your terms",
-              color: "text-emerald-600",
-              desc: "Every post has a clean link you can share anywhere without fighting platforms for visibility.",
+              desc: "Readers engage thoughtfully. Writing rises through discussion, not algorithms.",
             },
             {
               icon: Lock,
-              title: "Paid access",
-              color: "text-pink-600",
-              desc: "Attract people who are invested, supportive, and serious about being there.",
+              title: "Built-in paywall",
+              desc: "Publish free previews and lock full essays for subscribers in the same post.",
+              highlight: true,
             },
-          ].map(({ icon: Icon, title, desc, color }) => (
-            <motion.div key={title} variants={reveal}>
-              <Card className="p-6 w-full max-w-none hover:-translate-y-1 transition">
-                <Icon className={`h-5 w-5 ${color}`} />
-                <div className="mt-3 font-bold">{title}</div>
-                <p className="mt-2 text-sm text-gray-600">{desc}</p>
-              </Card>
+            {
+              icon: TrendingUp,
+              title: "Predictable income",
+              desc: "Turn consistent writing into recurring revenue from readers who value your work.",
+            },
+          ].map(({ icon: Icon, title, desc, highlight }) => (
+            <motion.div
+              key={title}
+              variants={reveal}
+              className={`
+        p-8 rounded-2xl transition h-full flex flex-col
+        ${
+          highlight
+            ? "bg-black text-white border border-black"
+            : "bg-white border border-gray-200"
+        }
+      `}
+            >
+              <Icon
+                className={`h-6 w-6 ${
+                  highlight ? "text-emerald-400" : "text-gray-800"
+                }`}
+              />
+
+              <h3
+                className={`mt-4 text-xl font-semibold ${
+                  highlight ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {title}
+              </h3>
+
+              <p
+                className={`mt-3 text-sm leading-relaxed ${
+                  highlight ? "text-white/80" : "text-gray-600"
+                }`}
+              >
+                {desc}
+              </p>
             </motion.div>
           ))}
         </motion.div>
       </section>
+      {/* FREE VS SUBSCRIBERS */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="text-center mb-14">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+            Free readers or paid supporters
+          </h2>
+          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            Let anyone discover your writing. Reward subscribers who choose to
+            support it.
+          </p>
+        </div>
+
+        <div className="grid gap-10 md:grid-cols-2 items-stretch">
+          {/* FREE */}
+          <div className="p-10 rounded-3xl border border-gray-200 bg-gray-50">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Free Readers
+            </h3>
+
+            <ul className="mt-8 space-y-4 text-sm text-gray-700">
+              <li className="flex items-center gap-3">
+                <Check className="h-4 w-4 text-gray-400" />
+                Read previews
+              </li>
+
+              <li className="flex items-center gap-3">
+                <Check className="h-4 w-4 text-gray-400" />
+                Comment on public posts
+              </li>
+
+              <li className="flex items-center gap-3">
+                <Check className="h-4 w-4 text-gray-400" />
+                Discover your work
+              </li>
+            </ul>
+          </div>
+
+          {/* SUBSCRIBERS */}
+          <div className="p-10 rounded-3xl bg-black text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-black to-neutral-900" />
+
+            <div className="relative">
+              <h3 className="text-xl font-semibold">Subscribers</h3>
+
+              <ul className="mt-8 space-y-4 text-sm">
+                <li className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-emerald-400" />
+                  Unlock full essays
+                </li>
+
+                <li className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-emerald-400" />
+                  Access private posts
+                </li>
+
+                <li className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-emerald-400" />
+                  Join paid discussions
+                </li>
+
+                <li className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-emerald-400" />
+                  Support your writing directly
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* EMAIL + PUBLICATION INFRASTRUCTURE */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="grid gap-12 lg:grid-cols-2 items-center">
+          {/* LEFT SIDE – COPY */}
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+              Own your audience.
+            </h2>
+
+            <p className="mt-4 text-lg text-gray-600 leading-relaxed">
+              When someone subscribes, they don’t just unlock content. They
+              become part of your publication.
+            </p>
+
+            <ul className="mt-8 space-y-4 text-gray-700">
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-emerald-500 mt-1" />
+                Custom email templates branded to your publication
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-emerald-500 mt-1" />
+                Automatic email alerts when you publish new work
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-emerald-500 mt-1" />
+                Notifications when readers comment or engage
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-emerald-500 mt-1" />A dedicated
+                publication page for all your writing
+              </li>
+            </ul>
+          </div>
+
+          {/* RIGHT SIDE – PLATFORM PREVIEW */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-8 shadow-xl">
+            {/* Publication Header */}
+            <div className="flex items-center justify-between">
+              <div className="text-white font-semibold">The Inspired</div>
+              <div className="text-xs text-neutral-500">
+                Writing by David Parsons
+              </div>
+            </div>
+
+            {/* Featured Post */}
+            <div className="mt-6 border border-neutral-800 rounded-xl p-6 bg-neutral-900">
+              <div className="text-lg font-bold text-white">
+                Silent in the woods
+              </div>
+              <div className="mt-1 text-sm text-neutral-400">
+                Lost in darkness
+              </div>
+              <div className="mt-3 text-xs text-neutral-500">
+                Feb 9, 2026 · David Parsons
+              </div>
+            </div>
+
+            {/* Sidebar List Style */}
+            <div className="mt-6 space-y-4">
+              <div className="border-t border-neutral-800 pt-4">
+                <div className="text-sm font-medium text-white">
+                  The seeds we sew
+                </div>
+                <div className="text-xs text-neutral-500">Jan 26, 2026</div>
+              </div>
+
+              <div className="border-t border-neutral-800 pt-4">
+                <div className="text-sm font-medium text-white">Letting Go</div>
+                <div className="text-xs text-neutral-500">Jan 23, 2026</div>
+              </div>
+
+              <div className="border-t border-neutral-800 pt-4">
+                <div className="text-sm font-medium text-white">
+                  Welcome to paradise
+                </div>
+                <div className="text-xs text-neutral-500">Jan 20, 2026</div>
+              </div>
+            </div>
+
+            {/* Email Badge */}
+          </div>
+        </div>
+      </section>
+
+      {/* AUDIO SECTION */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="grid gap-12 lg:grid-cols-2 items-center">
+          {/* LEFT CONTENT */}
+          <div>
+            <div className="text-sm font-semibold tracking-wide text-gray-500 uppercase">
+              Long-form audio built in
+            </div>
+
+            <h2 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight">
+              Publish audio up to 3 hours.
+            </h2>
+
+            <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+              Record podcasts. Read chapters of your book. Tell stories in your
+              own voice. Upload full-length audio directly to your posts and let
+              subscribers listen without leaving your page.
+            </p>
+
+            <ul className="mt-8 space-y-4 text-gray-700">
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 mt-1 text-emerald-500" />
+                Upload audio up to 3 hours long
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 mt-1 text-emerald-500" />
+                Perfect for podcasting and long-form storytelling
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 mt-1 text-emerald-500" />
+                Read your books aloud for your community
+              </li>
+
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 mt-1 text-emerald-500" />
+                Offer subscriber-only audio episodes
+              </li>
+            </ul>
+          </div>
+
+          {/* RIGHT VISUAL CARD */}
+          <div className="rounded-3xl border border-gray-200 bg-white p-10 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gray-200">
+                <AudioWaveform className="h-7 w-7 text-gray-800" />
+              </div>
+
+              <div className="text-xl font-semibold text-gray-900">
+                Built for serious creators
+              </div>
+            </div>
+
+            <p className="mt-6 text-gray-600 leading-relaxed">
+              This isn’t short clips. This is full-length audio publishing. Your
+              voice. Your pace. Your format.
+            </p>
+
+            <div className="mt-8 rounded-xl bg-black text-white p-6">
+              <div className="text-sm text-white/70">Maximum length</div>
+              <div className="mt-1 text-2xl font-bold">3 hours per upload</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
+      <section className="mx-auto max-w-6xl px-6 py-16 pb-24">
         <Card className="relative overflow-hidden p-10">
           {/* background gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-black to-neutral-900 sm:rounded-xl" />
@@ -240,13 +490,8 @@ export default function CommunityFeaturePage() {
               </div>
 
               <div className="mt-2 text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-                Build a community that values your writing.
+                Publish freely. Build a paid community.
               </div>
-
-              <p className="mt-3 text-white/90 max-w-xl">
-                Write freely, publish consistently, and grow a paid community
-                without algorithms, follower counts, or pressure to perform.
-              </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -255,13 +500,6 @@ export default function CommunityFeaturePage() {
                 className="rounded-xl bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-lg hover:bg-gray-100 transition"
               >
                 Join the community
-              </button>
-
-              <button
-                onClick={() => navigateWithReferral("/plans")}
-                className="rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-              >
-                Start free trial
               </button>
             </div>
           </div>

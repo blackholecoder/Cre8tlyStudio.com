@@ -332,7 +332,7 @@ export default function MyFragments() {
 
                 {/* BODY */}
                 <div
-                  className="mt-2 text-sm leading-relaxed line-clamp-3 text-dashboard-text-light dark:text-dashboard-text-dark"
+                  className="mt-2 text-sm leading-relaxed  text-dashboard-text-light dark:text-dashboard-text-dark whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{
                     __html:
                       typeof fragment?.body === "string" ? fragment.body : "",

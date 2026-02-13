@@ -7,6 +7,8 @@ import {
   TrendingUp,
   FileText,
   Users,
+  DollarSign,
+  Shield,
 } from "lucide-react";
 
 const Landing = () => {
@@ -34,7 +36,7 @@ const Landing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
         >
-          A quiet place for writers <br />
+          A place for writers <br />
           to grow together
         </motion.h1>
 
@@ -53,8 +55,7 @@ const Landing = () => {
         >
           The Messy Attic is a supportive writing community where drafts are
           welcomed, feedback is honest, and writers help each other improve.
-          Share your work, read thoughtfully, and grow without algorithms or
-          noise.
+          Share your work, read thoughtfully, and grow.
         </motion.p>
 
         {/* CTA */}
@@ -103,10 +104,9 @@ const Landing = () => {
             style={{ fontFamily: '"PT Serif", serif' }}
             className="mt-6 text-lg text-gray-700 leading-relaxed"
           >
-            The Messy Attic is a quiet, supportive writing community where
-            writers share work, exchange thoughtful feedback, and grow together.
-            There are no social feeds, and visibility is earned through real
-            reader engagement.
+            The Messy Attic is a new supportive writing community where writers
+            share work, exchange thoughtful feedback, and grow together.
+            Visibility is earned through real reader engagement.
           </p>
         </div>
 
@@ -115,54 +115,54 @@ const Landing = () => {
             {
               icon: PenTool,
               title: "Write without pressure",
-              desc: "Share drafts, ideas, and finished pieces in a space designed for honest feedback, not performance.",
+              desc: "Share drafts, ideas, and finished pieces in a space built for depth, honesty, and growth, not performance.",
             },
             {
               icon: MessageSquare,
               title: "Real discussion",
-              desc: "Comments and replies are the heart of the community. Readers engage thoughtfully and writers respond.",
+              desc: "Thoughtful comments and meaningful replies replace shallow reactions. Readers engage. Writers respond.",
             },
             {
               icon: Lock,
-              title: "Intentional access",
-              desc: "Membership is subscription-based, keeping the space focused, respectful, and free from noise.",
+              title: "Subscriber-only writing",
+              desc: "Protect your best work behind a paywall. Offer exclusive sections, full essays, or private releases to paying supporters.",
+            },
+            {
+              icon: DollarSign,
+              title: "Monetize your voice",
+              desc: "Turn readers into subscribers. Offer free previews and reserve premium content for those who invest in your work.",
             },
             {
               icon: TrendingUp,
               title: "Earned visibility",
-              desc: "Writing rises through thoughtful discussion and genuine reader interest, not popularity contests.",
+              desc: "Writing rises through real engagement and thoughtful discussion, not algorithms or popularity contests.",
             },
             {
-              icon: FileText,
-              title: "Long-form friendly",
-              desc: "A clean editor built for serious writing, not short posts, trends, or distractions.",
-            },
-            {
-              icon: Users,
-              title: "Built for writers",
-              desc: "This isn’t social media. It’s a place to write, read deeply, and improve together.",
+              icon: Shield,
+              title: "Intentional community",
+              desc: "Subscription-based access keeps the space focused, respectful, and committed to serious writers.",
             },
           ].map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
               className="
-          rounded-2xl
-          border border-gray-200
-          bg-white
-          p-6
-          shadow-sm
-          transition
-          hover:-translate-y-1
-        "
+        rounded-2xl
+        border border-gray-200
+        bg-white
+        p-6
+        shadow-sm
+        transition
+        hover:-translate-y-1
+      "
             >
               <div className="flex items-center gap-3">
                 <div
                   className="
-              flex h-10 w-10 items-center justify-center
-              rounded-md
-              border border-gray-200
-              text-gray-700
-            "
+            flex h-10 w-10 items-center justify-center
+            rounded-md
+            border border-gray-200
+            text-gray-700
+          "
                 >
                   <Icon className="h-5 w-5" />
                 </div>

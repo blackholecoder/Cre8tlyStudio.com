@@ -22,6 +22,7 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
     audio_url,
     audio_title,
     audio_duration_seconds,
+    allow_download,
   } = fragment;
   const navigate = useNavigate();
   const isVerified = author_is_verified === 1;
@@ -103,6 +104,7 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             audioUrl={audio_url}
             audioTitle={audio_title}
             durationSeconds={audio_duration_seconds}
+            allowDownload={fragment.allow_download}
           />
 
           {/* RESHARED FRAGMENT */}

@@ -21,6 +21,7 @@ export default function CreateFragment() {
   const [mentionResults, setMentionResults] = useState([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
+  const [allowDownload, setAllowDownload] = useState(false);
 
   // Audio State
 
@@ -65,29 +66,44 @@ export default function CreateFragment() {
       // 1️⃣ Validate duration locally
       const duration = await validateAudioDuration(file);
 
-      // 2️⃣ Prepare multipart form data
-      const formData = new FormData();
-      formData.append("audio", file);
+      console.log({
+        fileName: file.name,
+        mimeType: file.type,
+      });
 
-      // 3️⃣ Upload to backend (express-fileupload route)
-      const uploadRes = await axiosInstance.post(
-        "/fragments/upload-audio",
-        formData,
-      );
+      // 2️⃣ Request signed upload URL from backend
+      const signRes = await axiosInstance.post("/fragments/sign-audio-upload", {
+        fileName: file.name,
+        mimeType: file.type,
+      });
 
-      if (!uploadRes.data?.success) {
-        throw new Error("Audio upload failed");
+      if (!signRes.data?.success) {
+        throw new Error("Failed to get upload URL");
       }
 
-      const { publicUrl, fileSize, mimeType } = uploadRes.data;
+      const { uploadUrl, publicUrl } = signRes.data;
 
-      // 4️⃣ Set state from backend response
+      // 3️⃣ Upload DIRECTLY to DigitalOcean Spaces
+      const uploadRes = await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+          "x-amz-acl": "public-read",
+        },
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload to storage failed");
+      }
+
+      // 4️⃣ Save state using returned public URL
       setAudioFile(file);
       setAudioUrl(publicUrl);
       setAudioTitle(file.name.replace(/\.[^/.]+$/, ""));
       setAudioDuration(Math.floor(duration));
-      setAudioFileSize(fileSize);
-      setAudioMimeType(mimeType);
+      setAudioFileSize(file.size);
+      setAudioMimeType(file.type);
 
       toast.success("Audio uploaded");
     } catch (err) {
@@ -127,6 +143,7 @@ export default function CreateFragment() {
           audio_duration_seconds: audioDuration,
           audio_file_size: audioFileSize,
           audio_mime_type: audioMimeType,
+          allow_download: allowDownload ? 1 : 0,
         });
       } else {
         await axiosInstance.post("/fragments", {
@@ -137,6 +154,7 @@ export default function CreateFragment() {
           audio_duration_seconds: audioDuration,
           audio_file_size: audioFileSize,
           audio_mime_type: audioMimeType,
+          allow_download: allowDownload ? 1 : 0,
         });
       }
 
@@ -558,6 +576,17 @@ export default function CreateFragment() {
                     <div className="text-[11px] text-right opacity-60 mt-1">
                       {audioTitle.length}/255
                     </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="checkbox"
+                        checked={allowDownload}
+                        onChange={(e) => setAllowDownload(e.target.checked)}
+                        className="h-4 w-4 accent-green"
+                      />
+                      <label className="text-xs text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                        Allow users to download this audio
+                      </label>
+                    </div>
                   </div>
 
                   {/* Player */}
@@ -565,6 +594,7 @@ export default function CreateFragment() {
                     audioUrl={audioUrl}
                     audioTitle={audioTitle}
                     durationSeconds={audioDuration}
+                    allowDownload={allowDownload}
                   />
                 </div>
               )}

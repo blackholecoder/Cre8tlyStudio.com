@@ -50,6 +50,7 @@ export default function MyFragments() {
       setLoading(true);
       const res = await axiosInstance.get("/fragments/my-fragments");
       setFragments(res.data.fragments || []);
+      console.log("FRAGMENTS RESPONSE:", res.data.fragments);
     } catch (err) {
       console.error("Failed to fetch fragments:", err);
     } finally {
@@ -345,6 +346,7 @@ export default function MyFragments() {
                       audioUrl={fragment.audio_url}
                       audioTitle={fragment.audio_title}
                       durationSeconds={fragment.audio_duration_seconds}
+                      allowDownload={fragment.allow_download}
                     />
                   </div>
                 )}

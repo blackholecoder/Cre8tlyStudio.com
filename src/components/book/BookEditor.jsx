@@ -113,14 +113,14 @@ export default function BookEditor({ bookId, content, setContent }) {
   });
 
   useEffect(() => {
-    if (!editor || hasInitialized.current) return;
+    if (!editor) return;
 
-    if (content) {
-      editor.commands.setContent(content, false);
+    const currentHTML = editor.getHTML();
+
+    if (content !== currentHTML) {
+      editor.commands.setContent(content || "", false);
     }
-
-    hasInitialized.current = true;
-  }, [editor]);
+  }, [content, editor]);
 
   const addToDictionary = async (word) => {
     await axiosInstance.post("/dictionary/add", { word });

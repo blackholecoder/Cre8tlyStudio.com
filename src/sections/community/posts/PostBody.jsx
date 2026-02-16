@@ -165,6 +165,7 @@ export default function PostBody({
             audioUrl={post.audio_url}
             audioTitle={post.audio_title}
             durationSeconds={post.audio_duration_seconds}
+            allowDownload={post.allow_download}
           />
         )}
 

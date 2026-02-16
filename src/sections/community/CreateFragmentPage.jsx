@@ -220,6 +220,8 @@ export default function CreateFragment() {
           setAudioMimeType(f.audio_mime_type || null);
         }
 
+        setAllowDownload(Boolean(f.allow_download));
+
         // 🔥 THIS IS THE MISSING PART
         if (f.reshare_fragment_id) {
           const reshareRes = await axiosInstance.get(
@@ -555,6 +557,9 @@ export default function CreateFragment() {
                     </label>
 
                     <input
+                      value={audioTitle}
+                      onChange={(e) => setAudioTitle(e.target.value)}
+                      maxLength={255}
                       className="
                       w-full
                       px-3 py-2.5

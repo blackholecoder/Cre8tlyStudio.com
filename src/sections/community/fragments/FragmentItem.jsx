@@ -100,12 +100,14 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             }}
           />
 
-          <FragmentAudioPlayer
-            audioUrl={audio_url}
-            audioTitle={audio_title}
-            durationSeconds={audio_duration_seconds}
-            allowDownload={fragment.allow_download}
-          />
+          {audio_url && audio_url.trim() !== "" && (
+            <FragmentAudioPlayer
+              audioUrl={audio_url}
+              audioTitle={audio_title}
+              durationSeconds={audio_duration_seconds}
+              allowDownload={allow_download}
+            />
+          )}
 
           {/* RESHARED FRAGMENT */}
           {reshared_id && (

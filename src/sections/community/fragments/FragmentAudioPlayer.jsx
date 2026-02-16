@@ -1,108 +1,12 @@
-// import { useRef, useEffect } from "react";
-// import {
-//   registerAudio,
-//   unregisterAudio,
-// } from "../../../helpers/globalAudioManager";
-// import { Download } from "lucide-react";
-
-// export default function FragmentAudioPlayer({
-//   audioUrl,
-//   audioTitle,
-//   allowDownload = false,
-// }) {
-//   const audioRef = useRef(null);
-
-//   useEffect(() => {
-//     const audioEl = audioRef.current;
-//     if (!audioEl) return;
-
-//     const handlePlay = () => {
-//       registerAudio(audioEl);
-//     };
-
-//     const handleEnded = () => {
-//       unregisterAudio(audioEl);
-//     };
-
-//     const handlePause = () => {
-//       if (audioEl.currentTime === 0 || audioEl.paused) {
-//         unregisterAudio(audioEl);
-//       }
-//     };
-
-//     audioEl.addEventListener("play", handlePlay);
-//     audioEl.addEventListener("ended", handleEnded);
-//     audioEl.addEventListener("pause", handlePause);
-
-//     return () => {
-//       unregisterAudio(audioEl);
-//       audioEl.removeEventListener("play", handlePlay);
-//       audioEl.removeEventListener("ended", handleEnded);
-//       audioEl.removeEventListener("pause", handlePause);
-//     };
-//   }, []);
-
-//   if (!audioUrl) return null;
-
-//   return (
-//     <div
-//       className="
-//       mt-4
-//       rounded-xl
-//       border border-dashboard-border-light
-//       dark:border-dashboard-border-dark
-//       bg-dashboard-sidebar-light
-//       dark:bg-dashboard-sidebar-dark
-//       p-4
-//       space-y-3
-//     "
-//       onClick={(e) => e.stopPropagation()}
-//     >
-//       {/* Header Row */}
-//       <div className="flex items-center justify-between">
-//         <div className="min-w-0">
-//           <p className="text-sm font-semibold text-dashboard-text-light dark:text-dashboard-text-dark truncate">
-//             {audioTitle || "Audio"}
-//           </p>
-//         </div>
-
-//         {allowDownload && (
-//           <a
-//             href={audioUrl}
-//             download={audioTitle || "audio"}
-//             onClick={(e) => e.stopPropagation()}
-//             className="
-//             inline-flex items-center gap-1.5
-//             text-xs font-medium
-//             px-3 py-1.5
-//             rounded-full
-//             bg-green/10
-//             text-green
-//             hover:bg-green/20
-//             transition
-//           "
-//           >
-//             <Download size={14} />
-//             Download
-//           </a>
-//         )}
-//       </div>
-
-//       {/* Player */}
-//       <div className="rounded-lg overflow-hidden">
-//         <audio
-//           ref={audioRef}
-//           src={audioUrl}
-//           controls
-//           preload="metadata"
-//           className="w-full"
-//         />
-//       </div>
-//     </div>
-//   );
-// }
 import { useRef, useState, useEffect } from "react";
-import { Play, Pause, Download, RotateCcw, RotateCw } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Download,
+  RotateCcw,
+  RotateCw,
+  MoreVertical,
+} from "lucide-react";
 import axiosInstance from "../../../api/axios";
 
 export default function FragmentAudioPlayer({
@@ -116,6 +20,10 @@ export default function FragmentAudioPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+
+  const SPEEDS = [1, 1.25, 1.5, 2, 3];
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -135,6 +43,24 @@ export default function FragmentAudioPlayer({
       audio.removeEventListener("timeupdate", updateTime);
       audio.removeEventListener("ended", handleEnded);
     };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.playbackRate = playbackRate;
+  }, [playbackRate]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".speed-menu-wrapper")) {
+        setShowSpeedMenu(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const togglePlay = () => {
@@ -340,6 +266,63 @@ export default function FragmentAudioPlayer({
               {formatTime(durationSeconds || audioRef.current?.duration)}
             </span>
           </div>
+        </div>
+        {/* Speed Menu */}
+        <div className="relative speed-menu-wrapper">
+          <button
+            onClick={() => setShowSpeedMenu((prev) => !prev)}
+            className="
+      w-9 h-9
+      rounded-full
+      flex items-center justify-center
+      bg-dashboard-hover-light
+      text-dashboard-text-light
+      dark:bg-black
+      dark:text-green
+      hover:bg-dashboard-border-light
+      dark:hover:bg-dashboard-hover-dark
+      transition
+    "
+          >
+            <MoreVertical size={16} />
+          </button>
+
+          {showSpeedMenu && (
+            <div
+              className="
+        absolute right-0 bottom-full mb-2
+        w-28
+        rounded-xl
+        shadow-lg
+        border border-dashboard-border-light
+        dark:border-dashboard-border-dark
+        bg-dashboard-sidebar-light
+        dark:bg-dashboard-sidebar-dark
+        py-1
+        z-50
+      "
+            >
+              {SPEEDS.map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => {
+                    setPlaybackRate(speed);
+                    setShowSpeedMenu(false);
+                  }}
+                  className={`
+            w-full text-left px-3 py-2 text-sm transition
+            ${
+              playbackRate === speed
+                ? "bg-green/10 text-green"
+                : "text-dashboard-text-light dark:text-dashboard-text-dark hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+            }
+          `}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

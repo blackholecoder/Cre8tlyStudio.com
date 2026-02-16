@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import FragmentAudioPlayer from "./FragmentAudioPlayer";
 import FragmentOwnerMenu from "./FragmentOwnerMenu";
 
-export function FragmentItem({ fragment, onOpen, onToggleLike }) {
+export function FragmentItem({ fragment, onOpen, onToggleLike, onDeleted }) {
   const {
     body,
     created_at,
@@ -89,7 +89,11 @@ export function FragmentItem({ fragment, onOpen, onToggleLike }) {
             </div>
 
             {/* RIGHT SIDE */}
-            <FragmentOwnerMenu fragmentId={fragment.id} isOwner={is_owner} />
+            <FragmentOwnerMenu
+              fragmentId={fragment.id}
+              isOwner={is_owner}
+              onDeleted={onDeleted}
+            />
           </div>
 
           {/* BODY */}

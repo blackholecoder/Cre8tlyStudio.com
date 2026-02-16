@@ -339,6 +339,14 @@ export default function CommunityHome() {
     return body;
   }
 
+  const removeFragmentFromFeed = (fragmentId) => {
+    setFeedItems((prev) =>
+      prev.filter(
+        (item) => !(item.type === "fragment" && item.data.id === fragmentId),
+      ),
+    );
+  };
+
   useEffect(() => {
     const fetchViews = async () => {
       try {
@@ -911,6 +919,7 @@ export default function CommunityHome() {
                         navigate(`/community/fragments/${item.data.id}`)
                       }
                       onToggleLike={() => toggleFragmentLike(item.data)}
+                      onDeleted={removeFragmentFromFeed}
                     />
                   );
                 }

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../../api/axios";
 import { toast } from "react-toastify";
 
 export default function FragmentOwnerMenu({ fragmentId, isOwner, onDeleted }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!isOwner) return null;
 
@@ -78,7 +79,11 @@ export default function FragmentOwnerMenu({ fragmentId, isOwner, onDeleted }) {
             onClick={(e) => {
               e.stopPropagation();
               setOpen(false);
-              navigate(`/community/fragments/edit/${fragmentId}`);
+              navigate(
+                `/community/fragments/edit/${fragmentId}?from=${encodeURIComponent(
+                  location.pathname,
+                )}`,
+              );
             }}
             className="w-full px-4 py-3 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark flex items-center gap-2"
           >

@@ -11,8 +11,10 @@ export default function CreateFragment() {
   const MAX_AUDIO_SECONDS = 10800;
   const textareaRef = useRef(null);
   const navigate = useNavigate();
+
   const [searchParams] = useSearchParams();
   const reshareId = searchParams.get("reshare");
+  const returnPath = searchParams.get("from");
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [audioUploading, setAudioUploading] = useState(false);
@@ -159,7 +161,13 @@ export default function CreateFragment() {
       }
 
       toast.success("Fragment published");
-      navigate("/community");
+      if (returnPath) {
+        navigate(returnPath);
+      } else if (isEdit) {
+        navigate("/community/my-fragments");
+      } else {
+        navigate("/community");
+      }
     } catch (err) {
       console.error("Failed to create fragment:", err);
       toast.error("Failed to publish fragment");
@@ -185,10 +193,12 @@ export default function CreateFragment() {
   }, [isReshare, reshareId]);
 
   const handleCancel = () => {
-    if (isEdit) {
+    if (returnPath) {
+      navigate(returnPath);
+    } else if (isEdit) {
       navigate("/community/my-fragments");
     } else {
-      navigate("/community"); // or fragments feed
+      navigate("/community");
     }
   };
 
@@ -231,7 +241,11 @@ export default function CreateFragment() {
         }
       } catch (err) {
         console.error("Failed to load fragment:", err);
-        navigate("/community/my-fragments");
+        if (returnPath) {
+          navigate(returnPath);
+        } else {
+          navigate("/community/my-fragments");
+        }
       }
     }
 

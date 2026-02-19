@@ -1,13 +1,14 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { FragmentItem } from "../fragments/FragmentItem";
 import { MobilePostCard } from "../posts/MobilePostCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../../api/axios";
 import { Ellipsis } from "lucide-react";
 
 export default function AuthorFeed({ userId, isOwner = false }) {
   const PAGE_SIZE = 20;
   const loadMoreRef = useRef(null);
+  const location = useLocation();
 
   const [feedItems, setFeedItems] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -59,12 +60,19 @@ export default function AuthorFeed({ userId, isOwner = false }) {
   );
 
   useEffect(() => {
-    function closeMenu() {
+    function handleClickOutside(event) {
+      // if click is inside a menu or the trigger, do nothing
+      if (
+        event.target.closest(".author-feed-menu") ||
+        event.target.closest(".author-feed-trigger")
+      ) {
+        return;
+      }
       setOpenMenuId(null);
     }
 
-    window.addEventListener("click", closeMenu);
-    return () => window.removeEventListener("click", closeMenu);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
   function isFeedCommentsLocked(post) {
@@ -230,7 +238,9 @@ export default function AuthorFeed({ userId, isOwner = false }) {
                       <button
                         onClick={() => {
                           setOpenMenuId(null);
-                          navigate(`/community/edit-post/${post.id}`);
+                          navigate(`/community/edit-post/${post.id}`, {
+                            state: { from: location.pathname },
+                          });
                         }}
                         className="w-full px-4 py-3 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                       >
@@ -271,7 +281,7 @@ export default function AuthorFeed({ userId, isOwner = false }) {
                         openMenuId === item.data.id ? null : item.data.id,
                       );
                     }}
-                    className="p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
+                    className="author-feed-trigger p-2 rounded-md hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                   >
                     <Ellipsis size={18} />
                   </button>
@@ -280,19 +290,25 @@ export default function AuthorFeed({ userId, isOwner = false }) {
                     <div
                       onClick={(e) => e.stopPropagation()}
                       className="
-            absolute right-0 mt-2 z-30
-            w-48
-            rounded-xl
-            bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
-            border border-dashboard-border-light dark:border-dashboard-border-dark
-            shadow-xl
-            overflow-hidden
-          "
+                      author-feed-menu
+                      absolute right-0 mt-2 z-30
+                      w-48
+                      rounded-xl
+                      bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark
+                      border border-dashboard-border-light dark:border-dashboard-border-dark
+                      shadow-xl
+                      overflow-hidden
+                    "
                     >
                       <button
-                        onClick={() =>
-                          navigate(`/community/fragments/edit/${item.data.id}`)
-                        }
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          navigate(
+                            `/community/fragments/edit/${item.data.id}?from=${encodeURIComponent(
+                              `/community/profile/${userId}`,
+                            )}`,
+                          );
+                        }}
                         className="w-full px-4 py-3 text-sm text-left hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"
                       >
                         Edit

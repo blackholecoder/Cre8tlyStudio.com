@@ -5,6 +5,7 @@ import CommunityPostEditor from "./posts/CommunityPostEditor";
 import { toast } from "react-toastify";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CommentVisibilityDropdown from "./CommentVisibilityDropdown";
+import TopicSelectDropdown from "./modals/TopicSelectDropdown";
 
 export default function CreatePostPage({ post = null, topicId }) {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function CreatePostPage({ post = null, topicId }) {
   const [mentionQuery, setMentionQuery] = useState("");
   const [mentionResults, setMentionResults] = useState([]);
   const [showMentions, setShowMentions] = useState(false);
+
+  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(post?.image_url || null);
@@ -258,29 +261,36 @@ export default function CreatePostPage({ post = null, topicId }) {
           {/* Topic selector (My Posts Page only) */}
           {!isEdit && !lockedTopicId && topics.length > 0 && (
             <div className="space-y-1 mb-4">
-              <label className="text-sm font-medium">Topic</label>
+              <div className="space-y-1 mb-4">
+                <label className="text-sm font-medium">Topic</label>
 
-              <select
-                value={selectedTopicId}
-                onChange={(e) => setSelectedTopicId(e.target.value)}
-                className="
-                w-full p-3 rounded-lg
-                bg-dashboard-bg-light dark:bg-dashboard-bg-dark
-                border border-dashboard-border-light dark:border-dashboard-border-dark
-                text-dashboard-text-light dark:text-dashboard-text-dark
-                focus:outline-none focus:ring-2
-              "
-              >
-                <option value="">Select a topic</option>
-
-                {topics
-                  .filter((t) => !t.is_locked)
-                  .map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-              </select>
+                <button
+                  type="button"
+                  onClick={() => setShowTopicDropdown((prev) => !prev)}
+                  className="
+                  w-full p-3 rounded-lg text-left
+                  bg-dashboard-bg-light dark:bg-dashboard-bg-dark
+                  border border-dashboard-border-light dark:border-dashboard-border-dark
+                  text-dashboard-text-light dark:text-dashboard-text-dark
+                  hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark
+                  transition
+                "
+                >
+                  {selectedTopicId
+                    ? topics.find((t) => t.id === selectedTopicId)?.name
+                    : "Select a topic"}
+                </button>
+                <TopicSelectDropdown
+                  open={showTopicDropdown}
+                  topics={topics}
+                  selectedTopicId={selectedTopicId}
+                  onSelect={(id) => {
+                    setSelectedTopicId(id);
+                    setShowTopicDropdown(false);
+                  }}
+                  onClose={() => setShowTopicDropdown(false)}
+                />
+              </div>
             </div>
           )}
 

@@ -6,6 +6,7 @@ import { useAuth } from "../../../admin/AuthContext";
 import { ProfilePostCarousel } from "../posts/ProfilePostCarousel";
 import { ButtonSpinner } from "../../../helpers/buttonSpinner";
 import { BADGE_DEFS } from "../badges";
+import AuthorFeed from "./AuthorFeed";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,7 @@ export default function Profile() {
   const [subLoading, setSubLoading] = useState(false);
   const [badges, setBadges] = useState([]);
   const [hasPaidSubscription, setHasPaidSubscription] = useState(false);
+  const [activeView, setActiveView] = useState("feed");
 
   const isOwnProfile = !userId || user?.id === userId;
 
@@ -102,15 +104,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
-      <div className="max-w-6xl mx-auto px-0 py-2 sm:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="min-h-screen md:h-screen bg-dashboard-bg-light dark:bg-dashboard-bg-dark">
+      <div className="max-w-6xl mx-auto px-0 py-2 sm:py-8 md:h-full md:overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:h-full">
           {/* LEFT COLUMN */}
-          <div className="md:col-span-1 space-y-6">
+          <div className="md:col-span-1 space-y-6 md:sticky md:self-start">
             {/* Profile Card */}
             <div className="rounded-2xl p-6 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden mb-4 bg-dashboard-hover-light dark:bg-dashboard-hover-dark">
+              <div className="flex flex-col md:items-center md:text-center items-start text-left">
+                <div className="w-14 h-14 md:w-32 md:h-32 rounded-full overflow-hidden mb-3 md:mb-4 bg-dashboard-hover-light dark:bg-dashboard-hover-dark">
                   {profile.profile_image_url ? (
                     <img
                       src={profile.profile_image_url}
@@ -124,23 +126,27 @@ export default function Profile() {
                   )}
                 </div>
 
-                <h1 className="text-lg font-semibold">{profile.name}</h1>
-                <p>@{profile.username}</p>
+                <h1 className="text-sm md:text-lg font-medium md:font-semibold">
+                  {profile.name}
+                </h1>
+                <p className="text-xs md:text-base text-dashboard-muted-light dark:text-dashboard-muted-dark">
+                  @{profile.username}
+                </p>
                 {!isOwnProfile && (
                   <button
                     onClick={handleSubscribeClick}
                     disabled={subLoading}
                     className={`
-    mt-4
-    text-sm px-4 py-2 rounded-lg border transition
-    flex items-center justify-center gap-2
-    ${
-      isSubscribed
-        ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
-        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark border-dashboard-border-light dark:border-dashboard-border-dark hover:opacity-80"
-    }
-    disabled:opacity-50
-  `}
+                    mt-4
+                    text-sm px-4 py-2 rounded-lg border transition
+                    flex items-center justify-center gap-2
+                    ${
+                      isSubscribed
+                        ? "bg-green/10 text-green border-green/30 hover:bg-green/20"
+                        : "bg-dashboard-hover-light dark:bg-dashboard-hover-dark text-dashboard-text-light dark:text-dashboard-text-dark border-dashboard-border-light dark:border-dashboard-border-dark hover:opacity-80"
+                    }
+                    disabled:opacity-50
+                  `}
                   >
                     {subLoading ? (
                       <>
@@ -160,74 +166,40 @@ export default function Profile() {
                     {profile.bio}
                   </p>
                 )}
-                <button
-                  onClick={() => {
-                    if (isOwnProfile) {
-                      navigate("/community/subscriptions/subscribers");
-                    } else {
-                      navigate(`/community/authors/${profile.id}/subscribers`);
-                    }
-                  }}
-                  className="
-                  mt-4 w-full
-                  flex items-center justify-center
-                  rounded-lg
-                  bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-                  px-4 py-2
-                  text-sm
-                  text-dashboard-text-light dark:text-dashboard-text-dark
-                  hover:opacity-80
-                  transition
-                "
-                >
-                  <span>{profile.subscriber_count.toLocaleString()}</span>
-                  <span className="ml-1 opacity-70">
-                    subscriber{profile.subscriber_count === 1 ? "" : "s"}
-                  </span>
-                </button>
-                {badges.length > 0 && (
-                  <div className="mt-4 w-full">
-                    <div
-                      className="
-                      grid grid-cols-3 gap-3 justify-items-center
-                      sm:flex sm:flex-wrap sm:justify-center
-                    "
-                    >
-                      {badges.map((badge) => (
-                        <ProfileBadge key={badge.key_name} badge={badge} />
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Media Links */}
-            {profile.media_links?.length > 0 && (
-              <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
-                <h3 className="text-sm font-semibold mb-3">Links</h3>
+            <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
+              <h3 className="text-sm font-semibold mb-3">Subscribers</h3>
+              <button
+                onClick={() => {
+                  if (isOwnProfile) {
+                    navigate("/community/subscriptions/subscribers");
+                  } else {
+                    navigate(`/community/authors/${profile.id}/subscribers`);
+                  }
+                }}
+                className="
+                w-full
+                flex items-center justify-center
+                rounded-lg
+                bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+                px-4 py-3
+                text-sm
+                text-dashboard-text-light dark:text-dashboard-text-dark
+                hover:opacity-80
+                transition
+              "
+              >
+                <span className="font-medium">
+                  {profile.subscriber_count.toLocaleString()}
+                </span>
+                <span className="ml-1 opacity-70">
+                  subscriber{profile.subscriber_count === 1 ? "" : "s"}
+                </span>
+              </button>
+            </div>
 
-                <div className="space-y-2">
-                  {profile.media_links.map((m, i) => (
-                    <a
-                      key={i}
-                      href={m.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="
-                        flex items-center justify-between
-                        px-3 py-2 rounded-lg text-sm
-                        bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-                        hover:opacity-80 transition
-                      "
-                    >
-                      <span>{m.label}</span>
-                      <ExternalLink size={14} />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
             {/* Publication */}
             {profile.posts?.length > 0 && (
               <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
@@ -265,17 +237,17 @@ export default function Profile() {
                       navigate(`/community/authors/${profile.id}/publication`)
                     }
                     className="
-          mt-1
-          w-full
-          flex items-center justify-between
-          px-4 py-2
-          rounded-lg
-          bg-dashboard-hover-light dark:bg-dashboard-hover-dark
-          text-sm
-          text-dashboard-text-light dark:text-dashboard-text-dark
-          hover:opacity-80
-          transition
-        "
+                    mt-1
+                    w-full
+                    flex items-center justify-between
+                    px-4 py-2
+                    rounded-lg
+                    bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+                    text-sm
+                    text-dashboard-text-light dark:text-dashboard-text-dark
+                    hover:opacity-80
+                    transition
+                  "
                   >
                     <span>
                       Read {profile.publication_name || "publication"}
@@ -285,49 +257,141 @@ export default function Profile() {
                 </div>
               </div>
             )}
+
+            {/* Bio Button */}
+            <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
+              <h3 className="text-sm font-semibold mb-3">Bio</h3>
+              <button
+                onClick={() => setActiveView("bio")}
+                className="
+                w-full
+                flex items-center justify-between
+                px-4 py-2
+                rounded-lg
+                bg-dashboard-hover-light
+                dark:bg-dashboard-hover-dark
+                text-sm
+                text-dashboard-text-light
+                dark:text-dashboard-text-dark
+                hover:opacity-80
+                transition
+              "
+              >
+                <span>Read Authors Bio</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+
+            {/* Media Links */}
+            {profile.media_links?.length > 0 && (
+              <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
+                <h3 className="text-sm font-semibold mb-3">Links</h3>
+
+                <div className="space-y-2">
+                  {profile.media_links.map((m, i) => (
+                    <a
+                      key={i}
+                      href={m.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="
+                        flex items-center justify-between
+                        px-3 py-2 rounded-lg text-sm
+                        bg-dashboard-hover-light dark:bg-dashboard-hover-dark
+                        hover:opacity-80 transition
+                      "
+                    >
+                      <span>{m.label}</span>
+                      <ExternalLink size={14} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {badges.length > 0 && (
+              <div className="rounded-2xl p-5 bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark border border-dashboard-border-light dark:border-dashboard-border-dark">
+                <h3 className="text-sm font-semibold mb-3">Badges</h3>
+
+                <div
+                  className="
+                  grid grid-cols-3 gap-4 justify-items-center
+                  sm:flex sm:flex-wrap sm:justify-center md:justify-start
+                "
+                >
+                  {badges.map((badge) => (
+                    <ProfileBadge key={badge.key_name} badge={badge} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="md:col-span-2 md:h-full md:overflow-y-auto md:pr-2 md:pb-10">
+            {activeView === "bio" ? (
+              <div className="space-y-6">
+                <div className="md:col-span-2 space-y-8">
+                  {/* About */}
+                  {profile.about && (
+                    <Section title="About">
+                      <p className="text-sm leading-relaxed opacity-80 whitespace-pre-wrap">
+                        {profile.about}
+                      </p>
+                    </Section>
+                  )}
+
+                  {/* Current Employment */}
+                  {profile.current_employment && (
+                    <Section title="Current Employment">
+                      <p className="text-sm opacity-80">
+                        {profile.current_employment}
+                      </p>
+                    </Section>
+                  )}
+
+                  {/* Interests */}
+                  {profile.interests?.length > 0 && (
+                    <Section title="Interests">
+                      <TagGrid tags={profile.interests} />
+                    </Section>
+                  )}
+
+                  {/* Services */}
+                  {profile.services?.length > 0 && (
+                    <Section title="Services Provided">
+                      <TagGrid tags={profile.services} />
+                    </Section>
+                  )}
+
+                  {/* Recent Posts */}
+                  {profile.posts?.length > 0 && (
+                    <Section title="Posts">
+                      <ProfilePostCarousel posts={profile.posts} />
+                    </Section>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setActiveView("feed")}
+                  className="
+                  px-4 py-2
+                  rounded-lg
+                  text-sm
+                  bg-dashboard-hover-light
+                  dark:bg-dashboard-hover-dark
+                  hover:opacity-80
+                  transition
+                "
+                >
+                  Back to Feed
+                </button>
+              </div>
+            ) : (
+              <AuthorFeed userId={profile.id} isOwner={isOwnProfile} />
+            )}
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="md:col-span-2 space-y-8">
-            {/* About */}
-            {profile.about && (
-              <Section title="About">
-                <p className="text-sm leading-relaxed opacity-80 whitespace-pre-wrap">
-                  {profile.about}
-                </p>
-              </Section>
-            )}
-
-            {/* Current Employment */}
-            {profile.current_employment && (
-              <Section title="Current Employment">
-                <p className="text-sm opacity-80">
-                  {profile.current_employment}
-                </p>
-              </Section>
-            )}
-
-            {/* Interests */}
-            {profile.interests?.length > 0 && (
-              <Section title="Interests">
-                <TagGrid tags={profile.interests} />
-              </Section>
-            )}
-
-            {/* Services */}
-            {profile.services?.length > 0 && (
-              <Section title="Services Provided">
-                <TagGrid tags={profile.services} />
-              </Section>
-            )}
-
-            {/* Recent Posts */}
-            {profile.posts?.length > 0 && (
-              <Section title="Posts">
-                <ProfilePostCarousel posts={profile.posts} />
-              </Section>
-            )}
-          </div>
         </div>
       </div>
     </div>

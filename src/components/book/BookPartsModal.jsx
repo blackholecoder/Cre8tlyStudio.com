@@ -12,6 +12,8 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
   const [isComplete, setIsComplete] = useState(null);
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+
   const isBookMetaLoaded = isComplete !== null;
 
   useEffect(() => {
@@ -56,6 +58,22 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
     } catch (err) {
       console.error("❌ EPUB publish failed:", err);
       setPublishError(err?.response?.data?.error || "Failed to generate EPUB");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  async function handlePublishPDF() {
+    setPublishing(true);
+    setPublishError(null);
+
+    try {
+      const res = await axiosInstance.post(`/books/${bookId}/pdf/generate`);
+
+      setPdfUrl(res.data.pdfUrl);
+    } catch (err) {
+      console.error("❌ PDF publish failed:", err);
+      setPublishError(err?.response?.data?.error || "Failed to generate PDF");
     } finally {
       setPublishing(false);
     }
@@ -169,16 +187,49 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
               ))}
           </div>
 
-          {/* ✅ Publish EPUB Section */}
+          {/* ===================== */}
+          {/* FULL BOOK PDF SECTION */}
+          {/* ===================== */}
+
+          <div className="mt-4 flex flex-col items-center gap-3">
+            {publishError && (
+              <p className="text-red-400 text-sm text-center">{publishError}</p>
+            )}
+
+            {/* Generate PDF available anytime */}
+            {!pdfUrl && (
+              <button
+                onClick={handlePublishPDF}
+                disabled={!isPublishable || publishing}
+                className={`w-full py-3 rounded-xl font-semibold transition
+        ${
+          isPublishable
+            ? "bg-bookBtnColor hover:bg-bookBtnColor/80 text-black"
+            : "bg-gray-700 text-gray-400 cursor-not-allowed"
+        }`}
+              >
+                {publishing ? "Generating PDF..." : "Generate Full Book PDF"}
+              </button>
+            )}
+
+            {pdfUrl && (
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-center py-3 rounded-xl font-semibold bg-white hover:bg-green text-black transition"
+              >
+                Download Full PDF
+              </a>
+            )}
+          </div>
+
+          {/* ===================== */}
+          {/* EPUB SECTION (FINALIZED ONLY) */}
+          {/* ===================== */}
 
           {isComplete && (
-            <div className="mt-6 pt-6 flex flex-col items-center gap-3">
-              {publishError && (
-                <p className="text-red-400 text-sm text-center">
-                  {publishError}
-                </p>
-              )}
-
+            <div className="mt-4 flex flex-col items-center gap-3">
               <button
                 onClick={handlePublishEPUB}
                 disabled={!isPublishable || publishing}
@@ -193,12 +244,6 @@ export default function BookPartsModal({ bookId, onEditChapter, onClose }) {
                   ? "Publishing EPUB..."
                   : "Publish Full Book as EPUB"}
               </button>
-
-              {!isPublishable && (
-                <p className="text-gray-500 text-xs text-center">
-                  All chapters must be completed before publishing
-                </p>
-              )}
 
               {epubUrl && (
                 <a

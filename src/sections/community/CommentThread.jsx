@@ -4,6 +4,7 @@ import { useAuth } from "../../admin/AuthContext";
 import { Img } from "react-image";
 import { renderTextWithLinks } from "../../helpers/renderTextWithLinks";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function CommentThread({
   comment,
@@ -29,6 +30,7 @@ export default function CommentThread({
   setExpandedComments,
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const children = replies[comment.id] || [];
 
   const MAX_LENGTH = 420;
@@ -137,21 +139,18 @@ export default function CommentThread({
                       : undefined
                   }
                   onClick={() => {
-                    // own comment → no nav
                     if (user?.id === comment.user_id) return;
 
-                    // no profile → block
-                    if (!comment.author_has_profile) {
+                    if (comment.author_has_profile === 0) {
                       toast.info("This author hasn’t set up their profile yet");
                       return;
                     }
 
-                    // safe navigation
                     navigate(`/community/authors/${comment.user_id}`);
                   }}
                   className={`flex-shrink-0 ${
-                    !comment.author_has_profile ||
-                    comment.author_role === "admin"
+                    comment.author_has_profile === 0 ||
+                    user?.id === comment.user_id
                       ? "cursor-default"
                       : "cursor-pointer"
                   }`}

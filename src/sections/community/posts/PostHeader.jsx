@@ -9,7 +9,6 @@ import {
   Share2,
   ShieldCheck,
 } from "lucide-react";
-import { ButtonSpinner } from "../../../helpers/buttonSpinner";
 import { Img } from "react-image";
 import { headerLogo } from "../../../assets/images";
 
@@ -20,7 +19,6 @@ export default function PostHeader({
   isStudioPost,
   isAdmin,
   avatarInitial,
-  toggleSubscribe,
   subLoading,
   isSubscribed,
   formatPostDate,
@@ -119,26 +117,26 @@ export default function PostHeader({
                 }
                 disabled={subLoading}
                 className={`
-    text-xs
-    px-2
-    py-1
-    min-w-[88px]
-    rounded-md
-    border
-    transition
-    flex
-    items-center
-    justify-center
-    gap-1
+                text-xs
+                px-2
+                py-1
+                min-w-[88px]
+                rounded-md
+                border
+                transition
+                flex
+                items-center
+                justify-center
+                gap-1
 
-    ${
-      isSubscribed
-        ? "bg-green/10 text-green border-green/30"
-        : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark"
-    }
+                ${
+                  isSubscribed
+                    ? "bg-green/10 text-green border-green/30"
+                    : "bg-dashboard-sidebar-light dark:bg-dashboard-sidebar-dark text-dashboard-text-light dark:text-dashboard-text-dark"
+                }
 
-    ${subLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
-  `}
+                ${subLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-dashboard-hover-light dark:hover:bg-dashboard-hover-dark"}
+              `}
               >
                 <span>{isSubscribed ? "Subscribed" : "Subscribe"}</span>
               </button>

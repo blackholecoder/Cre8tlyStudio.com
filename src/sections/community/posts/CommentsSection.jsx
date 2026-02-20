@@ -4,6 +4,7 @@ import CommentThread from "../CommentThread";
 import CreateCommentBox from "../CreateCommentBox";
 import { Img } from "react-image";
 import { renderTextWithLinks } from "../../../helpers/renderTextWithLinks";
+import { toast } from "react-toastify";
 
 export default function CommentsSection({
   commentsState,
@@ -130,10 +131,10 @@ export default function CommentsSection({
                           : undefined
                       }
                       onClick={() => {
-                        // own comment → no navigation
+                        // Own comment → no navigation
                         if (user?.id === c.user_id) return;
 
-                        // no profile → block
+                        // No profile → block
                         if (!c.author_has_profile) {
                           toast.info(
                             "This author hasn’t set up their profile yet",
@@ -141,11 +142,11 @@ export default function CommentsSection({
                           return;
                         }
 
-                        // navigate
+                        // Safe navigation (same as PostHeader)
                         navigate(`/community/authors/${c.user_id}`);
                       }}
-                      className={`flex-shrink-0 ${
-                        !c.author_has_profile
+                      className={`group flex-shrink-0 ${
+                        !c.author_has_profile || user?.id === c.user_id
                           ? "cursor-default"
                           : "cursor-pointer"
                       }`}
